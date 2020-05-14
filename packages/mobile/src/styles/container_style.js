@@ -20,6 +20,8 @@ const ContainerStyle = StyleSheet.create({
      },
      login_content: {
           flex: 1,
+          paddingRight: '5%',
+          paddingLeft: '5%'
      },
      dashboard_content: {
           flex: 2.5
