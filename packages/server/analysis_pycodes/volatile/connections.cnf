@@ -1,0 +1,35 @@
+[sb_local]
+host = 202.90.159.64
+port = 3306
+user = cbewsl
+password = cb3wsls3rv3r
+schema = senslopedb
+
+[gsm_pi]
+host = 202.90.159.64
+port = 3306
+user = cbewsl
+password = cb3wsls3rv3r
+schema = comms_db
+
+
+[ubuntu75_pysys_local]
+host = 202.90.159.64
+port = 3306
+user = cbewsl
+password = cb3wsls3rv3r
+schema = senslopedb
+
+[staff1]
+host = 202.90.159.64
+port = 3306
+user = cbewsl
+password = cb3wsls3rv3r
+schema = senslopedb
+
+[smsdb_remote]
+host = 202.90.159.64
+port = 3306
+user = cbewsl
+password = cb3wsls3rv3r
+schema = senslopedb
