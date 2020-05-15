@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Image, ImageBackground, Text, TextInput, TouchableOpacity, View, ScrollView } from 'react-native';
+import { Image, ImageBackground, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ButtonStyle } from '../../styles/button_style';
 import { ContainerStyle } from '../../styles/container_style';
 import { ImageStyle } from '../../styles/image_style';
@@ -22,7 +22,7 @@ function Signin(props) {
                         <Image style={ImageStyle.seal} source={require('../../assets/umi_seal.png')}></Image>
                     </View>
                     <View style={ContainerStyle.login_content}>
-                        <Text style={[LabelStyle.large_label, LabelStyle.default, InputStyle.white]}>Community Based Early Warning Information for Landslides</Text>
+                        <Text style={[LabelStyle.large_label, LabelStyle.default, InputStyle.white]}>Community Based Early Warning System for Landslides</Text>
                         <TextInput style={[InputStyle.large, InputStyle.default, InputStyle.white]} placeholder="Username" placeholderTextColor="#fff" />
                         <TextInput style={[InputStyle.large, InputStyle.default, InputStyle.white]} secureTextEntry={true} placeholder="Password" placeholderTextColor="#fff" />
                         <Text style={[LabelStyle.brand]} onPress={() => {

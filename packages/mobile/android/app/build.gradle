@@ -130,7 +130,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.mobile"
+        applicationId "com.cbewslandslides"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

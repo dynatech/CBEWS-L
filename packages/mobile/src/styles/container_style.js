@@ -11,10 +11,8 @@ const ContainerStyle = StyleSheet.create({
           padding: '3.1%'
      },
      content: {
-          // flex: 1,
           width: '100%',
           alignContent: 'center',
-          // margin: '5%'
           marginTop: '5%',
           marginBottom: '5%'
      },
@@ -56,10 +54,10 @@ const ContainerStyle = StyleSheet.create({
           textAlign: 'center',
      },
      hr: {
-       borderColor: '#083451',
-       borderRadius: 10,
-       borderBottomWidth: 2,
-       paddingBottom: 5
+          borderColor: '#083451',
+          borderRadius: 10,
+          borderBottomWidth: 2,
+          paddingBottom: 5
      }
 })
 
