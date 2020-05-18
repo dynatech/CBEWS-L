@@ -1,11 +1,12 @@
 import { Picker } from '@react-native-community/picker';
 import React, { Fragment, useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View, ToastAndroid } from 'react-native';
 import { Input } from 'react-native-elements';
 import { ButtonStyle } from '../../styles/button_style';
 import { ContainerStyle } from '../../styles/container_style';
 import { LabelStyle } from '../../styles/label_style';
 import { Formik } from 'formik';
+import { UserManagement } from '@dynaslope/commons';
 
 function Signup(props) {
 
@@ -15,11 +16,14 @@ function Signup(props) {
         lastname: '',
         middlename: '',
         mobile_no: '',
+        email: '',
+        age: "0",
+        gender: 'm',
         username: '',
         password: '',
         cpassword: '',
-        site: '',
-        org: ''
+        site: 'mar',
+        org: 'lewc'
     }
 
     let sites = [
@@ -36,15 +40,23 @@ function Signup(props) {
         { label: 'Public', value: 'pub' }
     ]
 
-    const test = (value) => {
-        console.log(value)
-    }
     return (
         <Fragment>
             <ScrollView style={[ContainerStyle.content]}>
                 <Formik
                     initialValues={defaultValues}
-                    onSubmit={values => console.log(values)}
+                    onSubmit={values => {
+                        // Handle field validation before requesting an API
+                        setTimeout(async () => {
+                            let response = await UserManagement.AuthRegistration(values)
+                            if (response.status === true) {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                                navigator.goBack();
+                            } else {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            }
+                          }, 500);
+                    }}
                 >
                     {({ handleChange, handleBlur, handleSubmit, values }) => (
                         <View>
@@ -73,6 +85,30 @@ function Signup(props) {
                                     containerStyle={{ width: '80%' }}
                                     inputStyle={{ textAlign: 'center', padding: 0 }}
                                     onChangeText={handleChange('mobile_no')} />
+                                <Input placeholder="E.g. juandelacruz@gmail.com"
+                                    label="Email Address"
+                                    value={values.email}
+                                    containerStyle={{ width: '80%' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('email')} />
+                                <View style={{flexDirection: 'row', width: '80%'}}>
+                                    <Input placeholder="E.g. 26"
+                                        label="Age"
+                                        value={values.age}
+                                        containerStyle={{ width: '50%' }}
+                                        inputStyle={{ textAlign: 'center' }}
+                                        onChangeText={handleChange('age')} />
+                                    <View style={{ flex: 1, padding: 0, marginRight: 10, marginTop: -29, borderBottomWidth: 1, borderBottomColor: '#848e98', alignSelf: 'center' }}>
+                                        <Text style={{ fontWeight: 'bold', fontSize: 17, paddingLeft: 5, color: '#848e98' }}>Gender</Text>
+                                        <Picker
+                                            mode='dropdown'
+                                            selectedValue={values.gender}
+                                            onValueChange={handleChange('gender')}>
+                                            <Picker.Item key="m" label="Male" value="m" />
+                                            <Picker.Item key="f" label="Female" value="f" />
+                                        </Picker>
+                                    </View>
+                                </View>
                                 <Input placeholder="E.g. JuanDelaCruz"
                                     label="Username"
                                     value={values.username}

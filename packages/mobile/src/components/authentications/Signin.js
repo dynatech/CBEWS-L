@@ -6,6 +6,7 @@ import { ImageStyle } from '../../styles/image_style';
 import { InputStyle } from '../../styles/input_style';
 import { LabelStyle } from '../../styles/label_style';
 import { Formik } from 'formik';
+import { UserManagement } from '@dynaslope/commons';
 
 function Signin(props) {
     const navigator = props.navigation;
@@ -24,7 +25,14 @@ function Signin(props) {
                     </View>
                     <Formik
                         initialValues={{username: '', password: ''}}
-                        onSubmit={values => console.log(values)}
+                        onSubmit={values => {
+                            console.log("before")
+                            let response = UserManagement.UserAuthentication(values);
+                            console.log("after")
+                            response.then((res) => {
+                                console.log(res)
+                            })
+                        }}
                         >
                         {({ handleChange, handleBlur, handleSubmit, values }) => (
                             <View style={ContainerStyle.login_content}>
