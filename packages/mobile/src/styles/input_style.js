@@ -1,18 +1,17 @@
 import { StyleSheet } from 'react-native'
-import {Dimensions} from 'react-native';
-  
-let {width} = Dimensions.get('window');
-let {height} = Dimensions.get('window');
+import { Dimensions } from 'react-native';
+
+let { width } = Dimensions.get('window');
+let { height } = Dimensions.get('window');
 
 const InputStyle = StyleSheet.create({
     large: {
-        margin: 10,
         color: '#000',
         borderBottomWidth: 3,
+        margin: 10
     },
     medium: {
-        marginLeft: 10,
-        marginRight: 10,
+        margin: 10,
         color: '#000',
         borderBottomWidth: 3,
     },
@@ -28,6 +27,18 @@ const InputStyle = StyleSheet.create({
         borderRadius: 5,
         elevation: 2,
     },
+    form_input_large: {
+        textAlign: 'center',
+        width: '100%'
+    },
+    form_input_medium: {
+        textAlign: 'center',
+        width: '80%'
+    },
+    form_input_small: {
+        textAlign: 'center',
+        width: '50%'
+    },
     disabled: {
         backgroundColor: '#9c9c9c'
     },
@@ -41,7 +52,9 @@ const InputStyle = StyleSheet.create({
         color: '#fff',
     },
     dyna_yellow: {
-        color: '#f5981c'
+        borderBottomColor: '#f5981c',
+        textAlign: 'center',
+        padding: 0
     },
     black: {
         color: '#000'

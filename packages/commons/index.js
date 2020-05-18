@@ -1,5 +1,10 @@
-const index = () => {
-    return JSON.stringify({status: true})
+import { AuthRegistration, UserAuthentication } from './src/UserManagement/Auth';
+
+const UserManagement = {
+    AuthRegistration,
+    UserAuthentication
 }
 
-export default index;
+export {
+    UserManagement
+}

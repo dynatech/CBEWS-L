@@ -1,5 +1,5 @@
 {
-  "name": "mobile",
+  "name": "CBEWSLandslides",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -14,23 +14,30 @@
     "@dynaslope/commons": "file:../commons",
     "@material-ui/core": "^4.9.14",
     "@react-native-community/masked-view": "^0.1.10",
+    "@react-native-community/picker": "^1.5.0",
     "@react-navigation/bottom-tabs": "^5.4.2",
     "@react-navigation/drawer": "^5.7.2",
     "@react-navigation/material-bottom-tabs": "^5.2.2",
     "@react-navigation/material-top-tabs": "^5.2.2",
     "@react-navigation/native": "^5.3.0",
     "@react-navigation/stack": "^5.3.3",
+    "formik": "^2.1.4",
     "react": "16.11.0",
     "react-dom": "^16.13.1",
+    "react-hot-loader": "^4.12.21",
     "react-native": "0.62.2",
+    "react-native-elements": "^2.0.0",
     "react-native-gesture-handler": "^1.6.1",
+    "react-native-paper": "^3.10.1",
     "react-native-reanimated": "^1.8.0",
     "react-native-safe-area-context": "^1.0.0",
-    "react-native-screens": "^2.7.0"
+    "react-native-screens": "^2.7.0",
+    "react-native-vector-icons": "^6.6.0"
   },
   "devDependencies": {
     "@babel/core": "7.9.6",
     "@babel/runtime": "7.9.6",
+    "@bam.tech/react-native-make": "^3.0.0",
     "@haul-bundler/babel-preset-react-native": "^0.16.0",
     "@haul-bundler/cli": "^0.22.1",
     "@haul-bundler/preset-0.60": "^0.18.0",

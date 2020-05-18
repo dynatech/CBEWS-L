@@ -18,7 +18,6 @@ const ButtonStyle = StyleSheet.create({
       borderColor: '#083451',
       borderRadius: 50,
       borderWidth: 1,
-      elevation: 20,
       marginRight: 10,
       marginLeft: 10,
       width: width/2
