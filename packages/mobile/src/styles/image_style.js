@@ -10,6 +10,14 @@ const ImageStyle = StyleSheet.create({
       width: width * 0.25,
       margin: 5
    },
+   dashboard_seal: {
+      height: height * 0.12,
+      width: width * 0.23,
+   },
+   dashboard_menu_icon: {
+      height: height * 0.12,
+      width: width * 0.23,
+   },
    hazard_maps: {
       marginTop: '5%',
       marginBottom: '5%',

@@ -29,7 +29,7 @@ const UserAuthentication = (credentials) => {
     })
     .then((response) => response.json())
     .then((responseJson) => {
-        return responseJson
+        return responseJson;
     })
     .catch((error) => {
         console.log(error)
