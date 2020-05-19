@@ -68,6 +68,20 @@ class DatabaseConnection():
             db.close()
             return ret_val
 
+    def match_kv_pairs(colnames, values):
+        """
+        Just a utilitiy function combining the column and value pairs
+        """
+        final_list = []
+        list_of_cols = list(colnames)
+        for row in values:
+            entry = {}
+            for index, item in enumerate(row):
+                entry.update({list_of_cols[index]: item})
+            final_list.append(entry)
+        
+        return final_list
+
     def db_read(query, schema):
         try:
             db, cur = DatabaseConnection.db_connect(schema)
@@ -75,6 +89,9 @@ class DatabaseConnection():
             out = []
             if a:
                 out = cur.fetchall()
+                colnames = [desc[0] for desc in cur.description]
+                out = DatabaseConnection.match_kv_pairs(colnames, out)
+                
                 db.close()
             return out
 

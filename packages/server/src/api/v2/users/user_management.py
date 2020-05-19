@@ -11,10 +11,14 @@ def signin():
     username, password = credentials.values()
     account_details = Users.fetch_account(username)
     if len(account_details) != 0:
-        (user_id, profile_id, site_id, role_id, mobile_id,
-         username, v_password, salt, firstname, lastname,
-         middlename, age, gender, email, gsm_id, mobile_no,
-         org, role_restriction) = account_details[0]
+        # (user_id, profile_id, site_id, role_id, mobile_id,
+        #  username, v_password, salt, firstname, lastname,
+        #  middlename, age, gender, email, gsm_id, mobile_no,
+        #  org, role_restriction) = account_details[0]
+
+        acc_details = account_details[0]
+        v_password = acc_details["password"]
+        salt = acc_details["salt"]
 
         password_hashed = str(hashlib.sha512(str(password+salt).encode("utf-8")).hexdigest())
 
@@ -22,24 +26,7 @@ def signin():
             status = {
                 "status": True,
                 "message": "Login Successfull!",
-                "user_data": {
-                    "user_id": user_id,
-                    "profile_id": profile_id,
-                    "site_id": site_id,
-                    "role_id": role_id,
-                    "mobile_id": mobile_id,
-                    "username": username,
-                    "firstname": firstname,
-                    "lastname": lastname,
-                    "middlename": middlename,
-                    "age": age,
-                    "gender": gender,
-                    "email": email,
-                    "gsm_id": gsm_id,
-                    "mobile_no": mobile_no,
-                    "org": org,
-                    "role_restriction": role_restriction
-                }
+                "user_data": acc_details
             }
         else:
             status = {
