@@ -1,5 +1,5 @@
-import React, { Fragment } from 'react';
-import { Image, ImageBackground, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { Fragment, useState } from 'react';
+import { Image, ImageBackground, ScrollView, Text, TextInput, TouchableOpacity, View, ToastAndroid } from 'react-native';
 import { ButtonStyle } from '../../styles/button_style';
 import { ContainerStyle } from '../../styles/container_style';
 import { ImageStyle } from '../../styles/image_style';
@@ -10,6 +10,10 @@ import { UserManagement } from '@dynaslope/commons';
 
 function Signin(props) {
     const navigator = props.navigation;
+    const site_navigator = {
+        '51': 'MarirongDashboardStack',
+        '50': 'UminganDashboardStack'
+    }
     return (
         <Fragment>
             <ImageBackground style={ImageStyle.background} source={require('../../assets/login_screen.png')} blurRadius={1}>
@@ -26,11 +30,14 @@ function Signin(props) {
                     <Formik
                         initialValues={{username: '', password: ''}}
                         onSubmit={values => {
-                            console.log("before")
-                            let response = UserManagement.UserAuthentication(values);
-                            console.log("after")
-                            response.then((res) => {
-                                console.log(res)
+                            setTimeout(async ()=> {
+                                let response = await UserManagement.UserAuthentication(values);
+                                if (response.status == true) {
+                                    ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                                    navigator.navigate(site_navigator[response.user_data.site_id]);
+                                } else {
+                                    ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                                }
                             })
                         }}
                         >

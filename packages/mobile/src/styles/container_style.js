@@ -16,6 +16,11 @@ const ContainerStyle = StyleSheet.create({
           marginTop: '5%',
           marginBottom: '5%'
      },
+     dashboard_container: {
+          flex: 1,
+          alignContent: 'center',
+          margin: '5%'
+     },
      login_content: {
           flex: 1,
           paddingRight: '5%',
@@ -44,6 +49,13 @@ const ContainerStyle = StyleSheet.create({
           flexDirection: 'row',
           flex: 1,
           alignItems: 'center',
+          justifyContent: 'center'
+     },
+     dashboard_seals: {
+          flexDirection: 'row',
+          flex: 0.5,
+          alignItems: 'center',
+          alignContent: 'center',
           justifyContent: 'center'
      },
      weather_container: {

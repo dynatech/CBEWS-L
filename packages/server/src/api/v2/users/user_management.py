@@ -11,11 +11,6 @@ def signin():
     username, password = credentials.values()
     account_details = Users.fetch_account(username)
     if len(account_details) != 0:
-        # (user_id, profile_id, site_id, role_id, mobile_id,
-        #  username, v_password, salt, firstname, lastname,
-        #  middlename, age, gender, email, gsm_id, mobile_no,
-        #  org, role_restriction) = account_details[0]
-
         acc_details = account_details[0]
         v_password = acc_details["password"]
         salt = acc_details["salt"]
