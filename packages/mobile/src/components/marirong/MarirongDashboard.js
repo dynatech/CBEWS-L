@@ -41,7 +41,7 @@ function MarirongDashboard(props) {
           <View style={ContainerStyle.dashboard_menu}>
             <View style={ContainerStyle.menu_row}>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { navigator.navigate("CommunityRiskAssessment") }}>
+                <TouchableOpacity onPress={() => { navigator.navigate("CRATabStack") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/cra.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Community{"\n"}Risk Assessment</Text>
