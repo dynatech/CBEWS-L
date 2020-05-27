@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TouchableHighlight, Image } from 'react-native';
 import { ContainerStyle } from '../../styles/container_style';
 import { ImageStyle } from '../../styles/image_style';
@@ -11,7 +11,7 @@ function HazardMapping() {
 
     useEffect(() => {
         // Set fetching of maps
-    },[])
+    }, [])
 
     const showMaps = () => {
 
@@ -21,27 +21,27 @@ function HazardMapping() {
 
     }
 
-    return(
+    return (
         <View style={ContainerStyle.content}>
-        <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Latest Hazard Map for Marirong, Leon, Iloilo as of (last uploaded ts)</Text>
-            {   mapList.length == 0 ? 
-                    <Text style={[LabelStyle.large_label, LabelStyle.brand]} > No Hazzard map available.</Text>
+            <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Latest Hazard Map for Marirong, Leon, Iloilo as of (last uploaded ts)</Text>
+            {mapList.length == 0 ?
+                <Text style={[LabelStyle.large_label, LabelStyle.brand]} > No Hazzard map available.</Text>
                 :
-                    <TouchableHighlight onPress={() => this.showMapFunction()}>
-                        <Image
-                            style={ImageStyle.hazard_maps}
-                            source={mapList[0]}
-                            resizeMode="center" />
-                    </TouchableHighlight>
+                <TouchableHighlight onPress={() => this.showMapFunction()}>
+                    <Image
+                        style={ImageStyle.hazard_maps}
+                        source={mapList[0]}
+                        resizeMode="center" />
+                </TouchableHighlight>
             }
-        <Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click image to enlarge.</Text>
-        <Modal visible={mapView}
-          transparent={true}>
-          <ImageViewer imageUrls={mapList} enableSwipeDown={true} onSwipeDown={() => { hideMaps() }} />
-        </Modal>
-        <View style={{ paddingTop: '10%', alignItems: 'center' }}>
+            <Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click image to enlarge.</Text>
+            <Modal visible={mapView}
+                transparent={true}>
+                <ImageViewer imageUrls={mapList} enableSwipeDown={true} onSwipeDown={() => { hideMaps() }} />
+            </Modal>
+            <View style={{ paddingTop: '10%', alignItems: 'center' }}>
+            </View>
         </View>
-      </View>
     )
 }
 
