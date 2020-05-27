@@ -40,10 +40,6 @@ export default () =>
         submit: {
             margin: theme.spacing(3, 0, 2),
         },
-        xs_image: {
-            length: '80px',
-            width: '80px',
-        },
 
         media: {
             length: 200,

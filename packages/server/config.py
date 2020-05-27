@@ -35,7 +35,7 @@ APP_CONFIG = {
     "CANDIDATE_DIR": "/home/louie-cbews/CODES/cbews_iloilo/Documents/monitoringoutput/alertgen",
     "public_alert_file": "/home/louie-cbews/CODES/cbews_iloilo/Documents/monitoringoutput/alertgen/PublicAlertRefDB.json",
     "site_code": {
-        "29": "MARIRONG_DIR",
+        "51": "MARIRONG_DIR",
         "50": "UMINGAN_DIR"
     }
 }

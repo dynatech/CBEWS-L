@@ -81,7 +81,7 @@ class Users():
 
 	def get_role_privilige(org):
 		query = f"SELECT role_id FROM user_roles WHERE role_title = '{org}'"
-		ret_val = DB.db_read(query, 'CBEWSL_commons')[0][0]
+		ret_val = DB.db_read(query, 'CBEWSL_commons')[0]["role_id"]
 		return ret_val
 
 	def create_user_mobile(mobile_number):
