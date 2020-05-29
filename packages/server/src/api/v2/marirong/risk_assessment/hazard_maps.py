@@ -3,13 +3,14 @@ from connections import SOCKETIO
 from pprint import pprint
 import time
 import os
+from pathlib import Path
 from src.model.community_risk_assessment import CommunityRiskAssessment
 from src.api.helpers import Helpers as h
 from config import APP_CONFIG
 
 HAZARD_MAPS_BLUEPRINT = Blueprint("hazard_maps_blueprint", __name__)
 
-@HAZARD_MAPS_BLUEPRINT.route("/cra/hazard_maps/fetch/<site_id>", methods=["GET"])
+@HAZARD_MAPS_BLUEPRINT.route("/fetch/<site_id>", methods=["GET"])
 def fetch(site_id):
     site_dir = APP_CONFIG['site_code'][site_id]
     file_loc = APP_CONFIG[site_dir]
@@ -20,8 +21,10 @@ def fetch(site_id):
     maps = []
 
     for map in map_list:
-        path = os.path.join(basepath, map)
-        if not os.path.isdir(path):
+        # path = os.path.join(basepath, map)
+        path = Path(basepath)
+        filepath = path / map
+        if not os.path.isdir(filepath):
             file_type = map.split(".")[1]
             maps.append({
                 "filename": map,
@@ -32,7 +35,7 @@ def fetch(site_id):
     return jsonify({"status": True, "data": maps})
 
 
-@HAZARD_MAPS_BLUEPRINT.route("/cra/hazard_maps/upload", methods=["POST"])
+@HAZARD_MAPS_BLUEPRINT.route("/upload", methods=["POST"])
 def upload():
     try:
         file = request.files['file']
@@ -47,11 +50,11 @@ def upload():
 
         temp = f"{filename}{file_type}"
         uniq = 1
-        while os.path.exists(f"{directory}{temp}"):
+        while os.path.exists(Path(directory) / temp):
             temp = '%s_%d%s' % (filename, uniq, file_type)
             uniq += 1
 
-        file.save(os.path.join(directory, temp))
+        file.save(os.path.join(Path(directory), temp))
 
         return_data = { "status": True }
     except Exception as err:

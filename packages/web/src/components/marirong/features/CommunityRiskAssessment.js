@@ -1,8 +1,8 @@
 import React, { useState, Fragment } from 'react';
 import { Container, Grid, Fab } from '@material-ui/core';
 import { useStyles, tableStyles } from '../../../styles/general_styles';
-// import HazardMapping from './hazard_mapping';
-// import CommunityRiskAssessment from './cra';
+import HazardMapping from './hazard_maps';
+import CommunityRiskAssessment from './cra';
 import CapacityAndVulnerability from './cav';
 
 
@@ -10,8 +10,7 @@ import CapacityAndVulnerability from './cav';
 export default function CommunityRiskAssessmentPage () {
     const classes = useStyles();
 
-    // const [feature, setFeature] = useState([<HazardMapping />]);
-    const [feature, setFeature] = useState([<div />]);
+    const [feature, setFeature] = useState([<HazardMapping />]);
     const [hm, hmActive] = useState("primary");
     const [cra, crapActive] = useState("");
     const [cav, cavActive] = useState("");
@@ -23,25 +22,25 @@ export default function CommunityRiskAssessmentPage () {
                 hmActive("primary");
                 crapActive("");
                 cavActive("");
-                // return_feat = [<HazardMapping />];
+                return_feat = [<HazardMapping />];
                 break;
             case "c_r_a":
                 hmActive("");
                 crapActive("primary");
                 cavActive("");
-                // return_feat = [<CommunityRiskAssessment />];
+                return_feat = [<CommunityRiskAssessment />];
                 break;
             case "c_a_v":
                 hmActive("");
                 crapActive("");
                 cavActive("primary");
-                // return_feat = [<CapacityAndVulnerability />];
+                return_feat = [<CapacityAndVulnerability />];
                 break;
             default:
                 hmActive("primary")
                 crapActive("");
                 cavActive("");
-                // return_feat = [<HazardMapping />];
+                return_feat = [<HazardMapping />];
                 break;
         }
         setFeature(return_feat)

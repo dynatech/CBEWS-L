@@ -3,6 +3,7 @@ from connections import SOCKETIO
 from pprint import pprint
 import time
 import os
+from pathlib import Path
 from src.model.community_risk_assessment import CommunityRiskAssessment
 from src.api.helpers import Helpers as h
 from config import APP_CONFIG
@@ -45,15 +46,17 @@ def upload():
 
         temp = f"{filename}{file_type}"
         uniq = 1
-        while os.path.exists(f"{directory}{temp}"):
+        while os.path.exists(Path(directory) / temp):
+            # filename
             temp = '%s_%d%s' % (filename, uniq, file_type)
             uniq += 1
 
-        file.save(os.path.join(directory, temp))
+        # file.save(new_path)
+        file.save(os.path.join(Path(directory), temp))
 
         return_data = { "status": True }
     except Exception as err:
-        # raise err
-        return_data = { "status": False }
+        raise err
+        # return_data = { "status": False }
 
     return jsonify(return_data)

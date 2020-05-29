@@ -17,7 +17,9 @@ import AppConfig from '../../reducers/AppConfig';
 import {
     MuiPickersUtilsProvider,
     DateTimePicker,
+    KeyboardDatePicker,
 } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 import MomentUtils from '@date-io/moment';
 import moment from 'moment';
 
@@ -49,12 +51,12 @@ function CapacityAndVulerability() {
     const [openDelete, setOpenDelete] = React.useState(false);
     const [cavContainer, setCavContainer] = useState([]);
     const [cavID, setCavID] = useState(0);
-    const [datetime, setDatetime] = useState(moment(new Date()).format("YYYY-MM-DD HH:mm:ss"));
+    const [datetime, setDatetime] = useState(moment());
     const [resource, setResource] = useState('');
     const [quantity, setQuantity] = useState(0);
     const [statDesc, setStateDesc] = useState('');
     const [owner, setOwner] = useState('');
-    const [incharge, setIncharge] = useState('');
+    const [in_charge, setIncharge] = useState('');
     const [updater, setUpdater] = useState('');
     const [cmd, setCmd] = useState('add');
 
@@ -67,8 +69,8 @@ function CapacityAndVulerability() {
         initCaV(cookies.credentials.site_id, "all");
     },[]);
 
-    const initCaV = (site_id = 29, cav_id = "all") => {
-        fetch(`${AppConfig.HOSTNAME}/api/cra/capacity_and_vulnerability/fetch/${site_id}/${cav_id}`, {
+    const initCaV = (site_id = 51, cav_id = "all") => {
+        fetch(`${AppConfig.HOSTNAME}/v2/mar_risk_assessment/cav/fetch/${site_id}/${cav_id}`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -76,6 +78,7 @@ function CapacityAndVulerability() {
             }
         }).then((response) => response.json())
             .then((responseJson) => {
+                console.log("responseJson", responseJson);
                 setCavContainer(responseJson)
             })
             .catch((error) => {
@@ -97,7 +100,7 @@ function CapacityAndVulerability() {
         setQuantity(data.quantity)
         setStateDesc(data.stat_desc)
         setOwner(data.owner)
-        setIncharge(data.incharge)
+        setIncharge(data.in_charge)
         setUpdater(data.updater)
         setOpen(true);
     }
@@ -105,7 +108,7 @@ function CapacityAndVulerability() {
     const resetState = () => {
         setCmd('add')
         setCavID(0)
-        setDatetime(moment(new Date()).format("YYYY-MM-DD HH:mm:ss"))
+        setDatetime(moment().format("YYYY-MM-DD HH:mm:ss"))
         setResource('')
         setQuantity(0)
         setStateDesc('')
@@ -130,7 +133,7 @@ function CapacityAndVulerability() {
     }
 
     const confirmDelete = () => {
-        fetch(`${AppConfig.HOSTNAME}/api/cra/capacity_and_vulnerability/remove`, {
+        fetch(`${AppConfig.HOSTNAME}/v2/mar_risk_assessment/cav/remove`, {
             method: 'DELETE',
             headers: {
                 Accept: 'application/json',
@@ -173,7 +176,8 @@ function CapacityAndVulerability() {
                 "quantity": quantity,
                 "status": statDesc,
                 "owner": owner,
-                "incharge": incharge,
+                "incharge": in_charge,
+                "last_ts": datetime,
                 "updater": updater,
                 "user_id": cookies.credentials.user_id,
                 "site_id": cookies.credentials.site_id
@@ -181,12 +185,12 @@ function CapacityAndVulerability() {
         } else if (cmd === "update") {
             json = {
                 "cav_id": cavID,
-                "datetime": datetime,
+                "last_ts": datetime,
                 "resource": resource,
                 "quantity": quantity,
                 "status": statDesc,
                 "owner": owner,
-                "incharge": incharge,
+                "incharge": in_charge,
                 "updater": updater,
                 "user_id": cookies.credentials.user_id,
                 "site_id": cookies.credentials.site_id
@@ -194,7 +198,7 @@ function CapacityAndVulerability() {
         } else {
             return;
         }
-        fetch(`${AppConfig.HOSTNAME}/api/cra/capacity_and_vulnerability/${cmd}`, {
+        fetch(`${AppConfig.HOSTNAME}/v2/mar_risk_assessment/cav/${cmd}`, {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -247,6 +251,7 @@ function CapacityAndVulerability() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
+                                {/* {rows.map(row => ( */}
                                 {cavContainer.map(row => (
                                     <TableRow key={row.datetime} onClick={()=> {handleModifyOpen(row)}}>
                                         <TableCell component="th" scope="row">
@@ -256,7 +261,7 @@ function CapacityAndVulerability() {
                                         <TableCell>{row.quantity}</TableCell>
                                         <TableCell>{row.stat_desc}</TableCell>
                                         <TableCell>{row.owner}</TableCell>
-                                        <TableCell>{row.incharge}</TableCell>
+                                        <TableCell>{row.in_charge}</TableCell>
                                         <TableCell>{row.updater}</TableCell>
                                     </TableRow>
                                 ))}
@@ -296,6 +301,7 @@ function CapacityAndVulerability() {
                                 ampm={false}
                                 disableFuture
                                 value={datetime}
+                                format="yyyy-MM-dd hh:mm:ss"
                                 onChange={(date) => { setDatetime(moment(date).format("YYYY-MM-DD HH:mm:ss")) }}
                                 label="Date time"
                                 fullWidth
@@ -315,7 +321,6 @@ function CapacityAndVulerability() {
                     </Grid>
                     <Grid item xs={6}>
                         <TextField
-                            autoFocus
                             inputProps={{
                                 maxLength: 10,
                                 type: 'number'
@@ -330,7 +335,6 @@ function CapacityAndVulerability() {
                     </Grid>
                     <Grid item xs={6}>
                         <TextField
-                            autoFocus
                             inputProps={{
                                 maxLength: 40
                               }}
@@ -344,7 +348,6 @@ function CapacityAndVulerability() {
                     </Grid>
                     <Grid item xs={12}>
                         <TextField
-                            autoFocus
                             multiline
                             rowsMax={5}
                             inputProps={{
@@ -360,21 +363,19 @@ function CapacityAndVulerability() {
                     </Grid>
                     <Grid item xs={6}>
                         <TextField
-                            autoFocus
                             inputProps={{
                                 maxLength: 40
                               }}
                             margin="dense"
                             id="in-charge"
                             label="In-charge"
-                            value={incharge}
+                            value={in_charge}
                             onChange={(e) => {setIncharge(e.target.value)}}
                             fullWidth
                         />
                     </Grid>
                     <Grid item xs={6}>
                         <TextField
-                            autoFocus
                             inputProps={{
                                 maxLength: 40
                               }}

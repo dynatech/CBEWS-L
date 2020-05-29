@@ -27,13 +27,12 @@ function RouterApp() {
     )
   }
   const site_id = "credentials" in cookies && "site_id" in cookies.credentials ? cookies.credentials.site_id : null;
-  console.log("site_id", site_id)
 
   return (
     <BrowserRouter>
       <Switch>
         {
-          site_id !== null && component_object[site_id]
+          site_id !== null && (component_object[site_id])
         }
         <Route path='/forgot-password' component={ForgotPassword} /> 
         <Route path='/signup' component={SignUp} />
