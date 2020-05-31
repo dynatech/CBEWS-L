@@ -180,3 +180,87 @@ def delete_hazard_data():
             'message': f"Failed to delete hazard data: {e}"
         }
     return jsonify(ret_val)
+
+@RISK_ASSESSMENT_BLUEPRINT.route("/get/risk_assessment/umi/resource_and_capacities", methods=["GET"])
+def get_all_resource_and_capacities():
+    try:
+        resource_and_capacities = RiskAssessmentModel.fetch_all_resource_and_capacities()
+        ret_val = {
+            'status': True,
+            'message': "Successfully loaded risk assessment hazard data",
+            'data': resource_and_capacities
+        }
+    except Exception as err:
+        ret_val = {
+            'status': False,
+            'message': f"Failed to get risk assessment hazard data. Error: {err}"
+        }
+    return jsonify(ret_val)
+
+@RISK_ASSESSMENT_BLUEPRINT.route("/add/risk_assessment/umi/resource_and_capacities", methods=["POST"])
+def add_resource_and_capacities():
+    try:
+        data = request.get_json()
+        request_data = {
+            'resource_and_capacities': data['ResourceandCapacities'],
+            'status': data['Status'],
+            'owner': data['Owner'],
+            'user_id': data['user_id']
+        }
+        hazard_id = RiskAssessmentModel.create_resource_and_capacities(request_data)
+        ret_val = {
+            'status': True,
+            'message': "Successfully created new hazard data",
+            'hazard_id': hazard_id
+        }
+    except Exception as e:
+        ret_val = {
+            'status': False,
+            'message': f"Failed to add hazard data: {e}"
+        }
+    return jsonify(ret_val)
+
+@RISK_ASSESSMENT_BLUEPRINT.route("/update/risk_assessment/umi/resource_and_capacities", methods=["PATCH"])
+def update_resource_and_capacities():
+    try:
+        data = request.get_json()
+        hazard_status = RiskAssessmentModel.modify_resource_and_capacities(data)
+        if hazard_status == '0':
+            ret_val = {
+                'status': True,
+                'message': "Successfully updated hazard data",
+            }
+        else:
+            ret_val = {
+                'status': False,
+                'message': "Failed to update hazard data. Check your network connection",
+            }
+    except Exception as e:
+        ret_val = {
+            'status': False,
+            'message': f"Failed to update resource and capacities: {e}"
+        }
+    return jsonify(ret_val)
+
+
+@RISK_ASSESSMENT_BLUEPRINT.route("/delete/risk_assessment/umi/resource_and_capacities", methods=["DELETE"])
+def delete_resource_and_capacities():
+    try:
+        data = request.get_json()
+        hazard_status = RiskAssessmentModel.remove_resource_and_capacities(data['id'])
+        if hazard_status == '0':
+            ret_val = {
+                'status': True,
+                'message': "Successfully deleted hazard data",
+            }
+        else:
+            ret_val = {
+                'status': False,
+                'message': "Failed to delete hazard data. Check your network connection",
+            }
+    except Exception as e:
+        ret_val = {
+            'status': False,
+            'message': f"Failed to delete hazard data: {e}"
+        }
+    return jsonify(ret_val)

@@ -69,3 +69,35 @@ class RiskAssessmentModel():
 		query = f"DELETE FROM hazard_data WHERE id = '{id}'"
 		ret_val = DB.db_modify(query,'CBEWSL_UMI_collections', True)
 		return ret_val
+
+	def fetch_all_resource_and_capacities():
+		query = "SELECT * FROM resource_and_capacities"
+		ret_val = DB.db_read(query, 'CBEWSL_UMI_collections')
+		return ret_val
+
+	def modify_resource_and_capacities(data):
+		query = "UPDATE resource_and_capacities SET"
+		counter = 0
+		for x in data:
+			key = list(x)[0]
+			if 'id' == key:
+				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = '{x[key]}'"
+			else:
+				if counter == 0:
+					query += f" {key} = '{x[key]}'"
+				else:
+					query += f", {key} = '{x[key]}'"
+			counter += 1
+		ret_val = DB.db_modify(query,'CBEWSL_UMI_collections', True)
+		return ret_val
+
+	def create_resource_and_capacities(data):
+		query = f"INSERT INTO resource_and_capacities VALUES (0, '{data['resource_and_capacities']}', '{data['status']}', " \
+				f"'{data['owner']}', '{str(dt.today())}', '{data['user_id']}')"
+		ret_val = DB.db_modify(query,'CBEWSL_UMI_collections', True)
+		return ret_val
+
+	def remove_resource_and_capacities(id):
+		query = f"DELETE FROM resource_and_capacities WHERE id = '{id}'"
+		ret_val = DB.db_modify(query,'CBEWSL_UMI_collections', True)
+		return ret_val

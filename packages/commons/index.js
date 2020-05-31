@@ -1,6 +1,7 @@
 import { AuthRegistration, UserAuthentication } from './src/UserManagement/Auth';
 import { GetAllSummary, InsertSummary, UpdateSummary, DeleteSummary } from './src/UMI/RiskAssessment/Summary';
 import { GetAllHazardData, InsertHazardData, UpdateHazardData, DeleteHazardData } from './src/UMI/RiskAssessment/HazardData';
+import { GetAllResourceAndCapacities, InsertResourceAndCapacities, UpdateResourceAndCapacities, DeleteResourceAndCapacities } from './src/UMI/RiskAssessment/ResourceAndCapacities';
 
 const UserManagement = {
     AuthRegistration,
@@ -15,7 +16,11 @@ const UmiRiskManagement = {
     GetAllHazardData,
     InsertHazardData,
     UpdateHazardData,
-    DeleteHazardData
+    DeleteHazardData,
+    GetAllResourceAndCapacities,
+    InsertResourceAndCapacities,
+    UpdateResourceAndCapacities,
+    DeleteResourceAndCapacities
 }
 
 export {
