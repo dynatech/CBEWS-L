@@ -8,7 +8,8 @@ import { Formik } from 'formik';
 
 const Forms = (props) => {
     const { data, submitForm, deleteForm, formData, command } = props;
-    const { string, int, api } = data;
+    const { string, int } = data;
+
     const [defaultValues, setDefaultValues] = useState({});
     const [cmd, setCmd] = useState('');
 
@@ -30,7 +31,6 @@ const Forms = (props) => {
                 <View style={{ alignItems: 'center', paddingTop: 20 }}>
                     {   
                         Object.entries(defaultValues).map((e, l) => {
-                            
                             let key = e[0].replace(/\s/g, "");
                             return(
                                 <Input 
@@ -52,9 +52,7 @@ const Forms = (props) => {
                             <Text style={ButtonStyle.medium_text}>Submit</Text>
                         </TouchableOpacity>
                         {
-                            cmd == "add" ?
-                                <View></View>
-                            :
+                            cmd != "add" &&
                             <TouchableOpacity style={ButtonStyle.small} onPress={(deleteForm)}>
                                 <Text style={ButtonStyle.medium_text}>Delete</Text>
                             </TouchableOpacity>

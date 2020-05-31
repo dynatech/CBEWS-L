@@ -14,7 +14,9 @@ function RiskAssessmentSummary() {
     const [openModal, setOpenModal] = useState(false);
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
+
     const [cmd, setCmd] = useState('add');
+
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Location': '',
         'Impact': '',
@@ -201,8 +203,7 @@ function RiskAssessmentSummary() {
                  }}>
                 <Forms data={{
                     string: defaultStrValues,
-                    int: {},
-                    api: ''
+                    int: {}
                 }}
                     formData={formData}
                     command={cmd}
