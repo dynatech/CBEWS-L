@@ -92,6 +92,8 @@ def create_app():
 
     from src.api.v2.marirong.community_risk_assessment import COMMUNITY_RISK_ASSESSMENT_BLUEPRINT
     app.register_blueprint(COMMUNITY_RISK_ASSESSMENT_BLUEPRINT, url_prefix="/v2")
-
     
+    from src.api.v2.umi.risk_assessment import RISK_ASSESSMENT_BLUEPRINT
+    app.register_blueprint(RISK_ASSESSMENT_BLUEPRINT, url_prefix="/v2")
+
     return app

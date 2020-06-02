@@ -2,6 +2,8 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import MarirongDashboard from '../../components/marirong/MarirongDashboard';
+import CRATabStack from '../marirong/CRATabStack';
+
 const Stack = createStackNavigator();
 
 function MarirongDashboardStack() {
@@ -10,6 +12,13 @@ function MarirongDashboardStack() {
             <Stack.Screen name="MarirongDashboard" options={{
                 header: () => null
             }} component={MarirongDashboard} />
+            <Stack.Screen name="CRATabStack" options={{
+                title: 'Community Risk Assessment',
+                headerLeft: null,
+                headerTitleStyle: {
+                    textAlign: 'center',
+                  },
+            }} component={CRATabStack} />
         </Stack.Navigator>
     );
 }

@@ -21,6 +21,8 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 
+import { MarCommunityRiskAssessment } from '@dynaslope/commons';
+
 import AppConfig from "../../reducers/AppConfig";
 
 function Alert(props) {
@@ -48,26 +50,18 @@ export default function HazardMaps() {
     };
 
     useEffect(() => {
-        console.log("FAKKER")
         initHazardMaps();
     }, []);
 
     const initHazardMaps = () => {
-        fetch(`${AppConfig.HOSTNAME}/v2/mar_risk_assessment/hazard_maps/fetch/51`, {
-            method: "GET",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-        })
-            .then((response) => response.json())
-            .then((responseJson) => {
-                setMapsContainer(responseJson.data);
-                handleMapPreview(responseJson.data[0]);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        setTimeout(async () => {
+            const response = await MarCommunityRiskAssessment.GetHazardMaps();
+            if (response.status) {
+                console.log(response);
+                setMapsContainer(response.data);
+                handleMapPreview(response.data[0]);
+            }
+        }, 300);
     };
 
     const importAll = (require) =>
@@ -102,26 +96,21 @@ export default function HazardMaps() {
     const handleUpload = () => {
         const data = new FormData();
         data.append("file", fileToUpload);
-        fetch(`${AppConfig.HOSTNAME}/v2/mar_risk_assessment/hazard_maps/upload`, {
-            method: "POST",
-            body: data,
-        })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.status == true) {
-                    handleClose();
-                    setFileToUpload(null);
-                    setFilename("");
-                    setOpenNotif(true);
-                    setNotifStatus("success");
-                    setNotifText("Successfully uploaded new hazard map");
-                } else {
-                    setOpenNotif(true);
-                    setNotifStatus("error");
-                    setNotifText("Error uploading new hazard map");
-                }
-            })
-            .catch((error) => console.error(error));
+        setTimeout(async () => {
+            const response = await MarCommunityRiskAssessment.UploadHazardMaps(data);
+            if (response.status === true) {
+                handleClose();
+                setFileToUpload(null);
+                setFilename("");
+                setOpenNotif(true);
+                setNotifStatus("success");
+                setNotifText("Successfully uploaded new hazard map");
+            } else {
+                setOpenNotif(true);
+                setNotifStatus("error");
+                setNotifText("Error uploading new hazard map");
+            }
+        }, 300);
     };
 
     return (
