@@ -37,11 +37,11 @@ def create_app():
     from src.api.users.user import USER_BLUEPRINT
     app.register_blueprint(USER_BLUEPRINT, url_prefix="/api")
 
-    from src.api.risk_assessment.cav import CAPACITY_AND_VULNERABILITY_BLUEPRINT
-    app.register_blueprint(CAPACITY_AND_VULNERABILITY_BLUEPRINT, url_prefix="/api")
+    # from src.api.risk_assessment.cav import CAPACITY_AND_VULNERABILITY_BLUEPRINT
+    # app.register_blueprint(CAPACITY_AND_VULNERABILITY_BLUEPRINT, url_prefix="/api")
 
-    from src.api.risk_assessment.cra import COMMUNITY_RISK_ASSESSMENT_BLUEPRINT
-    app.register_blueprint(COMMUNITY_RISK_ASSESSMENT_BLUEPRINT, url_prefix="/api")
+    # from src.api.risk_assessment.cra import COMMUNITY_RISK_ASSESSMENT_BLUEPRINT
+    # app.register_blueprint(COMMUNITY_RISK_ASSESSMENT_BLUEPRINT, url_prefix="/api")
 
     from src.api.ground_data.surficial_markers import SURFICIAL_MARKERS_BLUEPRINT
     app.register_blueprint(SURFICIAL_MARKERS_BLUEPRINT, url_prefix="/api")
@@ -79,8 +79,8 @@ def create_app():
     from src.api.ground_data.on_demand import ON_DEMAND_BLUEPRINT
     app.register_blueprint(ON_DEMAND_BLUEPRINT, url_prefix="/api")
 
-    from src.api.risk_assessment.hazard_maps import HAZARD_MAPS_BLUEPRINT
-    app.register_blueprint(HAZARD_MAPS_BLUEPRINT, url_prefix="/api")
+    # from src.api.risk_assessment.hazard_maps import HAZARD_MAPS_BLUEPRINT
+    # app.register_blueprint(HAZARD_MAPS_BLUEPRINT, url_prefix="/api")
     
     from src.api.test import TEST_BLUEPRINT
     app.register_blueprint(TEST_BLUEPRINT, url_prefix="/test")
@@ -90,6 +90,9 @@ def create_app():
     from src.api.v2.users.user_management import USER_MANAGEMENT_BLUEPRINT
     app.register_blueprint(USER_MANAGEMENT_BLUEPRINT, url_prefix="/v2")
 
+    from src.api.v2.marirong.community_risk_assessment import COMMUNITY_RISK_ASSESSMENT_BLUEPRINT
+    app.register_blueprint(COMMUNITY_RISK_ASSESSMENT_BLUEPRINT, url_prefix="/v2")
+    
     from src.api.v2.umi.risk_assessment import RISK_ASSESSMENT_BLUEPRINT
     app.register_blueprint(RISK_ASSESSMENT_BLUEPRINT, url_prefix="/v2")
 

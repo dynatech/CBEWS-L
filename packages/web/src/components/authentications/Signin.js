@@ -16,16 +16,11 @@ import {
 } from "@material-ui/core";
 import { Alert as MuiAlert } from '@material-ui/lab';
 import { Link as RouteLink, withRouter } from "react-router-dom";
-import SigninStyle from "../../styles/sigin_styles";
-
-import { UserManagement } from "@dynaslope/commons";
-
-import dost_seal from "../../assets/dost_seal.png";
-import dynaslope_seal from "../../assets/dynaslope_seal.png";
-import leon_seal from "../../assets/leon_seal.png";
-import mar_seal from "../../assets/mar_seal.png";
-import umi_seal from "../../assets/umi_seal.png";
 import { useCookies } from "react-cookie";
+
+import SigninStyle from "../../styles/signin_styles";
+import { UserManagement } from "@dynaslope/commons";
+import { LogoSeries } from '../reducers/LogoSeries'
 
 function Copyright() {
     return (
@@ -37,32 +32,6 @@ function Copyright() {
             {new Date().getFullYear()}
             {"."}
         </Typography>
-    );
-}
-
-function LogoSeries(props) {
-    const { classes } = props;
-    return (
-        <Container className={classes.logo_container}>
-            <Grid container spacing={0} alignItems="center" justify="center">
-                <Grid item xs={4} md={2}>
-                    <img className={classes.xs_image} src={dost_seal} />
-                </Grid>
-                <Grid item xs={4} md={2}>
-                    <CardMedia/>
-                    <img className={classes.xs_image} src={dynaslope_seal} />
-                </Grid>
-                <Grid item xs={4} md={2}>
-                    <img className={classes.xs_image} src={mar_seal} />
-                </Grid>
-                <Grid item xs={4} md={2}>
-                    <img className={classes.xs_image} src={leon_seal} />
-                </Grid>
-                <Grid item xs={4} md={2}>
-                    <img className={classes.xs_image} src={umi_seal} />
-                </Grid>
-            </Grid>
-        </Container>
     );
 }
 
@@ -79,15 +48,17 @@ export default function SignInSide(props) {
     const [loginNotif, setLoginNotif] = useState(false);
     const loginSeverityRef = useRef();
 
-    // useEffect(() => {
-    //     if (cookies.credentials !== null) {
-    //         handleChangeRoute("dashboard");
-    //     }
-    // }, []);
-
     const handleChangeRoute = route => {
         props.history.push(`/${route}`);
     };
+
+    useEffect(() => {
+        console.log("FAKKER", cookies);
+        if ("credentials" in cookies && "site_id" in cookies.credentials) {
+            console.log("cookies", cookies);
+            handleChangeRoute("dashboard");
+        }
+    }, []);
 
     const handleClose = (event, reason) => {
         if (reason === "clickaway") {
@@ -110,7 +81,7 @@ export default function SignInSide(props) {
                 square
             >
                 <div className={classes.paper}>
-                    <LogoSeries classes={classes} />
+                    <LogoSeries classes={classes} siteCode="none" />
                     {/* <Avatar className={classes.avatar}>
                         <LockOutlinedIcon />
                     </Avatar> */}
@@ -142,6 +113,7 @@ export default function SignInSide(props) {
                         onSubmit={(values, { setSubmitting }) => {
                             setTimeout(async () => {
                                 let response = await UserManagement.UserAuthentication(values);
+                                console.log("response", response);
                                 if (response.status === true) {
                                     console.log("signed in");
                                     setCookie('credentials', response.user_data, { path: "/" });

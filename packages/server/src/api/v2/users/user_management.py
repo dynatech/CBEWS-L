@@ -42,7 +42,7 @@ def signout():
 @USER_MANAGEMENT_BLUEPRINT.route("/auth/signup", methods=["POST"])
 def signup():
     credentials = request.get_json()
-    is_existing = Users.account_exists(credentials['username'])[0][0]
+    is_existing = Users.account_exists(credentials['username'])[0]['COUNT(*)']
     if is_existing == 0:
         status = Users.create_user_account(credentials)
     else:

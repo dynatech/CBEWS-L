@@ -1,5 +1,6 @@
 from src.model.helper.utils import DatabaseConnection as DB
 from datetime import datetime as dt
+from src.api.helpers import Helpers as h
 
 class CommunityRiskAssessment():
 
@@ -21,7 +22,7 @@ class CommunityRiskAssessment():
         return result
     
     def update_cav(data):
-        (cav_id ,datetime ,resource ,quantity ,status ,owner ,incharge ,updater ,user_id ,site_id) = data.values()
+        (cav_id, datetime, resource, quantity, status, owner, incharge, updater, user_id, site_id) = data.values()
         query = f'UPDATE capacity_and_vulnerability SET ' \
             f'resource="{ resource }", quantity="{ quantity }", stat_desc="{ status }", ' \
             f'owner="{ owner }", in_charge="{ incharge }", updater="{ updater }", ' \

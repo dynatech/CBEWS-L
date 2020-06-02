@@ -10,7 +10,7 @@ import {
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import { UserManagement } from "@dynaslope/commons";
 
-import SigninStyle from "../../styles/sigin_styles";
+import SigninStyle from "../../styles/signin_styles";
 
 function Copyright() {
     return (
