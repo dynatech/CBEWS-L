@@ -5,20 +5,24 @@ import { ImageStyle } from '../../styles/image_style';
 import { LabelStyle } from '../../styles/label_style';
 import { ScrollView } from 'react-native-gesture-handler';
 
-function UminganDashboard() {
+function UminganDashboard(props) {
+    const navigator = props.navigation;
     return (
         <ScrollView>
             <View style={ContainerStyle.dashboard_container}>
-                <View style={[ContainerStyle.dashboard_seals]}>
+                <View style={[ContainerStyle.dashboard_seals, {paddingTop: 20, paddingBottom: 20}]}>
                     <Image style={ImageStyle.dashboard_seal} source={require('../../assets/umi_seal.png')}></Image>
                     <Image style={ImageStyle.dashboard_seal} source={require('../../assets/dost_seal.png')}></Image>
                     <Image style={ImageStyle.dashboard_seal} source={require('../../assets/dynaslope_seal.png')}></Image>
                 </View>
-                <View style={ContainerStyle.dashboard_content}>
+                <View style={{paddingTop: '10%', paddingBottom: '10%'}}>
                     <Text style={[LabelStyle.large_label, LabelStyle.branding]}>Early Warning System for Deep-seated Landslides</Text>
+                </View>
+                <View style={ContainerStyle.dashboard_content}>
+                    
                     <View style={ContainerStyle.menu_row}>
                         <View style={[ContainerStyle.menu_container]}>
-                        <TouchableOpacity onPress={() => { }}>
+                        <TouchableOpacity onPress={() => { navigator.navigate('RATabStack') }}>
                             <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/umingan/menu/cra.png')}></Image>
                         </TouchableOpacity>
                         <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Risk{'\n'}Assessment</Text>
