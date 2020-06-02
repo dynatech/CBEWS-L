@@ -2,7 +2,7 @@ import React, { useState, Fragment } from "react";
 import { Box, Container, Paper, Tabs, Tab, Grid } from "@material-ui/core";
 import {
     AlertGeneration,
-    CommunityRiskAssessment,
+    CommunityRiskAssessmentPage,
     DataAnalysis,
     Events,
     GroundData,
@@ -14,7 +14,7 @@ import {
 function handleContent(app_key) {
     const lookup_obj = {
         alertGen: <AlertGeneration />,
-        cra: <CommunityRiskAssessment />,
+        cra: <CommunityRiskAssessmentPage />,
         dataAnalysis: <DataAnalysis />,
         events: <Events />,
         groundData: <GroundData />,

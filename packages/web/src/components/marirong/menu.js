@@ -1,5 +1,5 @@
 import AlertGeneration from './features/AlertGeneration';
-import CommunityRiskAssessment from './features/CommunityRiskAssessment';
+import CommunityRiskAssessmentPage from './features/CommunityRiskAssessmentPage';
 import DataAnalysis from './features/DataAnalysis';
 import Events from './features/Events';
 import GroundData from './features/GroundData';
@@ -9,7 +9,7 @@ import SensorData from './features/SensorData';
 
 export {
     AlertGeneration,
-    CommunityRiskAssessment,
+    CommunityRiskAssessmentPage,
     DataAnalysis,
     Events,
     GroundData,
