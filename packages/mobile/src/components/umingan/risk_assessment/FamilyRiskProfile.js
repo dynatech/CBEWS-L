@@ -1,15 +1,58 @@
-import React, { useState } from 'react';
-import { View, Text, Modal, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, Modal, ScrollView, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
 import { DataTable } from 'react-native-paper';
 import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
 import { ButtonStyle } from '../../../styles/button_style';
-import { InputStyle } from '../../../styles/input_style';
+import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
-
+import MobileCaching from '../../../utils/MobileCaching';
 function FamilyRiskProfile() {
 
     const [openModal, setOpenModal] = useState(false);
+    const [dataTableContent, setDataTableContent] = useState([]);
+    const [selectedData, setSelectedData] = useState({});
+    const [cmd, setCmd] = useState('add');
+    const [defaultStrValues, setDefaultStrValues] = useState({
+        'Number of Members': '',
+        'Vulnerable Groups': '',
+        'Nature of Vulnerability': ''
+    });
+
+    let formData = useRef();
+
+
+    useEffect(() => {
+        init();
+    }, [])
+
+    const init = async () => {
+        let response = await UmiRiskManagement.GetAllFamilyRiskProfile()
+        if (response.status === true) {
+            let temp = [];
+            if (response.data.length != 0) {
+                let row = response.data;
+                row.forEach(element => {
+                    temp.push(
+                        <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
+                            <DataTable.Cell>{element.number_of_members}</DataTable.Cell>
+                            <DataTable.Cell>{element.vulnerable_groups}</DataTable.Cell>
+                            <DataTable.Cell>{element.nature_of_vulnerability}</DataTable.Cell>
+                        </DataTable.Row>
+                    )
+                });
+            } else {
+                temp.push(
+                    <View key={0}>
+                        <Text>No available data.</Text>
+                    </View>
+                )
+            }
+            setDataTableContent(temp)
+        } else {
+            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+        }
+    }
 
     const showForm = () => {
         setOpenModal(true);
@@ -17,6 +60,104 @@ function FamilyRiskProfile() {
 
     const closeForm = () => {
         setOpenModal(false);
+    }
+
+    const submitForm = () => {
+        let data = formData.current;
+        if (!Object.keys(selectedData).length) {
+            MobileCaching.getItem('user_credentials').then(credentials => {
+                setTimeout(async () => {
+                    data['user_id'] = credentials['user_id']
+                    let response = await UmiRiskManagement.InsertFamilyRiskProfile(data)
+                    if (response.status == true) {
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        init();
+                        closeForm();
+                    } else {
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                    }
+                }, 300);
+            });
+        } else {
+            if (!Object.keys(selectedData).length) {
+                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.LONG, ToastAndroid.CENTER)
+                closeForm();
+            } else {
+                MobileCaching.getItem('user_credentials').then(credentials => {
+                    setTimeout(async () => {
+                        let temp_array = []
+                        Object.keys(data).forEach(key => {
+                            let temp = {};
+                            switch(key) {
+                                case 'NumberofMembers':
+                                    temp["number_of_members"] = data[key]
+                                    break;
+                                case 'VulnerableGroups':
+                                    temp["vulnerable_groups"] = data[key]
+                                    break;
+                                case 'NatureofVulnerability':
+                                    temp["nature_of_vulnerability"] = data[key]
+                                    break;
+                                default:
+                                    temp[key.replace(" ","_").toLocaleLowerCase()] = data[key]
+                                    break;
+                            }
+                            temp_array.push(temp);
+                        });
+                        temp_array.push({'user_id': credentials['user_id']})
+                        temp_array.push({'id': selectedData['id']})
+                        let response = await UmiRiskManagement.UpdateFamilyRiskProfile(temp_array)
+                        if (response.status == true) {
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            init();
+                            closeForm();
+                            setCmd('add');
+                        } else {
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        }
+                    }, 300);
+                });
+            }
+        }
+    }
+
+    const modifySummary = (data) => {
+        setSelectedData(data)
+        setDefaultStrValues({
+            'Number of Members': data['number_of_members'],
+            'Vulnerable Groups': data['vulnerable_groups'],
+            'Nature of Vulnerability': data['nature_of_vulnerability']
+        })
+        setCmd('update')
+        showForm();
+    }
+
+    const deleteForm = () => {
+        Alert.alert(
+            "Risk Assessment Family Risk Profile",
+            "Are you sure you want to delete this data?",
+            [
+              {
+                text: "Cancel",
+                style: "cancel"
+              },
+              { text: "Confirm", onPress: () => {
+                setTimeout(async ()=> {
+                    let response = await UmiRiskManagement.DeleteFamilyRiskProfile({
+                        'id': selectedData['id']
+                    })
+                    if (response.status == true) {
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        init();
+                        closeForm();
+                    } else {
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                    }
+                },300)
+              }}
+            ],
+            { cancelable: false }
+        );
     }
 
     return (
@@ -31,11 +172,7 @@ function FamilyRiskProfile() {
                             <DataTable.Title>Vulnerable Groups</DataTable.Title>
                             <DataTable.Title>Nature of Vulnerability</DataTable.Title>
                         </DataTable.Header>
-                        <DataTable.Row onPress={() => { }}>
-                            <DataTable.Cell>test</DataTable.Cell>
-                            <DataTable.Cell>test</DataTable.Cell>
-                            <DataTable.Cell>test</DataTable.Cell>
-                        </DataTable.Row>
+                        { dataTableContent }
                     </DataTable>
                     <DataTable.Pagination
                         page={1}
@@ -54,18 +191,26 @@ function FamilyRiskProfile() {
                 </View>
             </View>
             <Modal animationType="slide"
-                visible={openModal}
-                onRequestClose={() => { setOpenModal(false) }}>
-                <Forms data={{
-                    string: { 
-                        'Number of Members': '',
-                        'Vulnerable Groups': '',
-                        'Nature of Vulnerability': '',
-                    },
-                    int: {},
-                    api: ''
-                }} closeForm={()=> {closeForm()}}/>
-            </Modal>
+            visible={openModal}
+            onRequestClose={() => { 
+                setDefaultStrValues({
+                    'Number of Members': '',
+                    'Vulnerable Groups': '',
+                    'Nature of Vulnerability': ''
+                })
+                setCmd('add');
+                setOpenModal(false);
+             }}>
+            <Forms data={{
+                string: defaultStrValues,
+                int: {}
+            }}
+                formData={formData}
+                command={cmd}
+                closeForm={() => { closeForm() }}
+                submitForm={() => { submitForm() }}
+                deleteForm={() => { deleteForm() }} />
+        </Modal>
         </ScrollView>
     )
 }

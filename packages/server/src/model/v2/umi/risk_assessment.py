@@ -101,3 +101,35 @@ class RiskAssessmentModel():
 		query = f"DELETE FROM resource_and_capacities WHERE id = '{id}'"
 		ret_val = DB.db_modify(query,'CBEWSL_UMI_collections', True)
 		return ret_val
+
+	def fetch_all_family_risk_profile():
+		query = "SELECT * FROM family_risk_profile"
+		ret_val = DB.db_read(query, 'CBEWSL_UMI_collections')
+		return ret_val
+
+	def modify_family_risk_profile(data):
+		query = "UPDATE family_risk_profile SET"
+		counter = 0
+		for x in data:
+			key = list(x)[0]
+			if 'id' == key:
+				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = '{x[key]}'"
+			else:
+				if counter == 0:
+					query += f" {key} = '{x[key]}'"
+				else:
+					query += f", {key} = '{x[key]}'"
+			counter += 1
+		ret_val = DB.db_modify(query,'CBEWSL_UMI_collections', True)
+		return ret_val
+
+	def create_family_risk_profile(data):
+		query = f"INSERT INTO family_risk_profile VALUES (0, '{data['number_of_members']}', '{data['vulnerable_groups']}', " \
+				f"'{data['nature_of_vulnerability']}', '{str(dt.today())}', '{data['user_id']}')"
+		ret_val = DB.db_modify(query,'CBEWSL_UMI_collections', True)
+		return ret_val
+
+	def remove_family_risk_profile(id):
+		query = f"DELETE FROM family_risk_profile WHERE id = '{id}'"
+		ret_val = DB.db_modify(query,'CBEWSL_UMI_collections', True)
+		return ret_val
