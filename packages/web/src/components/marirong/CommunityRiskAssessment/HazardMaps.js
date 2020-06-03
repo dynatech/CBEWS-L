@@ -70,13 +70,15 @@ export default function HazardMaps() {
             return acc;
         }, {});
 
-    const marirongMaps = importAll(
-        require.context(
-            "../../../../client-cbewsl/MARIRONG/MAPS",
-            false,
-            /\.(png|jpe?g|svg)$/,
-        ),
-    );
+    // TODO
+    // const marirongMaps = importAll(
+    //     require.context(
+    //         "../../../../client-cbewsl/MARIRONG/MAPS",
+    //         false,
+    //         /\.(png|jpe?g|svg)$/,
+    //     ),
+    // );
+    const marirongMaps = '';
 
     const handleMapPreview = (map_data) => {
         let temp = {

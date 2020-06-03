@@ -1,11 +1,11 @@
-import AlertGeneration from './features/AlertGeneration';
-import CommunityRiskAssessmentPage from './features/CommunityRiskAssessmentPage';
-import DataAnalysis from './features/DataAnalysis';
-import Events from './features/Events';
-import GroundData from './features/GroundData';
-import Home from './features/Home';
-import Maintenance from './features/Maintenance';
-import SensorData from './features/SensorData';
+import AlertGeneration from './AlertGeneration';
+import CommunityRiskAssessmentPage from './CommunityRiskAssessmentPage';
+import DataAnalysis from './DataAnalysis';
+import Events from './Events';
+import GroundData from './GroundData';
+import Home from './Home';
+import Maintenance from './Maintenance';
+import SensorData from './SensorData';
 
 export {
     AlertGeneration,
