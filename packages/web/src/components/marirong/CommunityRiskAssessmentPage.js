@@ -1,9 +1,9 @@
 import React, { useState, Fragment } from 'react';
 import { Container, Grid, Fab } from '@material-ui/core';
-import { useStyles, tableStyles } from '../../../styles/general_styles';
-import HazardMapping from './HazardMaps';
-import CommunityRiskAssessment from './CommunityRiskAssessment';
-import CapacityAndVulnerability from './CapacityAndVulnerability';
+import { useStyles, tableStyles } from '../../styles/general_styles';
+import HazardMapping from './CommunityRiskAssessment/HazardMaps';
+import CommunityRiskAssessment from './CommunityRiskAssessment/CommunityRiskAssessment';
+import CapacityAndVulnerability from './CommunityRiskAssessment/CapacityAndVulnerability';
 
 
 

@@ -31,9 +31,22 @@ def add_capacity_and_vulnerability():
     return jsonify(return_value)
 
 
-@COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/community_risk_assessment/mar/capacity_and_vulnerability/<site_id>/<cav_id>", methods=["GET"])
-def fetch_capacity_and_vulnerability(site_id, cav_id="all"):
-    result = CommunityRiskAssessment.fetch_cav(site_id, cav_id)
+@COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/all/community_risk_assessment/mar/capacity_and_vulnerability", methods=["GET"])
+def fetch_all_capacity_and_vulnerability():
+    result = CommunityRiskAssessment.fetch_cav('all')
+    data = []
+    for row in result:
+        row.update({
+            "datetime": h.dt_to_str(row["date"]),
+            "last_ts": h.dt_to_str(row["last_ts"])
+        })
+        data.append(row)
+    return jsonify(data)
+
+
+@COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/one/community_risk_assessment/mar/capacity_and_vulnerability/<cav_id>", methods=["GET"])
+def fetch_one_capacity_and_vulnerability(cav_id):
+    result = CommunityRiskAssessment.fetch_cav(cav_id)
     data = []
     for row in result:
         row.update({
@@ -63,8 +76,8 @@ def modify_capacity_and_vulnerability():
 
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/delete/community_risk_assessment/mar/capacity_and_vulnerability", methods=["DELETE"])
 def remove_capacity_and_vulnerability():
-    (cav_id, site_id) = request.get_json().values()
-    status = CommunityRiskAssessment.delete_cav(cav_id, site_id)
+    (cav_id) = request.get_json().values()
+    status = CommunityRiskAssessment.delete_cav(cav_id)
     if status is not None:
         return_value = {
             "status": True,
@@ -81,7 +94,6 @@ def remove_capacity_and_vulnerability():
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/community_risk_assessment/mar/community_risk_assessment", methods=["POST"])
 def fetch_community_risk_assessment_file():
     data = request.get_json()
-    h.var_checker("data", data)
     basepath = data['path']
     cra_list = os.listdir(basepath)
 
@@ -131,10 +143,9 @@ def upload_community_risk_assessment_file():
     return jsonify(return_data)
 
 
-@COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/community_risk_assessment/mar/hazard_map/<site_id>", methods=["GET"])
-def fetch_hazard_map(site_id):
-    site_dir = APP_CONFIG['site_code'][site_id]
-    file_loc = APP_CONFIG[site_dir]
+@COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/community_risk_assessment/mar/hazard_map", methods=["GET"])
+def fetch_hazard_map():
+    file_loc = APP_CONFIG['MARIRONG_DIR']
 
     basepath = f'{file_loc}/MAPS'
     map_list = os.listdir(basepath)
