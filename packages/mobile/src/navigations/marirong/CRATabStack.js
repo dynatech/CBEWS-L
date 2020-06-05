@@ -1,8 +1,8 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React from 'react';
-import CommunityRiskAssessment from '../../components/marirong/CommunityRiskAssessment';
-import HazardMapping from '../../components/marirong/HazardMapping';
-import CapacityAndVulnerability from '../../components/marirong/CapacityAndVulnerability';
+import CommunityRiskAssessment from '../../components/marirong/community_risk_assessment/CommunityRiskAssessment';
+import HazardMapping from '../../components/marirong/community_risk_assessment/HazardMapping';
+import CapacityAndVulnerability from '../../components/marirong/community_risk_assessment/CapacityAndVulnerability';
 
 const Tab = createMaterialTopTabNavigator();
 
