@@ -1,10 +1,10 @@
-import RiskAssessment from './features/RiskAssessment';
-import FieldSurvey from './features/FieldSurvey';
-import SituationReport from './features/SituationReport';
-import SensorMaintenance from './features/SensorMaintenance';
-import SurficialData from './features/SurficialData';
-import EWI from './features/EWI';
-import Reports from './features/Reports';
+import RiskAssessment from './RiskAssessment';
+import FieldSurvey from './FieldSurvey';
+import SituationReport from './SituationReport';
+import SensorMaintenance from './SensorMaintenance';
+import SurficialData from './SurficialData';
+import EWI from './EWI';
+import Reports from './Reports';
 
 export {
     RiskAssessment,

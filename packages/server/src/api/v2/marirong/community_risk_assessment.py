@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from flask import Blueprint, jsonify, request, redirect, url_for, send_from_directory, send_file
 from connections import SOCKETIO
-from src.model.community_risk_assessment import CommunityRiskAssessment
+from src.model.v2.mar.community_risk_assessment import CommunityRiskAssessment
 from src.api.helpers import Helpers as h
 
 from config import APP_CONFIG
@@ -15,6 +15,7 @@ COMMUNITY_RISK_ASSESSMENT_BLUEPRINT = Blueprint("capacity_and_vulnerability_blue
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/add/community_risk_assessment/mar/capacity_and_vulnerability", methods=["POST"])
 def add_capacity_and_vulnerability():
     data = request.get_json()
+    h.var_checker("data", data)
     status = CommunityRiskAssessment.create_cav(data)
     if status is not None:
         return_value = {
