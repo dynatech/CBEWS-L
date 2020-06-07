@@ -10,7 +10,7 @@ import CapacityAndVulnerability from './CommunityRiskAssessment/CapacityAndVulne
 export default function CommunityRiskAssessmentPage () {
     const classes = useStyles();
 
-    const [feature, setFeature] = useState([<CommunityRiskAssessment />]);
+    const [feature, setFeature] = useState([<HazardMapping />]);
     const [hm, hmActive] = useState("primary");
     const [cra, crapActive] = useState("");
     const [cav, cavActive] = useState("");
