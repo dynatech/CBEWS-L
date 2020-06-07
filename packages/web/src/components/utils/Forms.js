@@ -43,7 +43,7 @@ function ReusableInput(props) {
                     label={label}
                     onChange={handleChange(propKey)}
                     onBlur={handleBlur(propKey)}
-                    value={value}
+                    defaultValue={value}
                 />
             </Grid>
         );
@@ -57,26 +57,28 @@ function ReusableInput(props) {
                     label={label}
                     onChange={handleChange(`${propKey}`)}
                     onBlur={handleBlur(`${propKey}`)}
-                    value={value}
+                    defaultValue={value}
                 />
             </Grid>
         );
     } else if (propKey in reference.ts) {
         const val = moment(value).format("YYYY-MM-DD HH:mm:ss");
         component = (
-            // <MuiPickersUtilsProvider utils={MomentUtils}>
-            //     <DateTimePicker
-            //         autoOk
-            //         style={{paddingTop: 5}}
-            //         ampm={false}
-            //         disableFuture
-            //         value={val}
-            //         format="YYYY-MM-DD HH:mm:ss"
-            //         onChange={handleChange(`${propKey}`)}
-            //         label="Date time"
-            //         fullWidth
-            //     />
-            // </MuiPickersUtilsProvider>
+            // <Grid item xs={6}>
+            //     <MuiPickersUtilsProvider utils={MomentUtils}>
+            //         <DateTimePicker
+            //             autoOk
+            //             style={{paddingTop: 5}}
+            //             ampm={false}
+            //             disableFuture
+            //             defaultValue={moment()}
+            //             format="YYYY-MM-DD HH:mm:ss"
+            //             // onChange={}
+            //             label="Date time"
+            //             fullWidth
+            //         />
+            //     </MuiPickersUtilsProvider>
+            // </Grid>
             <Grid item xs={6}>
                 <TextField
                     variant="outlined"
@@ -85,7 +87,7 @@ function ReusableInput(props) {
                     label={label}
                     onChange={handleChange(`${propKey}`)}
                     onBlur={handleBlur(`${propKey}`)}
-                    value={val}
+                    defaultValue={val}
                 />
             </Grid>
         );
@@ -98,12 +100,12 @@ export default function Forms(props) {
     const classes = ButtonStyle();
     const { data, submitForm, deleteForm, formData, command } = props;
     const { string, int, ts } = data;
-    const [defaultValues, setDefaultValues] = useState(Object.assign({}, string, int, ts));
+    // const [defaultValues, setDefaultValues] = useState(Object.assign({}, string, int, ts));
+    const [defaultValues, setDefaultValues] = useState({});
     const [cmd, setCmd] = useState("");
 
     useEffect(() => {
-        console.log("formData", formData);
-        // setDefaultValues(Object.assign({}, string, int, ts));
+        setDefaultValues(Object.assign({}, string, int, ts));
         setCmd(command);
     }, []);
 
@@ -111,59 +113,50 @@ export default function Forms(props) {
         <Formik
             initialValues={defaultValues}
             onSubmit={(values) => {
-                console.log("values", values);
                 formData.current = values;
                 submitForm();
             }}
         >
-            {({ handleChange, handleBlur, handleSubmit, values }) => (
-                <form className={classes.form} >
-                    <Grid container spacing={1}>
-                        {Object.entries(values).map((e, l) => {
-                            let key = e[0].replace(/\s/g, "");
-                            const reference = { string, int, ts };
-                            return (
-                                // <Field 
-                                //     component={TextField}
-                                //     name={key}
-                                //     type="text"
-                                //     label={e[0]}
-                                //     onChange={handleChange(`${key}`)}
-                                //     onBlur={handleBlur(`${key}`)}
-                                //     value={e[1]}
-                                // />
-                                <ReusableInput
-                                    propKey={e[0]}
-                                    label={e[0]}
-                                    value={e[1]}
-                                    reference={reference}
-                                    handleBlur={handleBlur}
-                                    handleChange={handleChange}
-                                />
-                            );
-                        })}
-                        <Grid item xs={12}>
-                            <Typography>* All fields are required</Typography>
-                            <Typography>
-                                * Please review your details before submitting
-                            </Typography>
+            {({ handleChange, handleBlur, handleSubmit, values }) => {
+                return (
+                    <form className={classes.form} >
+                        <Grid container spacing={1}>
+                            {Object.entries(defaultValues).map((e, l) => {
+                                let key = e[0].replace(/\s/g, "");
+                                const reference = { string, int, ts };
+                                return (
+                                    <ReusableInput
+                                        propKey={e[0]}
+                                        label={e[0]}
+                                        value={e[1]}
+                                        reference={reference}
+                                        handleBlur={handleBlur}
+                                        handleChange={handleChange}
+                                    />
+                                );
+                            })}
+                            <Grid item xs={12}>
+                                <Typography>* All fields are required</Typography>
+                                <Typography>
+                                    * Please review your details before submitting
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Button
+                                    className={classes.small}
+                                    onClick={handleSubmit}
+                                    type="submit"
+                                >
+                                    Submit
+                                </Button>
+                                {cmd != "add" && (
+                                    <Button onClick={deleteForm}>Delete</Button>
+                                )}
+                            </Grid>
                         </Grid>
-                        <Grid item xs={12}>
-                            <Button
-                                className={classes.small}
-                                onClick={handleSubmit}
-                                // onClick={() => console.log("")}
-                                type="submit"
-                            >
-                                Submit
-                            </Button>
-                            {cmd != "add" && (
-                                <Button onClick={deleteForm}>Delete</Button>
-                            )}
-                        </Grid>
-                    </Grid>
-                </form>
-            )}
+                    </form>
+                )
+            }}
         </Formik>
     );
 }
