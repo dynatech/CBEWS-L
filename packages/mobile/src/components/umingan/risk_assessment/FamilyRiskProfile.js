@@ -7,6 +7,7 @@ import { ButtonStyle } from '../../../styles/button_style';
 import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
+
 function FamilyRiskProfile() {
 
     const [openModal, setOpenModal] = useState(false);
@@ -191,26 +192,26 @@ function FamilyRiskProfile() {
                 </View>
             </View>
             <Modal animationType="slide"
-            visible={openModal}
-            onRequestClose={() => { 
-                setDefaultStrValues({
-                    'Number of Members': '',
-                    'Vulnerable Groups': '',
-                    'Nature of Vulnerability': ''
-                })
-                setCmd('add');
-                setOpenModal(false);
-             }}>
-            <Forms data={{
-                string: defaultStrValues,
-                int: {}
-            }}
-                formData={formData}
-                command={cmd}
-                closeForm={() => { closeForm() }}
-                submitForm={() => { submitForm() }}
-                deleteForm={() => { deleteForm() }} />
-        </Modal>
+                visible={openModal}
+                onRequestClose={() => { 
+                    setDefaultStrValues({
+                        'Number of Members': '',
+                        'Vulnerable Groups': '',
+                        'Nature of Vulnerability': ''
+                    })
+                    setCmd('add');
+                    setOpenModal(false);
+                }}>
+                <Forms data={{
+                    string: defaultStrValues,
+                    int: {}
+                }}
+                    formData={formData}
+                    command={cmd}
+                    closeForm={() => { closeForm() }}
+                    submitForm={() => { submitForm() }}
+                    deleteForm={() => { deleteForm() }} />
+            </Modal>
         </ScrollView>
     )
 }
