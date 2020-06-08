@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from flask import Blueprint, jsonify, request, redirect, url_for, send_from_directory, send_file
 from connections import SOCKETIO
-from src.model.community_risk_assessment import CommunityRiskAssessment
+from src.model.v2.mar.community_risk_assessment import CommunityRiskAssessment
 from src.api.helpers import Helpers as h
 
 from config import APP_CONFIG
@@ -14,7 +14,19 @@ COMMUNITY_RISK_ASSESSMENT_BLUEPRINT = Blueprint("capacity_and_vulnerability_blue
 
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/add/community_risk_assessment/mar/capacity_and_vulnerability", methods=["POST"])
 def add_capacity_and_vulnerability():
-    data = request.get_json()
+    temp = request.get_json()
+    data = {
+        "resource": temp["resource"],
+        "quantity": temp["quantity"],
+        "status": temp["status"],
+        "owner": temp["owner"],
+        "in_charge": temp["in_charge"],
+        "updater": temp["updater"],
+        "datetime": temp["datetime"],
+        "user_id": temp["user_id"],
+        "last_ts": temp["last_ts"]
+    }
+
     status = CommunityRiskAssessment.create_cav(data)
     if status is not None:
         return_value = {
@@ -61,7 +73,7 @@ def fetch_one_capacity_and_vulnerability(cav_id):
 def modify_capacity_and_vulnerability():
     data = request.get_json()
     result = CommunityRiskAssessment.update_cav(data)
-    if result is not None:
+    if result:
         return_value = {
             "status": True,
             "message": "Capacity and vulnerability data successfully updated!"
@@ -78,7 +90,7 @@ def modify_capacity_and_vulnerability():
 def remove_capacity_and_vulnerability():
     (cav_id) = request.get_json().values()
     status = CommunityRiskAssessment.delete_cav(cav_id)
-    if status is not None:
+    if status:
         return_value = {
             "status": True,
             "message": "Capacity and vulnerability data successfully deleted!"

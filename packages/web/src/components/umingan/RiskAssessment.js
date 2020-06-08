@@ -1,6 +1,6 @@
 import React, { useState, Fragment } from 'react';
 import { Container, Grid, Fab } from '@material-ui/core';
-import { useStyles, tableStyles } from '../../../styles/general_styles';
+import { useStyles, tableStyles } from '../../styles/general_styles';
 // import HazardMapping from './hazard_mapping';
 // import CommunityRiskAssessment from './cra';
 import CapacityAndVulnerability from './cav';

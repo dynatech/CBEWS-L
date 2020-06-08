@@ -58,8 +58,10 @@ export default function HazardMaps() {
             const response = await MarCommunityRiskAssessment.GetHazardMaps();
             if (response.status) {
                 console.log(response);
-                setMapsContainer(response.data);
-                handleMapPreview(response.data[0]);
+                if (response.data.length > 0) {
+                    setMapsContainer(response.data);
+                    handleMapPreview(response.data[0]);
+                }
             }
         }, 300);
     };
