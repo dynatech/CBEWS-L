@@ -96,6 +96,22 @@ const useStyles = makeStyles((theme) => ({
         releaseEwiButton: {
             height: "130%",
         },
+
+        btnGroup: {
+            // display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            '& > *': {
+            margin: theme.spacing(1),
+            },
+        },
+
+        raPaper: {
+            padding: 20,
+        },
+        editLink: {
+            fontSize: 20
+        }
 }));
 
 const tableStyles = makeStyles(theme => ({

@@ -1,5 +1,6 @@
 import React, { useState, Fragment } from 'react';
-import { Container, Grid, Fab } from '@material-ui/core';
+import MUIDataTable from "mui-datatables";
+import { Container, Grid, Fab, Button, ButtonGroup, Paper, Typography, Link } from '@material-ui/core';
 import { useStyles, tableStyles } from '../../styles/general_styles';
 // import HazardMapping from './hazard_mapping';
 // import CommunityRiskAssessment from './cra';
@@ -47,48 +48,72 @@ export default function RiskAssessment () {
         setFeature(return_feat)
     }
 
+    const columns = ["Hazard", "Speed of Onset", "Early Warning", "Impact", "Actions"];
+    
+    const data = [
+        ["Landslide", "Slower", "Offline", "One week", <Button>Edit</Button>],
+        ["Crack", "None", "Online", "Two week", <Button>Edit</Button>],
+        ["Sinkhole", "Quick", "Offline", "One week", <Button>Edit</Button>],
+        // ["Rockslide", "Fast", "Online", "Two week", <Button>Edit</Button>],
+        // ["Mudslide", "Slower", "Offline", "One week", <Button>Edit</Button>],
+        // ["Mudshake", "Slowest", "Online", "Two week", <Button>Edit</Button>],
+    ];
+    
+    const options = {
+        filterType: 'checkbox',
+    };
 
     return (
         <Fragment>
             <Container maxWidth="xl" className={classes.root} spacing={24}>
                 <Grid container alignItems="center" justify="center">
-                    <Grid item xs={3}>
-                        <Grid container direction="column" className={classes.menuContainer}>
-                            <Grid item={true} xs={3} style={{ marginTop: '15%' }} />
-                            <Grid item={true} xs={12} style={{ marginTop: '20%' }}>
-                                <Fab variant="extended"
-                                    color={hm}
-                                    aria-label="add"
-                                    className={classes.menu}
-                                    onClick={() => { handleFeatureNav("hazard_map") }}>
-                                    Hazard Mapping
-                                </Fab>
-                            </Grid>
-                            <Grid item={true} xs={12} style={{ marginTop: '20%' }}>
-                                <Fab variant="extended"
-                                    color={cav}
-                                    aria-label="add"
-                                    className={classes.menu}
-                                    onClick={() => { handleFeatureNav("c_a_v") }}>
-                                    Capacity and Vulnerability
-                                </Fab>
-                            </Grid>
-                            <Grid item={true} xs={12} style={{ marginTop: '20%' }}>
-                                <Fab variant="extended"
-                                    color={cra}
-                                    aria-label="add"
-                                    className={classes.menu}
-                                    onClick={() => { handleFeatureNav("c_r_a") }}>
-                                    Community risk assessment
-                                </Fab>
-                            </Grid>
-                            <Grid item={true} xs={3} style={{ marginTop: '15%' }} />
-                        </Grid>
+                    <Grid item justify-xs-center className={classes.btnGroup}>
+                        <ButtonGroup variant="contained" color="primary" size="large" aria-label="contained primary button group">
+                            <Button>Risk Profile</Button>
+                            <Button>Hazard Map</Button>
+                            <Button>Hazard Data</Button>
+                            <Button>Resources and Capacities</Button>
+                            <Button>Family Risk Profile</Button>
+                        </ButtonGroup>
                     </Grid>
-                    <Grid item xs={9} >
-                        <div style={{ overflow: 'auto', height: 'auto' }}>
-                            {feature}
-                        </div>
+                    <Grid item xs={12} >
+                        <Paper elevation={3} className={classes.raPaper}>
+                            <Typography variant="h6">
+                                Risk Profile <Link>[edit]</Link>
+                            </Typography>
+                            <Typography variant="text">This is the current risk profile of the community.</Typography>
+                        </Paper>
+                        <br />
+                    </Grid>
+                    <Grid item xs={12} >
+                        <Paper elevation={3} className={classes.raPaper}>
+                            <Typography variant="h6">Hazard Map <Link>[edit]</Link></Typography>
+                        </Paper>
+                        <br />
+                    </Grid>
+                    <Grid item xs={12} >
+                        <Paper elevation={3} className={classes.raPaper}>
+                            <Typography variant="h6">Hazard Data <Link>[edit]</Link></Typography>
+                            
+                            <MUIDataTable
+                                data={data}
+                                columns={columns}
+                                options={options}
+                            />
+                        </Paper>
+                        <br />
+                    </Grid>
+                    <Grid item xs={12} >
+                        <Paper elevation={3} className={classes.raPaper}>
+                            <Typography variant="h6">Resources and Capacities <Link>[edit]</Link></Typography>
+                        </Paper>
+                        <br />
+                    </Grid>
+                    <Grid item xs={12} >
+                        <Paper elevation={3} className={classes.raPaper}>
+                            <Typography variant="h6">Family Risk Profile <Link>[edit]</Link></Typography>
+                        </Paper>
+                        <br />
                     </Grid>
                 </Grid>
             </Container>

@@ -40,7 +40,7 @@ export default function MarBody() {
     };
 
     return (
-        <Box style={{ paddingTop: 180, paddingBottom: 100 }}>
+        <Box style={{ paddingTop: 230, paddingBottom: 100 }}>
             <Paper square>
                 <Tabs
                     value={value}
