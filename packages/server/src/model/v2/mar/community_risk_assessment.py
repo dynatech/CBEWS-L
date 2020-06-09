@@ -2,10 +2,11 @@ from src.model.helper.utils import DatabaseConnection as DB
 from datetime import datetime as dt
 from src.api.helpers import Helpers as h
 
+schema = "cbewsl_mar_collections"
+
 class CommunityRiskAssessment():
 
 	def create_cav(data):
-		schema = "cbewsl_mar_collections"
 		query = f"INSERT INTO capacity_and_vulnerability VALUES (0, '{data['resource']}', {data['quantity']}, '{data['status']}', " \
 				f"'{data['owner']}', '{data['in_charge']}', '{data['updater']}', '{data['datetime']}', {data['user_id']}, '{str(dt.today())}')"
 		try:
@@ -19,7 +20,6 @@ class CommunityRiskAssessment():
 			query = 'SELECT * FROM capacity_and_vulnerability'
 		else:
 			query = f'SELECT * FROM capacity_and_vulnerability WHERE cav_id = "{cav_id}"'
-		schema = "cbewsl_mar_collections"
 		result = DB.db_read(query, schema)
 		return result
 	
@@ -36,12 +36,12 @@ class CommunityRiskAssessment():
 				else:
 					query += f", {key} = '{x[key]}'"
 			counter += 1
-		ret_val = DB.db_modify(query,'cbewsl_mar_collections', True)
+		ret_val = DB.db_modify(query, schema, True)
 		return ret_val
 
-	def delete_cav(data):
-		query = f"DELETE FROM capacity_and_vulnerability WHERE cav_id = { data['cav_id'] }"
+	def delete_cav(cav_id):
+		query = f"DELETE FROM capacity_and_vulnerability WHERE cav_id = { cav_id }"
+		h.var_checker("query", query)
 		schema = "cbewsl_mar_collections"
-		print(query)
 		result = DB.db_modify(query, schema, True)
 		return result

@@ -16,13 +16,13 @@ COMMUNITY_RISK_ASSESSMENT_BLUEPRINT = Blueprint("capacity_and_vulnerability_blue
 def add_capacity_and_vulnerability():
     temp = request.get_json()
     data = {
-        "resource": temp["Resource"],
-        "quantity": temp["Quantity"],
-        "status": temp["Status"],
-        "owner": temp["Owner"],
-        "in_charge": temp["Incharge"],
-        "updater": temp["Updater"],
-        "datetime": temp["Datetime"],
+        "resource": temp["resource"],
+        "quantity": temp["quantity"],
+        "status": temp["status"],
+        "owner": temp["owner"],
+        "in_charge": temp["in_charge"],
+        "updater": temp["updater"],
+        "datetime": temp["datetime"],
         "user_id": temp["user_id"]
     }
 
@@ -89,7 +89,8 @@ def modify_capacity_and_vulnerability():
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/delete/community_risk_assessment/mar/capacity_and_vulnerability", methods=["DELETE"])
 def remove_capacity_and_vulnerability():
     data = request.get_json()
-    status = CommunityRiskAssessment.delete_cav(data)
+    h.var_checker("data0", data)
+    status = CommunityRiskAssessment.delete_cav(data["cav_id"])
     if status:
         return_value = {
             "status": True,
