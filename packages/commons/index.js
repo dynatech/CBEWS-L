@@ -1,6 +1,6 @@
 import { AuthRegistration, UserAuthentication } from './src/UserManagement/Auth';
 import { UploadCommunityRiskAssessment, GetCommunityRiskAssessment } from './src/MAR/CommunityRiskAssessment/CommunityRiskAssessment';
-import { GetAllCapacityAndVulnerability, GetOneCapacityAndVulnerability, SubmitCapacityAndVulnerability, DeleteCapacityAndVulnerability } from './src/MAR/CommunityRiskAssessment/CapacityAndVulnerability';
+import { GetAllCapacityAndVulnerability, GetOneCapacityAndVulnerability, InsertCapacityAndVulnerability, UpdateCapacityAndVulnerability, DeleteCapacityAndVulnerability } from './src/MAR/CommunityRiskAssessment/CapacityAndVulnerability';
 import { GetHazardMaps, UploadHazardMaps, } from './src/MAR/CommunityRiskAssessment/HazardMaps';
 import { GetAllSummary, InsertSummary, UpdateSummary, DeleteSummary } from './src/UMI/RiskAssessment/Summary';
 import { GetAllHazardData, InsertHazardData, UpdateHazardData, DeleteHazardData } from './src/UMI/RiskAssessment/HazardData';
@@ -15,7 +15,8 @@ const UserManagement = {
 const MarCommunityRiskAssessment = {
     UploadCommunityRiskAssessment,
     GetCommunityRiskAssessment,
-    SubmitCapacityAndVulnerability,
+    InsertCapacityAndVulnerability, 
+    UpdateCapacityAndVulnerability,
     GetAllCapacityAndVulnerability,
     GetOneCapacityAndVulnerability,
     DeleteCapacityAndVulnerability,
