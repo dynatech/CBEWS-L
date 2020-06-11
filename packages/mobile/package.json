@@ -26,9 +26,11 @@
     "react": "16.11.0",
     "react-dom": "^16.13.1",
     "react-hot-loader": "^4.12.21",
-    "react-native": "0.62.2",
+    "react-native": "0.61.0",
     "react-native-data-table": "^0.2.1",
-    "react-native-elements": "^2.0.0",
+    "react-native-elements": "^2.0.2",
+    "react-native-file-picker": "0.0.19",
+    "react-native-fs": "2.16.2",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-image-zoom-viewer": "^3.0.1",
     "react-native-paper": "^3.10.1",
@@ -36,7 +38,8 @@
     "react-native-safe-area-context": "^1.0.0",
     "react-native-screens": "^2.7.0",
     "react-native-tab-view": "^2.14.2",
-    "react-native-vector-icons": "^6.6.0"
+    "react-native-vector-icons": "^6.6.0",
+    "rn-fetch-blob": "^0.12.0"
   },
   "devDependencies": {
     "@babel/core": "7.9.6",
