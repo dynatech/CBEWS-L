@@ -35,5 +35,5 @@ const GetCommunityRiskAssessment = () => {
 
 export { 
     UploadCommunityRiskAssessment,
-    GetCommunityRiskAssessment, 
+    GetCommunityRiskAssessment
 }
