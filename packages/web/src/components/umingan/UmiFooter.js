@@ -13,8 +13,8 @@ export default function MarFooter () {
             <Container className={classes.footerContainer}>
                 <Grid container spacing={0} justify="center">
                     <Grid item xs={12}>
-                        <Typography variant="h6" align="center">Email: pdrrmo@gmail.com</Typography>
-                        <Typography variant="h6" align="center">Hotline: 09123456789</Typography>
+                        <Typography variant="subtitle1" align="center">Email: pdrrmo@gmail.com</Typography>
+                        <Typography variant="subtitle1" align="center">Hotline: 09123456789</Typography>
                     </Grid>
                 </Grid>
             </Container>

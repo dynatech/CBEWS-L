@@ -15,6 +15,12 @@ import {
 } from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import MenuIcon from "@material-ui/icons/Menu";
+
+// AppBar Hider Imports
+import PropTypes from "prop-types";
+import useScrollTrigger from "@material-ui/core/useScrollTrigger";
+import Slide from "@material-ui/core/Slide";
+
 import { useCookies } from "react-cookie";
 
 import { LogoSeries } from "../reducers/LogoSeries";
@@ -29,9 +35,29 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+function HideOnScroll(props) {
+    const { children, window } = props;
+    const trigger = useScrollTrigger({ target: window ? window() : undefined });
+
+    return (
+        <Slide appear={false} direction="down" in={!trigger}>
+            {children}
+        </Slide>
+    );
+}
+
+HideOnScroll.propTypes = {
+    children: PropTypes.element.isRequired,
+    /**
+     * Injected by the documentation to work in an iframe.
+     * You won't need it on your project.
+     */
+    window: PropTypes.func,
+};
+
 export default function UmiHeader(props) {
     const classes = useStyles();
-    const [cookies, setCookie, removeCookie] = useCookies(['credentials'])
+    const [cookies, setCookie, removeCookie] = useCookies(["credentials"]);
     const [state, setState] = useState({
         top: false,
         left: false,
@@ -42,8 +68,8 @@ export default function UmiHeader(props) {
     const handleSignout = () => {
         console.log("props", props);
         removeCookie(["credentials"]);
-        alert("Signing out!")
-        props.history.push("/")
+        alert("Signing out!");
+        props.history.push("/");
     };
 
     const toggleDrawer = (side, open) => (event) => {
@@ -74,11 +100,7 @@ export default function UmiHeader(props) {
 
             <List>
                 {["Signout"].map((text, index) => (
-                    <ListItem
-                        button
-                        key={text}
-                        onClick={handleSignout}
-                    >
+                    <ListItem button key={text} onClick={handleSignout}>
                         <ListItemText primary={text} />
                     </ListItem>
                 ))}
@@ -87,35 +109,49 @@ export default function UmiHeader(props) {
     );
 
     return (
-        <Fragment>
-            <AppBar color="inherit">
-                <Grid container spacing={0} alignItems="center" alignContent="left">
-                    <Grid item xs={1}>
-                        <Toolbar>
-                            <IconButton
-                                color="inherit"
-                                edge="start"
-                                aria-label="menu"
-                                onClick={toggleDrawer("right", true)}
-                            >
-                                <MenuIcon />
-                            </IconButton>
-                        </Toolbar>
-                    </Grid>
-                    <Grid item xs={11}>
-                        <Typography>GOVPH</Typography>
-                    </Grid>
-                </Grid>
+            <Fragment>
+                <HideOnScroll>
+                    <AppBar color="inherit">
+                        <Grid
+                            container
+                            spacing={0}
+                            alignItems="center"
+                            alignContent="left"
+                        >
+                            <Grid item xs={1}>
+                                <Toolbar>
+                                    <IconButton
+                                        color="inherit"
+                                        edge="start"
+                                        aria-label="menu"
+                                        onClick={toggleDrawer("right", true)}
+                                    >
+                                        <MenuIcon />
+                                    </IconButton>
+                                </Toolbar>
+                            </Grid>
+                            <Grid item xs={11}>
+                                <Typography>GOVPH</Typography>
+                            </Grid>
+                        </Grid>
 
-                <img className={classes.xs_image} style={{width: '100%'}} src={umi_banner} />
-            </AppBar>
-            <Drawer open={state.right} onClose={toggleDrawer("right", false)}>
-                {drawerList("right")}
-            </Drawer>
+                        <img
+                            className={classes.xs_image}
+                            style={{ width: "100%" }}
+                            src={umi_banner}
+                        />
+                    </AppBar>
+                </HideOnScroll>
+                <Drawer
+                    open={state.right}
+                    onClose={toggleDrawer("right", false)}
+                >
+                    {drawerList("right")}
+                </Drawer>
 
-            {/* <Grid item xs={12} style={{paddingTop: '80px'}}>
+                {/* <Grid item xs={12} style={{paddingTop: '80px'}}>
                 <img className={classes.xs_image} style={{width: '100%'}} src={umi_banner} />
             </Grid> */}
-        </Fragment>
+            </Fragment>
     );
 }
