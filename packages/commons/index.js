@@ -6,6 +6,8 @@ import { GetAllSummary, InsertSummary, UpdateSummary, DeleteSummary } from './sr
 import { GetAllHazardData, InsertHazardData, UpdateHazardData, DeleteHazardData } from './src/UMI/RiskAssessment/HazardData';
 import { GetAllResourceAndCapacities, InsertResourceAndCapacities, UpdateResourceAndCapacities, DeleteResourceAndCapacities } from './src/UMI/RiskAssessment/ResourceAndCapacities';
 import { GetAllFamilyRiskProfile, InsertFamilyRiskProfile, UpdateFamilyRiskProfile, DeleteFamilyRiskProfile } from './src/UMI/RiskAssessment/FamilyRiskProfile';
+import { GetIncidentLogs, InsertIncidentLogs, UpdateIncidentLogs, DeleteIncidentLogs } from './src/MAR/MaintenanceLogs/IncidentLogs';
+import { GetMaintenanceLogs, InsertMaintenanceLogs, UpdateMaintenanceLogs, DeleteMaintenanceLogs } from './src/MAR/MaintenanceLogs/MaintenanceLogs';
 
 const UserManagement = {
     AuthRegistration,
@@ -22,6 +24,17 @@ const MarCommunityRiskAssessment = {
     DeleteCapacityAndVulnerability,
     GetHazardMaps,
     UploadHazardMaps, 
+}
+
+const MarMaintenanceLogs = {
+    GetIncidentLogs,
+    InsertIncidentLogs,
+    UpdateIncidentLogs,
+    DeleteIncidentLogs,
+    GetMaintenanceLogs,
+    InsertMaintenanceLogs,
+    UpdateMaintenanceLogs,
+    DeleteMaintenanceLogs
 }
     
 const UmiRiskManagement = {
@@ -46,5 +59,6 @@ const UmiRiskManagement = {
 export {
     UserManagement,
     MarCommunityRiskAssessment,
-    UmiRiskManagement
+    UmiRiskManagement,
+    MarMaintenanceLogs
 }
