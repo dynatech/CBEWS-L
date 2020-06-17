@@ -6,6 +6,7 @@ import { GetAllSummary, InsertSummary, UpdateSummary, DeleteSummary } from './sr
 import { GetAllHazardData, InsertHazardData, UpdateHazardData, DeleteHazardData } from './src/UMI/RiskAssessment/HazardData';
 import { GetAllResourceAndCapacities, InsertResourceAndCapacities, UpdateResourceAndCapacities, DeleteResourceAndCapacities } from './src/UMI/RiskAssessment/ResourceAndCapacities';
 import { GetAllFamilyRiskProfile, InsertFamilyRiskProfile, UpdateFamilyRiskProfile, DeleteFamilyRiskProfile } from './src/UMI/RiskAssessment/FamilyRiskProfile';
+import { GetHazardMaps as UmiGetHazardMaps, UploadHazardMaps as UmiUploadHazardMaps } from './src/UMI/RiskAssessment/HazardMaps';
 
 const UserManagement = {
     AuthRegistration,
@@ -40,7 +41,9 @@ const UmiRiskManagement = {
     GetAllFamilyRiskProfile,
     InsertFamilyRiskProfile,
     UpdateFamilyRiskProfile,
-    DeleteFamilyRiskProfile
+    DeleteFamilyRiskProfile,
+    GetHazardMaps: UmiGetHazardMaps,
+    UploadHazardMaps: UmiUploadHazardMaps, 
 }
 
 export {
