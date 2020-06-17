@@ -874,7 +874,7 @@ def main(end=datetime.now()):
     # site id and code
     query = "SELECT site_id, site_code FROM commons_db.sites WHERE active = 1"
     props = qdb.get_db_dataframe(query)
-    props = props[props.site_code == 'mar']
+    # props = props[props.site_code == 'mar']
     site_props = props.groupby('site_id', as_index=False)
     alerts = site_props.apply(site_public_alert, end=end,
                               public_symbols=public_symbols,

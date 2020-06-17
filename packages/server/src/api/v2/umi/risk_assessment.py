@@ -2,6 +2,7 @@
 from flask import Blueprint, jsonify, request
 from src.model.v2.umi.risk_assessment import RiskAssessmentModel
 import hashlib
+from src.api.helpers import Helpers as h
 
 RISK_ASSESSMENT_BLUEPRINT = Blueprint("risk_assessment_blueprint", __name__)
 
