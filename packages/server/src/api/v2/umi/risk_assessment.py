@@ -1,7 +1,13 @@
 
+import time
+import os
+from pathlib import Path
 from flask import Blueprint, jsonify, request
 from src.model.v2.umi.risk_assessment import RiskAssessmentModel
 import hashlib
+from src.api.helpers import Helpers as h
+
+from config import APP_CONFIG
 
 RISK_ASSESSMENT_BLUEPRINT = Blueprint("risk_assessment_blueprint", __name__)
 
@@ -348,3 +354,58 @@ def delete_family_risk_profile():
             'message': f"Failed to delete family risk profile: {e}"
         }
     return jsonify(ret_val)
+
+
+
+
+@RISK_ASSESSMENT_BLUEPRINT.route("/get/risk_assessment/umi/hazard_map", methods=["GET"])
+def fetch_hazard_map():
+    file_loc = APP_CONFIG['UMINGAN_DIR']
+
+    basepath = f'{file_loc}/MAPS'
+    map_list = os.listdir(basepath)
+
+    maps = []
+
+    for map in map_list:
+        # path = os.path.join(basepath, map)
+        path = Path(basepath)
+        filepath = path / map
+        if not os.path.isdir(filepath):
+            file_type = map.split(".")[1]
+            maps.append({
+                "filename": map,
+                "file_type": file_type,
+                "file_path": basepath
+            })
+
+    return jsonify({"status": True, "data": maps})
+
+
+@RISK_ASSESSMENT_BLUEPRINT.route("/upload/risk_assessment/umi/hazard_map", methods=["POST"])
+def upload_hazard_map():
+    try:
+        file = request.files['file']
+        directory = f"{APP_CONFIG['UMINGAN_DIR']}/MAPS/"
+        filename = file.filename
+
+        count = filename.count(".")
+        name_list = filename.split(".", count)
+        file_type = f".{name_list[count]}"
+        name_list.pop()
+        filename = f"{'.'.join(name_list)}"
+
+        temp = f"{filename}{file_type}"
+        uniq = 1
+        while os.path.exists(Path(directory) / temp):
+            temp = '%s_%d%s' % (filename, uniq, file_type)
+            uniq += 1
+
+        file.save(os.path.join(Path(directory), temp))
+
+        return_data = { "status": True }
+    except Exception as err:
+        # raise err
+        return_data = { "status": False }
+
+    return jsonify(return_data)

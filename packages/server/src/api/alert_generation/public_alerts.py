@@ -291,9 +291,15 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
         for e in events:
             try: 
                 event_data = {}
-                ( event_id, site_id, event_start,
-                    latest_release_id, latest_trigger_id,
-                    validity, status, site_code ) = e
+                event_id = e["event_id"]
+                site_id = e["site_id"]
+                event_start = e["event_start"]
+                latest_release_id = e["latest_release_id"]
+                latest_trigger_id = e["latest_trigger_id"]
+                validity = e["validity"]
+                status = e["status"]
+                site_code = e["site_code"]
+
                 latest_release = AG.get_event_releases(event_id=event_id, return_count=1)
                 ( release_id, data_timestamp,
                     internal_alert_level, release_time, reporter_id_mt ) = latest_release.values()

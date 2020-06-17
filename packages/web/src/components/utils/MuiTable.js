@@ -38,21 +38,19 @@ function getDeleteButton(handler) {
 }
 
 function appendActions(cmd, data, handlers) {
-    console.log("handlers", handlers);
     const { handleEdit, handleDelete } = handlers;
-    let mod_set;
-    switch (cmd) {
-        case "update-delete":
-            mod_set = [
-                getEditButton(handleEdit),
-                getDeleteButton(handleDelete),
-            ];
-            break;
-        default:
-            mod_set = [getEditButton(handleEdit)];
-    }
-
     return data.map((element) => {
+        let mod_set;
+        switch (cmd) {
+            case "update-delete":
+                mod_set = [
+                    getEditButton(() => handleEdit(element)),
+                    getDeleteButton(() => handleDelete(element)),
+                ];
+                break;
+            default:
+                mod_set = [getEditButton(handleEdit)];
+        }
         return Object.assign({}, element, { actions: mod_set });
     });
 }
@@ -60,12 +58,8 @@ function appendActions(cmd, data, handlers) {
 export default function MuiTable(props) {
     // cmd: cud, cu, c, cd
     const { classes, addLabel, data, cmd, handlers } = props;
-    console.log("props", props);
     const { columns, rows, options } = data;
     const [tableData, setTableData] = useState([]);
-
-    // columns.push({ name: "actions", label: "Actions" });
-    // const tableData = appendActions(cmd, rows, handlers);
 
     useEffect(() => {
         columns.push({ name: "actions", label: "Actions" });
