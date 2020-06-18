@@ -55,7 +55,6 @@ def update_summary():
     try:
         data = request.get_json()
         summary_status = RiskAssessmentModel.modify_summary(data)
-        print(summary_status)
         if summary_status == '0':
             ret_val = {
                 'status': True,

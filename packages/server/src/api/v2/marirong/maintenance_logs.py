@@ -13,26 +13,17 @@ MAINTENANCE_LOGS_BLUEPRINT = Blueprint(
 @MAINTENANCE_LOGS_BLUEPRINT.route("/add/maintenance/mar/maintenance_logs", methods=["POST"])
 @cross_origin()
 def add():
-    temp = request.get_json()
-    data = {
-        "in_charge": temp["In-charge"],
-        "maintenance_ts": temp["maintenance_date"],
-        "type": temp["MaintenanceActivity"],
-        "remarks": temp["Remarks"],
-        "updater": temp["Updater"],
-        "user_id": temp["user_id"]
-    }
-
+    data = request.get_json()
     status = maintenance.create_maintenance_log(data)
     if status is not None:
         return_value = {
-            "ok": True,
+            "status": True,
             "maintenance_log_id": status,
             "message": "New maintenance log data successfully added!"
         }
     else:
         return_value = {
-            "ok": False,
+            "status": False,
             "maintenance_log_id": None,
             "message": "Failed to add maintenance log data. Please check your network connection."
         }
@@ -61,44 +52,37 @@ def fetch():
     return jsonify(response)
 
 
-@MAINTENANCE_LOGS_BLUEPRINT.route("/update/maintenance/mar/maintenance_logs", methods=["POST"])
+@MAINTENANCE_LOGS_BLUEPRINT.route("/update/maintenance/mar/maintenance_logs", methods=["PATCH"])
 @cross_origin()
 def update():
     data = request.get_json()
-    result = maintenance.update_maintenance_log(m, data={
-        "maintenance_log_id": int(data['maintenance_log_id']),
-        "maintenance_ts": data['maintenance_ts'],
-        "maintenance_type": data['maintenance_type'],
-        "remarks": data['remarks'],
-        "in_charge": data['in_charge'],
-        "updater": data['updater'],
-        "site_id": int(data['site_id'])
-    })
+    result = maintenance.update_maintenance_log(data)
     if result is not None:
         return_value = {
-            "ok": True,
+            "status": True,
             "message": "Maintenance logs data successfully updated!"
         }
     else:
         return_value = {
-            "ok": False,
+            "status": False,
             "message": "Failed to update maintenance logs data. Please check your network connection."
         }
     return jsonify(return_value)
 
 
-@MAINTENANCE_LOGS_BLUEPRINT.route("/remove/maintenance/mar/maintenance_logs", methods=["POST"])
+@MAINTENANCE_LOGS_BLUEPRINT.route("/delete/maintenance/mar/maintenance_logs", methods=["DELETE"])
 @cross_origin()
-def remove(site_id, maintenance_log_id):
-    status = maintenance.delete_maintenance_log(m, maintenance_log_id, site_id)
-    if status is not None:
+def remove():
+    data = request.get_json()
+    status = maintenance.delete_maintenance_log(data['id'])
+    if status == "0":
         return_value = {
-            "ok": True,
+            "status": True,
             "message": "Maintenance log data successfully deleted!"
         }
     else:
         return_value = {
-            "ok": False,
+            "status": False,
             "message": "Failed to delete maintenance log data. Please check your network connection."
         }
     return jsonify(return_value)

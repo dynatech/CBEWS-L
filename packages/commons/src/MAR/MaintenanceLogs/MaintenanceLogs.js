@@ -37,12 +37,39 @@ const InsertMaintenanceLogs = (data) => {
     });
 }
 
-const UpdateMaintenanceLogs = () => {
-
+const UpdateMaintenanceLogs = (data) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/update/maintenance/mar/maintenance_logs`, {
+        method: 'PATCH',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    }).then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        console.error("Problem in common SubmitCAV", error);
+    });
 }
 
-const DeleteMaintenanceLogs = () => {
-
+const DeleteMaintenanceLogs = (data) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/delete/maintenance/mar/maintenance_logs`, {
+        method: 'DELETE',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        console.error("Problem in Delete CAV", error);
+    });
 }
 
 export {
