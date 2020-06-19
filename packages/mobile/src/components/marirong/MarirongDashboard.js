@@ -81,7 +81,7 @@ function MarirongDashboard(props) {
             </View>
             <View style={ContainerStyle.menu_row}>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { navigator.navigate("Maintenance") }}>
+                <TouchableOpacity onPress={() => { navigator.navigate("MaintenanceLogsTabStack") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/maintenance.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Maintenance</Text>

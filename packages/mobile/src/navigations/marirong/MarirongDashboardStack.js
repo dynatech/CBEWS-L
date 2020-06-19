@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import MarirongDashboard from '../../components/marirong/MarirongDashboard';
 import CRATabStack from '../marirong/CRATabStack';
+import MaintenanceLogsTabStack from '../marirong/MaintenanceLogsTabStack';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +20,13 @@ function MarirongDashboardStack() {
                     textAlign: 'center',
                   },
             }} component={CRATabStack} />
+            <Stack.Screen name="MaintenanceLogsTabStack" options={{
+                title: 'Maintenance Logs',
+                headerLeft: null,
+                headerTitleStyle: {
+                    textAlign: 'center',
+                  },
+            }} component={MaintenanceLogsTabStack} />
         </Stack.Navigator>
     );
 }
