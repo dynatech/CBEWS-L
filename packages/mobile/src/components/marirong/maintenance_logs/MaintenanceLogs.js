@@ -136,7 +136,7 @@ function MaintenanceLogs () {
 
     const deleteForm = () => {
         Alert.alert(
-            "Capacity and Vulnerability",
+            "Maintenance Logs",
             "Are you sure you want to delete this data?",
             [
               {

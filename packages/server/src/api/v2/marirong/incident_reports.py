@@ -1,99 +1,89 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS, cross_origin
 from connections import SOCKETIO
-from src.model.maintenance import Maintenance as m
+from src.model.v2.mar.maintenance_logs import Maintenance as maintenance
 from src.api.helpers import Helpers as h
 from config import APP_CONFIG
 
 INCIDENT_REPORTS_BLUEPRINT = Blueprint("incident_reports_blueprint", __name__)
 
 
-@INCIDENT_REPORTS_BLUEPRINT.route("/maintenance/incident_reports/add", methods=["POST"])
+@INCIDENT_REPORTS_BLUEPRINT.route("/add/maintenance/mar/incident_logs", methods=["POST"])
 @cross_origin()
 def add():
     data = request.get_json()
-    status = m.create_incident_report(m, data)
+    status = maintenance.create_incident_report(data)
     if status is not None:
         return_value = {
-            "ok": True,
-            "ir_id": status,
+            "status": True,
+            "id": status,
             "message": "New incident report data successfully added!"
         }
     else:
         return_value = {
-            "ok": False,
-            "ir_id": None,
+            "status": False,
+            "id": None,
             "message": "Failed to add incident report data. Please check your network connection."
         }
     return jsonify(return_value)
 
-
-@INCIDENT_REPORTS_BLUEPRINT.route("/maintenance/incident_reports/fetch", methods=["POST"])
-@INCIDENT_REPORTS_BLUEPRINT.route("/maintenance/incident_reports/fetch/<site_id>/<ir_id>", methods=["GET"])
+@INCIDENT_REPORTS_BLUEPRINT.route("/fetch/maintenance/mar/incident_logs", methods=["GET"])
 @cross_origin()
-def fetch(site_id=None, ir_id=None):
-    """Returns incident report in two forms of filter. One is via get request
-    """
+def fetch():
     try:
-        json_data = request.get_json()
-        ts_dict = None
-        if json_data:
-            ts_dict = json_data["ts_dict"]
-            site_id = json_data["site_id"]
-
-        result = m.fetch_incident_report(m,
-                                         site_id=site_id, ir_id=ir_id, ts_dict=ts_dict)
+        result = maintenance.fetch_incident_report()
         response = {
-            "ok": True,
-            "data": result
+            "status": True,
+            "data": result,
+            "message": "Sucessfully fetched incident logs."
         }
 
     except Exception as err:
-        print(err)
         response = {
-            "ok": False,
-            "data": []
+            "status": False,
+            "data": [],
+            "message": f"Failed to fetch incident logs. Err: {err}"
         }
 
     return jsonify(response)
 
 
-@INCIDENT_REPORTS_BLUEPRINT.route("/maintenance/incident_reports/update", methods=["POST"])
+@INCIDENT_REPORTS_BLUEPRINT.route("/update/maintenance/mar/incident_logs", methods=["PATCH"])
 @cross_origin()
 def modify():
     data = request.get_json()
-    result = m.update_incident_report(m, data={
-        "ir_id": int(data['ir_id']),
-        "report_ts": data['report_ts'],
-        "description": data['description'],
-        "reporter": data['reporter'],
-        "site_id": int(data['site_id'])
-    })
-    if result is not None:
+    result = maintenance.update_incident_report(data)
+    try:
+        if result == "0":
+            return_value = {
+                "status": True,
+                "message": "Incident report data successfully updated!"
+            }
+        else:
+            return_value = {
+                "status": False,
+                "message": "Failed to update incident reports data. Please check your network connection."
+            }
+    except Exception as err:
         return_value = {
-            "ok": True,
-            "message": "Incident report data successfully updated!"
-        }
-    else:
-        return_value = {
-            "ok": False,
-            "message": "Failed to update incident reports data. Please check your network connection."
+            "status": False,
+            "message": f"Failed to update incident reports data. Err: {err}"
         }
     return jsonify(return_value)
 
-
-@INCIDENT_REPORTS_BLUEPRINT.route("/maintenance/incident_reports/remove/<site_id>/<ir_id>", methods=["GET"])
+@INCIDENT_REPORTS_BLUEPRINT.route("/delete/maintenance/mar/incident_logs", methods=["DELETE"])
 @cross_origin()
-def remove(site_id, ir_id):
-    status = m.delete_incident_report(m, ir_id, site_id)
+def remove():
+    data = request.get_json()
+    status = maintenance.delete_incident_report(data['id'])
     if status is not None:
         return_value = {
-            "ok": True,
+            "status": True,
             "message": "Maintenance log data successfully deleted!"
         }
     else:
         return_value = {
-            "ok": False,
+            "status": False,
             "message": "Failed to delete incident report data. Please check your network connection."
         }
     return jsonify(return_value)

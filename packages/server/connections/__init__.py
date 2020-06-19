@@ -67,8 +67,8 @@ def create_app():
     #from src.api.maintenance.maintenance_logs import MAINTENANCE_LOGS_BLUEPRINT
     #app.register_blueprint(MAINTENANCE_LOGS_BLUEPRINT, url_prefix="/api")
 
-    from src.api.maintenance.incident_reports import INCIDENT_REPORTS_BLUEPRINT
-    app.register_blueprint(INCIDENT_REPORTS_BLUEPRINT, url_prefix="/api")
+    # from src.api.maintenance.incident_reports import INCIDENT_REPORTS_BLUEPRINT
+    # app.register_blueprint(INCIDENT_REPORTS_BLUEPRINT, url_prefix="/api")
 
     from src.api.reports import REPORTS_BLUEPRINT
     app.register_blueprint(REPORTS_BLUEPRINT, url_prefix="/api")
@@ -98,5 +98,8 @@ def create_app():
 
     from src.api.v2.marirong.maintenance_logs import MAINTENANCE_LOGS_BLUEPRINT
     app.register_blueprint(MAINTENANCE_LOGS_BLUEPRINT, url_prefix="/v2")
+
+    from src.api.v2.marirong.incident_reports import INCIDENT_REPORTS_BLUEPRINT
+    app.register_blueprint(INCIDENT_REPORTS_BLUEPRINT, url_prefix="/v2")
 
     return app
