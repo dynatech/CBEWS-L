@@ -31,6 +31,7 @@ function ReusableInput(props) {
     } = props;
     let label = temp[0].toUpperCase() + temp.slice(1);
     label = label.replace("_", " ");
+    const key = propKey.replace(/\s/g, "");
 
     let component;
     if (propKey in reference.string) {
@@ -41,8 +42,8 @@ function ReusableInput(props) {
                     fullWidth
                     id={propKey}
                     label={label}
-                    onChange={handleChange(propKey)}
-                    onBlur={handleBlur(propKey)}
+                    onChange={handleChange(`${key}`)}
+                    onBlur={handleBlur(`${key}`)}
                     defaultValue={value}
                 />
             </Grid>
@@ -55,8 +56,8 @@ function ReusableInput(props) {
                     fullWidth
                     id={propKey}
                     label={label}
-                    onChange={handleChange(`${propKey}`)}
-                    onBlur={handleBlur(`${propKey}`)}
+                    onChange={handleChange(`${key}`)}
+                    onBlur={handleBlur(`${key}`)}
                     defaultValue={value}
                 />
             </Grid>
@@ -85,13 +86,13 @@ function ReusableInput(props) {
                     fullWidth
                     id={propKey}
                     label={label}
-                    onChange={handleChange(`${propKey}`)}
-                    onBlur={handleBlur(`${propKey}`)}
+                    onChange={handleChange(`${key}`)}
+                    onBlur={handleBlur(`${key}`)}
                     defaultValue={val}
                 />
             </Grid>
         );
-    }
+    } else component = <Typography>Error</Typography>
 
     return component;
 }
@@ -122,8 +123,8 @@ export default function Forms(props) {
                     <form className={classes.form} >
                         <Grid container spacing={1}>
                             {Object.entries(defaultValues).map((e, l) => {
-                                let key = e[0].replace(/\s/g, "");
                                 const reference = { string, int, ts };
+                                console.log("e", e);
                                 return (
                                     <ReusableInput
                                         propKey={e[0]}
@@ -149,7 +150,7 @@ export default function Forms(props) {
                                 >
                                     Submit
                                 </Button>
-                                {cmd != "add" && (
+                                {command != "add" && (
                                     <Button onClick={deleteForm}>Delete</Button>
                                 )}
                             </Grid>
