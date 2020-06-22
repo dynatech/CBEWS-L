@@ -502,7 +502,7 @@ def get_alert_history(current_events):
     start_ts = current_events['ts'].values[0]
     public_alert_symbols = current_events['alert_symbol'].values[0]
     
-    query = "SELECT CONCAT(cdb.firstname, ' ', cdb.lastname) as iomp, " 
+    query = "SELECT CONCAT(cdb.first_name, ' ', cdb.last_name) as iomp, " 
     query += "sites.site_code, OTS.alert_symbol, ALS.ts_last_retrigger, OTS.alert_level, " 
     query += "ALS.remarks, TH.trigger_source, ALS.alert_status, PAS.alert_symbol as public_alert_symbol "
     query += "FROM alert_status as ALS "
@@ -515,7 +515,7 @@ def get_alert_history(current_events):
     query += "      ON OT.trigger_sym_id = OTS.trigger_sym_id " 
     query += "      JOIN trigger_hierarchies as TH "
     query += "      ON OTS.source_id = TH.source_id "
-    query += "      JOIN comms_db.users as cdb "
+    query += "      JOIN commons_db.users as cdb "
     query += "      ON ALS.user_id = cdb.user_id "
     query += "      JOIN public_alerts as PA"
     query += "      ON PA.site_id = OT.site_id"

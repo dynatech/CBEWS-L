@@ -75,10 +75,22 @@ class AlertGeneration():
 
         schema = "senslopedb"
         stat_row = DB.db_read(query, schema)
+
         if stat_row:
             stat_row = stat_row[0]
 
-        return stat_row
+            retun_dict = {
+                "stat_id": stat_row[0],
+                "ts_last_retrigger": h.dt_to_str(stat_row[1]),
+                "trigger_id": stat_row[2],
+                "ts_set": h.dt_to_str(stat_row[3]),
+                "ts_ack": h.dt_to_str(stat_row[4]),
+                "alert_status": stat_row[5],
+                "remarks": stat_row[6],
+                "user_id": stat_row[7]
+            }
+
+        return retun_dict
 
     def insert_operational_trigger(site_id, trig_sym_id, ts_updated):
         """Inserts operational_trigger table entry.
@@ -374,7 +386,19 @@ class AlertGeneration():
         schema = "senslopedb"
         result = DB.db_read(query, schema)
 
-        return result
+        result_list = []
+        for row in result:
+            result_list.append({
+                "trigger_sym_id": row[0],
+                "internal_sym_id": row[1],
+                "ias_symbol": row[2],
+                "ots_symbol": row[3],
+                "alert_description": row[4],
+                "alert_level": row[5],
+                "trigger_source": row[6]
+            })
+
+        return result_list
 
 
     def get_ias_by_lvl_source(trigger_source, alert_level, return_col=None):
@@ -441,7 +465,19 @@ class AlertGeneration():
         return_data = None
         if return_col:
             if result:
-                return_data = result[0]["alert_symbol"]
+                return_data = result[0][0]
+        else:
+            if result:
+                result = result[0]
+                return_data = {
+                    "internal_sym_id": result[0], 
+                    "trigger_sym_id": result[1], 
+                    "ias_symbol": result[2], 
+                    "ots_symbol": result[3], 
+                    "alert_description": result[4], 
+                    "alert_level": result[5], 
+                    "trigger_source": result[6]
+                }
 
         return return_data
 
@@ -483,6 +519,6 @@ class AlertGeneration():
 
         return_data = result[0]
         if return_col:
-            return_data = result[0][return_col]
+            return_data = result[0][0]
 
         return return_data
