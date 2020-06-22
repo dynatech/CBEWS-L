@@ -77,18 +77,7 @@ class AlertGeneration():
         stat_row = DB.db_read(query, schema)
 
         if stat_row:
-            stat_row = stat_row[0]
-
-            retun_dict = {
-                "stat_id": stat_row[0],
-                "ts_last_retrigger": h.dt_to_str(stat_row[1]),
-                "trigger_id": stat_row[2],
-                "ts_set": h.dt_to_str(stat_row[3]),
-                "ts_ack": h.dt_to_str(stat_row[4]),
-                "alert_status": stat_row[5],
-                "remarks": stat_row[6],
-                "user_id": stat_row[7]
-            }
+            retun_dict = stat_row[0]
 
         return retun_dict
 
@@ -149,18 +138,10 @@ class AlertGeneration():
         schema = "senslopedb"
         result = DB.db_read(query, schema)
 
-        return_dict = None
         if result:
             result = result[0]
 
-            return_dict = {
-                "trigger_id": result[0],
-                "ts": result[1],
-                "site_id": result[2],
-                "trigger_sym_id": result[3],
-                "ts_updated": result[4]
-            }
-        return return_dict
+        return result
 
 
     def get_ongoing_extended_overdue_events(site_id=None, complete=False, include_site=False):
@@ -503,7 +484,7 @@ class AlertGeneration():
         
         return_data = result[0]
         if return_col:
-            return_data = result[0][0]
+            return_data = result[0][return_col]
 
         return return_data
 
