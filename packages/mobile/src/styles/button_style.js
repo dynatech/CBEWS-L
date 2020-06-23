@@ -27,7 +27,7 @@ const ButtonStyle = StyleSheet.create({
       borderColor: '#083451',
       borderRadius: 50,
       borderWidth: 1,
-      elevation: 20,
+      elevation: 10,
       marginRight: 10,
       marginLeft: 10,
       width: width/3
@@ -37,7 +37,7 @@ const ButtonStyle = StyleSheet.create({
       borderColor: 'green',
       borderRadius: 50,
       borderWidth: 1,
-      elevation: 20,
+      elevation: 10,
       marginRight: 10,
       marginLeft: 10,
       width: width/3
@@ -47,7 +47,7 @@ const ButtonStyle = StyleSheet.create({
       borderColor: 'red',
       borderRadius: 50,
       borderWidth: 1,
-      elevation: 20,
+      elevation: 10,
       marginRight: 10,
       marginLeft: 10,
       width: width/3
