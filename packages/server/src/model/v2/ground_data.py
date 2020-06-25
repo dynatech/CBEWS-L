@@ -205,6 +205,7 @@ class GroundData():
     def update_monitoring_moms(moms_id, remarks):
         try:
             query = f'UPDATE monitoring_moms SET remarks = "{remarks}" WHERE moms_id = {moms_id}'
+            print(query)
             update_status = DB.db_modify(query, 'senslopedb', True)
             result = {"status": True, "data": update_status}
         except Exception as err:

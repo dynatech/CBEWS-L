@@ -76,8 +76,8 @@ def create_app():
     from src.api.events.template_creator import TEMPLATE_CREATOR_BLUEPRINT
     app.register_blueprint(TEMPLATE_CREATOR_BLUEPRINT, url_prefix="/api")
 
-    from src.api.ground_data.on_demand import ON_DEMAND_BLUEPRINT
-    app.register_blueprint(ON_DEMAND_BLUEPRINT, url_prefix="/api")
+    # from src.api.ground_data.on_demand import ON_DEMAND_BLUEPRINT
+    # app.register_blueprint(ON_DEMAND_BLUEPRINT, url_prefix="/api")
 
     # from src.api.risk_assessment.hazard_maps import HAZARD_MAPS_BLUEPRINT
     # app.register_blueprint(HAZARD_MAPS_BLUEPRINT, url_prefix="/api")
@@ -106,6 +106,9 @@ def create_app():
     app.register_blueprint(PUBLIC_ALERTS_BLUEPRINT, url_prefix="/v2")
 
     from src.api.v2.ground_data.manifestation_of_movements import MANIFESTATION_OF_MOVEMENTS_BLUEPRINT
-    app.register_blueprint(MANIFESTATION_OF_MOVEMENTS_BLUEPRINT, url_prefix="/api")
+    app.register_blueprint(MANIFESTATION_OF_MOVEMENTS_BLUEPRINT, url_prefix="/v2")
+
+    from src.api.v2.ground_data.on_demand import ON_DEMAND_BLUEPRINT
+    app.register_blueprint(ON_DEMAND_BLUEPRINT, url_prefix="/v2")
 
     return app
