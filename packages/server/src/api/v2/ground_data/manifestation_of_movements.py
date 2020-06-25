@@ -8,11 +8,17 @@ from src.api.helpers import Helpers as H
 
 MANIFESTATION_OF_MOVEMENTS_BLUEPRINT = Blueprint("manifestation_of_movements_blueprint", __name__)
 
+def modify_ts_format(entry):
+    entry.update({"observance_ts": H.dt_to_str(entry["observance_ts"])})
+    return entry
+
+
 @MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/mar/moms", methods=["GET"])
 def fetch_mar_moms():
     try:
         site_id = 51
         moms_list = GroundData.fetch_moms(site_id)
+        moms_list = list(map(modify_ts_format, moms_list))
         moms = {
             "status": True,
             "data": moms_list
@@ -30,6 +36,7 @@ def fetch_umi_moms():
     try:
         site_id = 50
         moms_list = GroundData.fetch_moms(site_id)
+        moms_list = list(map(modify_ts_format, moms_list))
         moms = {
             "status": True,
             "data": moms_list
@@ -61,7 +68,7 @@ def add():
             instance = GroundData.insert_moms_instance(site_id, feature_id, feature_name, 
                                                             location, reporter)
         else:
-            instance = instance[0][0]
+            instance = instance[0]["instance_id"]
         moms_id = GroundData.insert_moms_record(
             instance=instance, ts=ts, remarks=description,
             reporter_id=user_id, alert_level=alert_level
@@ -119,23 +126,23 @@ def update():
     try:
         data = request.get_json()
         
+        moms_id = data["moms_id"]
+        remarks = data["remarks"]
         ts = data["ts"]
         feature_id = data["feature_id"]
         feature_name = data["feature_name"]
         reporter = data["reporter"]
         location = data["location"]
-        remarks = data["remarks"]
         site_id = data["site_id"]
         user_id = data["user_id"]
         alert_level = data["alert_level"]
-        moms_id = data["moms_id"]
 
         instance = GroundData.fetch_feature_name(feature_id, feature_name, site_id)
         if len(instance) == 0:
             instance = GroundData.insert_moms_instance(site_id, feature_id, feature_name, 
                                                             location, reporter)
         else:
-            instance = instance[0][0]
+            instance = instance[0]["instance_id"]
         moms_instance_update = GroundData.update_moms_instance(instance, location, reporter)
         if moms_instance_update['status'] == True:
             moms_monitoring_update = GroundData.update_monitoring_moms(moms_id, remarks)
@@ -163,7 +170,7 @@ def update():
     return jsonify(moms)
 
 
-@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/delete/ground_data/moms/delete", methods=["delete"])
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/delete/ground_data/moms", methods=["delete"])
 def delete():
     try:
         moms = request.get_json()
