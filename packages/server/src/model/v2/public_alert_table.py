@@ -132,7 +132,7 @@ class PublicAlertTable():
         schema = "senslopedb"
         bulletin_number = DB.db_read(query, schema)
         if bulletin_number:
-            bulletin_number = int(bulletin_number[0][0])
+            bulletin_number = int(bulletin_number[0]["bulletin_number"])
 
         return bulletin_number
 

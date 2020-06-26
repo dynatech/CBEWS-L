@@ -34,6 +34,8 @@ def format_release_triggers(candidate, all_event_triggers):
                 trigger_source = AG.get_trigger_hierarchy(source_id, "trigger_source")
                 ots_symbol = trigger["alert"]
                 trigger_type = AG.get_internal_alert_symbol_row(trigger_symbol=ots_symbol, return_col="ias.alert_symbol")
+                h.var_checker("trigger_source", trigger_source)
+                h.var_checker("tech_info_dict", tech_info_dict)
                 tech_info = tech_info_dict[trigger_source]
 
                 trigger_payload = {

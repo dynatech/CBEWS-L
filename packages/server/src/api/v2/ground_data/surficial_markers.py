@@ -3,7 +3,7 @@ from connections import SOCKETIO
 import sys
 from datetime import datetime as dt
 from src.model.ground_data import GroundData
-
+from config import APP_CONFIG
 
 SURFICIAL_MARKERS_BLUEPRINT = Blueprint("surficial_markers_blueprint", __name__)
 
@@ -11,7 +11,7 @@ SURFICIAL_MARKERS_BLUEPRINT = Blueprint("surficial_markers_blueprint", __name__)
 @SURFICIAL_MARKERS_BLUEPRINT.route("/get/ground_data/<site_code>/surficial_markers", methods=["GET"])
 def fetch(site_code):
     try:
-        site_list = { "mar": 51, "umi":50 }
+        site_list = APP_CONFIG["site_ids"]
         site_id = site_list[site_code]
         temp_ts = ""
         temp_item = {}

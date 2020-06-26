@@ -230,23 +230,23 @@ class AlertGeneration():
             result = result[0]
             if complete:
                 return_data = {
-                    "release_id": result[0], 
-                    "event_id": result[1], 
-                    "data_timestamp": h.dt_to_str(result[2]), 
-                    "internal_alert_level": result[3], 
-                    "release_time": h.timedelta_to_str(result[4]),
-                    "comments": result[5],
-                    "bulletin_number": result[6],
-                    "reporter_id_mt": result[7],
-                    "reporter_id_ct": result[8]
+                    "release_id": result["release_id"], 
+                    "event_id": result["event_id"], 
+                    "data_timestamp": h.dt_to_str(result["data_timestamp"]), 
+                    "internal_alert_level": result["internal_alert_level"], 
+                    "release_time": h.timedelta_to_str(result["release_time"]), 
+                    "comments": result["comments"], 
+                    "bulletin_number": result["bulletin_number"], 
+                    "reporter_id_mt": result["reporter_id_mt"], 
+                    "reporter_id_ct": result["reporter_id_ct"] 
                 }
             else:
                 return_data = {
-                    "release_id": result[0], 
-                    "data_timestamp": h.dt_to_str(result[1]), 
-                    "internal_alert_level": result[2], 
-                    "release_time": h.timedelta_to_str(result[3]), 
-                    "reporter_id_mt": result[4]
+                    "release_id": result["release_id"], 
+                    "data_timestamp": h.dt_to_str(result["data_timestamp"]), 
+                    "internal_alert_level": result["internal_alert_level"], 
+                    "release_time": h.timedelta_to_str(result["release_time"]), 
+                    "reporter_id_mt": result["reporter_id_mt"]
                 }
 
         return return_data
@@ -340,15 +340,15 @@ class AlertGeneration():
 
         return_data = None
         if return_col:
-            return_data = result[0][0]
+            return_data = result[0][return_col]
         else:
             temp = result[0]
             return_data = {
-                "pub_sym_id": temp[0],
-                "alert_symbol": temp[1],
-                "alert_level": temp[2],
-                "alert_type": temp[3],
-                "recommended_response": temp[4]
+                "pub_sym_id": temp["pub_sym_id"],
+                "alert_symbol": temp["alert_symbol"],
+                "alert_level": temp["alert_level"],
+                "alert_type": temp["alert_type"],
+                "recommended_response": temp["recommended_response"]
             }
 
         return return_data
@@ -404,7 +404,7 @@ class AlertGeneration():
         result = DB.db_read(query, schema)
 
         if return_col:
-            result = result[0][0]
+            result = result[0][return_col]
 
         return result
 
@@ -467,7 +467,7 @@ class AlertGeneration():
         
         return_data = result[0]
         if return_col:
-            return_data = result[0][0]
+            return_data = result[0][return_col]
 
         return return_data
 

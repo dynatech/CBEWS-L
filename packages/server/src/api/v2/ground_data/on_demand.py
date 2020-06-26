@@ -5,6 +5,7 @@ from datetime import datetime as dt
 from src.model.ground_data import GroundData
 from src.model.alert_generation import AlertGeneration as AlertGen
 from src.api.helpers import Helpers as H
+from config import APP_CONFIG
 
 
 ON_DEMAND_BLUEPRINT = Blueprint("on_demand_blueprint", __name__)
@@ -13,7 +14,7 @@ ON_DEMAND_BLUEPRINT = Blueprint("on_demand_blueprint", __name__)
 @ON_DEMAND_BLUEPRINT.route("/fetch/ground_data/<site_code>/on_demand", methods=["GET"])
 def fetch(site_code):
     try:
-        site_dict = { "mar": 51, "umi": 50 }
+        site_dict = APP_CONFIG["site_ids"]
         site_id = site_dict[site_code]
         od_list = GroundData.get_latest_od_events(site_id=site_id)
         od = {

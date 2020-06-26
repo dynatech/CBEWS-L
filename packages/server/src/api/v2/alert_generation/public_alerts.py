@@ -79,7 +79,8 @@ def prepare_triggers(row):
 
     return row
 
-@PUBLIC_ALERTS_BLUEPRINT.route("/alert_gen/UI/get_mar_alert_validation_data", methods=["GET"])
+
+@PUBLIC_ALERTS_BLUEPRINT.route("/get/alert_gen/mar/alert_validation_data", methods=["GET"])
 def get_mar_alert_validation_data():
     """API that returns data needed by web ui.
     Also runs the alert generation scripts
@@ -111,6 +112,59 @@ def get_mar_alert_validation_data():
 
             response = {
                 "data": mar_data,
+                "status": 200,
+                "ok": True
+            }
+        else:
+            response = {
+                "data": {
+                    "as_of_ts": as_of_ts,
+                    "public_alert_level": 0,
+                    "status": "no_alert"
+                },
+                "status": 200,
+                "ok": True
+            }
+            
+    
+    except Exception as err:
+        raise(err)
+
+    return jsonify(response)
+
+
+@PUBLIC_ALERTS_BLUEPRINT.route("/get/alert_gen/umi/alert_validation_data", methods=["GET"])
+def get_umi_alert_validation_data():
+    """API that returns data needed by web ui.
+    Also runs the alert generation scripts
+    """
+    response = {
+        "data": None,
+        "status":   404,
+        "ok": False
+    }
+    try:
+        json_data = json.loads(candidate_alerts_generator.main(to_update_pub_alerts=True))
+        umi_data = next(filter(lambda x: x["site_code"] == "umi", json_data), None)
+        new_rel_trigs = []
+        as_of_ts = h.dt_to_str(h.round_down_data_ts(dt.now()))
+        if umi_data:
+            release_triggers = umi_data["release_triggers"]
+
+            new_rel_trigs = list(map(prepare_triggers, release_triggers))
+
+            umi_data.update({
+                "release_triggers": new_rel_trigs, 
+                "as_of_ts": as_of_ts,
+                # "all_validated": True
+                "release_time": h.dt_to_str(dt.now()),
+                "comments": "No Comment",
+                "bulletin_number": PAT.fetch_site_bulletin_number(PAT, site_id=29)
+            })
+            h.var_checker("umi_data", umi_data, True)
+
+            response = {
+                "data": umi_data,
                 "status": 200,
                 "ok": True
             }
@@ -530,7 +584,7 @@ def adjust_bulletin_number(site_id):
     return new_bulletin_number
 
 
-@PUBLIC_ALERTS_BLUEPRINT.route("/alert_gen/public_alerts/insert_ewi", methods=["GET", "POST"])
+@PUBLIC_ALERTS_BLUEPRINT.route("/insert/alert_gen/ewi", methods=["GET", "POST"])
 def insert_ewi(internal_ewi_data=None):
     """
     """

@@ -5,6 +5,7 @@ from datetime import datetime as dt
 from src.model.v2.ground_data import GroundData
 from src.model.v2.alert_generation import AlertGeneration as AlertGen
 from src.api.helpers import Helpers as H
+from config import APP_CONFIG
 
 MANIFESTATION_OF_MOVEMENTS_BLUEPRINT = Blueprint("manifestation_of_movements_blueprint", __name__)
 
@@ -16,7 +17,7 @@ def modify_ts_format(entry):
 @MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/mar/moms", methods=["GET"])
 def fetch_mar_moms():
     try:
-        site_id = 51
+        site_id = APP_CONFIG["site_ids"]["mar"]
         moms_list = GroundData.fetch_moms(site_id)
         moms_list = list(map(modify_ts_format, moms_list))
         moms = {
