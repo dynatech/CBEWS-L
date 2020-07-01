@@ -82,14 +82,7 @@ def prepare_triggers(row):
 
 @PUBLIC_ALERTS_BLUEPRINT.route("/get/alert_gen/mar/alert_validation_data", methods=["GET"])
 def get_mar_alert_validation_data():
-    """API that returns data needed by web ui.
-    Also runs the alert generation scripts
-    """
-    response = {
-        "data": None,
-        "status":   404,
-        "ok": False
-    }
+    response = { "data": None, "status": False }
     try:
         json_data = json.loads(candidate_alerts_generator.main(to_update_pub_alerts=True))
         mar_data = next(filter(lambda x: x["site_code"] == "mar", json_data), None)
@@ -97,18 +90,15 @@ def get_mar_alert_validation_data():
         as_of_ts = h.dt_to_str(h.round_down_data_ts(dt.now()))
         if mar_data:
             release_triggers = mar_data["release_triggers"]
-
             new_rel_trigs = list(map(prepare_triggers, release_triggers))
 
             mar_data.update({
                 "release_triggers": new_rel_trigs, 
                 "as_of_ts": as_of_ts,
-                # "all_validated": True
                 "release_time": h.dt_to_str(dt.now()),
                 "comments": "No Comment",
                 "bulletin_number": PAT.fetch_site_bulletin_number(PAT, site_id=29)
             })
-            h.var_checker("mar_data", mar_data, True)
 
             response = {
                 "data": mar_data,
@@ -126,7 +116,6 @@ def get_mar_alert_validation_data():
                 "ok": True
             }
             
-    
     except Exception as err:
         raise(err)
 
@@ -135,14 +124,7 @@ def get_mar_alert_validation_data():
 
 @PUBLIC_ALERTS_BLUEPRINT.route("/get/alert_gen/umi/alert_validation_data", methods=["GET"])
 def get_umi_alert_validation_data():
-    """API that returns data needed by web ui.
-    Also runs the alert generation scripts
-    """
-    response = {
-        "data": None,
-        "status":   404,
-        "ok": False
-    }
+    response = { "data": None, "status": False }
     try:
         json_data = json.loads(candidate_alerts_generator.main(to_update_pub_alerts=True))
         umi_data = next(filter(lambda x: x["site_code"] == "umi", json_data), None)
@@ -156,7 +138,6 @@ def get_umi_alert_validation_data():
             umi_data.update({
                 "release_triggers": new_rel_trigs, 
                 "as_of_ts": as_of_ts,
-                # "all_validated": True
                 "release_time": h.dt_to_str(dt.now()),
                 "comments": "No Comment",
                 "bulletin_number": PAT.fetch_site_bulletin_number(PAT, site_id=29)
@@ -178,7 +159,6 @@ def get_umi_alert_validation_data():
                 "status": 200,
                 "ok": True
             }
-            
     
     except Exception as err:
         raise(err)
