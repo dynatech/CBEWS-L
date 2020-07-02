@@ -28,7 +28,7 @@ function UminganDashboard(props) {
                         <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Risk{'\n'}Assessment</Text>
                         </View>
                         <View style={[ContainerStyle.menu_container]}>
-                        <TouchableOpacity onPress={() => { }}>
+                        <TouchableOpacity onPress={() => { navigator.navigate('FieldSurvey')}}>
                             <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/umingan/menu/field_survey.png')}></Image>
                         </TouchableOpacity>
                         <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Field Survey</Text>

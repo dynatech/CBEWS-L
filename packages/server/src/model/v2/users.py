@@ -39,7 +39,7 @@ class Users():
 		role_id = Users.get_role_privilige(org)
 
 		query = f"INSERT INTO user_accounts VALUES (0, {profile_id}, {site_id}, {role_id}, {mobile_id}, '{username}', '{password}', '{salt}')"
-		user_id = DB.db_modify(query, 'CBEWSL_commons', True)
+		user_id = DB.db_modify(query, 'cbewsl_commons_db', True)
 
 		if user_id:
 			status = {
@@ -81,30 +81,30 @@ class Users():
 
 	def get_role_privilige(org):
 		query = f"SELECT role_id FROM user_roles WHERE role_title = '{org}'"
-		ret_val = DB.db_read(query, 'CBEWSL_commons')[0]["role_id"]
+		ret_val = DB.db_read(query, 'cbewsl_commons_db')[0]["role_id"]
 		return ret_val
 
 	def create_user_mobile(mobile_number):
 		query = f"INSERT INTO user_mobiles VALUES (0, 0, '63{mobile_number[:10]}')"
-		mobile_id = DB.db_modify(query,'CBEWSL_commons', True)
+		mobile_id = DB.db_modify(query,'cbewsl_commons_db', True)
 		return mobile_id
 	
 	def create_user_profile(firstname, lastname, middlename,
 							age, gender, email):
 		query = f"INSERT INTO user_profiles VALUES (0, '{firstname}','{lastname}', '{middlename}', {age}, '{gender}', '{email}')"
-		profile_id = DB.db_modify(query,'CBEWSL_commons', True)
+		profile_id = DB.db_modify(query,'cbewsl_commons_db', True)
 		return profile_id
 
 	def account_exists(username):
 		query = ('SELECT COUNT(*) FROM user_accounts WHERE username = "%s"') % username
-		count = DB.db_read(query, 'CBEWSL_commons')
+		count = DB.db_read(query, 'cbewsl_commons_db')
 		return count
 
 	def fetch_account(username):
 		query = "SELECT * FROM user_accounts INNER JOIN user_profiles USING(profile_id) " \
 				"INNER JOIN user_mobiles USING(mobile_id) INNER JOIN user_roles USING(role_id) " \
 				f"WHERE username = '{username}'"
-		account = DB.db_read(query, 'CBEWSL_commons')
+		account = DB.db_read(query, 'cbewsl_commons_db')
 		return account
 
 	def fetch_user(user_id):

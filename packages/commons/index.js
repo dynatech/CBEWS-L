@@ -9,6 +9,8 @@ import { GetAllFamilyRiskProfile, InsertFamilyRiskProfile, UpdateFamilyRiskProfi
 import { GetIncidentLogs, InsertIncidentLogs, UpdateIncidentLogs, DeleteIncidentLogs } from './src/MAR/MaintenanceLogs/IncidentLogs';
 import { GetMaintenanceLogs, InsertMaintenanceLogs, UpdateMaintenanceLogs, DeleteMaintenanceLogs } from './src/MAR/MaintenanceLogs/MaintenanceLogs';
 import { GetHazardMaps as UmiGetHazardMaps, UploadHazardMaps as UmiUploadHazardMaps } from './src/UMI/RiskAssessment/HazardMaps';
+import { GetFieldSurveyLogs, InsertFieldSurveyLogs, UpdateFieldSurveyLogs, DeleteFieldSurveyLogs } from './src/UMI/FieldSurvey/FieldSurveyLogs';
+import { GetLatestReportSummary, DownloadLatestReportSummary, EmailLatestReportSummary } from './src/UMI/FieldSurvey/ReportSummary';
 
 const UserManagement = {
     AuthRegistration,
@@ -59,9 +61,20 @@ const UmiRiskManagement = {
     UploadHazardMaps: UmiUploadHazardMaps, 
 }
 
+const UmiFieldSurvey = {
+    GetFieldSurveyLogs,
+    InsertFieldSurveyLogs,
+    UpdateFieldSurveyLogs,
+    DeleteFieldSurveyLogs,
+    GetLatestReportSummary,
+    DownloadLatestReportSummary,
+    EmailLatestReportSummary
+}
+
 export {
     UserManagement,
     MarCommunityRiskAssessment,
+    MarMaintenanceLogs,
     UmiRiskManagement,
-    MarMaintenanceLogs
+    UmiFieldSurvey
 }
