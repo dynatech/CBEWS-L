@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, Linking, View } from 'react-native';
 import { ContainerStyle } from '../../styles/container_style';
 import { ImageStyle } from '../../styles/image_style';
 import { LabelStyle } from '../../styles/label_style';
@@ -68,13 +68,13 @@ function UminganDashboard(props) {
                         <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Reports</Text>
                         </View>
                         <View style={[ContainerStyle.menu_container]}>
-                        <TouchableOpacity onPress={() => { }}>
+                        <TouchableOpacity onPress={() => { Linking.openURL('tel:') }}>
                             <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/umingan/menu/call.png')}></Image>
                         </TouchableOpacity>
                         <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Call</Text>
                         </View>
                         <View style={[ContainerStyle.menu_container]}>
-                        <TouchableOpacity onPress={() => { }}>
+                        <TouchableOpacity onPress={() => { Linking.openURL(`sms:?addresses=null&body=`); }}>
                             <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/umingan/menu/messaging.png')}></Image>
                         </TouchableOpacity>
                         <Text style={[LabelStyle.small_label, LabelStyle.brand]}>SMS</Text>
