@@ -102,6 +102,9 @@ def create_app():
     from src.api.v2.marirong.incident_reports import INCIDENT_REPORTS_BLUEPRINT
     app.register_blueprint(INCIDENT_REPORTS_BLUEPRINT, url_prefix="/v2")
 
+    from src.api.v2.marirong.events_template import EVENTS_TEMPLATE_BLUEPRINT
+    app.register_blueprint(EVENTS_TEMPLATE_BLUEPRINT, url_prefix="/v2")
+
     from src.api.v2.umi.field_survey import FIELD_SURVEY_BLUEPRINT
     app.register_blueprint(FIELD_SURVEY_BLUEPRINT, url_prefix="/v2")
 

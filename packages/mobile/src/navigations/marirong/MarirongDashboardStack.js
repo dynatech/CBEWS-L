@@ -4,6 +4,7 @@ import React from 'react';
 import MarirongDashboard from '../../components/marirong/MarirongDashboard';
 import CRATabStack from '../marirong/CRATabStack';
 import MaintenanceLogsTabStack from '../marirong/MaintenanceLogsTabStack';
+import EventsTemplate from '../../components/marirong/events/EventsTemplate';
 
 const Stack = createStackNavigator();
 
@@ -27,6 +28,13 @@ function MarirongDashboardStack() {
                     textAlign: 'center',
                   },
             }} component={MaintenanceLogsTabStack} />
+            <Stack.Screen name="EventsTemplate" options={{
+                title: 'Events',
+                headerLeft: null,
+                headerTitleStyle: {
+                    textAlign: 'center',
+                  },
+            }} component={EventsTemplate} />
         </Stack.Navigator>
     );
 }
