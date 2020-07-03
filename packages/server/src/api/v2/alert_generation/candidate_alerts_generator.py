@@ -2,12 +2,12 @@ import sys, json, os
 from flask import Blueprint, jsonify, request
 from connections import SOCKETIO
 from datetime import datetime as dt, timedelta
-from src.api.alert_generation import public_alerts as PA 
+from src.api.v2.alert_generation import public_alerts as PA 
 from config import APP_CONFIG
-from src.model.alert_generation import AlertGeneration as AG
-from src.model.public_alert_table import PublicAlertTable as PAT
-from src.model.users import Users
-from src.model.sites import Sites
+from src.model.v2.alert_generation import AlertGeneration as AG
+from src.model.v2.public_alert_table import PublicAlertTable as PAT
+from src.model.v2.users import Users
+from src.model.v2.sites import Sites
 from src.api.helpers import Helpers as h
 
 
@@ -34,8 +34,6 @@ def format_release_triggers(candidate, all_event_triggers):
                 trigger_source = AG.get_trigger_hierarchy(source_id, "trigger_source")
                 ots_symbol = trigger["alert"]
                 trigger_type = AG.get_internal_alert_symbol_row(trigger_symbol=ots_symbol, return_col="ias.alert_symbol")
-                h.var_checker("trigger_source", trigger_source)
-                h.var_checker("tech_info_dict", tech_info_dict)
                 tech_info = tech_info_dict[trigger_source]
 
                 trigger_payload = {
@@ -420,7 +418,6 @@ def tag_invalid_triggers(triggers_list, invalid_symbols_list):
         is_invalid = False
         if result:
             has_alert_status = True
-            h.var_checker("result", result)
             if result["alert_status"] == -1:
                 is_invalid = True
             else:
@@ -449,7 +446,6 @@ def fix_internal_alert_invalids(entry, invalid_triggers_list, merged_list):
     has_no_ground_data = entry["has_no_ground_data"]
 
     site_db_alert = next(filter(lambda x: x["site_code"] == site_code, merged_list), None)
-    h.var_checker("merged_list", merged_list)
     current_internal_alert = ""
     current_public_alert_level = 0
     current_entry_source = ""

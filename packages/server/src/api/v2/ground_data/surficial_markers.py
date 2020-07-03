@@ -67,13 +67,16 @@ def modify():
             }
         else:
             mo_ret_val = GroundData.fetch_surficial_mo_id(data['ref_ts'], data['site_id'])
-            marker_ids = dict(map(reversed, GroundData.fetch_marker_ids_v_moid(mo_ret_val[0][0])))
+            # marker_ids = dict(map(reversed, GroundData.fetch_marker_ids_v_moid(mo_ret_val[0][0])))
+            marker_ids = dict(map(reversed, GroundData.fetch_marker_ids_v_moid(mo_ret_val[0]["mo_id"])))
             for x in data['marker_values']:
-                status = GroundData.update_surficial_marker_values(mo_ret_val[0][0], marker_ids[x], data['marker_values'][x])
+                # status = GroundData.update_surficial_marker_values(mo_ret_val[0][0], marker_ids[x], data['marker_values'][x])
+                status = GroundData.update_surficial_marker_values(mo_ret_val[0]["mo_id"], marker_ids[x], data['marker_values'][x])
                 if status == None:
                     marker_values_update = False
             if marker_values_update == True:
-                status = GroundData.update_surficial_marker_observation(mo_ret_val[0][0], 
+                # status = GroundData.update_surficial_marker_observation(mo_ret_val[0][0], 
+                status = GroundData.update_surficial_marker_observation(mo_ret_val[0]["mo_id"], 
                         data['new_ts'], data['weather'], data['observer'], data['site_id'])
                 if status != None:
                     surficial = {

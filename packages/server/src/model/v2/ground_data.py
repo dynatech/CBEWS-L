@@ -232,20 +232,21 @@ class GroundData():
 
         od_data = DB.db_read(query, 'senslopedb')
 
-        return_list = []
-        if od_data:
-            return_list = []
-            for row in od_data:
-                return_list.append({
-                    "id": row[0],
-                    "ts": Helpers.dt_to_str(row[1]),
-                    "site_id": row[2],
-                    "reason": row[3],
-                    "reporter": row[4],
-                    "alert_level": row[5]
-                })
+        # return_list = []
+        # if od_data:
+        #     return_list = []
+        #     for row in od_data:
+        #         return_list.append({
+        #             "id": row[0],
+        #             "ts": Helpers.dt_to_str(row[1]),
+        #             "site_id": row[2],
+        #             "reason": row[3],
+        #             "reporter": row[4],
+        #             "alert_level": row[5]
+        #         })
 
-        return return_list
+        # return return_list
+        return od_data
 
 
     def insert_on_demand_alert(ts, site_id, reason, reporter, alert_level):

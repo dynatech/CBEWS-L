@@ -19,18 +19,9 @@ class PublicAlertTable():
         return_data = None
         if event:
             if return_col:
-                return_data = event[0][0]
+                return_data = event[0][return_col]
             else:
-                temp = event[0]
-                return_data = {
-                    "event_id": temp[0],
-                    "site_id": temp[1],
-                    "event_start": temp[2],
-                    "latest_release_id": temp[3],
-                    "latest_trigger_id": temp[4],
-                    "validity": temp[5],
-                    "status": temp[6] 
-                } 
+                return_data = event[0]
 
         return return_data
 

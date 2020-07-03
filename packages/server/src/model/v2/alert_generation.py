@@ -194,7 +194,7 @@ class AlertGeneration():
         result = DB.db_read(query, schema)
 
         if result:
-            result = result[0][0]
+            result = result[0]["validity"]
 
         return result
 
@@ -222,24 +222,14 @@ class AlertGeneration():
         if result:
             result = result[0]
             if complete:
-                return_data = {
-                    "release_id": result[0], 
-                    "event_id": result[1], 
-                    "data_timestamp": h.dt_to_str(result[2]), 
-                    "internal_alert_level": result[3], 
-                    "release_time": h.timedelta_to_str(result[4]),
-                    "comments": result[5],
-                    "bulletin_number": result[6],
-                    "reporter_id_mt": result[7],
-                    "reporter_id_ct": result[8]
-                }
+                return_data = result
             else:
                 return_data = {
-                    "release_id": result[0], 
-                    "data_timestamp": h.dt_to_str(result[1]), 
-                    "internal_alert_level": result[2], 
-                    "release_time": h.timedelta_to_str(result[3]), 
-                    "reporter_id_mt": result[4]
+                    "release_id": result["release_id"], 
+                    "data_timestamp": result["data_timestamp"], 
+                    "internal_alert_level": result["internal_alert_level"], 
+                    "release_time": result["release_time"], 
+                    "reporter_id_mt": result["reporter_id_mt"]
                 }
 
         return return_data
@@ -268,21 +258,14 @@ class AlertGeneration():
             for trig in result:
                 temp_dict = None
                 if complete:
-                    temp_dict = {
-                        "trigger_id": trig[0],
-                        "event_id": trig[1],
-                        "release_id": trig[2],
-                        "trigger_type": trig[3],
-                        "timestamp": h.dt_to_str(trig[4]),
-                        "info": trig[5]
-                    }
+                    temp_dict = trig
                 else:
                     temp_dict = {
-                        "trigger_id": trig[0],
-                        "release_id": trig[1],
-                        "trigger_type": trig[2],
-                        "timestamp": h.dt_to_str(trig[3]),
-                        "info": trig[4]
+                        "trigger_id": trig["trigger_id"],
+                        "release_id": trig["release_id"],
+                        "trigger_type": trig["trigger_type"],
+                        "timestamp": trig["timestamp"],
+                        "info": trig["info"]
                     }
                 temp_list.append(temp_dict)
 
@@ -333,16 +316,17 @@ class AlertGeneration():
 
         return_data = None
         if return_col:
-            return_data = result[0][0]
+            return_data = result[0][return_col]
         else:
-            temp = result[0]
-            return_data = {
-                "pub_sym_id": temp[0],
-                "alert_symbol": temp[1],
-                "alert_level": temp[2],
-                "alert_type": temp[3],
-                "recommended_response": temp[4]
-            }
+            return_data = result[0]
+            # temp = result[0]
+            # return_data = {
+            #     "pub_sym_id": temp[0],
+            #     "alert_symbol": temp[1],
+            #     "alert_level": temp[2],
+            #     "alert_type": temp[3],
+            #     "recommended_response": temp[4]
+            # }
 
         return return_data
 
@@ -367,19 +351,20 @@ class AlertGeneration():
         schema = "senslopedb"
         result = DB.db_read(query, schema)
 
-        result_list = []
-        for row in result:
-            result_list.append({
-                "trigger_sym_id": row[0],
-                "internal_sym_id": row[1],
-                "ias_symbol": row[2],
-                "ots_symbol": row[3],
-                "alert_description": row[4],
-                "alert_level": row[5],
-                "trigger_source": row[6]
-            })
+        # result_list = []
+        # for row in result:
+        #     result_list.append({
+        #         "trigger_sym_id": row[0],
+        #         "internal_sym_id": row[1],
+        #         "ias_symbol": row[2],
+        #         "ots_symbol": row[3],
+        #         "alert_description": row[4],
+        #         "alert_level": row[5],
+        #         "trigger_source": row[6]
+        #     })
 
-        return result_list
+        # return result_list
+        return result
 
 
     def get_ias_by_lvl_source(trigger_source, alert_level, return_col=None):
@@ -427,6 +412,11 @@ class AlertGeneration():
                     trigger_source"
         if return_col:
             select_option = return_col
+            if return_col == "ias.alert_symbol":
+                return_col = "ias_symbol"
+            elif return_col == "ots.alert_symbol":
+                return_col = "ots_symbol"
+            select_option = f"{select_option} as {return_col}"
         query = f"SELECT {select_option} FROM " + \
                 "senslopedb.internal_alert_symbols ias " + \
             "INNER JOIN " + \
@@ -446,19 +436,10 @@ class AlertGeneration():
         return_data = None
         if return_col:
             if result:
-                return_data = result[0][0]
+                return_data = result[0][return_col]
         else:
             if result:
-                result = result[0]
-                return_data = {
-                    "internal_sym_id": result[0], 
-                    "trigger_sym_id": result[1], 
-                    "ias_symbol": result[2], 
-                    "ots_symbol": result[3], 
-                    "alert_description": result[4], 
-                    "alert_level": result[5], 
-                    "trigger_source": result[6]
-                }
+                return_data = result[0]
 
         return return_data
 
@@ -500,6 +481,6 @@ class AlertGeneration():
 
         return_data = result[0]
         if return_col:
-            return_data = result[0][0]
+            return_data = result[0][return_col]
 
         return return_data

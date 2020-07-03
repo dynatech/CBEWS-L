@@ -102,8 +102,7 @@ def get_mar_alert_validation_data():
 
             response = {
                 "data": mar_data,
-                "status": 200,
-                "ok": True
+                "status": True
             }
         else:
             response = {
@@ -112,8 +111,7 @@ def get_mar_alert_validation_data():
                     "public_alert_level": 0,
                     "status": "no_alert"
                 },
-                "status": 200,
-                "ok": True
+                "status": True
             }
             
     except Exception as err:
@@ -142,7 +140,6 @@ def get_umi_alert_validation_data():
                 "comments": "No Comment",
                 "bulletin_number": PAT.fetch_site_bulletin_number(PAT, site_id=29)
             })
-            h.var_checker("umi_data", umi_data, True)
 
             response = {
                 "data": umi_data,
@@ -261,7 +258,7 @@ def format_release_triggers(payload, process_one=False):
             "trigger_source": trigger_source,
             "trigger_alert_level": alert_level,
             # NOTE: Unconventional
-            "trigger_timestamp": dt.strftime(timestamp, "%Y-%m-%d %H:%M:%S"), 
+            "trigger_timestamp": timestamp, 
             "info": info
         })
 
@@ -360,11 +357,11 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
                 event_data["site_code"] = site_code
                 # NOTE: Unconventional
                 event_data["latest_release_id"] = release_id
-                event_data["data_ts"] = dt.strftime(data_ts, "%Y-%m-%d %H:%M:%S")
+                event_data["data_ts"] = h.dt_to_str(data_ts)
                 event_data["release_time"] = str(release_time)
                 event_data["internal_alert_level"] = internal_alert
-                event_data["event_start"] = dt.strftime(event_start, "%Y-%m-%d %H:%M:%S")
-                event_data["validity"] = dt.strftime(validity, "%Y-%m-%d %H:%M:%S")
+                event_data["event_start"] = event_start
+                event_data["validity"] = validity
                 event_data["reporter"] = reporter
                 event_data["event_id"] = event_id
                 event_data["event_status"] = status
@@ -407,7 +404,7 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
                 )
                 event_data["latest_event_triggers"] = get_unique_trigger_per_type(all_event_triggers)
 
-                if run_ts <= validity:
+                if run_ts <= h.str_to_dt(validity):
                     active_events_dict["latest"].append(event_data)
                 elif validity < run_ts:
                     # if int(event_data["public_alert_level"]) > 0:
@@ -695,17 +692,15 @@ def insert_ewi(internal_ewi_data=None):
             print(f"Event ID {event_id} was updated")
 
         return_data = {
-            "status": 200,
-            "data": event_id,
-            "ok": True
+            "status": True,
+            "data": event_id
         }
     except Exception as err:
         raise(err)
         
         return_data = {
-            "status": 200,
-            "data": None,
-            "ok": False
+            "status": True,
+            "data": None
         }
 
     return jsonify(return_data)

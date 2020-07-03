@@ -76,7 +76,6 @@ def add():
                 "ok": False,
                 "message": f"Failed to add OD data."
             }
-        H.var_checker("od_data_return", od_data_return, True)
     except Exception as err:
         raise(err)
         od_data_return = {
@@ -102,7 +101,6 @@ def raise_on_demand():
             site_id=site_id,
             trig_sym_id=trigger_sym_id
         )
-        H.var_checker("op_trig_data_dict", op_trig_data_dict, True)
 
         # If nothing exists in database:
         if not op_trig_data_dict:
