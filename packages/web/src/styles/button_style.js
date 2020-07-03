@@ -31,6 +31,17 @@ const ButtonStyle = makeStyles((theme) => ({
         marginLeft: 10,
         width: width / 3,
     },
+    small2: {
+        backgroundColor: "#083451",
+        borderColor: "#083451",
+        color: '#FFFFFF',
+        borderRadius: 50,
+        borderWidth: 1,
+        elevation: 20,
+        marginRight: 10,
+        marginLeft: 10,
+        width: width / 6,
+    },
     valid: {
         backgroundColor: "green",
         borderColor: "green",

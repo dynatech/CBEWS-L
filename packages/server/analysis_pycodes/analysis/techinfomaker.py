@@ -140,7 +140,7 @@ def formulate_subsurface_tech_info(alert_detail):
         node_details = '; '.join(node_details)
         return node_details
     except Exception as err:
-        print(err)
+        print("form subs tech info: " + err)
         raise
 
 def get_subsurface_tech_info(site_id, start_ts, latest_trigger_ts):
@@ -161,7 +161,7 @@ def get_subsurface_tech_info(site_id, start_ts, latest_trigger_ts):
                 
         return subsurface_tech_info
     except Exception as err:
-        print(err)
+        print("get subs tech info: " + err)
         raise
 
 def get_rainfall_tech_info(site_id, latest_trigger_ts):
@@ -200,7 +200,7 @@ def get_rainfall_tech_info(site_id, latest_trigger_ts):
         return rain_tech_info  
 
     except Exception as err:
-        print(err)
+        print("get rain tech info: " + err)
         raise
 
 
@@ -218,7 +218,7 @@ def formulate_surficial_tech_info(alert_detail):
         return surficial_tech_info
 
     except Exception as err:
-        print(err)
+        print("form sur tech info: " + err)
         raise
 
 
@@ -239,7 +239,7 @@ def get_surficial_tech_info(site_id, latest_trigger_ts):
         return surficial_tech_info
     
     except Exception as err:
-        print(err)
+        print("form moms tech info: " + err)
         raise
 
 
@@ -259,7 +259,7 @@ def formulate_moms_tech_info(alert_detail, moms_type_df):
         return moms_tech_info
 
     except Exception as err:
-        print(err)
+        print("form moms tech info: " + err)
         raise
 
 
@@ -284,7 +284,7 @@ def get_moms_tech_info(site_id, latest_trigger_ts):
         return moms_tech_info
     
     except Exception as err:
-        print(err)
+        print("get moms tech info: " + err)
 
 
 def get_od_tech_info(site_id, latest_trigger_ts):
@@ -298,7 +298,7 @@ def get_od_tech_info(site_id, latest_trigger_ts):
         return od_tech_info
     
     except Exception as err:
-        print(err)
+        print("get od tech info: " + err)
 
 
 def get_eq_tech_info(site_id, latest_trigger_ts):
@@ -312,7 +312,7 @@ def get_eq_tech_info(site_id, latest_trigger_ts):
         return od_tech_info
     
     except Exception as err:
-        print(err)
+        print("get eq tech info: " + err)
 
         
 def main(trigger_df):

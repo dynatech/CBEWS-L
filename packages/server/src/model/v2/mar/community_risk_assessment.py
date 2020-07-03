@@ -41,7 +41,6 @@ class CommunityRiskAssessment():
 
 	def delete_cav(cav_id):
 		query = f"DELETE FROM capacity_and_vulnerability WHERE cav_id = { cav_id }"
-		h.var_checker("query", query)
 		schema = "cbewsl_mar_collections"
 		result = DB.db_modify(query, schema, True)
 		return result

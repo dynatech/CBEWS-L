@@ -32,12 +32,16 @@ APP_CONFIG = {
     "url": "http://localhost:3000",
     # "MARIRONG_DIR": "/home/jgeliberte/codes/cbews-l-mar-fe/src/client-cbewsl/MARIRONG",
     # "UMINGAN_DIR": "/home/jgeliberte/codes/cbews-l-mar-fe/src/client-cbewsl/UMINGAN",
-    "MARIRONG_DIR": "C:/Users/John Louie/codes/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG",
-    "UMINGAN_DIR": "C:/Users/John Louie/codes/CBEWS-L/packages/commons/src/client-cbewsl/UMINGAN",
-    "CANDIDATE_DIR": "/home/louie-cbews/CODES/cbews_iloilo/Documents/monitoringoutput/alertgen",
-    "public_alert_file": "/home/louie-cbews/CODES/cbews_iloilo/Documents/monitoringoutput/alertgen/PublicAlertRefDB.json",
+    "MARIRONG_DIR": "/home/louie-cbews/CODES/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG",
+    "UMINGAN_DIR": "/home/louie-cbews/CODES/CBEWS-L/packages/commons/src/client-cbewsl/UMINGAN",
+    "CANDIDATE_DIR": "/home/louie-cbews/CODES/CBEWS-L/packages/server/Documents/monitoringoutput/alertgen",
+    "public_alert_file": "/home/louie-cbews/CODES/CBEWS-L/packages/server/Documents/monitoringoutput/alertgen/PublicAlertRefDB.json",
     "site_code": {
-        "51": "MARIRONG_DIR",
+        "29": "MARIRONG_DIR",
         "50": "UMINGAN_DIR"
+    },
+    "site_ids": {
+        "mar": 29,
+        "umi": 50
     }
 }

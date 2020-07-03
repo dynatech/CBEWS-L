@@ -95,7 +95,6 @@ def upload_report_attachment():
     try:
         file = request.files['file']
 
-        h.var_checker("request.form", request.form, True)
         form_json = request.form.to_dict(flat=False)
         ir_id = form_json["ir_id"][0]
         file_path = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/INCIDENT_REPORTS/{ir_id}/"
