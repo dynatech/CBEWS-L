@@ -111,4 +111,7 @@ def create_app():
     from src.api.v2.ground_data.on_demand import ON_DEMAND_BLUEPRINT
     app.register_blueprint(ON_DEMAND_BLUEPRINT, url_prefix="/v2")
 
+    from src.api.v2.umi.field_survey import FIELD_SURVEY_BLUEPRINT
+    app.register_blueprint(FIELD_SURVEY_BLUEPRINT, url_prefix="/v2")
+
     return app

@@ -11,7 +11,7 @@ const LabelStyle = StyleSheet.create({
       fontSize: width * 0.06,
    },
    medium_label: {
-      fontSize: width * 0.04,
+      fontSize: width * 0.05,
       padding: 10
    },
    small_label: {

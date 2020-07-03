@@ -77,7 +77,7 @@ class DatabaseConnection():
         for row in values:
             entry = {}
             for index, item in enumerate(row):
-                entry.update({list_of_cols[index]: item})
+                entry.update({list_of_cols[index]: str(item)})
             final_list.append(entry)
         
         return final_list

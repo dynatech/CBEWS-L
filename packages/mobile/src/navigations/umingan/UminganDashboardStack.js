@@ -3,6 +3,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import UminganDashboard from '../../components/umingan/UminganDashboard';
 import RATabStack from '../umingan/RATabStack';
+import FieldSurveyStack from '../umingan/FieldSurveyStack';
+
 
 const Stack = createStackNavigator();
 
@@ -19,6 +21,13 @@ function UminganDashboardStack() {
                     textAlign: 'center',
                   },
             }} component={RATabStack} />
+            <Stack.Screen name="FieldSurvey" options={{
+                title: 'Field Survey',
+                headerLeft: null,
+                headerTitleStyle: {
+                    textAlign: 'center',
+                  },
+            }} component={FieldSurveyStack} />
         </Stack.Navigator>
     );
 }
