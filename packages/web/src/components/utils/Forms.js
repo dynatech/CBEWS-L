@@ -142,18 +142,34 @@ export default function Forms(props) {
                                     * Please review your details before submitting
                                 </Typography>
                             </Grid>
-                            <Grid item xs={12}>
-                                <Button
-                                    className={classes.small}
-                                    onClick={handleSubmit}
-                                    type="submit"
-                                >
-                                    Submit
-                                </Button>
-                                {command != "add" && (
-                                    <Button onClick={deleteForm}>Delete</Button>
-                                )}
-                            </Grid>
+                            {command != "add" ? (
+                                <Fragment>
+                                    <Grid item xs={6}>
+                                        <Button
+                                            className={classes.small2}
+                                            onClick={handleSubmit}
+                                            type="submit"
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Button 
+                                            className={classes.small2}
+                                            onClick={deleteForm}>Delete</Button>
+                                    </Grid>
+                                </Fragment>
+                            ) : (
+                                <Grid item xs={12}>
+                                    <Button
+                                        className={classes.small}
+                                        onClick={handleSubmit}
+                                        type="submit"
+                                    >
+                                        Submit
+                                    </Button>
+                                </Grid>
+                            )}
                         </Grid>
                     </form>
                 )

@@ -46,11 +46,11 @@ def create_app():
     from src.api.ground_data.surficial_markers import SURFICIAL_MARKERS_BLUEPRINT
     app.register_blueprint(SURFICIAL_MARKERS_BLUEPRINT, url_prefix="/api")
 
-    from src.api.ground_data.manifestation_of_movements import MANIFESTATION_OF_MOVEMENTS_BLUEPRINT
-    app.register_blueprint(MANIFESTATION_OF_MOVEMENTS_BLUEPRINT, url_prefix="/api")
+    # from src.api.ground_data.manifestation_of_movements import MANIFESTATION_OF_MOVEMENTS_BLUEPRINT
+    # app.register_blueprint(MANIFESTATION_OF_MOVEMENTS_BLUEPRINT, url_prefix="/api")
 
-    from src.api.alert_generation.public_alerts import PUBLIC_ALERTS_BLUEPRINT
-    app.register_blueprint(PUBLIC_ALERTS_BLUEPRINT, url_prefix="/api")
+    # from src.api.alert_generation.public_alerts import PUBLIC_ALERTS_BLUEPRINT
+    # app.register_blueprint(PUBLIC_ALERTS_BLUEPRINT, url_prefix="/api")
 
     from src.api.data_analysis.rainfall_analysis import RAINFALL_ANALYSIS_BLUEPRINT
     app.register_blueprint(RAINFALL_ANALYSIS_BLUEPRINT, url_prefix="/api")
@@ -76,8 +76,8 @@ def create_app():
     from src.api.events.template_creator import TEMPLATE_CREATOR_BLUEPRINT
     app.register_blueprint(TEMPLATE_CREATOR_BLUEPRINT, url_prefix="/api")
 
-    from src.api.ground_data.on_demand import ON_DEMAND_BLUEPRINT
-    app.register_blueprint(ON_DEMAND_BLUEPRINT, url_prefix="/api")
+    # from src.api.ground_data.on_demand import ON_DEMAND_BLUEPRINT
+    # app.register_blueprint(ON_DEMAND_BLUEPRINT, url_prefix="/api")
 
     # from src.api.risk_assessment.hazard_maps import HAZARD_MAPS_BLUEPRINT
     # app.register_blueprint(HAZARD_MAPS_BLUEPRINT, url_prefix="/api")
@@ -101,6 +101,15 @@ def create_app():
 
     from src.api.v2.marirong.incident_reports import INCIDENT_REPORTS_BLUEPRINT
     app.register_blueprint(INCIDENT_REPORTS_BLUEPRINT, url_prefix="/v2")
+    
+    from src.api.v2.alert_generation.public_alerts import PUBLIC_ALERTS_BLUEPRINT
+    app.register_blueprint(PUBLIC_ALERTS_BLUEPRINT, url_prefix="/v2")
+
+    from src.api.v2.ground_data.manifestation_of_movements import MANIFESTATION_OF_MOVEMENTS_BLUEPRINT
+    app.register_blueprint(MANIFESTATION_OF_MOVEMENTS_BLUEPRINT, url_prefix="/v2")
+
+    from src.api.v2.ground_data.on_demand import ON_DEMAND_BLUEPRINT
+    app.register_blueprint(ON_DEMAND_BLUEPRINT, url_prefix="/v2")
 
     from src.api.v2.marirong.events_template import EVENTS_TEMPLATE_BLUEPRINT
     app.register_blueprint(EVENTS_TEMPLATE_BLUEPRINT, url_prefix="/v2")

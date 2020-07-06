@@ -89,7 +89,6 @@ def modify_capacity_and_vulnerability():
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/delete/community_risk_assessment/mar/capacity_and_vulnerability", methods=["DELETE"])
 def remove_capacity_and_vulnerability():
     data = request.get_json()
-    h.var_checker("data0", data)
     status = CommunityRiskAssessment.delete_cav(data["cav_id"])
     if status:
         return_value = {

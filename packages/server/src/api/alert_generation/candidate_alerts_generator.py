@@ -208,6 +208,8 @@ def prepare_sites_for_routine_release(no_alerts, excluded_indexes_list, invalid_
             if month in matrix[season - 1]:
                 print("IT IS IN ROUTINE")
                 # TODO: FINISH ROUTINE TASKS. TEST FOR NOW.
+    
+    return return_list
 
 
 def prepare_sites_for_extended_release(extended_sites, no_alerts):
@@ -629,7 +631,6 @@ def process_candidate_alerts(generated_alerts, db_alerts):
     candidate_alerts_list.extend(return_list)
     
     return_list = tag_sites_for_lowering(merged_list, no_alerts)
-    # TODO: Somethings wrong with the lowering indexes list
     lowering_return, lowering_indexes_list = return_list
     candidate_alerts_list.extend(lowering_return)
 
@@ -637,11 +638,9 @@ def process_candidate_alerts(generated_alerts, db_alerts):
     extended_return, extended_indexes_list = return_list
     candidate_alerts_list.extend(extended_return)
 
-    excluded_indexes_list = lowering_indexes_list + extended_indexes_list
     if no_alerts:
         return_list = prepare_sites_for_routine_release(no_alerts, extended_indexes_list, invalid_entries)
-    
-    # FUCKING STAMP THE STATUSES AND VALIDITIES
+
     candidate_alerts_list = finalize_candidates_before_release(candidate_alerts_list, latest, overdue, extended, invalids)
 
     return candidate_alerts_list

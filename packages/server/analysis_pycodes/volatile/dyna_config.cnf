@@ -1,10 +1,10 @@
 [Hosts]
-local = 202.90.159.64
-senslope = 202.90.159.64
-dynaslope = 202.90.159.64
-gsm = 202.90.159.64
-gsm2 = 202.90.159.64
-sandbox = 202.90.159.64
+local = 127.0.0.1
+senslope = 127.0.0.1
+dynaslope = 127.0.0.1
+gsm = 127.0.0.1
+gsm2 = 127.0.0.1
+sandbox = 127.0.0.1
 
 
 [Resource]
@@ -23,9 +23,9 @@ resources4 = sb_remote,sb_rack_remote_1,sb_local
 
 
 [Db]
-password = cb3wsls3rv3r
+password = senslope
 name = senslopedb
-user = cbewsl
+user = root
 
 [Serial]
 baudrate = 57600

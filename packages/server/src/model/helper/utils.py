@@ -1,7 +1,7 @@
 import MySQLdb
 import configparser
 import time
-
+from config import APP_CONFIG
 # class DatabaseCredentials():
 # 	def __new__(self, host):
 # 		config = configparser.ConfigParser()
@@ -102,7 +102,7 @@ class DatabaseConnection():
     
     def db_switcher(site_id):
         schema = ""
-        if int(site_id) == 51:
+        if int(site_id) == APP_CONFIG["site_ids"]["mar"]:
             schema = "cbewsl_mar_collections"
         else:
             schema = "cbewsl_umi_collections"

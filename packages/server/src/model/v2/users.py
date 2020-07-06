@@ -75,7 +75,7 @@ class Users():
 				print(Exception("Invalid mobile number length"))
 
 		query = f"SELECT gsm_id FROM sim_prefixes WHERE prefix = {prefix}"
-		gsm_id = DB.db_read(query, 'comms_db')[0][0]
+		gsm_id = DB.db_read(query, 'comms_db')[0]["gsm_id"]
 
 		return gsm_id, f"639{remaining_number}"
 
