@@ -14,8 +14,9 @@ function EventsTemplate() {
     const [ cmd, setCmd ] = useState('add');
     const [ templateContainer, setTemplateContainer ] = useState([]);
     const [ templatePicker, setTemplatePicker ] = useState([]);
+    const [ selectedId, setSelectedId ] = useState(null);
     const [ selectedTemplateName, setSelectedTemplateName] = useState('');
-    const [ selectedMessageTemplate, setSelectedMessageTemplate] = useState('def');
+    const [ selectedMessageTemplate, setSelectedMessageTemplate] = useState('');
 
     useEffect(()=> {
         init();
@@ -25,17 +26,25 @@ function EventsTemplate() {
         let response = await MarEventsTemplate.GetAllEventsTemplate()
         if (response.status === true) {
             let temp = [];
+            response.data.push({
+                id: "0",
+                template_name: 'New template',
+                message_template: 'New template'
+            })
             response.data.forEach(element => {
                 temp.push(
                     <Picker.Item key={element.id} label={element.template_name} value={element.id} />
                 )
             });
-            temp.push(<Picker.Item key="new" label="New template" value="new" />);
+            // temp.push(<Picker.Item key="new" label="New template" value="new" />);
             if (response.data.length != 0) {
-                setSelectedTemplateName(response.data[0].id)
+                setCmd('update')
+                setSelectedId(response.data[0].id);
+                setSelectedTemplateName(response.data[0].template_name);
                 setSelectedMessageTemplate(response.data[0].message_template);
             } else {
-                setSelectedTemplateName('new')
+                setCmd('Add')
+                setSelectedTemplateName('')
                 setSelectedMessageTemplate('');
             }
             setTemplatePicker(temp);
@@ -46,20 +55,31 @@ function EventsTemplate() {
     }
     
     const handleChangeTemplate = (value) => {
-        alert('CHANGE')
-        setSelectedMessageTemplate('');
-        setSelectedTemplateName(value);
+        let select = templateContainer.find(x => x.id == value);
+        select.id == "0" ? setCmd('add') : setCmd('update')
+        setSelectedMessageTemplate(select.message_template);
+        setSelectedTemplateName(select.template_name);
+        setSelectedId(select.id);
     }
 
     const handleSubmit = () => {
         MobileCaching.getItem('user_credentials').then(credentials => {
             setTimeout(async ()=> {
-                let response = await MarEventsTemplate.InsertEventsTemplate({
-                    'template_name': selectedTemplateName,
-                    'message_template': selectedMessageTemplate,
-                    'user_id': credentials['user_id']
-                })
-    
+                let response = null;
+                if (cmd == "add") {
+                    response = await MarEventsTemplate.InsertEventsTemplate({
+                        'template_name': selectedTemplateName,
+                        'message_template': selectedMessageTemplate,
+                        'user_id': credentials['user_id']
+                    })
+                } else {
+                    response = await MarEventsTemplate.UpdateEventsTemplate({
+                        'id': selectedId,
+                        'template_name': selectedTemplateName,
+                        'message_template': selectedMessageTemplate,
+                        'user_id': credentials['user_id']
+                    })
+                }
                 if (response.status == true) {
                     ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                     init();
@@ -72,9 +92,31 @@ function EventsTemplate() {
     }
 
     const handleDelete = () => {
-
+        Alert.alert(
+            "SMS Template",
+            "Are you sure you want to delete this data?",
+            [
+              {
+                text: "Cancel",
+                style: "cancel"
+              },
+              { text: "Confirm", onPress: () => {
+                setTimeout(async ()=> {
+                    let response = await MarEventsTemplate.DeleteEventsTemplate({
+                        'id': selectedId
+                    })
+                    if (response.status == true) {
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        init();
+                    } else {
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                    }
+                },300)
+              }}
+            ],
+            { cancelable: false }
+        );
     }
-
     return(
         <ScrollView>
             <View style={ContainerStyle.content}>
@@ -85,7 +127,7 @@ function EventsTemplate() {
                         <Text style={{ fontWeight: 'bold', fontSize: 17, color: '#848e98' }}>Select template</Text>
                         <Picker
                             mode='dropdown'
-                            selectedValue={selectedTemplateName}
+                            selectedValue={selectedId}
                             onValueChange={(v, i) =>
                                 handleChangeTemplate(v)
                             }>

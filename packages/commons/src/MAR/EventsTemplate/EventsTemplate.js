@@ -19,7 +19,7 @@ const InsertEventsTemplate = (data) => {
 
 const UpdateEventsTemplate = (data) => {
     return fetch(`${AppConfig.HOSTNAME}/v2/update/mar/events_template`, {
-        method: 'POST',
+        method: 'PATCH',
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
