@@ -1,5 +1,6 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React from 'react';
+import { Dimensions } from 'react-native';
 import CurrentSituationReport from '../../components/umingan/situation_report/CurrentSituationReport';
 import SituationReportLogs from '../../components/umingan/situation_report/SituationReportLogs';
 
