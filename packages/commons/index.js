@@ -11,6 +11,7 @@ import { GetMaintenanceLogs, InsertMaintenanceLogs, UpdateMaintenanceLogs, Delet
 import { GetHazardMaps as UmiGetHazardMaps, UploadHazardMaps as UmiUploadHazardMaps } from './src/UMI/RiskAssessment/HazardMaps';
 import { GetFieldSurveyLogs, InsertFieldSurveyLogs, UpdateFieldSurveyLogs, DeleteFieldSurveyLogs } from './src/UMI/FieldSurvey/FieldSurveyLogs';
 import { GetLatestReportSummary, DownloadLatestReportSummary, EmailLatestReportSummary } from './src/UMI/FieldSurvey/ReportSummary';
+import { InsertEventsTemplate, UpdateEventsTemplate, GetAllEventsTemplate, DeleteEventsTemplate } from './src/MAR/EventsTemplate/EventsTemplate';
 
 const UserManagement = {
     AuthRegistration,
@@ -71,10 +72,18 @@ const UmiFieldSurvey = {
     EmailLatestReportSummary
 }
 
+const MarEventsTemplate = {
+    InsertEventsTemplate,
+    UpdateEventsTemplate,
+    GetAllEventsTemplate,
+    DeleteEventsTemplate
+}
+
 export {
     UserManagement,
     MarCommunityRiskAssessment,
     MarMaintenanceLogs,
+    MarEventsTemplate,
     UmiRiskManagement,
     UmiFieldSurvey
 }
