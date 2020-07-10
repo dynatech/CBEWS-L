@@ -8,6 +8,7 @@ from src.model.alert_generation import AlertGeneration as AG
 from src.model.public_alert_table import PublicAlertTable as PAT
 from src.model.users import Users
 from src.model.sites import Sites
+from src.model.v2.dynamic_variables import DynamicVariables as dv
 from src.api.helpers import Helpers as h
 
 
@@ -130,7 +131,14 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         #########################
         # CHECK IF RELEASE TIME #
         #########################
-        scheduled_release_time = h.round_to_nearest_release_time(candidate_ts)
+
+        # Troublesome setup starts here
+        site_dv = dv.get_site_dynamic_variables(site_id)
+        release_interval_hours = site_dv["release_interval_hours"]
+        h.var_checker("site_dv", site_dv)
+        # Troublesome setup ends here
+
+        scheduled_release_time = h.round_to_nearest_release_time(candidate_ts, release_interval_hours)
         target_data_ts = scheduled_release_time - timedelta(minutes=30)
 
         is_higher_alert = site_db_pub_al_lvl < int(candidate["public_alert_level"])
@@ -227,8 +235,12 @@ def prepare_sites_for_extended_release(extended_sites, no_alerts):
             day = site["day"]
             ts = h.str_to_dt(x["ts"])
 
+            # TODO: ADJUST THIS TO ACCEPT VARIABLE RELEASE TIME FOR EXTENDED
             if data_ts != ts and day > 0:
-                if ts.hour == 11 and ts.minute == 30:
+                site_dv = dv.get_site_dynamic_variables(site_id)
+                extended_release_time = int(site_dv["extended_release_time"]) - 1
+                # if ts.hour == 11 and ts.minute == 30:
+                if ts.hour == extended_release_time and ts.minute == 30:
                     # x.update({
                     #     "status": "extended",
                     #     "latest_trigger_timestamp": "extended",
@@ -574,6 +586,7 @@ def process_with_alerts_entries(with_alerts, merged_list, invalids):
     for w_alert in with_alerts:
         entry = w_alert
         site_code = entry["site_code"]
+        site_id = entry["site_id"]
 
         entry = fix_internal_alert_invalids(entry, invalids, merged_list)
 

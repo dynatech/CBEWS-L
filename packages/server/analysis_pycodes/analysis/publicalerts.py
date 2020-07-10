@@ -530,6 +530,14 @@ def get_alert_history(current_events):
     
     return current_events_history
 
+def get_site_dynamic_variables(site_id):
+    query = "SELECT * FROM commons_db.dynamic_variables WHERE "
+    query = f"{query} fk_site_id={site_id}" 
+
+    dynamic_variables = qdb.get_db_dataframe(query)
+
+    return dynamic_variables
+
 def site_public_alert(site_props, end, public_symbols, internal_symbols,
                       start_time):  
     """Dataframe containing necessary information for public release.
@@ -573,8 +581,14 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     # operational triggers for monitoring at timestamp end
     op_trig = get_operational_trigger(site_id, start_monitor, end)
 
+    # NOTE: Retrieves CBEWS-L dynamic variables
+    site_dynamic_vars = get_site_dynamic_variables(site_id)
+
+    rel_interval_hour = int(site_dynamic_vars['release_interval_hours'][0])
+
     release_op_trig = op_trig[op_trig.ts_updated >= \
-            release_time(end)-timedelta(hours=4)]
+            # release_time(end)-timedelta(hours=4)]
+            release_time(end)-timedelta(hours=rel_interval_hour)]
     release_op_trig = release_op_trig.drop_duplicates(['source_id', \
             'alert_level'])
     subsurface_id = internal_symbols[internal_symbols.trigger_source == \
@@ -601,7 +615,8 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
 
     # SURFICIAL ALERT
     if public_alert > 0:
-        surficial_ts = release_time(end) - timedelta(hours=4)
+        # surficial_ts = release_time(end) - timedelta(hours=4)
+        surficial_ts = release_time(end) - timedelta(hours=rel_interval_hour, mins=30)
     else:
         surficial_ts = pd.to_datetime(end.date())
 
@@ -615,7 +630,8 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     # MOMS ALERT NOTE: Following code is redundant with above
     # TODO: LOUIE 
     if public_alert > 0:
-        moms_ts = release_time(end) - timedelta(hours=4)
+        # moms_ts = release_time(end) - timedelta(hours=4)
+        moms_ts = release_time(end) - timedelta(hours=rel_interval_hour)
     else:
         moms_ts = pd.to_datetime(end.date())
     
@@ -875,6 +891,7 @@ def main(end=datetime.now()):
     query = "SELECT site_id, site_code FROM commons_db.sites WHERE active = 1"
     props = qdb.get_db_dataframe(query)
     # props = props[props.site_code == 'mar']
+    props = props[(props.site_code == 'mar') | (props.site_code == 'umi')]
     site_props = props.groupby('site_id', as_index=False)
     alerts = site_props.apply(site_public_alert, end=end,
                               public_symbols=public_symbols,
