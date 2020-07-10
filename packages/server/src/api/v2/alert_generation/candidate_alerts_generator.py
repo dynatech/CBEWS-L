@@ -6,6 +6,7 @@ from src.api.v2.alert_generation import public_alerts as PA
 from config import APP_CONFIG
 from src.model.v2.alert_generation import AlertGeneration as AG
 from src.model.v2.public_alert_table import PublicAlertTable as PAT
+from src.model.v2.dynamic_variables import DynamicVariables as dv
 from src.model.v2.users import Users
 from src.model.v2.sites import Sites
 from src.api.helpers import Helpers as h
@@ -28,8 +29,6 @@ def format_release_triggers(candidate, all_event_triggers):
             saved_trigger = next(filter(lambda x: x["trigger_type"] == ias_symbol and x["timestamp"] == trigger["ts"], all_event_triggers), None)
 
             if not saved_trigger: 
-                if not trigger["has_alert_status"]:
-                    all_validated = False
                 source_id = trigger["source_id"]
                 trigger_source = AG.get_trigger_hierarchy(source_id, "trigger_source")
                 ots_symbol = trigger["alert"]
@@ -45,10 +44,22 @@ def format_release_triggers(candidate, all_event_triggers):
                     "alert_level": trigger["alert_level"],
                     "trigger_id": trigger["trigger_id"],
                     "ots_symbol": ots_symbol,
-                    "trigger_source": trigger_source,
-                    "is_invalid": trigger["is_invalid"],
-                    "has_alert_status": trigger["has_alert_status"]
+                    "trigger_source": trigger_source
                 }
+                
+                try:
+                    if not trigger["has_alert_status"]:
+                        all_validated = False
+
+                    trigger_payload.update({
+                        "is_invalid": trigger["is_invalid"],
+                        "has_alert_status": trigger["has_alert_status"]
+                    })
+                except KeyError:
+                    pass
+                except Exception:
+                    raise
+
                 new_trigger_list.append(trigger_payload)
     except Exception as err:
         raise(err)
@@ -65,7 +76,6 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
 
     for candidate in candidate_alerts_list:
         # Containers
-        candidate_status = ""
         site_db_pub_al_lvl = 0
         are_all_validated = False
         is_new_release = False
@@ -130,7 +140,14 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         #########################
         # CHECK IF RELEASE TIME #
         #########################
-        scheduled_release_time = h.round_to_nearest_release_time(candidate_ts)
+
+        # Troublesome setup starts here
+        site_dv = dv.get_site_dynamic_variables(site_id)
+        release_interval_hours = int(site_dv["release_interval_hours"])
+        # Troublesome setup ends here
+
+        # scheduled_release_time = h.round_to_nearest_release_time(candidate_ts)
+        scheduled_release_time = h.round_to_nearest_release_time(candidate_ts, release_interval_hours)
         target_data_ts = scheduled_release_time - timedelta(minutes=30)
 
         is_higher_alert = site_db_pub_al_lvl < int(candidate["public_alert_level"])
@@ -187,8 +204,8 @@ def prepare_sites_for_routine_release(no_alerts, excluded_indexes_list, invalid_
     data_ts = h.str_to_dt(data_timestamp)
     weekday = data_ts.weekday()
     matrix = None
-    return_list = []
-    routine_list = []
+    # return_list = []
+    # routine_list = []
 
     if dt.strftime(data_ts, "%H:%M") == "11:30":
         if weekday == 3:
@@ -203,12 +220,13 @@ def prepare_sites_for_routine_release(no_alerts, excluded_indexes_list, invalid_
             ts = item["ts"]
             month = h.str_to_dt(ts).month
             site_detail = Sites.get_site_details(filter_value=site_code, site_filter="site_code")
-            season = site_detail["season"]
+            season = int(site_detail["season"])
 
             if month in matrix[season - 1]:
                 print("IT IS IN ROUTINE")
                 # TODO: FINISH ROUTINE TASKS. TEST FOR NOW.
 
+    return []
 
 def prepare_sites_for_extended_release(extended_sites, no_alerts):
     """
@@ -225,8 +243,12 @@ def prepare_sites_for_extended_release(extended_sites, no_alerts):
             day = site["day"]
             ts = h.str_to_dt(x["ts"])
 
+            # TODO: ADJUST THIS TO ACCEPT VARIABLE RELEASE TIME FOR EXTENDED
             if data_ts != ts and day > 0:
-                if ts.hour == 11 and ts.minute == 30:
+                site_dv = dv.get_site_dynamic_variables(site["site_id"])
+                extended_release_time = int(site_dv["extended_release_time"]) - 1
+                # if ts.hour == 11 and ts.minute == 30:
+                if ts.hour == extended_release_time and ts.minute == 30:
                     # x.update({
                     #     "status": "extended",
                     #     "latest_trigger_timestamp": "extended",
@@ -310,7 +332,7 @@ def get_retrigger_index(retriggers, trigger):
 
 
 def adjust_alert_level_if_invalid_rain(entry):
-    retriggers = entry["triggers"]
+    # retriggers = entry["triggers"]
     internal_alert = entry["internal_alert"]
 
     # Rain trigger is plain invalid
@@ -338,19 +360,15 @@ def adjust_alert_level_if_invalid_sensor(public_alert, entry):
     if is_L2_available > -1 and public_alert == "A3":
         public_alert_level = "A2"
         # internal_alert_level = internal_alert.replace(/S0*/g, "s").replace("A3", "A2");
-        # TODO: Test this code
         internal_alert_level = re.sub(
                     r"%s?" % ["s", "S"], "", internal_alert)
     else:
         public_alert_level = "A1"
-        # TODO: Test this code
         internal_alert_level = re.sub(
                     r"%s?" % ["s", "S"], "", internal_alert)
-        
-        # TODO double check this from 236
+
         has_sensor_data = list(filter(lambda x: x["alert"] != "ND"), subsurface_alert)
         if not has_sensor_data and surficial_alert == "g0":
-            # TODO doublecheck this 237
             internal_alert_level = re.sub(
                     r"A[1-3]?", "ND", internal_alert_level)
         else:
@@ -403,15 +421,6 @@ def getTriggerSource(source):
 def tag_invalid_triggers(triggers_list, invalid_symbols_list):
     alert_lvl_list = []
     for trig in triggers_list:
-        # candidate_trig_ias = AG.get_internal_alert_symbol_row(trigger_symbol=trig["alert"], return_col="ias.alert_symbol")
-        # if candidate_trig_ias in invalid_symbols_list:
-        #     # IF Invalid
-        #     is_invalid = { "is_invalid": True }
-        # else:
-        #     # IF Valid
-        #     alert_lvl_list.append(trig["alert_level"])
-        #     is_invalid = { "is_invalid": False }
-        # trig.update(is_invalid)
 
         result = AG.fetch_alert_status(AG, trig["trigger_id"])
         has_alert_status = False
@@ -438,8 +447,6 @@ def tag_invalid_triggers(triggers_list, invalid_symbols_list):
 def fix_internal_alert_invalids(entry, invalid_triggers_list, merged_list):
     """
     """
-    IAS_TABLE = AG.get_ias_table()
-
     site_code = entry["site_code"]
     site_invalid_trigs_list = get_all_invalid_triggers_of_site(site_code, invalid_triggers_list)
     candidate_ia = entry["internal_alert"]
@@ -449,11 +456,9 @@ def fix_internal_alert_invalids(entry, invalid_triggers_list, merged_list):
     current_internal_alert = ""
     current_public_alert_level = 0
     current_entry_source = ""
-    is_ongoing_event = False
 
     # RETRIEVE THE ALERT CHARACTERS (the string after 'A#-') 
     if site_db_alert:
-        is_ongoing_event = True
         current_public_alert_level = int(site_db_alert["public_alert_level"])
         current_internal_alert = site_db_alert["internal_alert_level"]
         if "-" in current_internal_alert:
@@ -512,10 +517,7 @@ def fix_internal_alert_invalids(entry, invalid_triggers_list, merged_list):
                     internal_alert = public_alert
         if candidate_entry_source:
             internal_alert = f"{public_alert}-{candidate_entry_source}"
-        
-        # status = "new"
-        # if is_ongoing_event:
-        #     status = "on-going"
+
     else:
         if has_no_ground_data:
             internal_alert = "ND"
@@ -523,10 +525,6 @@ def fix_internal_alert_invalids(entry, invalid_triggers_list, merged_list):
         else:
             internal_alert = "A0"
             public_alert = "A0"
-        # internal_alert = "A0"
-        # status = "routine"
-        # if is_ongoing_event:
-        #     status = "on-going"
 
     # TODO: Confirm validity adjustment logic from Meryll. Which ts is the basis for extension of validity?
     if site_db_alert and entry["validity"] > site_db_alert["validity"]:
@@ -637,7 +635,7 @@ def process_candidate_alerts(generated_alerts, db_alerts):
     extended_return, extended_indexes_list = return_list
     candidate_alerts_list.extend(extended_return)
 
-    excluded_indexes_list = lowering_indexes_list + extended_indexes_list
+    # excluded_indexes_list = lowering_indexes_list + extended_indexes_list
     if no_alerts:
         return_list = prepare_sites_for_routine_release(no_alerts, extended_indexes_list, invalid_entries)
     

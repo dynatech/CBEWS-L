@@ -103,7 +103,7 @@ def add():
             )
         if moms_id['status'] == True:
             moms = {
-                "status": False,
+                "status": True,
                 "message": "Successfully added new Manifestation of Movements data.",
                 "moms_id": moms_id['data'],
                 "trigger_id": trigger_id
