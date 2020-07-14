@@ -1,6 +1,6 @@
 import AppConfig from '../../utils/AppConfig';
 
-const GetSituationReport = () => {
+const GetCurrentSituationReport = () => {
     return fetch(`${AppConfig.HOSTNAME}/v2/get/situation_report/umi/latest_report`, {
         method: 'GET',
         headers: {
@@ -53,4 +53,4 @@ const EmailSituationReport = (data) => {
     );
 }
 
-export { GetSituationReport, DownloadSituationReport, EmailSituationReport }
+export { GetCurrentSituationReport, DownloadSituationReport, EmailSituationReport }

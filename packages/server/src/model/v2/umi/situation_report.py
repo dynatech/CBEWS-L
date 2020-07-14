@@ -9,18 +9,16 @@ class SituationReportModel():
 		ret_val = DB.db_read(query, 'cbewsl_umi_collections')
 		return ret_val
 
-	# def fetch_field_survey_logs():
-	# 	query = "SELECT * FROM field_survey order by report_date"
-	# 	ret_val = DB.db_read(query, 'cbewsl_umi_collections')
-	# 	return ret_val
-
-	# def create_field_survey_log(data):
-	# 	query = f"INSERT INTO field_survey VALUES (0, '{data['report_date']}', '{data['feature']}', " \
-	# 			f"'{data['materials_characterization']}','{data['mechanism']}', '{data['exposure']}', " \
-	# 			f"'{data['report_narrative']}', '{data['reporter']}', '{data['attachment_path']}', '{data['user_id']}', " \
-	# 			f"'{str(dt.today())}')"
-	# 	ret_val = DB.db_modify(query,'cbewsl_umi_collections', True)
-	# 	return ret_val
+	def fetch_all_situation_report_logs():
+		query = "SELECT * FROM situation_report order by report_ts desc;"
+		ret_val = DB.db_read(query, 'cbewsl_umi_collections')
+		return ret_val
+		
+	def create_situation_report_logs(data):
+		query = f"INSERT INTO situation_report VALUES (0, '{data['report_ts']}', '{data['report_summary']}', " \
+				f"'{data['attachment']}', '{data['user_id']}' , '{str(dt.today())}')"
+		ret_val = DB.db_modify(query,'cbewsl_umi_collections', True)
+		return ret_val
 
 	# def modify_field_survey_logs(data):
 	# 	query = "UPDATE field_survey SET"

@@ -15,9 +15,11 @@ const Uploader = (url, file) => {
         }
       }).promise.then((response) => {
         if (response.statusCode == 200) {
+          let json_response = JSON.encode(response);
             return {
                 'status': true,
-                'message': 'Upload success!'
+                'message': 'Upload success!',
+                'file_path': json_response['file_path']
             }
         } else {
             return {
