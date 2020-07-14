@@ -15,7 +15,7 @@ class Sites():
 		if return_col:
 			option = return_col
 		query = f"SELECT {option} FROM sites WHERE {site_filter} = '{filter_value}'"
-		result = DB.db_read(query, 'CBEWSL_commons')
+		result = DB.db_read(query, 'cbewsl_commons_db')
 
 		if result: 
 			result = result[0]

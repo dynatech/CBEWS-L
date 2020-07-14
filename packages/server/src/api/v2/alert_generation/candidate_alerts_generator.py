@@ -650,7 +650,7 @@ def main(to_update_pub_alerts=False, internal_gen_data=None):
     generated_alerts_dict = []
 
     if to_update_pub_alerts:
-        os.system("python ~/CODES/cbews_iloilo/analysis_pycodes/analysis/publicalerts.py")
+        os.system("python ~/CODES/CBEWSL/packages/server/analysis_pycodes/analysis/publicalerts.py")
 
     if internal_gen_data:
         generated_alerts_dict = internal_gen_data

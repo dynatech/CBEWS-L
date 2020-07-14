@@ -348,7 +348,7 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
                 latest_release = AG.get_event_releases(event_id=event_id, return_count=1)
                 ( release_id, data_timestamp,
                     internal_alert_level, release_time, reporter_id_mt ) = latest_release.values()
-                user_result = Users.fetch_user(user_id=reporter_id_mt)
+                user_result = Users.fetch_user(profile_id=reporter_id_mt)
                 reporter = ""
                 if user_result:
                     result = user_result[0]

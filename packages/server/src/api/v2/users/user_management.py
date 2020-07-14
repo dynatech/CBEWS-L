@@ -9,7 +9,9 @@ USER_MANAGEMENT_BLUEPRINT = Blueprint("user_management_blueprint", __name__)
 def signin():
     credentials = request.get_json()
     username, password = credentials.values()
+    print("username", username)
     account_details = Users.fetch_account(username)
+    print("account_details", account_details)
     if len(account_details) != 0:
         acc_details = account_details[0]
         v_password = acc_details["password"]
@@ -41,9 +43,10 @@ def signout():
 
 @USER_MANAGEMENT_BLUEPRINT.route("/auth/signup", methods=["POST"])
 def signup():
+    print("asdf")
     credentials = request.get_json()
     is_existing = Users.account_exists(credentials['username'])[0]['COUNT(*)']
-    if is_existing == 0:
+    if int(is_existing) == 0:
         status = Users.create_user_account(credentials)
     else:
         status = {

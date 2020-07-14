@@ -13,6 +13,7 @@ import { useCookies } from "react-cookie";
 
 function RouterApp() {
   const [cookies, setCookies] = useCookies(['credentials']);
+  console.log("coockies", cookies);
   const component_object = {
     29: (
       <Fragment>
