@@ -4,7 +4,7 @@ import React from 'react';
 import UminganDashboard from '../../components/umingan/UminganDashboard';
 import RATabStack from '../umingan/RATabStack';
 import FieldSurveyStack from '../umingan/FieldSurveyStack';
-
+import SituationReportStack from '../umingan/SituationReportStack';
 
 const Stack = createStackNavigator();
 
@@ -28,6 +28,13 @@ function UminganDashboardStack() {
                     textAlign: 'center',
                   },
             }} component={FieldSurveyStack} />
+            <Stack.Screen name="SituationReportStack" options={{
+                title: 'Situation Report',
+                headerLeft: null,
+                headerTitleStyle: {
+                    textAlign: 'center',
+                  },
+            }} component={SituationReportStack} />
         </Stack.Navigator>
     );
 }

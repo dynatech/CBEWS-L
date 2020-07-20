@@ -151,7 +151,6 @@ def upload_community_risk_assessment_file():
     except Exception as err:
         raise err
         # return_data = { "status": False }
-
     return jsonify(return_data)
 
 
