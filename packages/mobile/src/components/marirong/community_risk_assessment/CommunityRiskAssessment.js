@@ -117,7 +117,6 @@ function CommunityRiskAssessment() {
                                   hideChevron={true}
                               />
                           </TouchableOpacity>
-                      
                       )) :
                       <View style={{padding: '10%'}}>
                         <Text style={[LabelStyle.large_label, LabelStyle.brand]}>No files available for download.</Text>

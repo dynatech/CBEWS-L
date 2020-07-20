@@ -12,7 +12,7 @@ import MobileCaching from '../../utils/MobileCaching';
 function Signin(props) {
     const navigator = props.navigation;
     const site_navigator = {
-        '29': 'MarirongDashboardStack',
+        '51': 'MarirongDashboardStack',
         '50': 'UminganDashboardStack'
     }
 

@@ -34,7 +34,7 @@ function UminganDashboard(props) {
                         <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Field Survey</Text>
                         </View>
                         <View style={[ContainerStyle.menu_container]}>
-                        <TouchableOpacity onPress={() => { }}>
+                        <TouchableOpacity onPress={() => { navigator.navigate('SituationReportStack') }}>
                             <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/umingan/menu/situation_report.png')}></Image>
                         </TouchableOpacity>
                         <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Situation{'\n'}Report</Text>

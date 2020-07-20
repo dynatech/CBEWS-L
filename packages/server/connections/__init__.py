@@ -117,4 +117,7 @@ def create_app():
     from src.api.v2.umi.field_survey import FIELD_SURVEY_BLUEPRINT
     app.register_blueprint(FIELD_SURVEY_BLUEPRINT, url_prefix="/v2")
 
+    from src.api.v2.umi.situation_report import SITUATION_REPORT_BLUEPRINT
+    app.register_blueprint(SITUATION_REPORT_BLUEPRINT, url_prefix="/v2")
+
     return app

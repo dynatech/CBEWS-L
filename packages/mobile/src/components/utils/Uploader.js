@@ -2,35 +2,30 @@ import React from 'react';
 // import RNFetchBlob from 'rn-fetch-blob';
 import RNFS from 'react-native-fs';
 
-const Uploader = (url, file) => {
-    return RNFS.uploadFiles({
-        toUrl: url,
-        files: file,
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-        },
-        fields: {
-          'hello': 'world',
-        }
-      }).promise.then((response) => {
-        if (response.statusCode == 200) {
-            return {
-                'status': true,
-                'message': 'Upload success!'
-            }
-        } else {
-            return {
-                'status': false,
-                'message': 'Upload failed!'
-            }
-        }
-      }).catch((err) => {
-            if (err.description === "cancelled") {
-            // cancelled by user
-            }
-            console.log(err);
-        });
+const Uploader = async (url, file) => {
+  return await RNFS.uploadFiles({
+      toUrl: url,
+      files: file,
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+      },
+      fields: {
+        'hello': 'world',
+      }
+    }).promise.then((response) => {
+      let data = JSON.parse(response.body);
+      return {
+        'status': true,
+        'message': 'Upload success!',
+        'file_path': data.file_path
+      };
+    }).catch((err) => {
+       return {
+        'status': false,
+        'message': `Upload failed! Err: ${err}`
+      }
+    });
 }
 
 export default Uploader
