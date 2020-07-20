@@ -72,7 +72,7 @@ function SituationReportLogs () {
                 setTimeout(async () => {
                     let response = null;
                     if ('attachment' in data) {
-                        const url = 'http://192.168.150.204:5000/v2/upload/situation_report/umi/situation_report_logs'
+                        const url = 'http://192.168.0.15:5000/v2/upload/situation_report/umi/situation_report_logs'
                         const file = [{
                           name: 'file',
                           filename: data.attachment['filename'],
@@ -82,9 +82,7 @@ function SituationReportLogs () {
                         }];
                         
                         let upload_status = await Uploader(url, file);
-
                         if (upload_status.status == true) {
-                            alert(JSON.stringify(upload_status));
                             temp['attachment'] = upload_status.file_path;
                             response = await UmiSituationReport.InsertSituationReport(temp);
                         } else {
@@ -116,10 +114,10 @@ function SituationReportLogs () {
                                 let temp = {};
                                 switch(key) {
                                     case "Reporttimestamp":
-                                        temp['report_narrative'] = data['Reportnarrative'];
+                                        temp['report_ts'] = data['Reporttimestamp'];
                                         break;
-                                    case "SituationReportSummary":
-                                        temp['materials_characterization'] = data['MaterialsCharacterization'];
+                                    case "Situationreportsummary":
+                                        temp['report_summary'] = data['Situationreportsummary'];
                                         break;
                                     default:
                                         temp[key.replace(" ","_").toLocaleLowerCase()] = data[key];
@@ -130,8 +128,7 @@ function SituationReportLogs () {
                             temp_array.push({'user_id': credentials['user_id']})
                             temp_array.push({'id': selectedData['id']})
 
-                            alert(JSON.stringify(temp_array));
-                            // let response = await UmiSituationReport.UpdateSituationReport(temp_array)
+                            let response = await UmiSituationReport.UpdateSituationReport(temp_array)
 
                             if (response.status == true) {
                                 ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
@@ -152,7 +149,6 @@ function SituationReportLogs () {
     }
 
     const modifySummary = (data) => {
-        alert(JSON.stringify(data))
         setSelectedData(data)
         setDefaultStrValues({
             'Report timestamp': moment(data['report_ts']).format("HH:mm:ss"),
@@ -172,21 +168,19 @@ function SituationReportLogs () {
                 text: "Cancel",
                 style: "cancel"
               },
-              { text: "Confirm", onPress: () => {
-                // setTimeout(async ()=> {
-                //     let response = await UmiFieldSurvey.DeleteFieldSurveyLogs({
-                //         'id': selectedData['id']
-                //     })
-                //     if (response.status == true) {
-                //         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                //         init();
-                //         setDataContainer([]);
-                //         closeForm();
-                //         setCmd('add');
-                //     } else {
-                //         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                //     }
-                // },300)
+              { text: "Confirm", onPress: async () => {
+                let response = await UmiSituationReport.DeleteSituationReport({
+                    'id': selectedData['id']
+                })
+                if (response.status == true) {
+                    ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                    init();
+                    setDataContainer([]);
+                    closeForm();
+                    setCmd('add');
+                } else {
+                    ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                }
               }}
             ],
             { cancelable: false }

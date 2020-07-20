@@ -36,7 +36,7 @@ const InsertSituationReport = (data) => {
 }
 
 const UpdateSituationReport = (data) => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/update/field_survey/umi/field_survey_logs`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/update/situation_report/umi/situation_report_logs`, {
         method: 'PATCH',
         headers: {
             Accept: 'application/json',
@@ -54,7 +54,7 @@ const UpdateSituationReport = (data) => {
 }
 
 const DeleteSituationReport = (data) => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/delete/field_survey/umi/field_survey_logs`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/delete/situation_report/umi/situation_report_logs`, {
         method: 'DELETE',
         headers: {
             Accept: 'application/json',
@@ -71,7 +71,7 @@ const DeleteSituationReport = (data) => {
     );
 }
 
-const UploadSituationReport = (data) => {
+const UploadSituationReport = async (data) => {
     const file = [{
       name: 'file',
       filename: data['filename'],
@@ -79,7 +79,7 @@ const UploadSituationReport = (data) => {
       filetype: data['filetype'],
       filesize: data['filesize']
     }];
-    return Uploader(`${AppConfig.HOSTNAME}/v2/upload/situation_report/umi/situation_report_logs`, file);
+    return await Uploader(`${AppConfig.HOSTNAME}/v2/upload/situation_report/umi/situation_report_logs`, file);
 }
 
 export { GetSituationReport, InsertSituationReport, UpdateSituationReport, DeleteSituationReport, UploadSituationReport }

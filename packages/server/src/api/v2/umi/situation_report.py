@@ -83,20 +83,20 @@ def get_all_field_survey_logs():
 
 @SITUATION_REPORT_BLUEPRINT.route("/add/situation_report/umi/situation_report_logs", methods=["POST"])
 def add_situation_report():
-    try:
-        data = request.get_json()
-        report = SituationReportModel.create_situation_report_logs(data)
-        ret_val = {
-            'status': True,
-            'message': "Successfully added new Latest Situation Report Logs",
-            'data': report
-        }
-    except Exception as err:
-        ret_val = {
-            'status': False,
-            'message': f"Failed to add Latest Situation Report Logs. Err: {err}"
-        }
-    return jsonify(ret_val)
+	try:
+		data = request.get_json()
+		report = SituationReportModel.create_situation_report_logs(data)
+		ret_val = {
+			'status': True,
+			'message': "Successfully added new Latest Situation Report Logs",
+			'data': report
+		}
+	except Exception as err:
+		ret_val = {
+			'status': False,
+			'message': f"Failed to add Latest Situation Report Logs. Err: {err}"
+		}
+	return jsonify(ret_val)
 
 @SITUATION_REPORT_BLUEPRINT.route("/upload/situation_report/umi/situation_report_logs", methods=["POST"])
 def upload_situation_report_log_file():
@@ -119,56 +119,55 @@ def upload_situation_report_log_file():
 
 		file_path = Path(directory)
 		file.save(os.path.join(file_path, temp))
-
 		return_data = { "status": True, 'file_path': str(file_path) }
 
 	except Exception as err:
 		raise err
-		# return_data = { "status": False }
+		return_data = { "status": False }
 	return jsonify(return_data)
 
-# @SITUATION_REPORT_BLUEPRINT.route("/update/field_survey/umi/field_survey_logs", methods=["PATCH"])
-# def update_field_survey_logs():
-#     try:
-#         data = request.get_json()
-#         summary_status = FieldSurveyModel.modify_field_survey_logs(data)
+@SITUATION_REPORT_BLUEPRINT.route("/update/situation_report/umi/situation_report_logs", methods=["PATCH"])
+def update_situation_report_logs():
+	try:
+		data = request.get_json()
+		report_status = SituationReportModel.modify_situation_report(data)
 
-#         if summary_status == '0':
-#             ret_val = {
-#                 'status': True,
-#                 'message': "Successfully updated field survey log",
-#             }
-#         else:
-#             ret_val = {
-#                 'status': False,
-#                 'message': "Failed to update field survey log. Check your network connection",
-#             }
-#     except Exception as err:
-#         ret_val = {
-#             'status': False,
-#             'message': f"Failed to updated Field Survey Logs. Err: {err}"
-#         }
-#     return jsonify(ret_val)
+		if report_status == '0':
+			ret_val = {
+				'status': True,
+				'message': "Successfully updated situation report logs",
+			}
+		else:
+			ret_val = {
+				'status': False,
+				'message': "Failed to update situation report logs. Check your network connection",
+			}
+	except Exception as err:
+		ret_val = {
+			'status': False,
+			'message': f"Failed to updated situation report logs. Err: {err}"
+		}
+	return jsonify(ret_val)
 
-# @SITUATION_REPORT_BLUEPRINT.route("/delete/field_survey/umi/field_survey_logs", methods=["DELETE"])
-# def delete_field_survey_logs():
-#     try:
-#         data = request.get_json()
-#         summary_status = FieldSurveyModel.remove_field_survey_logs(data['id'])
+@SITUATION_REPORT_BLUEPRINT.route("/delete/situation_report/umi/situation_report_logs", methods=["DELETE"])
+def delete_field_survey_logs():
+    try:
+        data = request.get_json()
+        delete_status = SituationReportModel.remove_situation_report_log(data['id'])
 
-#         if summary_status == '0':
-#             ret_val = {
-#                 'status': True,
-#                 'message': "Successfully deleted field survey log",
-#             }
-#         else:
-#             ret_val = {
-#                 'status': False,
-#                 'message': "Failed to delete field survey log. Check your network connection",
-#             }
-#     except Exception as err:
-#         ret_val = {
-#             'status': False,
-#             'message': f"Failed to delete Field Survey Logs. Err: {err}"
-#         }
-#     return jsonify(ret_val)
+        if delete_status == '0':
+            ret_val = {
+                'status': True,
+                'message': "Successfully deleted situation report log",
+            }
+        else:
+            ret_val = {
+                'status': False,
+                'message': "Failed to delete situation report log. Check your network connection",
+            }
+    except Exception as err:
+        ret_val = {
+            'status': False,
+            'message': f"Failed to delete situation report logs. Err: {err}"
+        }
+    return jsonify(ret_val)
