@@ -615,7 +615,6 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
 
     # SURFICIAL ALERT
     if public_alert > 0:
-        # surficial_ts = release_time(end) - timedelta(hours=4)
         surficial_ts = release_time(end) - timedelta(hours=rel_interval_hour, minutes=30)
     else:
         surficial_ts = pd.to_datetime(end.date())
@@ -630,7 +629,6 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     # MOMS ALERT NOTE: Following code is redundant with above
     # TODO: LOUIE 
     if public_alert > 0:
-        # moms_ts = release_time(end) - timedelta(hours=4)
         moms_ts = release_time(end) - timedelta(hours=rel_interval_hour)
     else:
         moms_ts = pd.to_datetime(end.date())
@@ -890,8 +888,6 @@ def main(end=datetime.now()):
     # site id and code
     query = "SELECT site_id, site_code FROM cbewsl_commons_db.sites WHERE active = 1"
     props = qdb.get_db_dataframe(query)
-    # props = props[props.site_code == 'mar']
-    # props = props[(props.site_code in ['mar','umi'])]
     site_props = props.groupby('site_id', as_index=False)
     alerts = site_props.apply(site_public_alert, end=end,
                               public_symbols=public_symbols,

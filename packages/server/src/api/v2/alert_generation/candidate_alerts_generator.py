@@ -1,4 +1,4 @@
-import sys, json, os
+import sys, json, os, platform
 from flask import Blueprint, jsonify, request
 from connections import SOCKETIO
 from datetime import datetime as dt, timedelta
@@ -70,7 +70,6 @@ def format_release_triggers(candidate, all_event_triggers):
 def finalize_candidates_before_release(candidate_alerts_list, latest_events, overdue_events, extended_events, invalids_events):
     """
     """
-    # PREPARE SHITS
     merged_db_alerts = latest_events + overdue_events
 
 
@@ -204,8 +203,6 @@ def prepare_sites_for_routine_release(no_alerts, excluded_indexes_list, invalid_
     data_ts = h.str_to_dt(data_timestamp)
     weekday = data_ts.weekday()
     matrix = None
-    # return_list = []
-    # routine_list = []
 
     if dt.strftime(data_ts, "%H:%M") == "11:30":
         if weekday == 3:
@@ -332,7 +329,6 @@ def get_retrigger_index(retriggers, trigger):
 
 
 def adjust_alert_level_if_invalid_rain(entry):
-    # retriggers = entry["triggers"]
     internal_alert = entry["internal_alert"]
 
     # Rain trigger is plain invalid
@@ -650,7 +646,11 @@ def main(to_update_pub_alerts=False, internal_gen_data=None):
     generated_alerts_dict = []
 
     if to_update_pub_alerts:
-        os.system("python ~/CODES/CBEWSL/packages/server/analysis_pycodes/analysis/publicalerts.py")
+        if platform.system() == "Windows":
+            # TODO: please identify ung path pag sa windows. 
+            # os.system("python C:/")
+        else:
+            os.system("python ~/CODES/CBEWSL/packages/server/analysis_pycodes/analysis/publicalerts.py")
 
     if internal_gen_data:
         generated_alerts_dict = internal_gen_data

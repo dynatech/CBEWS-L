@@ -43,7 +43,6 @@ def signout():
 
 @USER_MANAGEMENT_BLUEPRINT.route("/auth/signup", methods=["POST"])
 def signup():
-    print("asdf")
     credentials = request.get_json()
     is_existing = Users.account_exists(credentials['username'])[0]['COUNT(*)']
     if int(is_existing) == 0:

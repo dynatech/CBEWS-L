@@ -43,5 +43,6 @@ APP_CONFIG = {
     "site_ids": {
         "mar": 29,
         "umi": 50
-    }
+    },
+    "site_schema": "cbewsl_commons_db"
 }
