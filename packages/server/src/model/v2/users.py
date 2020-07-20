@@ -7,15 +7,18 @@ class Users():
 
 	def create_user(username):
 		query = ('INSERT INTO users VALUES (0, "%s", "","", 1)') % username
-		user_id = DB.db_modify(query,'commons_db', True)
+		user_id = DB.db_modify(query,'cbewsl_commons_db', True)
 		return user_id
 
 	def create_user_complete_details(firstname, lastname, nickname):
 		query = (f"INSERT INTO users VALUES (0, '{firstname}', '{lastname}', '{nickname}', 1)")
-		user_id = DB.db_modify(query,'commons_db', True)
+		user_id = DB.db_modify(query,'cbewsl_commons_db', True)
 		return user_id
 
 	def create_user_account(data):
+		print()
+		print("status")
+		print()
 		try:
 			firstname, lastname, middlename, \
 			mobile_number, email, age, gender, username, \
@@ -31,7 +34,6 @@ class Users():
 
 		salt =  str(hashlib.md5(str(dt.today()).encode("utf-8")).hexdigest())
 		password = str(hashlib.sha512(str(password+salt).encode("utf-8")).hexdigest())
-		
 		profile_id = Users.create_user_profile(firstname, lastname, middlename,
 													age, gender, email)
 		mobile_id = Users.create_user_mobile(mobile_number)
@@ -104,10 +106,14 @@ class Users():
 		query = "SELECT * FROM user_accounts INNER JOIN user_profiles USING(profile_id) " \
 				"INNER JOIN user_mobiles USING(mobile_id) INNER JOIN user_roles USING(role_id) " \
 				f"WHERE username = '{username}'"
+		print(query)
 		account = DB.db_read(query, 'cbewsl_commons_db')
 		return account
 
-	def fetch_user(user_id):
-		query = f"SELECT first_name, last_name FROM commons_db.users WHERE user_id = {user_id}"
-		user = DB.db_read(query, 'commons_db')
+	def fetch_user(profile_id):
+		query = "SELECT firstname, lastname FROM cbewsl_commons_db.user_profiles as cdb_up " \
+				"INNER JOIN cbewsl_commons_db.user_accounts as cdb_ua " \
+				"USING (profile_id)" \
+				f"WHERE cbd_up.profile_id = {profile_id}"
+		user = DB.db_read(query, 'cbewsl_commons_db')
 		return user

@@ -115,7 +115,7 @@ def get_site_moms_alerts(site_id, start, end):
     query = "SELECT * FROM senslopedb.monitoring_moms as moms"
     query = f"{query} JOIN senslopedb.moms_instances as mi"
     query = f"{query} ON moms.instance_id = mi.instance_id"
-    query = f"{query} JOIN commons_db.sites as site"
+    query = f"{query} JOIN cbewsl_commons_db.sites as site"
     query = f"{query} ON mi.site_id = site.site_id"
     query = f"{query} WHERE site.site_id = {site_id}"
     query = f"{query} AND moms.observance_ts >= '{start}'"
@@ -502,20 +502,20 @@ def get_alert_history(current_events):
     start_ts = current_events['ts'].values[0]
     public_alert_symbols = current_events['alert_symbol'].values[0]
     
-    query = "SELECT CONCAT(cdb.first_name, ' ', cdb.last_name) as iomp, " 
+    query = "SELECT CONCAT(cdb.firstname, ' ', cdb.lastname) as iomp, " 
     query += "sites.site_code, OTS.alert_symbol, ALS.ts_last_retrigger, OTS.alert_level, " 
     query += "ALS.remarks, TH.trigger_source, ALS.alert_status, PAS.alert_symbol as public_alert_symbol "
     query += "FROM alert_status as ALS "
     query += "  JOIN operational_triggers as OT "
     query += "    ON ALS.trigger_id = OT.trigger_id "
-    # LOUIE - added commons_db.
-    query += "      JOIN commons_db.sites "
+    # LOUIE - added cbewsl_commons_db.
+    query += "      JOIN cbewsl_commons_db.sites "
     query += "      ON sites.site_id = OT.site_id " 
     query += "      JOIN operational_trigger_symbols as OTS "
     query += "      ON OT.trigger_sym_id = OTS.trigger_sym_id " 
     query += "      JOIN trigger_hierarchies as TH "
     query += "      ON OTS.source_id = TH.source_id "
-    query += "      JOIN commons_db.users as cdb "
+    query += "      JOIN cbewsl_commons_db.user_accounts as cdb "
     query += "      ON ALS.user_id = cdb.user_id "
     query += "      JOIN public_alerts as PA"
     query += "      ON PA.site_id = OT.site_id"
@@ -529,6 +529,14 @@ def get_alert_history(current_events):
     current_events_history = qdb.get_db_dataframe(query)
     
     return current_events_history
+
+def get_site_dynamic_variables(site_id):
+    query = "SELECT * FROM cbewsl_commons_db.dynamic_variables WHERE "
+    query = f"{query} fk_site_id={site_id}" 
+
+    dynamic_variables = qdb.get_db_dataframe(query)
+
+    return dynamic_variables
 
 def site_public_alert(site_props, end, public_symbols, internal_symbols,
                       start_time):  
@@ -573,8 +581,14 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     # operational triggers for monitoring at timestamp end
     op_trig = get_operational_trigger(site_id, start_monitor, end)
 
+    # NOTE: Retrieves CBEWS-L dynamic variables
+    site_dynamic_vars = get_site_dynamic_variables(site_id)
+
+    rel_interval_hour = int(site_dynamic_vars['release_interval_hours'][0])
+
     release_op_trig = op_trig[op_trig.ts_updated >= \
-            release_time(end)-timedelta(hours=4)]
+            # release_time(end)-timedelta(hours=4)]
+            release_time(end)-timedelta(hours=rel_interval_hour)]
     release_op_trig = release_op_trig.drop_duplicates(['source_id', \
             'alert_level'])
     subsurface_id = internal_symbols[internal_symbols.trigger_source == \
@@ -601,7 +615,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
 
     # SURFICIAL ALERT
     if public_alert > 0:
-        surficial_ts = release_time(end) - timedelta(hours=4)
+        surficial_ts = release_time(end) - timedelta(hours=rel_interval_hour, minutes=30)
     else:
         surficial_ts = pd.to_datetime(end.date())
 
@@ -615,7 +629,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     # MOMS ALERT NOTE: Following code is redundant with above
     # TODO: LOUIE 
     if public_alert > 0:
-        moms_ts = release_time(end) - timedelta(hours=4)
+        moms_ts = release_time(end) - timedelta(hours=rel_interval_hour)
     else:
         moms_ts = pd.to_datetime(end.date())
     
@@ -872,9 +886,8 @@ def main(end=datetime.now()):
     
     # LOUIE
     # site id and code
-    query = "SELECT site_id, site_code FROM commons_db.sites WHERE active = 1"
+    query = "SELECT site_id, site_code FROM cbewsl_commons_db.sites WHERE active = 1"
     props = qdb.get_db_dataframe(query)
-    # props = props[props.site_code == 'mar']
     site_props = props.groupby('site_id', as_index=False)
     alerts = site_props.apply(site_public_alert, end=end,
                               public_symbols=public_symbols,

@@ -37,7 +37,7 @@ def query_tsm_alerts(site_id, start_ts, latest_trigger_ts):
         query += "JOIN tsm_sensors AS t_s"
         query += "  ON node_alerts.tsm_id = t_s.tsm_id "
         query += "JOIN "
-        query += "  (SELECT site_code, site_id FROM commons_db.sites WHERE site_id = '%s') AS sc " %(site_id)
+        query += "  (SELECT site_code, site_id FROM cbewsl_commons_db.sites WHERE site_id = '%s') AS sc " %(site_id)
         query += "  ON t_s.site_id = sc.site_id "
         query += "WHERE ts >= '%s' " %(start_ts)
         query += "AND ts <= '%s' " %(latest_trigger_ts) 
@@ -72,7 +72,7 @@ def query_moms_alerts(site_id, latest_trigger_ts):
         query = "SELECT * FROM senslopedb.monitoring_moms as moms " + \
             "JOIN senslopedb.moms_instances as mi " + \
             "ON moms.instance_id = mi.instance_id " + \
-            "JOIN commons_db.sites as site " + \
+            "JOIN cbewsl_commons_db.sites as site " + \
             "ON mi.site_id = site.site_id " + \
             f"WHERE site.site_id = '{site_id}'" + \
             f"AND moms.observance_ts = '{latest_trigger_ts}'" + \

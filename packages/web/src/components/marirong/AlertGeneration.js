@@ -1,8 +1,73 @@
-import React from 'react';
+import React, { useState, Fragment } from 'react';
+import { Container, Grid, Fab } from '@material-ui/core';
+import { AlertValidation, LatestCurrentAlert } from './AlertGenerationFeature';
+import { useStyles } from '../../styles/general_styles';
 
 export default function AlertGeneration () {
 
+    // const [feature, setFeature] = useState(<LatestCurrentAlert />);
+    const [feature, setFeature] = useState(<AlertValidation />);
+    const [av, avActive] = useState("primary");
+    const [lca, lcaActive] = useState("");
+
+    function handleFeatureNav(feature) {
+        let return_feat = []
+        switch (feature) {
+            case "alert_validation":
+                lcaActive("");
+                avActive("primary");
+                return_feat = <AlertValidation />
+                break;
+            case "latest_current_alert":
+                lcaActive("primary");
+                avActive("");
+                return_feat = <LatestCurrentAlert />
+                break;
+            default:
+                lcaActive("primary")
+                avActive("");
+                return_feat = <LatestCurrentAlert />
+                break;
+        }
+        setFeature(return_feat)
+    }
+
+    const classes = useStyles();
     return (
-        <div>AlertGeneration Not yet created</div>
+        <Fragment>
+            <Container maxWidth="xl" className={classes.root} spacing={24}>
+                <Grid container alignItems="center" justify="center">
+                    <Grid item xs={3} >
+                        <Grid container direction="column" className={classes.menuContainer}>
+                            {/* <Grid item={true} xs={3} style={{ marginTop: '30%' }} /> */}
+                            <Grid item={true} xs={12} style={{ marginTop: '25%' }}>
+                                <Fab variant="extended"
+                                    color={av}
+                                    aria-label="add"
+                                    className={classes.menu}
+                                    onClick={() => { handleFeatureNav("alert_validation") }}>
+                                    Alert Validation
+                                </Fab>
+                            </Grid>
+                            <Grid item={true} xs={12} style={{ marginTop: '25%' }}>
+                                <Fab variant="extended"
+                                    color={lca}
+                                    aria-label="add"
+                                    className={classes.menu}
+                                    onClick={() => { handleFeatureNav("latest_current_alert") }}>
+                                    Latest Current Alert
+                                </Fab>
+                            </Grid>
+                            {/* <Grid item={true} xs={3} style={{ marginTop: '30%' }} /> */}
+                        </Grid>
+                    </Grid>
+                    <Grid item xs={9} >
+                    <div style={{overflow: 'auto', height: 660}}>
+                        {feature}
+                    </div>
+                    </Grid>
+                </Grid>
+            </Container>
+        </Fragment>
     )
 }

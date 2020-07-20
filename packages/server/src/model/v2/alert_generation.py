@@ -1,6 +1,7 @@
 from src.model.helper.utils import DatabaseConnection as DB
 from datetime import datetime as dt
 from src.api.helpers import Helpers as h
+from config import APP_CONFIG
 
 
 class AlertGeneration():
@@ -148,6 +149,7 @@ class AlertGeneration():
         """
         Returns ongoing, extended, and routine events
         """
+        sites_db = APP_CONFIG["sites_schema"]
         select_option = "site_id, status"
         if complete:
             select_option = "public_alert_event.*"
@@ -156,7 +158,7 @@ class AlertGeneration():
 
         query = f"SELECT {select_option} FROM public_alert_event"
         if include_site:
-            query = f"{query} INNER JOIN commons_db.sites USING (site_id)"
+            query = f"{query} INNER JOIN {sites_db}.sites USING (site_id)"
         query = f"{query} WHERE status in ('on-going', 'extended')"
 
         # schema = DB.db_switcher(site_id)
@@ -168,12 +170,13 @@ class AlertGeneration():
         """
         Returns event row. There is an option to include site details
         """
+        sites_db = APP_CONFIG["sites_schema"]
         query = "SELECT public_alert_event.*"
         if include_site:
-            query = f"{query}, commons_db.sites.*"
+            query = f"{query}, {sites_db}.sites.*"
         query = f"{query} FROM public_alert_event"
         if include_site:
-            query = f"{query} INNER JOIN commons_db.sites USING (site_id)"
+            query = f"{query} INNER JOIN {sites_db}.sites USING (site_id)"
         query = f"{query} WHERE public_alert_event.event_id = {event_id}"
 
         # schema = DB.db_switcher("senslopedb")

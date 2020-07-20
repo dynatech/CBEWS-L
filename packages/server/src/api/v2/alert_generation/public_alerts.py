@@ -5,6 +5,7 @@ from datetime import datetime as dt, timedelta
 from src.model.v2.alert_generation import AlertGeneration
 from src.model.v2.public_alert_table import PublicAlertTable as PAT
 from src.model.v2.users import Users
+from src.model.v2.dynamic_variables import DynamicVariables as dv
 from src.api.helpers import Helpers as h
 from src.api.v2.alert_generation import candidate_alerts_generator
 
@@ -73,9 +74,13 @@ def prepare_triggers(row):
         "trigger": trigger_source.capitalize(),
         "data_source": data_source,
         "description": info,
-        "trigger_id": row["trigger_id"],
-        "is_invalid": row["is_invalid"]
+        "trigger_id": row["trigger_id"]
     })
+
+    try:
+        row.update({ "is_invalid": row["is_invalid"]})
+    except KeyError:
+        pass
 
     return row
 
@@ -138,7 +143,7 @@ def get_umi_alert_validation_data():
                 "as_of_ts": as_of_ts,
                 "release_time": h.dt_to_str(dt.now()),
                 "comments": "No Comment",
-                "bulletin_number": PAT.fetch_site_bulletin_number(PAT, site_id=29)
+                "bulletin_number": PAT.fetch_site_bulletin_number(PAT, site_id=50)
             })
 
             response = {
@@ -306,9 +311,10 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
         run_ts (Datetime)
         source (String)
     """
-    ROU_EXT_RELEASE_TIME = 12
+    routine_release_time = 12
+    extended_release_time = 12
     release_interval_hours = 4
-    extended_monitoring_days = 3
+    extended_monitoring_days = 3 
     run_ts=dt.now()
 
     try:
@@ -331,14 +337,22 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
                 status = e["status"]
                 site_code = e["site_code"]
 
+                # NOTE: Dynamic vars
+                site_dynamic_vars = dv.get_site_dynamic_variables(site_id)
+
+                release_interval_hours = int(site_dynamic_vars["release_interval_hours"])
+                extended_monitoring_days = int(site_dynamic_vars["extended_monitoring_days"])
+                routine_release_time = int(site_dynamic_vars["routine_release_time"])
+                extended_release_time = int(site_dynamic_vars["extended_release_time"])
+
                 latest_release = AG.get_event_releases(event_id=event_id, return_count=1)
                 ( release_id, data_timestamp,
                     internal_alert_level, release_time, reporter_id_mt ) = latest_release.values()
-                user_result = Users.fetch_user(user_id=reporter_id_mt)
+                user_result = Users.fetch_user(profile_id=reporter_id_mt)
                 reporter = ""
                 if user_result:
-                    ( firstname, lastname ) = user_result[0]
-                    reporter = f"{firstname} {lastname}"
+                    result = user_result[0]
+                    reporter = f"{result['firstname']} {result['lastname']}"
 
                 data_ts = h.str_to_dt(data_timestamp)
                 release_time = h.str_to_timedelta(release_time)
@@ -406,7 +420,7 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
 
                 if run_ts <= h.str_to_dt(validity):
                     active_events_dict["latest"].append(event_data)
-                elif validity < run_ts:
+                elif h.str_to_dt(validity) < run_ts:
                     # if int(event_data["public_alert_level"]) > 0:
                     #     print("Seeing an overdue")
                     #     # Late release
@@ -414,7 +428,7 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
                     # else:
                     print("Seeing an extended")
                     # Get Next Day 00:00
-                    next_day = validity + timedelta(days=1)
+                    next_day = h.str_to_dt(validity) + timedelta(days=1)
                     start = dt(next_day.year, next_day.month,
                                     next_day.day, 0, 0, 0)
                     # Day 3 is the 3rd 12-noon from validity
@@ -548,12 +562,13 @@ def adjust_bulletin_number(site_id):
     Returns updated bulletin number.
     """
     try:
-        bulletin_number = PAT.fetch_site_bulletin_number(PAT, site_id=29)
-        result = PAT.update_bulletin_number(PAT, site_id=29, bulletin_number=bulletin_number+1)
+        bulletin_number = PAT.fetch_site_bulletin_number(PAT, site_id=site_id)
+        adjusted_bulletin_number = int(bulletin_number) + 1
+        result = PAT.update_bulletin_number(PAT, site_id=site_id, bulletin_number=adjusted_bulletin_number)
 
         new_bulletin_number = 0
         if result:
-            new_bulletin_number = result[0]
+            new_bulletin_number = adjusted_bulletin_number
     except Exception as err:
         print(err)
         raise
@@ -656,6 +671,7 @@ def insert_ewi(internal_ewi_data=None):
                 event_id = ewi_data["event_id"]
             
             release_dict["event_id"] = event_id
+            release_dict["bulletin_number"] = adjust_bulletin_number(site_id=site_id)
             release_list.append(release_dict)
         
         for release_dict in release_list:
@@ -676,7 +692,11 @@ def insert_ewi(internal_ewi_data=None):
                 event_id = release_dict["event_id"]
             elif status in ["new", "on-going"]:
                 if "extend_ND" in ewi_data or "extend_rain_x" in ewi_data:
-                    updated_validity = h.str_to_dt(event_validity) + timedelta(hours=4)
+                    # TODO: NO DATA EXTENSION VALUE
+                    site_dv = dv.get_site_dynamic_variables(site_id)
+                    no_data_extension_hours = int(site_dv["no_data_extension_hours"])
+                    # updated_validity = h.str_to_dt(event_validity) + timedelta(hours=4)
+                    updated_validity = h.str_to_dt(event_validity) + timedelta(hours=no_data_extension_hours)
                     update_event_container.update({"validity": h.dt_to_str(updated_validity)})
                 else:
                     latest_trigger_id = save_triggers(ewi_data, event_id, release_id)
