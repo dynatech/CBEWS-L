@@ -1,5 +1,5 @@
 import { Picker } from '@react-native-community/picker';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { ScrollView, Text, TouchableOpacity, View, ToastAndroid } from 'react-native';
 import { Input } from 'react-native-elements';
 import { ButtonStyle } from '../../styles/button_style';
@@ -7,6 +7,7 @@ import { ContainerStyle } from '../../styles/container_style';
 import { LabelStyle } from '../../styles/label_style';
 import { Formik } from 'formik';
 import { UserManagement } from '@dynaslope/commons';
+import NetworkUtils from '../../utils/NetworkUtils';
 
 function Signup(props) {
 
@@ -39,6 +40,15 @@ function Signup(props) {
         { label: 'PNP', value: 'pnp' },
         { label: 'Public', value: 'pub' }
     ]
+
+    useEffect(()=> {
+        setTimeout(async()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+                ToastAndroid.showWithGravity("CBEWS-L is not connected to the internet. \nPlease Check your Internet connectivity before logging into the App.", ToastAndroid.LONG, ToastAndroid.CENTER)
+            }
+        },100);
+    })
 
     return (
         <Fragment>

@@ -1,13 +1,29 @@
-import React, { Component } from 'react';
-import { Image, Text, Alert, TouchableOpacity, View, Linking } from 'react-native';
+import React, { useEffect } from 'react';
+import { Image, Text, Alert, TouchableOpacity, View, Linking, ToastAndroid } from 'react-native';
 // import { Icon } from 'native-base'
 import { ImageStyle } from '../../styles/image_style'
 import { ContainerStyle } from '../../styles/container_style';
 import { LabelStyle } from '../../styles/label_style';
 import { ScrollView } from 'react-native-gesture-handler';
+import NetworkUtils from '../../utils/NetworkUtils';
 
 function MarirongDashboard(props) {
   const navigator = props.navigation;
+
+  useEffect(()=> {
+    setTimeout( async ()=> {
+      const isConnected = await NetworkUtils.isNetworkAvailable()
+      if (isConnected != true) {
+        Alert.alert(
+          'CBEWS-L is not connected to the internet',
+          'CBEWS-L Local data will be used.',
+          [
+            { text: 'Ok', onPress: () => console.log('OK Pressed'), style: 'cancel' },
+          ]
+        )
+      }
+    },100);
+  });
 
   const initiateCallOrSms = () => {
     Alert.alert(
