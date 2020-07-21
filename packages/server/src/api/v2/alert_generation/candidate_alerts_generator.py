@@ -648,7 +648,7 @@ def main(to_update_pub_alerts=False, internal_gen_data=None):
     if to_update_pub_alerts:
         if platform.system() == "Windows":
             # TODO: please identify ung path pag sa windows. 
-            # os.system("python C:/")
+            os.system(f"python {APP_CONFIG['app_directory']}\\CBEWS-L\\packages\\server\\analysis_pycodes\\analysis\\publicalerts.py")
         else:
             os.system("python ~/CODES/CBEWSL/packages/server/analysis_pycodes/analysis/publicalerts.py")
 

@@ -14,7 +14,7 @@ import { useCookies } from "react-cookie";
 function RouterApp() {
   const [cookies, setCookies] = useCookies(['credentials']);
   const component_object = {
-    29: (
+    51: (
       <Fragment>
         <Route path='/dashboard' component={MarDashboard} />
       </Fragment>
@@ -26,6 +26,8 @@ function RouterApp() {
     )
   }
   const site_id = "credentials" in cookies && "site_id" in cookies.credentials ? cookies.credentials.site_id : null;
+
+  console.log("cookies", cookies);
 
   return (
     <BrowserRouter>
