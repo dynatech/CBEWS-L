@@ -14,10 +14,15 @@ import { GetLatestReportSummary, DownloadLatestReportSummary, EmailLatestReportS
 import { InsertEventsTemplate, UpdateEventsTemplate, GetAllEventsTemplate, DeleteEventsTemplate } from './src/MAR/EventsTemplate/EventsTemplate';
 import { GetCurrentSituationReport, DownloadSituationReport, EmailSituationReport } from './src/UMI/SituationReport/CurrentSituationReport';
 import { GetSituationReport, InsertSituationReport, UpdateSituationReport, DeleteSituationReport, UploadSituationReport} from './src/UMI/SituationReport/SituationReport';
+import { GetOngoingAndExtendedMonitoring } from './src/AlertGeneration/PublicAlerts';
 
 const UserManagement = {
     AuthRegistration,
     UserAuthentication
+}
+
+const AlertGeneration = {
+    GetOngoingAndExtendedMonitoring
 }
 
 const MarCommunityRiskAssessment = {
@@ -93,6 +98,7 @@ const UmiSituationReport = {
 }
 
 export {
+    AlertGeneration,
     UserManagement,
     MarCommunityRiskAssessment,
     MarMaintenanceLogs,

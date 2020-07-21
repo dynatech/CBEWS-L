@@ -25,7 +25,7 @@ class ProductionConfig(Config):
 
     DEBUG = False
 
-APP_DIR = "C:/Users/John Geliberte/Work"
+APP_DIR = "C:/Users/John Louie/codes"
 
 APP_CONFIG = {
     "development": DevelopmentConfig,
@@ -43,6 +43,6 @@ APP_CONFIG = {
         "mar": 29,
         "umi": 50
     },
-    "site_schema": "cbewsl_commons_db",
+    "sites_schema": "cbewsl_commons_db",
     "app_directory": APP_DIR
 }

@@ -138,7 +138,7 @@ function AlertValidation() {
                 } else if (status === "no_alert") {
                     setPublicAlert(
                         <Typography variant="h2" color="#28a745" className={[classes.label_paddings, classes.alert_level]}>
-                            NO CANDIDATE AS OF NOW
+                            No candidate alert
                         </Typography>
                         )
                     setNotifText("No new candidate data.");
@@ -299,17 +299,17 @@ function AlertValidation() {
                         )
                     })}
                     <Grid item xs={12}>
-                        <Typography variant="h5" className={[classes.label_paddings]}>
+                        <Typography variant="h5" className={classes.label_paddings}>
                             As of {as_of_ts}
                         </Typography>
                         {public_alert}
-                        <Typography variant="h5" className={[classes.label_paddings]}>
-                            Status: {candidate_status === 'no_alert' ? "No candidate as of the moment" : candidate_status.toUpperCase()}
+                        <Typography variant="h5" className={classes.label_paddings}>
+                            Status: {candidate_status === 'no_alert' ? "A0" : candidate_status.toUpperCase()}
                         </Typography>
                         {
                             ![null, ''].includes(validity) && (
                                 <Fragment>
-                                    <Typography variant="h5" className={[classes.label_paddings]}>
+                                    <Typography variant="h5" className={classes.label_paddings}>
                                         Validity: {validity}
                                     </Typography>
                                 </Fragment>
@@ -382,7 +382,8 @@ function CurrentAlertArea(props) {
 
     };
 
-    if (leo !== "empty") {
+    if (leo !== "empty" && leo !== "undefined") {
+        console.log("leo", leo);
         const as_of = moment(leo.data_ts).add(30, "mins").format("dddd, MMMM Do YYYY, h:mm A");
         const event_start = moment(leo.event_start).format("MMMM D, YYYY h:mm A");
         const validity = moment(leo.validity).format("MMMM D, YYYY h:mm A");
@@ -459,12 +460,12 @@ function CurrentAlertArea(props) {
         );
     } else {
         return (
-            <Typography variant="h2">No activity in site</Typography>
+            <Typography variant="h2">No current alert</Typography>
         )
     }
 }
 
-function LatestCurrentAlert() {
+function CurrentAlert() {
     const classes = useStyles();
     const [modal, setModal] = useState([<TransitionalModal status={false} />]);
     const [leo, setLeo] = useState("empty");
@@ -484,7 +485,7 @@ function LatestCurrentAlert() {
             else if (data.extended.length > 0) key = "extended";
 
             if (key in data) {
-                const site_data = data[key].find(site_data => site_data.site_id === 29);
+                const site_data = data[key].find(site_data => site_data.site_id === 50);
                 setLeo(site_data);
             } else {
                 console.error("There is something wrong with the code in latest current alert");
@@ -528,4 +529,4 @@ function LatestCurrentAlert() {
     )
 }
 
-export { AlertValidation, LatestCurrentAlert }
+export { AlertValidation, CurrentAlert }
