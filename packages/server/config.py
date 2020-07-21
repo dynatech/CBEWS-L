@@ -25,17 +25,16 @@ class ProductionConfig(Config):
 
     DEBUG = False
 
+APP_DIR = "C:/Users/John Geliberte/Work"
 
 APP_CONFIG = {
     "development": DevelopmentConfig,
     "production": ProductionConfig,
     "url": "http://localhost:3000",
-    # "MARIRONG_DIR": "/home/jgeliberte/codes/cbews-l-mar-fe/src/client-cbewsl/MARIRONG",
-    # "UMINGAN_DIR": "/home/jgeliberte/codes/cbews-l-mar-fe/src/client-cbewsl/UMINGAN",
-    "MARIRONG_DIR": "C:/Users/John Geliberte/Work/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG",
-    "UMINGAN_DIR": "C:/Users/John Geliberte/Work/CBEWS-L/packages/commons/src/client-cbewsl/UMINGAN",
-    "CANDIDATE_DIR": "/home/louie-cbews/CODES/cbews_iloilo/Documents/monitoringoutput/alertgen",
-    "public_alert_file": "/home/louie-cbews/CODES/cbews_iloilo/Documents/monitoringoutput/alertgen/PublicAlertRefDB.json",
+    "MARIRONG_DIR": f"{APP_DIR}/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG",
+    "UMINGAN_DIR": f"{APP_DIR}/CBEWS-L/packages/commons/src/client-cbewsl/UMINGAN",
+    "CANDIDATE_DIR": f"{APP_DIR}/CBEWS-L/packages/server/Documents/monitoringoutput/alertgen",
+    "public_alert_file": f"{APP_DIR}/CBEWS-L/packages/server/Documents/monitoringoutput/alertgen/PublicAlertRefDB.json",
     "site_code": {
         "29": "MARIRONG_DIR",
         "50": "UMINGAN_DIR"
@@ -44,5 +43,6 @@ APP_CONFIG = {
         "mar": 29,
         "umi": 50
     },
-    "site_schema": "cbewsl_commons_db"
+    "site_schema": "cbewsl_commons_db",
+    "app_directory": APP_DIR
 }
