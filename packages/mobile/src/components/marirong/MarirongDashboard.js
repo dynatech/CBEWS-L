@@ -6,6 +6,8 @@ import { ContainerStyle } from '../../styles/container_style';
 import { LabelStyle } from '../../styles/label_style';
 import { ScrollView } from 'react-native-gesture-handler';
 import NetworkUtils from '../../utils/NetworkUtils';
+import DataSync from '../../utils/DataSync';
+import MobileCaching from '../../utils/MobileCaching';
 
 function MarirongDashboard(props) {
   const navigator = props.navigation;
@@ -21,6 +23,12 @@ function MarirongDashboard(props) {
             { text: 'Ok', onPress: () => console.log('OK Pressed'), style: 'cancel' },
           ]
         )
+      } else {
+        MobileCaching.getItem('user_credentials').then(async(credentials)=> {
+          let cache_key = await DataSync.getCachedData(credentials.site_id)
+          let _Alterations = await DataSync.compileUnsyncData(cache_key);
+          alert(JSON.stringify(_Alterations));
+        });
       }
     },100);
   });
