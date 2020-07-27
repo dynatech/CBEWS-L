@@ -53,7 +53,6 @@ export default function SignInSide(props) {
     };
 
     useEffect(() => {
-        console.log("FAKKER", cookies);
         if ("credentials" in cookies && "site_id" in cookies.credentials) {
             console.log("cookies", cookies);
             handleChangeRoute("dashboard");

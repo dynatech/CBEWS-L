@@ -94,9 +94,9 @@ def query_od_alerts(site_id, latest_trigger_ts):
         return result
     
 def query_eq_alerts(site_id, latest_trigger_ts):
-        query = "SELECT * FROM senslopedb.earthquake_events " + \
-            f"WHERE site_id = {site_id} and ts = '{latest_trigger_ts}'"
-
+        query = "SELECT * FROM senslopedb.earthquake_events"
+        query = f"{query} INNER JOIN senslopedb.earthquake_alerts  as ea USING (eq_id)"
+        query = f"{query} WHERE ea.site_id = {site_id} and ts = '{latest_trigger_ts}'"
         result = qdb.get_db_dataframe(query)
 
         if not result.empty:
@@ -303,11 +303,16 @@ def get_od_tech_info(site_id, latest_trigger_ts):
 
 def get_eq_tech_info(site_id, latest_trigger_ts):
     try:
+        var_checker("latest_trigger_ts", latest_trigger_ts)
         alert_detail = query_eq_alerts(site_id, latest_trigger_ts)
 
-        reason = alert_detail["reason"]
-        reporter = alert_detail["reporter"]
-        od_tech_info = f"{reporter} requested on-demand monitoring for the following reason: '{reason}'"
+        var_checker("alert_detail", alert_detail)
+
+        magnitude = alert_detail["magnitude"]
+        depth = alert_detail["depth"]
+        distance = alert_detail["distance"]
+        issuer = alert_detail["issuer"]
+        od_tech_info = f"Magnitude {magnitude} earthquake recorded {distance} km from site."
 
         return od_tech_info
     
@@ -337,7 +342,7 @@ def main(trigger_df):
         elif trigger_source == 'on demand':
             technical_info['on demand'] = get_od_tech_info(site_id, latest_trigger_ts)
         elif trigger_source == 'earthquake':
-            # technical_info['earthquake'] = get_eq_tech_info(site_id, latest_trigger_ts)
-            technical_info['earthquake'] = "This is a dummy earthquake info"
+            technical_info['earthquake'] = get_eq_tech_info(site_id, latest_trigger_ts)
+            # technical_info['earthquake'] = "This is a dummy earthquake info"
     
     return technical_info

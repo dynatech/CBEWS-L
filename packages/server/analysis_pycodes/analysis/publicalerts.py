@@ -504,7 +504,7 @@ def get_alert_history(current_events):
     
     query = "SELECT CONCAT(cdb.firstname, ' ', cdb.lastname) as iomp, " 
     query += "sites.site_code, OTS.alert_symbol, ALS.ts_last_retrigger, OTS.alert_level, " 
-    query += "ALS.remarks, TH.trigger_source, ALS.alert_status, PAS.alert_symbol as public_alert_symbol "
+    query += "ALS.remarks, TH.trigger_source, ALS.alert_status, PAS.alert_symbol as public_alert_symbol, ALS.trigger_id as trigger_id "
     query += "FROM alert_status as ALS "
     query += "  JOIN operational_triggers as OT "
     query += "    ON ALS.trigger_id = OT.trigger_id "
@@ -907,7 +907,7 @@ def main(end=datetime.now()):
     current_events = query_current_events(end)
     current_alerts = current_events.apply(get_alert_history)
 
-    columns = ['iomp', 'site_code', 'alert_symbol', 'ts_last_retrigger', 'alert_level', 'remarks', 'trigger_source', 'alert_status', 'public_alert_symbol']
+    columns = ['iomp', 'site_code', 'alert_symbol', 'ts_last_retrigger', 'alert_level', 'remarks', 'trigger_source', 'alert_status', 'public_alert_symbol', 'trigger_id']
     invalid_alerts = pd.DataFrame(columns=columns)
     try:
         for site in current_alerts.site_code.unique():

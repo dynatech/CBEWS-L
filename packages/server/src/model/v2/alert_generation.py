@@ -397,7 +397,8 @@ class AlertGeneration():
         result = DB.db_read(query, schema)
 
         if return_col:
-            result = result[0][0]
+            return_col = "alert_symbol" if return_col == "ias.alert_symbol" else return_col
+            result = result[0][return_col]
 
         return result
 

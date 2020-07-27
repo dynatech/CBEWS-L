@@ -1,7 +1,5 @@
 import React, { useState, Fragment } from "react";
-// import { Container, Grid, Fab } from "@material-ui/core";
 import { AlertValidation, CurrentAlert } from "./EWIFeature";
-// import { useStyles } from "../../styles/general_styles";
 
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
@@ -47,7 +45,6 @@ function a11yProps(index) {
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
-        // width: "100%",
         marginTop: 10,
         backgroundColor: theme.palette.background.paper,
     },
@@ -60,70 +57,8 @@ export default function EWI() {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-    // const [feature, setFeature] = useState(<AlertValidation />);
-    // const [av, avActive] = useState("primary");
-    // const [lca, lcaActive] = useState("");
 
-    // function handleFeatureNav(feature) {
-    //     let return_feat = [];
-    //     switch (feature) {
-    //         case "alert_validation":
-    //             lcaActive("");
-    //             avActive("primary");
-    //             return_feat = <AlertValidation />
-    //             break;
-    //         case "current_alert":
-    //             lcaActive("primary");
-    //             avActive("");
-    //             return_feat = <CurrentAlert />;
-    //             break;
-    //         default:
-    //             lcaActive("primary");
-    //             avActive("");
-    //             return_feat = <CurrentAlert />;
-    //             break;
-    //     }
-    //     setFeature(return_feat);
-    // }
-
-    // const classes = useStyles();
     return (
-        // <Fragment>
-        //     <Container maxWidth="xl" className={classes.root} spacing={24}>
-        //         <Grid container alignItems="center" justify="center">
-        //             <Grid item xs={3} >
-        //                 <Grid container direction="column" className={classes.menuContainer}>
-        //                     {/* <Grid item={true} xs={3} style={{ marginTop: '30%' }} /> */}
-        //                     <Grid item={true} xs={12} style={{ marginTop: '25%' }}>
-        //                         <Fab variant="extended"
-        //                             color={av}
-        //                             aria-label="add"
-        //                             className={classes.menu}
-        //                             onClick={() => { handleFeatureNav("alert_validation") }}>
-        //                             Alert Validation
-        //                         </Fab>
-        //                     </Grid>
-        //                     <Grid item={true} xs={12} style={{ marginTop: '25%' }}>
-        //                         <Fab variant="extended"
-        //                             color={lca}
-        //                             aria-label="add"
-        //                             className={classes.menu}
-        //                             onClick={() => { handleFeatureNav("current_alert") }}>
-        //                             Current Alert
-        //                         </Fab>
-        //                     </Grid>
-        //                     {/* <Grid item={true} xs={3} style={{ marginTop: '30%' }} /> */}
-        //                 </Grid>
-        //             </Grid>
-        //             <Grid item xs={9} >
-        //             <div style={{overflow: 'auto', height: 660}}>
-        //                 {feature}
-        //             </div>
-        //             </Grid>
-        //         </Grid>
-        //     </Container>
-        // </Fragment>
-
         <div className={classes.root}>
             <AppBar position="static" color="default">
                 <Tabs

@@ -304,7 +304,7 @@ function AlertValidation() {
                         </Typography>
                         {public_alert}
                         <Typography variant="h5" className={classes.label_paddings}>
-                            Status: {candidate_status === 'no_alert' ? "A0" : candidate_status.toUpperCase()}
+                            Status: {candidate_status === 'no_alert' ? "No candidate as of the moment" : candidate_status.toUpperCase()}
                         </Typography>
                         {
                             ![null, ''].includes(validity) && (
@@ -367,14 +367,14 @@ function CurrentAlertArea(props) {
             return triggers.map(trigger => {
                 const { trigger_type, timestamp, info, trigger_source } = trigger;
                 return (
-                    <Typography variant="h5" className={classes.label_paddings}>
+                    <Typography variant="h6" className={classes.label_paddings}>
                         {`${moment(timestamp).format("MMMM D, YYYY h:mm A")} | ${trigger_source.toUpperCase()} (${trigger_type}): ${info}`}
                     </Typography>
                 );
             });
         } else {
             return (
-                <Typography variant="h5" className={classes.label_paddings}>
+                <Typography variant="h6" className={classes.label_paddings}>
                     No retriggers
                 </Typography>
             )
@@ -403,13 +403,22 @@ function CurrentAlertArea(props) {
                         {prepareTriggers(leo.release_triggers)}
                     </Typography> */}
                     <Typography variant="h5" className={classes.label_paddings}>
-                        {`Event Start: ${event_start}`}
+                        <strong>Event started at </strong>{event_start}
                     </Typography>
                     <Typography variant="h5" className={classes.label_paddings}>
-                        {`Validity: ${validity}`}
+                        {
+                            ['lowering', 'extended'].includes(leo.event_status) || (leo.event_status == "on-going" && leo.public_alert_level == 0) ? (
+                                <Typography variant="h5">Day <strong>{
+                                    "day" in leo ? leo.day : '0'
+                                }</strong> of Extended Monitoring</Typography>
+                            ) : (
+                                <Fragment><strong>Valid until </strong>{validity}</Fragment>
+                            )
+                        }
                     </Typography>
                     <Typography variant="h5" className={classes.label_paddings}>
-                        {`Recommended Response: ${leo.recommended_response}`}
+                        <strong>Recommended Response:</strong><br />
+                        {`${leo.recommended_response}`}
                     </Typography>
                 </Grid>
                 <Grid item xs={6}>
@@ -419,15 +428,12 @@ function CurrentAlertArea(props) {
                     {prepareTriggers(leo.latest_event_triggers)}
                 </Grid>
                 <Grid item xs={12} align="right">
-                    <Box style={{ paddingTop: 100 }}>
+                    <Box style={{ paddingTop: 'auto' }}>
                         Prepared by: {leo.reporter}
                     </Box>
                 </Grid>
 
                 <Grid container justify="center" className={classes.menu_functions}>
-                    <Grid item xs={3}>
-
-                    </Grid>
                     <Grid item xs={2} align="center" >
                         <Fab variant="extended"
                             color="primary"
@@ -435,25 +441,6 @@ function CurrentAlertArea(props) {
                             onClick={() => { sendEmail() }}>
                             Email
                         </Fab>
-                    </Grid>
-                    <Grid item xs={2} align="center">
-                        <Fab variant="extended"
-                            color="primary"
-                            aria-label="add" className={classes.button_fluid}
-                            onClick={() => { download() }}>
-                            Download
-                        </Fab>
-                    </Grid>
-                    <Grid item xs={2} align="center">
-                        <Fab variant="extended"
-                            color="primary"
-                            aria-label="add" className={classes.button_fluid}
-                            onClick={() => { print() }}>
-                            Print
-                        </Fab>
-                    </Grid>
-                    <Grid item xs={3}>
-
                     </Grid>
                 </Grid>
             </Fragment>
