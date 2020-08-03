@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Text, Alert, TouchableOpacity, View, Linking, ToastAndroid } from 'react-native';
-// import { Icon } from 'native-base'
+import Spinner from 'react-native-loading-spinner-overlay';
 import { ImageStyle } from '../../styles/image_style'
 import { ContainerStyle } from '../../styles/container_style';
 import { LabelStyle } from '../../styles/label_style';
@@ -11,6 +11,8 @@ import MobileCaching from '../../utils/MobileCaching';
 
 function MarirongDashboard(props) {
   const navigator = props.navigation;
+  const [isSyncing, setSyncing] = useState(true);
+  const [syncMessage, setSyncMessage] = useState("Syncing data to servers...");
 
   useEffect(()=> {
     setTimeout( async ()=> {
@@ -25,13 +27,16 @@ function MarirongDashboard(props) {
         )
       } else {
         MobileCaching.getItem('user_credentials').then(async(credentials)=> {
-          let cache_key = await DataSync.getCachedData(credentials.site_id)
-          let _Alterations = await DataSync.compileUnsyncData(cache_key);
-          alert(JSON.stringify(_Alterations));
+          setTimeout(()=> {
+            let cache_keys = await DataSync.getCachedData(credentials.site_id)
+            let _Alterations = await DataSync.compileUnsyncData(cache_keys, "Marirong");
+            setSyncing(false);
+          }, 1000);
+          // alert(JSON.stringify(_Alterations));
         });
       }
     },100);
-  });
+  }, []);
 
   const initiateCallOrSms = () => {
     Alert.alert(
@@ -49,6 +54,10 @@ function MarirongDashboard(props) {
 
   return (
     <ScrollView>
+        <Spinner
+          visible={isSyncing}
+          textContent={syncMessage}
+        />
       <View style={ContainerStyle.dashboard_container}>
         <View style={ContainerStyle.dashboard_seals}>
           <Image style={ImageStyle.dashboard_seal} source={require('../../assets/dost_seal.png')}></Image>
