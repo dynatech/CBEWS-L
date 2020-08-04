@@ -1,20 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { Image, Text, Alert, TouchableOpacity, View, Linking, ToastAndroid } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Image, Text, Alert, TouchableOpacity, View, Linking, PermissionsAndroid } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { ImageStyle } from '../../styles/image_style'
 import { ContainerStyle } from '../../styles/container_style';
 import { LabelStyle } from '../../styles/label_style';
 import { ScrollView } from 'react-native-gesture-handler';
+import Geolocation from 'react-native-geolocation-service';
 import NetworkUtils from '../../utils/NetworkUtils';
 import DataSync from '../../utils/DataSync';
 import MobileCaching from '../../utils/MobileCaching';
+import moment from 'moment';
 
 function MarirongDashboard(props) {
-  const navigator = props.navigation;
+  const StackNavigator = props.navigation;
   const [isSyncing, setSyncing] = useState(true);
   const [syncMessage, setSyncMessage] = useState("Syncing data to servers...");
+  const [weather, setWeather] = useState({});
 
   useEffect(()=> {
+    initLocation();
     setTimeout( async ()=> {
       const isConnected = await NetworkUtils.isNetworkAvailable()
       if (isConnected != true) {
@@ -26,8 +30,8 @@ function MarirongDashboard(props) {
           ]
         )
       } else {
-        MobileCaching.getItem('user_credentials').then(async(credentials)=> {
-          setTimeout(()=> {
+        MobileCaching.getItem('user_credentials').then((credentials)=> {
+          setTimeout(async()=> {
             let cache_keys = await DataSync.getCachedData(credentials.site_id)
             let _Alterations = await DataSync.compileUnsyncData(cache_keys, "Marirong");
             setSyncing(false);
@@ -50,13 +54,36 @@ function MarirongDashboard(props) {
     )
   }
 
-  // <Icon name="menu" onPress={() => navigator.openDrawer()} />
+  const initLocation = () => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        const {latitude, longitude} = position.coords;
+        getWeather(latitude, longitude)
+      },
+      (error) => {
+        console.log(error.code, error.message);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  }
+
+  const getWeather = (lat, lon) => {
+    let url = `http://api.weatherstack.com/current?access_key=5eb44eecc33ef8ad7fea90773ae7a6fa&query=${lat},${lon}`;
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        setWeather(data.current)
+    })
+  }
 
   return (
     <ScrollView>
         <Spinner
           visible={isSyncing}
           textContent={syncMessage}
+          textStyle={{
+            color: '#fff'
+          }}
         />
       <View style={ContainerStyle.dashboard_container}>
         <View style={ContainerStyle.dashboard_seals}>
@@ -68,13 +95,14 @@ function MarirongDashboard(props) {
         <View style={ContainerStyle.dashboard_content}>
           <Text style={[LabelStyle.large_label, LabelStyle.branding]}>Community Based Early Warning Information for Landslides</Text>
           <View style={ContainerStyle.weather_container}>
-            <Text style={[LabelStyle.medium_label]}>Weather update: Clear skies</Text>
-            <Text style={[LabelStyle.medium_label]}>Date time: August 16, 2019 04:00 PM</Text>
+            <Text style={[LabelStyle.weather]}>Cloud cover: {weather.cloudcover}</Text>
+            <Text style={[LabelStyle.weather]}>Feels like: {weather.feelslike}°</Text>
+            <Text style={[LabelStyle.weather]}>Weather update: {weather.weather_descriptions}</Text>
           </View>
           <View style={ContainerStyle.dashboard_menu}>
             <View style={ContainerStyle.menu_row}>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { navigator.navigate("CRATabStack") }}>
+                <TouchableOpacity onPress={() => { StackNavigator.navigate("CRATabStack") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/cra.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Community{"\n"}Risk Assessment</Text>
@@ -86,7 +114,7 @@ function MarirongDashboard(props) {
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Call and Text</Text>
               </View>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { navigator.navigate("AlertGeneration") }}>
+                <TouchableOpacity onPress={() => { StackNavigator.navigate("AlertGeneration") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/alert_gen.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Alert{"\n"}Generation</Text>
@@ -94,19 +122,19 @@ function MarirongDashboard(props) {
             </View>
             <View style={ContainerStyle.menu_row}>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { navigator.navigate("DataAnalysis") }}>
+                <TouchableOpacity onPress={() => { StackNavigator.navigate("DataAnalysis") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/data_analysis.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Data{"\n"}Analysis</Text>
               </View>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { navigator.navigate("GroundData") }}>
+                <TouchableOpacity onPress={() => { StackNavigator.navigate("GroundData") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/ground_data.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Ground Data</Text>
               </View>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { navigator.navigate("SensorData") }}>
+                <TouchableOpacity onPress={() => { StackNavigator.navigate("SensorData") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/sensor_data.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Sensor Data</Text>
@@ -114,19 +142,19 @@ function MarirongDashboard(props) {
             </View>
             <View style={ContainerStyle.menu_row}>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { navigator.navigate("MaintenanceLogsTabStack") }}>
+                <TouchableOpacity onPress={() => { StackNavigator.navigate("MaintenanceLogsTabStack") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/maintenance.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Maintenance</Text>
               </View>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { navigator.navigate("EventsTemplate") }}>
+                <TouchableOpacity onPress={() => { StackNavigator.navigate("EventsTemplate") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/events.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Events</Text>
               </View>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { navigator.navigate("DataSync") }}>
+                <TouchableOpacity onPress={() => { StackNavigator.navigate("DataSync") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/data_sync.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Data Sync</Text>
