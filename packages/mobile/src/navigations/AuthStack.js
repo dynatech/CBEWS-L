@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import ForgotPassword from '../components/authentications//ForgotPassword';
+import ForgotPassword from '../components/authentications/ForgotPassword';
 import Signin from '../components/authentications/Signin';
 import Signup from '../components/authentications/Signup';
 import MarirongDashboardStack from '../navigations/marirong/MarirongDashboardStack';
