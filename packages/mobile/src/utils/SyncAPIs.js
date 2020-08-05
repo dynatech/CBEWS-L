@@ -37,6 +37,56 @@ const MARIRONG_API_LIST = (data) => {
     }
 };
 
+const UMINGAN_API_LIST = (data) => {
+    return {
+        'UmiRiskAssessmentSummary': {
+            'add': (async (data)=> {
+
+            }),
+            'update': (async (data)=> {
+
+            }),
+            'delete': ((data)=> {
+
+            })
+        },
+        'UmiResourceAndCapacities': {
+            'add': (async (data)=> {
+
+            }),
+            'update': (async (data)=> {
+
+            }),
+            'delete': ((data)=> {
+
+            })
+        },
+        'UmiHazardData': {
+            'add': (async (data)=> {
+
+            }),
+            'update': (async (data)=> {
+
+            }),
+            'delete': ((data)=> {
+
+            })
+        }
+        ,'UmiFamilyRiskProfile': {
+            'add': (async (data)=> {
+
+            }),
+            'update': (async (data)=> {
+
+            }),
+            'delete': ((data)=> {
+
+            })
+        }
+    }
+};
+
+
 const MarirongSync = (data) => {
     data.forEach(element => {
         let apis = null;
@@ -55,7 +105,20 @@ const MarirongSync = (data) => {
 }
 
 const UminganSync = (data) => {
+    data.forEach(element => {
+        let apis = null;
+        element.data.add.forEach(x => {
+            apis = UMINGAN_API_LIST()[element.key][x.alterations](x);
+        });
 
+        element.data.modify.forEach(y => {
+            apis = UMINGAN_API_LIST()[element.key][y.alterations](y);
+        });
+
+        element.data.delete.forEach(z => {
+            apis = UMINGAN_API_LIST()[element.key][z.alterations](z);
+        });
+    });
 }
 
 export { MarirongSync, UminganSync }

@@ -7,12 +7,14 @@ import { ButtonStyle } from '../../../styles/button_style';
 import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
+import NetworkUtils from '../../../utils/NetworkUtils';
 
 function FamilyRiskProfile() {
 
     const [openModal, setOpenModal] = useState(false);
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
+    const [familyRiskProfile, setFamilyRiskProfile] = useState([]);
     const [cmd, setCmd] = useState('add');
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Number of Members': '',
@@ -22,34 +24,50 @@ function FamilyRiskProfile() {
 
     let formData = useRef();
 
-
     useEffect(() => {
-        init();
-    }, [])
-
-    const init = async () => {
-        let response = await UmiRiskManagement.GetAllFamilyRiskProfile()
-        if (response.status === true) {
-            let temp = [];
-            if (response.data.length != 0) {
-                let row = response.data;
-                row.forEach(element => {
-                    temp.push(
-                        <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
-                            <DataTable.Cell>{element.number_of_members}</DataTable.Cell>
-                            <DataTable.Cell>{element.vulnerable_groups}</DataTable.Cell>
-                            <DataTable.Cell>{element.nature_of_vulnerability}</DataTable.Cell>
-                        </DataTable.Row>
-                    )
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+                MobileCaching.getItem('UmiFamilyRiskProfile').then(response => {
+                    init(response);
+                    setFamilyRiskProfile(response);
                 });
             } else {
-                temp.push(
-                    <View key={0}>
-                        <Text>No available data.</Text>
-                    </View>
-                )
+                fetchLatestData();
             }
-            setDataTableContent(temp)
+        },100);
+
+    }, [])
+
+    const init = async (data) => {
+        let temp = [];
+        if (data.length != 0) {
+            let row = data;
+            row.forEach(element => {
+                temp.push(
+                    <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
+                        <DataTable.Cell>{element.number_of_members}</DataTable.Cell>
+                        <DataTable.Cell>{element.vulnerable_groups}</DataTable.Cell>
+                        <DataTable.Cell>{element.nature_of_vulnerability}</DataTable.Cell>
+                    </DataTable.Row>
+                )
+            });
+        } else {
+            temp.push(
+                <View key={0}>
+                    <Text>No available data.</Text>
+                </View>
+            )
+        }
+        setDataTableContent(temp)
+    }
+
+    const fetchLatestData = async () => {
+        let response = await UmiRiskManagement.GetAllFamilyRiskProfile()
+        if (response.status == true) {
+            init(response.data);
+            setFamilyRiskProfile(response.data);
+            MobileCaching.setItem('UmiFamilyRiskProfile', response.data);
         } else {
             ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
         }

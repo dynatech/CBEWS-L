@@ -9,12 +9,11 @@ import Geolocation from 'react-native-geolocation-service';
 import NetworkUtils from '../../utils/NetworkUtils';
 import DataSync from '../../utils/DataSync';
 import MobileCaching from '../../utils/MobileCaching';
-import moment from 'moment';
 
 function MarirongDashboard(props) {
   const StackNavigator = props.navigation;
   const [isSyncing, setSyncing] = useState(true);
-  const [syncMessage, setSyncMessage] = useState("Syncing data to servers...");
+  const [syncMessage, setSyncMessage] = useState("Syncing data to Marirong server...");
   const [weather, setWeather] = useState({});
 
   useEffect(()=> {

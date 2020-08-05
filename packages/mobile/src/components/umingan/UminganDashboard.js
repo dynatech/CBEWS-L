@@ -1,14 +1,51 @@
-import React from 'react';
-import { Image, Text, TouchableOpacity, Linking, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, Text, TouchableOpacity, Linking, View, Alert } from 'react-native';
 import { ContainerStyle } from '../../styles/container_style';
 import { ImageStyle } from '../../styles/image_style';
 import { LabelStyle } from '../../styles/label_style';
 import { ScrollView } from 'react-native-gesture-handler';
+import Spinner from 'react-native-loading-spinner-overlay';
+import NetworkUtils from '../../utils/NetworkUtils';
+import DataSync from '../../utils/DataSync';
+import MobileCaching from '../../utils/MobileCaching';
 
 function UminganDashboard(props) {
     const navigator = props.navigation;
+    const [isSyncing, setSyncing] = useState(true);
+    const [syncMessage, setSyncMessage] = useState("Syncing data to Umingan server...");
+
+    useEffect(()=> {
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+              Alert.alert(
+                'CBEWS-L is not connected to the internet',
+                'CBEWS-L Local data will be used.',
+                [
+                  { text: 'Ok', onPress: () => console.log('OK Pressed'), style: 'cancel' },
+                ]
+              )
+            } else {
+              MobileCaching.getItem('user_credentials').then((credentials)=> {
+                setTimeout(async()=> {
+                  let cache_keys = await DataSync.getCachedData(credentials.site_id)
+                  let _Alterations = await DataSync.compileUnsyncData(cache_keys, "Umingan");
+                  setSyncing(false);
+                }, 1000);
+                // alert(JSON.stringify(_Alterations));
+              });
+            }
+          },100);
+    })
     return (
         <ScrollView>
+            <Spinner
+                visible={isSyncing}
+                textContent={syncMessage}
+                textStyle={{
+                    color: '#fff'
+                }}
+            />
             <View style={ContainerStyle.dashboard_container}>
                 <View style={[ContainerStyle.dashboard_seals, {paddingTop: 20, paddingBottom: 20}]}>
                     <Image style={ImageStyle.dashboard_seal} source={require('../../assets/umi_seal.png')}></Image>

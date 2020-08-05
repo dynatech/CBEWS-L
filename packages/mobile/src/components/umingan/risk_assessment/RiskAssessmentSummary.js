@@ -8,13 +8,15 @@ import { InputStyle } from '../../../styles/input_style';
 import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
+import NetworkUtils from '../../../utils/NetworkUtils';
 
-function RiskAssessmentSummary() {
-
+function RiskAssessmentSummary(props) {
+    const navigator = props.navigation;
+    
     const [openModal, setOpenModal] = useState(false);
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
-
+    const [riskAssessmentContainer, setRiskAssessmentContainer] = useState([]);
     const [cmd, setCmd] = useState('add');
 
     const [defaultStrValues, setDefaultStrValues] = useState({
@@ -26,35 +28,58 @@ function RiskAssessmentSummary() {
 
     let formData = useRef();
 
-
     useEffect(() => {
-        init();
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+              Alert.alert(
+                'CBEWS-L is not connected to the internet',
+                'CBEWS-L Local data will be used.',
+                [
+                  { text: 'Ok', onPress: () => {
+                    MobileCaching.getItem('UmiRiskAssessmentSummary').then(response => {
+                        init(response);
+                        setRiskAssessmentContainer(response);
+                    });
+                  }, style: 'cancel' },
+                ]
+              )
+            } else {
+                fetchLatestData();
+            }
+          },100);
     }, [])
 
-    const init = async () => {
-        let response = await UmiRiskManagement.GetAllSummary()
-        if (response.status === true) {
-            let temp = [];
-            if (response.data.length != 0) {
-                let row = response.data;
-                row.forEach(element => {
-                    temp.push(
-                        <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
-                            <DataTable.Cell>{element.location}</DataTable.Cell>
-                            <DataTable.Cell>{element.impact}</DataTable.Cell>
-                            <DataTable.Cell>{element.adaptive_capacity}</DataTable.Cell>
-                            <DataTable.Cell>{element.vulnerability}</DataTable.Cell>
-                        </DataTable.Row>
-                    )
-                });
-            } else {
+    const init = async (data) => {
+        let temp = [];
+        if (data.length != 0) {
+            let row = data;
+            row.forEach(element => {
                 temp.push(
-                    <View key={0}>
-                        <Text>No available data.</Text>
-                    </View>
+                    <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
+                        <DataTable.Cell>{element.location}</DataTable.Cell>
+                        <DataTable.Cell>{element.impact}</DataTable.Cell>
+                        <DataTable.Cell>{element.adaptive_capacity}</DataTable.Cell>
+                        <DataTable.Cell>{element.vulnerability}</DataTable.Cell>
+                    </DataTable.Row>
                 )
-            }
-            setDataTableContent(temp)
+            });
+        } else {
+            temp.push(
+                <View key={0}>
+                    <Text>No available data.</Text>
+                </View>
+            )
+        }
+        setDataTableContent(temp)
+    }
+
+    const fetchLatestData = async () => {
+        let response = await UmiRiskManagement.GetAllSummary()
+        if (response.status == true) {
+            init(response.data);
+            setRiskAssessmentContainer(response.data);
+            MobileCaching.setItem('UmiRiskAssessmentSummary', response.data);
         } else {
             ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
         }

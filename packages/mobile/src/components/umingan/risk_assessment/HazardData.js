@@ -7,12 +7,14 @@ import { ButtonStyle } from '../../../styles/button_style';
 import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
+import NetworkUtils from '../../../utils/NetworkUtils';
 
 function HazardData() {
 
     const [openModal, setOpenModal] = useState(false);
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
+    const [hazardDataContainer, setHazardDataContainer] = useState([]);
     const [cmd, setCmd] = useState('add');
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Hazard': '',
@@ -23,35 +25,50 @@ function HazardData() {
 
     let formData = useRef();
 
-
     useEffect(() => {
-        init();
-    }, [])
-
-    const init = async () => {
-        let response = await UmiRiskManagement.GetAllHazardData()
-        if (response.status === true) {
-            let temp = [];
-            if (response.data.length != 0) {
-                let row = response.data;
-                row.forEach(element => {
-                    temp.push(
-                        <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
-                            <DataTable.Cell>{element.hazard}</DataTable.Cell>
-                            <DataTable.Cell>{element.speed_of_onset}</DataTable.Cell>
-                            <DataTable.Cell>{element.early_warning}</DataTable.Cell>
-                            <DataTable.Cell>{element.impact}</DataTable.Cell>
-                        </DataTable.Row>
-                    )
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+                MobileCaching.getItem('UmiHazardData').then(response => {
+                    init(response);
+                    setHazardDataContainer(response);
                 });
             } else {
-                temp.push(
-                    <View key={0}>
-                        <Text>No available data.</Text>
-                    </View>
-                )
+                fetchLatestData();
             }
-            setDataTableContent(temp)
+        },100);
+    }, [])
+
+    const init = async (data) => {
+        let temp = [];
+        if (data.length != 0) {
+            let row = data;
+            row.forEach(element => {
+                temp.push(
+                    <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
+                        <DataTable.Cell>{element.hazard}</DataTable.Cell>
+                        <DataTable.Cell>{element.speed_of_onset}</DataTable.Cell>
+                        <DataTable.Cell>{element.early_warning}</DataTable.Cell>
+                        <DataTable.Cell>{element.impact}</DataTable.Cell>
+                    </DataTable.Row>
+                )
+            });
+        } else {
+            temp.push(
+                <View key={0}>
+                    <Text>No available data.</Text>
+                </View>
+            )
+        }
+        setDataTableContent(temp)
+    }
+
+    const fetchLatestData = async () => {
+        let response = await UmiRiskManagement.GetAllHazardData()
+        if (response.status == true) {
+            init(response.data);
+            setHazardDataContainer(response.data);
+            MobileCaching.setItem('UmiHazardData', response.data);
         } else {
             ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
         }

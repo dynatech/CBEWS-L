@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import MobileCaching from './MobileCaching';
-import { MarirongSync } from './SyncAPIs';
+import { MarirongSync, UminganSync } from './SyncAPIs';
 
 const SiteCodes = {
 	51: 'Marirong',
@@ -12,7 +12,12 @@ const SyncKeys = {
 	'Marirong': [
 		'MarCapacityAndVulnerability'
 	],
-	'Umingan': []
+	'Umingan': [
+		'UmiRiskAssessmentSummary',
+		'UmiResourceAndCapacities',
+		'UmiHazardData',
+		'UmiFamilyRiskProfile'
+	]
 }
 
 const DataSync = {
@@ -56,6 +61,9 @@ const DataSync = {
 				switch(site) {
 					case 'Marirong':
 						MarirongSync(toSync)
+						break;
+					case 'Umingan':
+						UminganSync(toSync)
 						break;
 					default:
 						break;

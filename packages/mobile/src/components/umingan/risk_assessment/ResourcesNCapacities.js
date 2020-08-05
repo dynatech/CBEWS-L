@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Modal, ScrollView, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { View, Text, Modal, ScrollView, TouchableOpacity, ToastAndroid, Alert, BackHandler } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { DataTable } from 'react-native-paper';
 import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
@@ -7,12 +8,15 @@ import { ButtonStyle } from '../../../styles/button_style';
 import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
+import NetworkUtils from '../../../utils/NetworkUtils';
 
-function ResourcesNCapacities() {
+function ResourcesNCapacities(props) {
+    const navigator = props.navigation;
 
     const [openModal, setOpenModal] = useState(false);
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
+    const [resourceAndCapacitiesContainer, setResourceAndCapacitiesContainer] = useState([]);
     const [cmd, setCmd] = useState('add');
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Resource and Capacities': '',
@@ -22,34 +26,62 @@ function ResourcesNCapacities() {
 
     let formData = useRef();
 
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         const onBackPress = () => {
+    //             navigator.jumpTo('UminganDashboard');
+    //         };
+      
+    //         BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      
+    //         return () =>
+    //           BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    //     }, [])
+    // );
 
     useEffect(() => {
-        init();
-    }, [])
-
-    const init = async () => {
-        let response = await UmiRiskManagement.GetAllResourceAndCapacities()
-        if (response.status === true) {
-            let temp = [];
-            if (response.data.length != 0) {
-                let row = response.data;
-                row.forEach(element => {
-                    temp.push(
-                        <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
-                            <DataTable.Cell>{element.resource_and_capacities}</DataTable.Cell>
-                            <DataTable.Cell>{element.status}</DataTable.Cell>
-                            <DataTable.Cell>{element.owner}</DataTable.Cell>
-                        </DataTable.Row>
-                    )
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+                MobileCaching.getItem('UmiResourceAndCapacities').then(response => {
+                    init(response);
+                    setResourceAndCapacitiesContainer(response);
                 });
             } else {
-                temp.push(
-                    <View key={0}>
-                        <Text>No available data.</Text>
-                    </View>
-                )
+                fetchLatestData();
             }
-            setDataTableContent(temp)
+        },100);
+    }, [])
+
+    const init = async (data) => {
+        let temp = [];
+        if (data.length != 0) {
+            let row = data;
+            row.forEach(element => {
+                temp.push(
+                    <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
+                        <DataTable.Cell>{element.resource_and_capacities}</DataTable.Cell>
+                        <DataTable.Cell>{element.status}</DataTable.Cell>
+                        <DataTable.Cell>{element.owner}</DataTable.Cell>
+                    </DataTable.Row>
+                )
+            });
+        } else {
+            temp.push(
+                <View key={0}>
+                    <Text>No available data.</Text>
+                </View>
+            )
+        }
+        setDataTableContent(temp)
+    }
+
+    const fetchLatestData = async () => {
+        let response = await UmiRiskManagement.GetAllResourceAndCapacities()
+        if (response.status == true) {
+            init(response.data);
+            setResourceAndCapacitiesContainer(response.data);
+            MobileCaching.setItem('UmiResourceAndCapacities', response.data);
         } else {
             ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
         }
