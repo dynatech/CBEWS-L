@@ -14,6 +14,10 @@ const LabelStyle = StyleSheet.create({
       fontSize: width * 0.05,
       padding: 10
    },
+   weather: {
+      fontSize: width * 0.05,
+      padding: 2
+   },
    small_label: {
       fontSize: width * 0.03,
    },

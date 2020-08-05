@@ -8,6 +8,7 @@ import { LabelStyle } from '../../styles/label_style';
 import { Formik } from 'formik';
 import { UserManagement } from '@dynaslope/commons';
 import MobileCaching from '../../utils/MobileCaching';
+import NetworkUtils from '../../utils/NetworkUtils';
 
 function Signin(props) {
     const navigator = props.navigation;
@@ -17,11 +18,18 @@ function Signin(props) {
     }
 
     useEffect(()=> {
-        MobileCaching.getItem('user_credentials').then(credentials=> {
-            if (credentials != null) {
-                navigator.navigate(site_navigator[credentials.site_id]);
-            }
-        })
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            MobileCaching.getItem('user_credentials').then(credentials=> {
+                if (credentials != null) {
+                    navigator.navigate(site_navigator[credentials.site_id]);
+                } else {
+                    if (isConnected != true) {
+                        ToastAndroid.showWithGravity("CBEWS-L is not connected to the internet. \nPlease Check your Internet connectivity before logging into the App.", ToastAndroid.LONG, ToastAndroid.CENTER)
+                    }
+                }
+            })
+        },100);
     }, []);
 
     return (

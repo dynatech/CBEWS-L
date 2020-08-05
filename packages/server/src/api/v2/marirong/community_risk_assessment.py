@@ -14,29 +14,18 @@ COMMUNITY_RISK_ASSESSMENT_BLUEPRINT = Blueprint("capacity_and_vulnerability_blue
 
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/add/community_risk_assessment/mar/capacity_and_vulnerability", methods=["POST"])
 def add_capacity_and_vulnerability():
-    temp = request.get_json()
-    data = {
-        "resource": temp["resource"],
-        "quantity": temp["quantity"],
-        "status": temp["status"],
-        "owner": temp["owner"],
-        "in_charge": temp["in_charge"],
-        "updater": temp["updater"],
-        "datetime": temp["datetime"],
-        "user_id": temp["user_id"]
-    }
-
+    data = request.get_json()
     status = CommunityRiskAssessment.create_cav(data)
     if status is not None:
         return_value = {
             "status": True,
-            "cav_id": status,
+            "id": status,
             "message": "New capacity and vulnerability data successfully added!"
         }
     else:
         return_value = {
             "status": False,
-            "cav_id": None,
+            "id": None,
             "message": "Failed to add capacity and vulnerability data. Please check your network connection."
         }
     return jsonify(return_value)
@@ -44,34 +33,42 @@ def add_capacity_and_vulnerability():
 
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/all/community_risk_assessment/mar/capacity_and_vulnerability", methods=["GET"])
 def fetch_all_capacity_and_vulnerability():
-    result = CommunityRiskAssessment.fetch_cav('all')
-    data = []
-    for row in result:
-        row.update({
-            "datetime": h.dt_to_str(row["date"]),
-            "last_ts": h.dt_to_str(row["last_ts"])
-        })
-        data.append(row)
-    return jsonify(data)
+    try:
+        result = CommunityRiskAssessment.fetch_cav()
+        data = {
+            "status": True,
+            "data": result
+        }
+    except Exception as err:
+        data = {
+            "status": False,
+            "message": f"Failed to fetch capacity and vulnerability data. Err: {err}"
+        }
+    finally:
+        return jsonify(data)
+    
 
 
-@COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/one/community_risk_assessment/mar/capacity_and_vulnerability/<cav_id>", methods=["GET"])
-def fetch_one_capacity_and_vulnerability(cav_id):
-    result = CommunityRiskAssessment.fetch_cav(cav_id)
-    data = []
-    for row in result:
-        row.update({
-            "datetime": h.dt_to_str(row["date"]),
-            "last_ts": h.dt_to_str(row["last_ts"])
-        })
-        data.append(row)
-    return jsonify(data)
+@COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/one/community_risk_assessment/mar/capacity_and_vulnerability/<id>", methods=["GET"])
+def fetch_one_capacity_and_vulnerability(id):
+    try:
+        result = CommunityRiskAssessment.fetch_cav(id)
+        data = {
+            "status": True,
+            "data": result
+        }
+    except Exception as err:
+        data = {
+            "status": False,
+            "message": "Failed to fetch capacity and vulnerability data"
+        }
+    finally:
+        return jsonify(data)
 
 
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/update/community_risk_assessment/mar/capacity_and_vulnerability", methods=["POST"])
 def modify_capacity_and_vulnerability():
     data = request.get_json()
-    print(data)
     result = CommunityRiskAssessment.update_cav(data)
     if result:
         return_value = {
@@ -89,7 +86,7 @@ def modify_capacity_and_vulnerability():
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/delete/community_risk_assessment/mar/capacity_and_vulnerability", methods=["DELETE"])
 def remove_capacity_and_vulnerability():
     data = request.get_json()
-    status = CommunityRiskAssessment.delete_cav(data["cav_id"])
+    status = CommunityRiskAssessment.delete_cav(data["id"])
     if status:
         return_value = {
             "status": True,

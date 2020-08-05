@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ToastAndroid, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, ToastAndroid, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { List, ListItem } from 'react-native-elements'
 import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
 import { ButtonStyle } from '../../../styles/button_style';
 import { MarCommunityRiskAssessment } from '@dynaslope/commons';
 import MobileCaching from '../../../utils/MobileCaching';
+import NetworkUtils from '../../../utils/NetworkUtils';
 import Uploader from '../../utils/Uploader';
 import FilePickerManager from 'react-native-file-picker';
 import RNFS from 'react-native-fs'
@@ -23,12 +24,17 @@ function CommunityRiskAssessment() {
     },[])
 
     const init = async () => {
+      const isConnected = await NetworkUtils.isNetworkAvailable()
+      if (isConnected != true) {
+        setList([{"file_path": "", "file_type": "NA", "filename": "DATA CONNECTION NOT AVAILABLE"}])
+      } else {
         let response = await MarCommunityRiskAssessment.GetCommunityRiskAssessment()
         if (response.status == true) {
             setList(response.data);
         } else {
             setList([{"file_path": "", "file_type": "NA", "filename": "NO AVAILABLE DATA"}])
         }
+      }
     }
 
     const comfirmUpload = async () => {
@@ -70,24 +76,35 @@ function CommunityRiskAssessment() {
       }
     
 
-    const downloadFile = (full_path, file_name) => {
+    const downloadFile = async (full_path, file_name) => {
       // Only available in Metro bundler
       // Disabling for now
       // const HTTP_URL = full_path.replace('/var/www/html', '');
-      RNFetchBlob.config({
-        fileCache: true,
-        addAndroidDownloads: {
-          useDownloadManager: true,
-          notification: true,
-          path: RNFetchBlob.fs.dirs.DownloadDir + "/" + file_name,
-          description: 'File downloaded by download manager.'
-          ,
-        }
-      })
-        .fetch('GET', `${AppConfig.HOST_DIR}${HTTP_URL}`)
-        .then((res) => {
-          ToastAndroid.show(`The file saved to ${res.path()}`, ToastAndroid.LONG);
+      const isConnected = await NetworkUtils.isNetworkAvailable()
+      if (isConnected != true) {
+        Alert.alert(
+          'CBEWS-L is not connected to the internet',
+          'Cannot download file from server.',
+          [
+            { text: 'Ok', onPress: () => { }, style: 'cancel' },
+          ]
+        )
+      } else {
+        RNFetchBlob.config({
+          fileCache: true,
+          addAndroidDownloads: {
+            useDownloadManager: true,
+            notification: true,
+            path: RNFetchBlob.fs.dirs.DownloadDir + "/" + file_name,
+            description: 'File downloaded by download manager.'
+            ,
+          }
         })
+          .fetch('GET', `${AppConfig.HOST_DIR}${HTTP_URL}`)
+          .then((res) => {
+            ToastAndroid.show(`The file saved to ${res.path()}`, ToastAndroid.LONG);
+          })
+      }
     }
 
     const resetState = () => {
