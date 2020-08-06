@@ -92,7 +92,6 @@ export default function CommunityRiskAssessment(props) {
 
     const updateList = () => {
         setTimeout(async () => {
-            const input = { path: `${AppConfig.MARIRONG_DIR}/DOCUMENTS`};
             let response = await MarCommunityRiskAssessment.GetCommunityRiskAssessment();
             if (response.status) {
                 setCraData(formatCRAData(response.data))

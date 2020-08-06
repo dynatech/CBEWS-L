@@ -85,7 +85,7 @@ export default function CommunityRiskAssessmentPage () {
                         </Grid>
                     </Grid>
                     <Grid item xs={9} >
-                        <div style={{ overflow: 'auto', height: 'auto' }}>
+                        <div style={{ height: 'auto' }}>
                             {feature}
                         </div>
                     </Grid>

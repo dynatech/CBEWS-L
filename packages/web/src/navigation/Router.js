@@ -14,7 +14,7 @@ import { useCookies } from "react-cookie";
 function RouterApp() {
   const [cookies, setCookies] = useCookies(['credentials']);
   const component_object = {
-    51: (
+    29: (
       <Fragment>
         <Route path='/dashboard' component={MarDashboard} />
       </Fragment>
@@ -31,7 +31,7 @@ function RouterApp() {
     <BrowserRouter>
       <Switch>
         {
-          site_id !== null && (component_object[site_id])
+          site_id !== null && (component_object[int(site_id)])
         }
         <Route path='/forgot-password' component={ForgotPassword} /> 
         <Route path='/signup' component={SignUp} />

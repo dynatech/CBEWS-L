@@ -5,13 +5,17 @@ import {
     Fab,
     TextField,
     Button,
-    GridList,
-    GridListTile,
-    GridListTileBar,
-    Input,
 } from "@material-ui/core/";
 import { useStyles } from "../../../styles/general_styles";
-import ImageZoom from "react-medium-image-zoom";
+
+import {
+    Magnifier,
+    GlassMagnifier,
+    SideBySideMagnifier,
+    PictureInPictureMagnifier,
+    MOUSE_ACTIVATION,
+    TOUCH_ACTIVATION,
+} from "react-image-magnifiers";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -21,7 +25,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 
-import { MarCommunityRiskAssessment } from '@dynaslope/commons';
+import { MarCommunityRiskAssessment } from "@dynaslope/commons";
 
 import AppConfig from "../../reducers/AppConfig";
 
@@ -72,16 +76,13 @@ export default function HazardMaps() {
             return acc;
         }, {});
 
-    // TODO
-    // const marirongMaps = importAll(
-    //     require.context(
-    //         "../../../../client-cbewsl/MARIRONG/MAPS",
-    //         false,
-    //         /\.(png|jpe?g|svg)$/,
-    //     ),
-    // );
-    const marirongMaps = '';
-
+    const marirongMaps = importAll(
+        require.context(
+            "C:/Users/John Louie/codes/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG/MAPS",
+            false,
+            /\.(png|jpe?g|svg)$/,
+        ),
+    );
     const handleMapPreview = (map_data) => {
         let temp = {
             img: marirongMaps[map_data.filename],
@@ -101,7 +102,9 @@ export default function HazardMaps() {
         const data = new FormData();
         data.append("file", fileToUpload);
         setTimeout(async () => {
-            const response = await MarCommunityRiskAssessment.UploadHazardMaps(data);
+            const response = await MarCommunityRiskAssessment.UploadHazardMaps(
+                data,
+            );
             if (response.status === true) {
                 handleClose();
                 setFileToUpload(null);
@@ -121,49 +124,18 @@ export default function HazardMaps() {
         <Fragment>
             <Container className={classes.img_container}>
                 <Grid container spacing={2} align="center">
-                    {mapPreview.length != 0 ? (
-                        mapPreview.map((tile) => (
-                            <Grid item xs={12}>
-                                <ImageZoom
-                                    image={{
-                                        src: tile.img,
-                                        alt: tile.title,
-                                        className: classes.img_container,
-                                        style: { width: "50em", zIndex: 1000 },
-                                    }}
-                                    zoomImage={{
-                                        src: tile.img,
-                                        alt: tile.title,
-                                    }}
+                    <Grid item xs={12} />
+                    <Grid item xs={12}>
+                        {mapsContainer.length > 0 && (
+                            <Fragment>
+                                <Magnifier
+                                    imageSrc={marirongMaps[mapsContainer[0].filename]}
+                                    imageAlt="MAR Hazard Map"
+                                    mouseActivation={MOUSE_ACTIVATION.SINGLE_CLICK}
+                                    touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
                                 />
-                            </Grid>
-                        ))
-                    ) : (
-                        <div></div>
-                    )}
-                    <Grid item={true} xs={12}>
-                        <GridList className={classes.thumbnail} cols={2.5}>
-                            {mapsContainer.map((tile) => (
-                                <GridListTile
-                                    key={tile.img}
-                                    onClick={() => {
-                                        handleMapPreview(tile);
-                                    }}
-                                >
-                                    <img
-                                        src={marirongMaps[tile.filename]}
-                                        alt={tile.filename}
-                                    />
-                                    <GridListTileBar
-                                        title={tile.filename}
-                                        classes={{
-                                            root: classes.thumbnailTitle,
-                                            title: classes.gridTitle,
-                                        }}
-                                    />
-                                </GridListTile>
-                            ))}
-                        </GridList>
+                            </Fragment>
+                        )}
                     </Grid>
                     <Grid item={true} xs={12}>
                         <Fab

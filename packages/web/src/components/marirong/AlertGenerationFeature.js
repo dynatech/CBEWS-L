@@ -99,7 +99,7 @@ function AlertValidation() {
     };
 
     const updateAlertGen = () => {
-        fetch(`${AppConfig.HOSTNAME}/v2/get/alert_gen/umi/alert_validation_data`, {
+        fetch(`${AppConfig.HOSTNAME}/v2/get/alert_gen/mar/alert_validation_data`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -243,8 +243,8 @@ function AlertValidation() {
     return (
         <Fragment>
             <Container fixed>
-                <Grid container align="center" spacing={10}>
-                    <Grid item xs={12} container spacing={5} >
+                <Grid container align="center" spacing={5}>
+                    <Grid item xs={12} container spacing={2} >
                         <Grid item={12}><Typography variant="h3"> </Typography></Grid>
                     </Grid>
 
@@ -395,19 +395,19 @@ function CurrentAlertArea(props) {
                     <Typography variant="h2" className={[classes.label_paddings, classes.alert_level, color_class]}>
                         {`Alert ${leo.public_alert_level}`}
                     </Typography>
-                    <Typography variant="h5">
+                    <Typography variant="h6">
                         {`As of ${as_of}`}
                     </Typography>
-                    {/* <Typography variant="h5">
+                    {/* <Typography variant="h6">
                         {prepareTriggers(leo.release_triggers)}
                     </Typography> */}
-                    <Typography variant="h5" className={classes.label_paddings}>
+                    <Typography variant="h6" className={classes.label_paddings}>
                         {`Event Start: ${event_start}`}
                     </Typography>
-                    <Typography variant="h5" className={classes.label_paddings}>
+                    <Typography variant="h6" className={classes.label_paddings}>
                         {`Validity: ${validity}`}
                     </Typography>
-                    <Typography variant="h5" className={classes.label_paddings}>
+                    <Typography variant="h6" className={classes.label_paddings}>
                         {`Recommended Response: ${leo.recommended_response}`}
                     </Typography>
                 </Grid>
