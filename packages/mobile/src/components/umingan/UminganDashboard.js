@@ -11,7 +11,7 @@ import MobileCaching from '../../utils/MobileCaching';
 
 function UminganDashboard(props) {
     const navigator = props.navigation;
-    const [isSyncing, setSyncing] = useState(true);
+    const [isSyncing, setSyncing] = useState(false);
     const [syncMessage, setSyncMessage] = useState("Syncing data to Umingan server...");
 
     useEffect(()=> {
@@ -22,21 +22,28 @@ function UminganDashboard(props) {
                 'CBEWS-L is not connected to the internet',
                 'CBEWS-L Local data will be used.',
                 [
-                  { text: 'Ok', onPress: () => console.log('OK Pressed'), style: 'cancel' },
+                  { text: 'Ok', onPress: () => {
+                    setSyncing(true);
+                    setSyncMessage("Collecting local data...")
+                    setTimeout(async()=> {
+                        setSyncing(false);
+                    }, 1000);
+                  }, style: 'cancel' },
                 ]
               )
             } else {
               MobileCaching.getItem('user_credentials').then((credentials)=> {
+                setSyncing(true);
                 setTimeout(async()=> {
                   let cache_keys = await DataSync.getCachedData(credentials.site_id)
                   let _Alterations = await DataSync.compileUnsyncData(cache_keys, "Umingan");
                   setSyncing(false);
                 }, 1000);
-                // alert(JSON.stringify(_Alterations));
               });
             }
           },100);
-    })
+    },[])
+
     return (
         <ScrollView>
             <Spinner
