@@ -84,13 +84,30 @@ const UMINGAN_API_LIST = (data) => {
         },
         'UmiHazardData': {
             'add': (async (data)=> {
-
+                let response = await UmiRiskManagement.InsertHazardData({
+                    'Hazard': data['hazard'],
+                    'SpeedofOnset':data['speed_of_onset'],
+                    'EarlyWarning':data['early_warning'],
+                    'Impact': data['impact'],
+                    'user_id': data['user_id']
+                })
+                // Loading counter
             }),
             'update': (async (data)=> {
-
+                let temp = [];
+                for (var key in data) {
+                    let obj = {};
+                    if (key != 'alterations') {
+                        obj[key] = data[key];
+                        temp.push(obj);
+                    }   
+                }
+                let response = await UmiRiskManagement.UpdateHazardData(temp)
+                // Loading Counter
             }),
             'delete': ((data)=> {
-
+                alert(JSON.stringify("DELETE"))
+                alert(JSON.stringify(data));
             })
         }
         ,'UmiFamilyRiskProfile': {

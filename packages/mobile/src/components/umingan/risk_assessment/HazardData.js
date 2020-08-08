@@ -87,11 +87,44 @@ function HazardData() {
         if (!Object.keys(selectedData).length) {
             MobileCaching.getItem('user_credentials').then(credentials => {
                 setTimeout(async () => {
-                    data['user_id'] = credentials['user_id']
-                    let response = await UmiRiskManagement.InsertHazardData(data)
+                    const isConnected = await NetworkUtils.isNetworkAvailable();
+                    let response = null;
+                    if (isConnected != true) {
+                        let temp = await MobileCaching.getItem("UmiHazardData").then(cached_data => {
+                            cached_data.push({
+                                'early_warning': data[''],
+                                'hazard': data[''],
+                                'id': 0,
+                                'impact': data[''],
+                                'last_ts': null,
+                                'speed_of_onset': data[''],
+                                'user_id': credentials['user_id'],
+                                'alterations': 'add'
+                            });
+                            try {
+                                MobileCaching.setItem("UmiHazardData", cached_data);
+                                response = {
+                                    "status": true,
+                                    "message": "Hazard Data is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                }
+                            } catch (err) {
+                                response = {
+                                    "status": false,
+                                    "message": "Hazard Data failed to save data to memory."
+                                }
+                            }
+                            setHazardDataContainer(cached_data);
+                            init(cached_data);
+                            return response;
+                        });
+                    } else {
+                        data['user_id'] = credentials['user_id']
+                        response = await UmiRiskManagement.InsertHazardData(data)
+                        fetchLatestData();
+                    }
+
                     if (response.status == true) {
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        init();
                         closeForm();
                     } else {
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
@@ -119,19 +152,50 @@ function HazardData() {
                                     temp[key.replace(" ","_").toLocaleLowerCase()] = data[key]
                                     break;
                             }
-                            temp_array.push(temp);
+
+                            if (key != 'attachment') {
+                                temp_array.push(temp);
+                            }
                         });
                         temp_array.push({'user_id': credentials['user_id']})
                         temp_array.push({'id': selectedData['id']})
-                        let response = await UmiRiskManagement.UpdateHazardData(temp_array)
-                        if (response.status == true) {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                            init();
-                            closeForm();
-                            setCmd('add');
+
+                        const isConnected = await NetworkUtils.isNetworkAvailable();
+                        let response = null;
+                        if (isConnected != true) {
+                            let temp = await MobileCaching.getItem("UmiHazardData").then(cached_data => {
+                                let state_contaner = selectedData;
+                                temp_array.forEach(element => {
+                                    let key = Object.keys(element)[0];
+                                    state_contaner[key] = element[key];
+                                });
+                                state_contaner['alterations'] = "update";
+                                let index = cached_data.findIndex(x => x.id == selectedData['id']);
+                                cached_data[index] = state_contaner;
+                                try {
+                                    MobileCaching.setItem("UmiHazardData", cached_data);
+                                    response = {
+                                        "status": true,
+                                        "message": "Hazard data is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                    }
+                                } catch (err) {
+                                    response = {
+                                        "status": false,
+                                        "message": "Hazard data failed to save data to memory."
+                                    }
+                                }
+                                init(cached_data);
+                                return response;
+                            });
                         } else {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            response = await UmiRiskManagement.UpdateHazardData(temp_array)
+                            if (response.status == true) {
+                                fetchLatestData();
+                            }
                         }
+                        setCmd('add');
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        closeForm();
                     }, 300);
                 });
             }

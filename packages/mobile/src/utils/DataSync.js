@@ -58,6 +58,7 @@ const DataSync = {
 					toSync.push(keyToSync);
 				});
 
+				alert(JSON.stringify(toSync));
 				switch(site) {
 					case 'Marirong':
 						MarirongSync(toSync)
