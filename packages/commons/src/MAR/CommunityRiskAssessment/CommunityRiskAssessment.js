@@ -3,11 +3,7 @@ import AppConfig from '../../utils/AppConfig';
 const UploadCommunityRiskAssessment = (data) => {
     return fetch(`${AppConfig.HOSTNAME}/v2/upload/community_risk_assessment/mar/community_risk_assessment`, {
         method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        body: data,
     }).then(response => response.json())
     .then(responseJson => {
         return responseJson;

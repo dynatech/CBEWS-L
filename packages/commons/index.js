@@ -6,8 +6,8 @@ import { GetAllSummary, InsertSummary, UpdateSummary, DeleteSummary } from './sr
 import { GetAllHazardData, InsertHazardData, UpdateHazardData, DeleteHazardData } from './src/UMI/RiskAssessment/HazardData';
 import { GetAllResourceAndCapacities, InsertResourceAndCapacities, UpdateResourceAndCapacities, DeleteResourceAndCapacities } from './src/UMI/RiskAssessment/ResourceAndCapacities';
 import { GetAllFamilyRiskProfile, InsertFamilyRiskProfile, UpdateFamilyRiskProfile, DeleteFamilyRiskProfile } from './src/UMI/RiskAssessment/FamilyRiskProfile';
-import { GetIncidentLogs, InsertIncidentLogs, UpdateIncidentLogs, DeleteIncidentLogs } from './src/MAR/MaintenanceLogs/IncidentLogs';
-import { GetMaintenanceLogs, InsertMaintenanceLogs, UpdateMaintenanceLogs, DeleteMaintenanceLogs } from './src/MAR/MaintenanceLogs/MaintenanceLogs';
+import { GetIncidentLogs, GetDayIncidentLogs, GetMonthIncidentLogs, InsertIncidentLogs, UpdateIncidentLogs, DeleteIncidentLogs, UploadReportAttachment } from './src/MAR/MaintenanceLogs/IncidentLogs';
+import { GetMaintenanceLogs, GetDayMaintenanceLogs, GetMonthMaintenanceLogs, InsertMaintenanceLogs, UpdateMaintenanceLogs, DeleteMaintenanceLogs } from './src/MAR/MaintenanceLogs/MaintenanceLogs';
 import { GetHazardMaps as UmiGetHazardMaps, UploadHazardMaps as UmiUploadHazardMaps } from './src/UMI/RiskAssessment/HazardMaps';
 import { GetFieldSurveyLogs, InsertFieldSurveyLogs, UpdateFieldSurveyLogs, DeleteFieldSurveyLogs } from './src/UMI/FieldSurvey/FieldSurveyLogs';
 import { GetLatestReportSummary, DownloadLatestReportSummary, EmailLatestReportSummary } from './src/UMI/FieldSurvey/ReportSummary';
@@ -39,13 +39,18 @@ const MarCommunityRiskAssessment = {
 
 const MarMaintenanceLogs = {
     GetIncidentLogs,
+    GetDayIncidentLogs,
+    GetMonthIncidentLogs,
     InsertIncidentLogs,
     UpdateIncidentLogs,
     DeleteIncidentLogs,
+    UploadReportAttachment,
     GetMaintenanceLogs,
+    GetDayMaintenanceLogs,
+    GetMonthMaintenanceLogs,
     InsertMaintenanceLogs,
     UpdateMaintenanceLogs,
-    DeleteMaintenanceLogs
+    DeleteMaintenanceLogs,
 }
     
 const UmiRiskManagement = {

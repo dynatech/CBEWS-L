@@ -121,7 +121,7 @@ const tableStyles = makeStyles(theme => ({
         overflowX: 'auto',
     },
     table: {
-        minWidth: 650,
+        minWidth: 75,
     },
 }));
 

@@ -40,7 +40,7 @@ const ButtonStyle = makeStyles((theme) => ({
         elevation: 20,
         marginRight: 10,
         marginLeft: 10,
-        width: width / 6,
+        width: width / 8,
     },
     valid: {
         backgroundColor: "green",

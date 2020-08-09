@@ -1,4 +1,6 @@
 from flask import Blueprint, jsonify, request
+from datetime import datetime
+from calendar import monthrange
 from werkzeug.datastructures import ImmutableMultiDict
 from flask_cors import CORS, cross_origin
 from connections import SOCKETIO
@@ -14,11 +16,11 @@ MAINTENANCE_LOGS_BLUEPRINT = Blueprint(
 @cross_origin()
 def add():
     data = request.get_json()
-    status = maintenance.create_maintenance_log(data)
-    if status is not None:
+    response = maintenance.create_maintenance_log(data)
+    if response:
         return_value = {
             "status": True,
-            "maintenance_log_id": status,
+            "maintenance_log_id": response,
             "message": "New maintenance log data successfully added!"
         }
     else:
@@ -34,7 +36,7 @@ def add():
 @cross_origin()
 def fetch():
     try:
-        result = maintenance.fetch_maintenance_log(site_id=59)
+        result = maintenance.fetch_all_maintenance_log()
         for x in result:
             x['maintenance_date'] = str(x['maintenance_date'])
             x['last_ts'] = str(x['last_ts'])
@@ -44,6 +46,48 @@ def fetch():
             "data": result
         }
     except Exception as err:
+        response = {
+            "status": False,
+            "message": f'Error fetching maintenance logs. Err: {err}'
+        }
+
+    return jsonify(response)
+
+
+@MAINTENANCE_LOGS_BLUEPRINT.route("/fetch/day/maintenance/mar/maintenance_logs/<input_date>", methods=["GET"])
+@cross_origin()
+def fetch_day(input_date):
+    try:
+        input_date = helpers.str_to_dt(input_date)
+        start = datetime(input_date.year, input_date.month, input_date.day, 0, 0, 0)
+        end = datetime(input_date.year, input_date.month, input_date.day, 23, 59, 0)
+        result = maintenance.fetch_filtered_maintenance_log(start, end)
+        response = {
+            "status": True,
+            "data": result,
+            "message": "Sucessfully fetched incident logs."
+        }
+    except Exception as err:
+        response = {
+            "status": False,
+            "message": f'Error fetching maintenance logs. Err: {err}'
+        }
+
+    return jsonify(response)
+
+
+@MAINTENANCE_LOGS_BLUEPRINT.route("/fetch/month/maintenance/mar/maintenance_logs/<start>/<end>", methods=["GET"])
+@cross_origin()
+def fetch_month(start, end):
+    try:
+        result = maintenance.fetch_filtered_maintenance_log(start, end)
+        response = {
+            "status": True,
+            "message": 'Successfully fetch maintenance logs.',
+            "data": result
+        }
+    except Exception as err:
+        raise
         response = {
             "status": False,
             "message": f'Error fetching maintenance logs. Err: {err}'
@@ -73,8 +117,11 @@ def update():
 @MAINTENANCE_LOGS_BLUEPRINT.route("/delete/maintenance/mar/maintenance_logs", methods=["DELETE"])
 @cross_origin()
 def remove():
+    print("SHIIIIIIIIIIIIIT")
     data = request.get_json()
+    helpers.var_checker("data", data)
     status = maintenance.delete_maintenance_log(data['id'])
+    helpers.var_checker("status", status)
     if status == "0":
         return_value = {
             "status": True,

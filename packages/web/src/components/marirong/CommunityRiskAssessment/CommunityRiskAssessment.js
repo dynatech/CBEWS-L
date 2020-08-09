@@ -8,9 +8,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Input from '@material-ui/core/Input';
 import Helpers from '../../reducers/Helpers';
-import AppConfig from "../../reducers/AppConfig";
 
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -90,21 +88,20 @@ export default function CommunityRiskAssessment(props) {
         }, 400);
     };
 
-    const updateList = () => {
-        setTimeout(async () => {
-            let response = await MarCommunityRiskAssessment.GetCommunityRiskAssessment();
-            if (response.status) {
-                setCraData(formatCRAData(response.data))
-            } else {
-                console.error("response", response);
-                console.error("Problem in fetching CRA");
-            }
-        }, 400);
+    const updateList = async () => {
+        let response = await MarCommunityRiskAssessment.GetCommunityRiskAssessment();
+        if (response.status) {
+            setCraData(formatCRAData(response.data))
+        } else {
+            console.error("response", response);
+            console.error("Problem in fetching CRA");
+        }
     };
 
 
     const handleDelete = path => () =>  {
-        console.log("Clicked Delete! This is a pending function.")
+        console.log("Clicked Delete! This is a pending function.");
+        // DO os.remove(<path>) in python
     }
 
     useEffect(() => {
@@ -117,8 +114,7 @@ export default function CommunityRiskAssessment(props) {
                 <CustomGridList 
                     data={cra_data}
                     type="cra_list"
-                    // handleDownload={Helpers.downloadBlob}
-                    handleDownload={() => console.log("clicked download")}
+                    handleDownload={Helpers.downloadBlob}
                     handleDelete={handleDelete} 
                 />
                 <Grid container>

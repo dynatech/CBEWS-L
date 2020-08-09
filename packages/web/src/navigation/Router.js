@@ -31,7 +31,7 @@ function RouterApp() {
     <BrowserRouter>
       <Switch>
         {
-          site_id !== null && (component_object[int(site_id)])
+          site_id !== null && (component_object[parseInt(site_id)])
         }
         <Route path='/forgot-password' component={ForgotPassword} /> 
         <Route path='/signup' component={SignUp} />
