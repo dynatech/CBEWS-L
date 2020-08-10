@@ -5,7 +5,6 @@ const MARIRONG_API_LIST = (data) => {
     return {
         'MarCapacityAndVulnerability': {
             'add': (async (cav)=> {
-                alert(JSON.stringify(cav));
                 let result = await MarCommunityRiskAssessment.InsertCapacityAndVulnerability({
                     'resource': cav.resource,
                     'quantity': cav.quantity,
@@ -73,13 +72,30 @@ const UMINGAN_API_LIST = (data) => {
         },
         'UmiResourceAndCapacities': {
             'add': (async (data)=> {
-
+                let response = await UmiRiskManagement.InsertResourceAndCapacities({
+                    ResourceandCapacities: data['resource_and_capacities'],
+                    Status: data['status'],
+                    Owner: data['owner'],
+                    user_id: data['user_id']
+                })
+                // Loading counter
             }),
             'update': (async (data)=> {
-
+                let temp = [];
+                for (var key in data) {
+                    let obj = {};
+                    if (key != 'alterations') {
+                        obj[key] = data[key];
+                        temp.push(obj);
+                    }   
+                }
+                let response = await UmiRiskManagement.UpdateResourceAndCapacities(temp)
+                alert(JSON.stringify(response));
+                // Loading counter
             }),
             'delete': ((data)=> {
-
+                alert(JSON.stringify("DELETE"))
+                alert(JSON.stringify(data));
             })
         },
         'UmiHazardData': {

@@ -41,24 +41,32 @@ function HazardData() {
 
     const init = async (data) => {
         let temp = [];
-        if (data.length != 0) {
-            let row = data;
-            row.forEach(element => {
-                temp.push(
-                    <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
-                        <DataTable.Cell>{element.hazard}</DataTable.Cell>
-                        <DataTable.Cell>{element.speed_of_onset}</DataTable.Cell>
-                        <DataTable.Cell>{element.early_warning}</DataTable.Cell>
-                        <DataTable.Cell>{element.impact}</DataTable.Cell>
-                    </DataTable.Row>
-                )
-            });
-        } else {
+        if (data == undefined) {
             temp.push(
                 <View key={0}>
-                    <Text>No available data.</Text>
+                    <Text>No local data available.</Text>
                 </View>
             )
+        } else {
+            if (data.length != 0) {
+                let row = data;
+                row.forEach(element => {
+                    temp.push(
+                        <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
+                            <DataTable.Cell>{element.hazard}</DataTable.Cell>
+                            <DataTable.Cell>{element.speed_of_onset}</DataTable.Cell>
+                            <DataTable.Cell>{element.early_warning}</DataTable.Cell>
+                            <DataTable.Cell>{element.impact}</DataTable.Cell>
+                        </DataTable.Row>
+                    )
+                });
+            } else {
+                temp.push(
+                    <View key={0}>
+                        <Text>No available data.</Text>
+                    </View>
+                )
+            }
         }
         setDataTableContent(temp)
     }

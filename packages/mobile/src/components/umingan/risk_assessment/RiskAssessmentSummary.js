@@ -52,24 +52,32 @@ function RiskAssessmentSummary(props) {
 
     const init = async (data) => {
         let temp = [];
-        if (data.length != 0) {
-            let row = data;
-            row.forEach(element => {
-                temp.push(
-                    <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
-                        <DataTable.Cell>{element.location}</DataTable.Cell>
-                        <DataTable.Cell>{element.impact}</DataTable.Cell>
-                        <DataTable.Cell>{element.adaptive_capacity}</DataTable.Cell>
-                        <DataTable.Cell>{element.vulnerability}</DataTable.Cell>
-                    </DataTable.Row>
-                )
-            });
-        } else {
+        if (data == undefined) {
             temp.push(
                 <View key={0}>
-                    <Text>No available data.</Text>
+                    <Text>No local data available.</Text>
                 </View>
             )
+        } else {
+            if (data.length != 0) {
+                let row = data;
+                row.forEach(element => {
+                    temp.push(
+                        <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
+                            <DataTable.Cell>{element.location}</DataTable.Cell>
+                            <DataTable.Cell>{element.impact}</DataTable.Cell>
+                            <DataTable.Cell>{element.adaptive_capacity}</DataTable.Cell>
+                            <DataTable.Cell>{element.vulnerability}</DataTable.Cell>
+                        </DataTable.Row>
+                    )
+                });
+            } else {
+                temp.push(
+                    <View key={0}>
+                        <Text>No available data.</Text>
+                    </View>
+                )
+            }
         }
         setDataTableContent(temp)
     }

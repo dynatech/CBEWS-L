@@ -55,23 +55,31 @@ function ResourcesNCapacities(props) {
 
     const init = async (data) => {
         let temp = [];
-        if (data.length != 0) {
-            let row = data;
-            row.forEach(element => {
-                temp.push(
-                    <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
-                        <DataTable.Cell>{element.resource_and_capacities}</DataTable.Cell>
-                        <DataTable.Cell>{element.status}</DataTable.Cell>
-                        <DataTable.Cell>{element.owner}</DataTable.Cell>
-                    </DataTable.Row>
-                )
-            });
-        } else {
+        if (data == undefined) {
             temp.push(
                 <View key={0}>
-                    <Text>No available data.</Text>
+                    <Text>No local data available.</Text>
                 </View>
             )
+        } else {
+            if (data.length != 0) {
+                let row = data;
+                row.forEach(element => {
+                    temp.push(
+                        <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
+                            <DataTable.Cell>{element.resource_and_capacities}</DataTable.Cell>
+                            <DataTable.Cell>{element.status}</DataTable.Cell>
+                            <DataTable.Cell>{element.owner}</DataTable.Cell>
+                        </DataTable.Row>
+                    )
+                });
+            } else {
+                temp.push(
+                    <View key={0}>
+                        <Text>No available data.</Text>
+                    </View>
+                )
+            }
         }
         setDataTableContent(temp)
     }
@@ -100,15 +108,42 @@ function ResourcesNCapacities(props) {
         if (!Object.keys(selectedData).length) {
             MobileCaching.getItem('user_credentials').then(credentials => {
                 setTimeout(async () => {
-                    data['user_id'] = credentials['user_id']
-                    let response = await UmiRiskManagement.InsertResourceAndCapacities(data)
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        init();
-                        closeForm();
+                    const isConnected = await NetworkUtils.isNetworkAvailable();
+                    let response = null;
+                    if (isConnected != true) {
+                        let temp = await MobileCaching.getItem("UmiResourceAndCapacities").then(cached_data => {
+                            cached_data.push({
+                                'id': 0,
+                                'last_ts': null,
+                                'owner': data['Owner'],
+                                'resource_and_capacities': data['ResourceandCapacities'],
+                                'status': data['Status'],
+                                'user_id': credentials['user_id'],
+                                'alterations': 'add'
+                            });
+                            try {
+                                MobileCaching.setItem("UmiResourceAndCapacities", cached_data);
+                                response = {
+                                    "status": true,
+                                    "message": "Resource and capacity is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                }
+                            } catch (err) {
+                                response = {
+                                    "status": false,
+                                    "message": "Resource and capacity failed to save data to memory."
+                                }
+                            }
+                            setResourceAndCapacitiesContainer(cached_data);
+                            init(cached_data);
+                            return response;
+                        });
                     } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        data['user_id'] = credentials['user_id']
+                        response = await UmiRiskManagement.InsertResourceAndCapacities(data)
+                        fetchLatestData()
                     }
+                    ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                    closeForm();
                 }, 300);
             });
         } else {
@@ -118,7 +153,8 @@ function ResourcesNCapacities(props) {
             } else {
                 MobileCaching.getItem('user_credentials').then(credentials => {
                     setTimeout(async () => {
-                        let temp_array = []
+                        let response = {};
+                        let temp_array = [];
                         Object.keys(data).forEach(key => {
                             let temp = {};
                             switch(key) {
@@ -129,19 +165,48 @@ function ResourcesNCapacities(props) {
                                     temp[key.replace(" ","_").toLocaleLowerCase()] = data[key]
                                     break;
                             }
-                            temp_array.push(temp);
+                            if (key != 'attachment') {
+                                temp_array.push(temp);
+                            }
                         });
                         temp_array.push({'user_id': credentials['user_id']})
                         temp_array.push({'id': selectedData['id']})
-                        let response = await UmiRiskManagement.UpdateResourceAndCapacities(temp_array)
-                        if (response.status == true) {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                            init();
-                            closeForm();
-                            setCmd('add');
+
+                        const isConnected = await NetworkUtils.isNetworkAvailable();
+                        if (isConnected != true) {
+                            let temp = await MobileCaching.getItem("UmiResourceAndCapacities").then(cached_data => {
+                                let state_contaner = selectedData;
+                                temp_array.forEach(element => {
+                                    let key = Object.keys(element)[0];
+                                    state_contaner[key] = element[key];
+                                });
+                                state_contaner['alterations'] = "update";
+                                let index = cached_data.findIndex(x => x.id == selectedData['id']);
+                                cached_data[index] = state_contaner;
+                                try {
+                                    MobileCaching.setItem("UmiResourceAndCapacities", cached_data);
+                                    response = {
+                                        "status": true,
+                                        "message": "Resource and capacity is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                    }
+                                } catch (err) {
+                                    response = {
+                                        "status": false,
+                                        "message": "Resource and capacity failed to save data to memory."
+                                    }
+                                }
+                                init(cached_data);
+                                return response;
+                            });
                         } else {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            response = await UmiRiskManagement.UpdateResourceAndCapacities(temp_array)
+                            if (response.status == true) {
+                                fetchLatestData();
+                            }
                         }
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        closeForm();
+                        setCmd('add');
                     }, 300);
                 });
             }
@@ -170,15 +235,20 @@ function ResourcesNCapacities(props) {
               },
               { text: "Confirm", onPress: () => {
                 setTimeout(async ()=> {
-                    let response = await UmiRiskManagement.DeleteResourceAndCapacities({
-                        'id': selectedData['id']
-                    })
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        init();
-                        closeForm();
+                    const isConnected = await NetworkUtils.isNetworkAvailable();
+                    if (isConnected != true) {
+                        ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.LONG, ToastAndroid.CENTER)
                     } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        let response = await UmiRiskManagement.DeleteResourceAndCapacities({
+                            'id': selectedData['id']
+                        })
+                        if (response.status == true) {
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            fetchLatestData();
+                            closeForm();
+                        } else {
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        }
                     }
                 },300)
               }}

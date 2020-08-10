@@ -40,7 +40,6 @@ const DataSync = {
 							'delete': []
 						}
 					}
-	
 					switch(data.alterations) {
 						case 'add':
 							keyToSync.data.add.push(data)
@@ -57,23 +56,21 @@ const DataSync = {
 					}
 					toSync.push(keyToSync);
 				});
-
-				alert(JSON.stringify(toSync));
-				switch(site) {
-					case 'Marirong':
-						MarirongSync(toSync)
-						break;
-					case 'Umingan':
-						UminganSync(toSync)
-						break;
-					default:
-						break;
-				}
+				DataSync.syncDataToCloud(site, toSync)
 			}
 		});
 	},
-	syncDataToCloud: async function () {
-
+	syncDataToCloud: async function (site, toSync) {
+		switch(site) {
+			case 'Marirong':
+				MarirongSync(toSync)
+				break;
+			case 'Umingan':
+				UminganSync(toSync)
+				break;
+			default:
+				break;
+		}
 	},
 	syncDataToServer: async function () {
 

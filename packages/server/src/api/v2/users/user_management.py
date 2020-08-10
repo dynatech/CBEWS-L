@@ -7,6 +7,7 @@ USER_MANAGEMENT_BLUEPRINT = Blueprint("user_management_blueprint", __name__)
 
 @USER_MANAGEMENT_BLUEPRINT.route("/auth/signin", methods=["POST"])
 def signin():
+    print("Signing in...")
     credentials = request.get_json()
     username, password = credentials.values()
     account_details = Users.fetch_account(username)
