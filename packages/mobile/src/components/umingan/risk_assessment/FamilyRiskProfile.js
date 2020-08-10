@@ -7,12 +7,14 @@ import { ButtonStyle } from '../../../styles/button_style';
 import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
+import NetworkUtils from '../../../utils/NetworkUtils';
 
 function FamilyRiskProfile() {
 
     const [openModal, setOpenModal] = useState(false);
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
+    const [familyRiskProfile, setFamilyRiskProfile] = useState([]);
     const [cmd, setCmd] = useState('add');
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Number of Members': '',
@@ -22,17 +24,32 @@ function FamilyRiskProfile() {
 
     let formData = useRef();
 
-
     useEffect(() => {
-        init();
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+                MobileCaching.getItem('UmiFamilyRiskProfile').then(response => {
+                    init(response);
+                    setFamilyRiskProfile(response);
+                });
+            } else {
+                fetchLatestData();
+            }
+        },100);
+
     }, [])
 
-    const init = async () => {
-        let response = await UmiRiskManagement.GetAllFamilyRiskProfile()
-        if (response.status === true) {
-            let temp = [];
-            if (response.data.length != 0) {
-                let row = response.data;
+    const init = async (data) => {
+        let temp = [];
+        if (data == undefined) {
+            temp.push(
+                <View key={0}>
+                    <Text>No local data available.</Text>
+                </View>
+            )
+        } else {
+            if (data.length != 0) {
+                let row = data;
                 row.forEach(element => {
                     temp.push(
                         <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
@@ -49,7 +66,17 @@ function FamilyRiskProfile() {
                     </View>
                 )
             }
-            setDataTableContent(temp)
+        }
+
+        setDataTableContent(temp)
+    }
+
+    const fetchLatestData = async () => {
+        let response = await UmiRiskManagement.GetAllFamilyRiskProfile()
+        if (response.status == true) {
+            init(response.data);
+            setFamilyRiskProfile(response.data);
+            MobileCaching.setItem('UmiFamilyRiskProfile', response.data);
         } else {
             ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
         }

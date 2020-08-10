@@ -8,13 +8,15 @@ import { InputStyle } from '../../../styles/input_style';
 import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
+import NetworkUtils from '../../../utils/NetworkUtils';
 
-function RiskAssessmentSummary() {
-
+function RiskAssessmentSummary(props) {
+    const navigator = props.navigation;
+    
     const [openModal, setOpenModal] = useState(false);
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
-
+    const [riskAssessmentContainer, setRiskAssessmentContainer] = useState([]);
     const [cmd, setCmd] = useState('add');
 
     const [defaultStrValues, setDefaultStrValues] = useState({
@@ -26,17 +28,39 @@ function RiskAssessmentSummary() {
 
     let formData = useRef();
 
-
     useEffect(() => {
-        init();
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+              Alert.alert(
+                'CBEWS-L is not connected to the internet',
+                'CBEWS-L Local data will be used.',
+                [
+                  { text: 'Ok', onPress: () => {
+                    MobileCaching.getItem('UmiRiskAssessmentSummary').then(response => {
+                        init(response);
+                        setRiskAssessmentContainer(response);
+                    });
+                  }, style: 'cancel' },
+                ]
+              )
+            } else {
+                fetchLatestData();
+            }
+          },100);
     }, [])
 
-    const init = async () => {
-        let response = await UmiRiskManagement.GetAllSummary()
-        if (response.status === true) {
-            let temp = [];
-            if (response.data.length != 0) {
-                let row = response.data;
+    const init = async (data) => {
+        let temp = [];
+        if (data == undefined) {
+            temp.push(
+                <View key={0}>
+                    <Text>No local data available.</Text>
+                </View>
+            )
+        } else {
+            if (data.length != 0) {
+                let row = data;
                 row.forEach(element => {
                     temp.push(
                         <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
@@ -54,7 +78,16 @@ function RiskAssessmentSummary() {
                     </View>
                 )
             }
-            setDataTableContent(temp)
+        }
+        setDataTableContent(temp)
+    }
+
+    const fetchLatestData = async () => {
+        let response = await UmiRiskManagement.GetAllSummary()
+        if (response.status == true) {
+            init(response.data);
+            setRiskAssessmentContainer(response.data);
+            MobileCaching.setItem('UmiRiskAssessmentSummary', response.data);
         } else {
             ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
         }
@@ -72,17 +105,50 @@ function RiskAssessmentSummary() {
         let data = formData.current;
         if (!Object.keys(selectedData).length) {
             MobileCaching.getItem('user_credentials').then(credentials => {
-                setTimeout(async () => {
-                    data['user_id'] = credentials['user_id']
-                    let response = await UmiRiskManagement.InsertSummary(data)
+                setTimeout(async()=> {
+                    const isConnected = await NetworkUtils.isNetworkAvailable();
+                    let response = null;
+                    if (isConnected != true) {
+                        let temp = await MobileCaching.getItem("UmiRiskAssessmentSummary").then(cached_data => {
+                            cached_data.push({
+                                'adaptive_capacity': data['AdaptiveCapacity'],
+                                'id': 0,
+                                'impact': data['Impact'],
+                                'last_ts': null,
+                                'location': data['Location'],
+                                'user_id': credentials['user_id'],
+                                'vulnerability': data['Vulnerability'],
+                                'alterations': 'add'
+                            });
+                            try {
+                                MobileCaching.setItem("UmiRiskAssessmentSummary", cached_data);
+                                response = {
+                                    "status": true,
+                                    "message": "Risk assessment summary is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                }
+                            } catch (err) {
+                                response = {
+                                    "status": false,
+                                    "message": "Risk assessment summary failed to save data to memory."
+                                }
+                            }
+                            setRiskAssessmentContainer(cached_data);
+                            init(cached_data);
+                            return response;
+                        });
+                    } else {
+                        data['user_id'] = credentials['user_id']
+                        response = await UmiRiskManagement.InsertSummary(data)
+                        fetchLatestData();
+                    }
+
                     if (response.status == true) {
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        init();
                         closeForm();
                     } else {
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                     }
-                }, 300);
+                }, 100)
             });
         } else {
             if (!Object.keys(selectedData).length) {
@@ -91,6 +157,8 @@ function RiskAssessmentSummary() {
             } else {
                 MobileCaching.getItem('user_credentials').then(credentials => {
                     setTimeout(async () => {
+                        const isConnected = await NetworkUtils.isNetworkAvailable();
+                        let response = null;
                         let temp_array = []
                         Object.keys(data).forEach(key => {
                             let temp = {};
@@ -99,19 +167,48 @@ function RiskAssessmentSummary() {
                             } else {
                                 temp[key.replace(" ","_").toLocaleLowerCase()] = data[key]
                             }
-                            temp_array.push(temp);
+
+                            if (key != 'attachment') {
+                                temp_array.push(temp);
+                            }
                         });
                         temp_array.push({'user_id': credentials['user_id']})
                         temp_array.push({'id': selectedData['id']})
-                        let response = await UmiRiskManagement.UpdateSummary(temp_array)
-                        if (response.status == true) {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                            init();
-                            closeForm();
-                            setCmd('add');
+                        
+                        if (isConnected != true) {
+                            let temp = await MobileCaching.getItem("UmiRiskAssessmentSummary").then(cached_data => {
+                                let state_contaner = selectedData;
+                                temp_array.forEach(element => {
+                                    let key = Object.keys(element)[0];
+                                    state_contaner[key] = element[key];
+                                });
+                                state_contaner['alterations'] = "update";
+                                let index = cached_data.findIndex(x => x.id == selectedData['id']);
+                                cached_data[index] = state_contaner;
+                                try {
+                                    MobileCaching.setItem("UmiRiskAssessmentSummary", cached_data);
+                                    response = {
+                                        "status": true,
+                                        "message": "Risk assessment summary is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                    }
+                                } catch (err) {
+                                    response = {
+                                        "status": false,
+                                        "message": "Risk assessment summary failed to save data to memory."
+                                    }
+                                }
+                                init(cached_data);
+                                return response;
+                            });
                         } else {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            response = await UmiRiskManagement.UpdateSummary(temp_array)
+                            if (response.status == true) {
+                                fetchLatestData()
+                            }
                         }
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        closeForm();
+                        setCmd('add');
                     }, 300);
                 });
             }
@@ -141,15 +238,20 @@ function RiskAssessmentSummary() {
               },
               { text: "Confirm", onPress: () => {
                 setTimeout(async ()=> {
-                    let response = await UmiRiskManagement.DeleteSummary({
-                        'id': selectedData['id']
-                    })
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        init();
-                        closeForm();
+                    const isConnected = await NetworkUtils.isNetworkAvailable();
+                    if (isConnected != true) {
+                        ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.LONG, ToastAndroid.CENTER)
                     } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        let response = await UmiRiskManagement.DeleteSummary({
+                            'id': selectedData['id']
+                        })
+                        if (response.status == true) {
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            init();
+                            closeForm();
+                        } else {
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        }
                     }
                 },300)
               }}
