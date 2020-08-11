@@ -5,11 +5,10 @@ import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
 import { ButtonStyle } from '../../../styles/button_style';
 import { MarCommunityRiskAssessment } from '@dynaslope/commons';
-import MobileCaching from '../../../utils/MobileCaching';
 import NetworkUtils from '../../../utils/NetworkUtils';
 import Uploader from '../../utils/Uploader';
 import FilePickerManager from 'react-native-file-picker';
-import RNFS from 'react-native-fs'
+// import RNFS from 'react-native-fs'
 
 function CommunityRiskAssessment() {
     const [list, setList] = useState([])

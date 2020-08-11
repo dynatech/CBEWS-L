@@ -145,3 +145,32 @@ def delete_field_survey_logs():
             'message': f"Failed to delete Field Survey Logs. Err: {err}"
         }
     return jsonify(ret_val)
+
+@FIELD_SURVEY_BLUEPRINT.route("/upload/field_survey/umi/field_survey_logs", methods=["POST"])
+def upload_field_survey_logs():
+    try:
+        file = request.files['file']
+        directory = f"{APP_CONFIG['UMINGAN_DIR']}/DOCUMENTS/Field-Survey"
+        filename = file.filename
+
+        count = filename.count(".")
+        name_list = filename.split(".", count)
+        file_type = f".{name_list[count]}"
+        name_list.pop()
+        filename = f"{'.'.join(name_list)}"
+
+        temp = f"{filename}{file_type}"
+        uniq = 1
+        while os.path.exists(Path(directory) / temp):
+            # filename
+            temp = '%s_%d%s' % (filename, uniq, file_type)
+            uniq += 1
+
+        # file.save(new_path)
+        file.save(os.path.join(Path(directory), temp))
+
+        return_data = { "status": True, "file_path": f"{directory}/{filename}" }
+    except Exception as err:
+        raise err
+        # return_data = { "status": False }
+    return jsonify(return_data)

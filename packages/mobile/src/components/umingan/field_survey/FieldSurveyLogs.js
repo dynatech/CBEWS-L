@@ -9,6 +9,9 @@ import { Calendar } from 'react-native-calendars';
 import Forms from '../../utils/Forms';
 import moment from 'moment';
 import MobileCaching from '../../../utils/MobileCaching';
+import NetworkUtils from '../../../utils/NetworkUtils';
+import Uploader from '../../utils/Uploader';
+import FilePickerManager from 'react-native-file-picker';
 
 function FieldSurveyLogs () {
 
@@ -22,35 +25,46 @@ function FieldSurveyLogs () {
     const [selectedDate, setSelectedDate] = useState('');
     const [defaultStrValues, setDefaultStrValues] = useState({});
 
+    const [confirmUpload, setConfirmUpload] = useState(false);
+    const [filename, setFilename] = useState("None");
+    const [filepath, setFilepath] = useState();
+    const [filetype, setFiletype] = useState();
+    const [filesize, setFilesize] = useState();
+
     let formData = useRef();
 
     useEffect(() => {
-        init();
-        setDefaultStrValues(default_fields);
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+                MobileCaching.getItem('UmiFiedlSurveyLogs').then(response => {
+                    init(response);
+                    setFieldSurveyLogs(response);
+                });
+            } else {
+                fetchLatestData();
+            }
+          },100);
     }, [])
 
-    const default_fields = {
-        'Report timestamp': '',
-        'Feature': '',
-        'Materials Characterization': '',
-        'Mechanism': '',
-        'Exposure': '',
-        'Report narrative': '',
-        'Reporter': '',
-        'Attachments': 'N/A'
+    const init = async (data) => {
+        let temp = {};
+        data.forEach(element => {
+            temp[moment(element.report_date).format('YYYY-MM-DD')] = {
+                selected: true
+            }
+        });
+        setFieldSurveyLogs(data);
+        setMarkedDates(temp);
+        setDefaultStrValues(default_fields);
     }
 
-    const init = async () => {
+    const fetchLatestData = async () => {
         let response = await UmiFieldSurvey.GetFieldSurveyLogs()
-        if (response.status === true) {
-            let temp = {};
-            response.data.forEach(element => {
-                temp[moment(element.report_date).format('YYYY-MM-DD')] = {
-                    selected: true
-                }
-            });
+        if (response.status == true) {
+            init(response.data);
             setFieldSurveyLogs(response.data);
-            setMarkedDates(temp);
+            MobileCaching.setItem('UmiFieldSurveyLogs', response.data);
         } else {
             ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
         }
@@ -64,12 +78,28 @@ function FieldSurveyLogs () {
         setOpenModal(false);
     }
 
+    const uploadFile = async (attachment) => {
+        const url = 'http://192.168.0.15:5000/v2/upload/field_survey/umi/field_survey_logs'
+        const file = [{
+          name: 'file',
+          filename: attachment.filename,
+          filepath: attachment.filepath,
+          filetype: attachment.filetype,
+          filesize: attachment.filesize
+        }];
+        let upload_status = await Uploader(url, file);
+        return upload_status
+    }
+
     const submitForm = () => {
         let data = formData.current;
         if (!Object.keys(selectedData).length) {
             MobileCaching.getItem('user_credentials').then(credentials => {
                 let temp = {};
+                let response = {};
                 setTimeout(async () => {
+                    const isConnected = await NetworkUtils.isNetworkAvailable();
+
                     temp['user_id'] = credentials['user_id'];
                     temp['feature'] = data['Feature'];
                     temp['exposure'] = data['Exposure'];
@@ -79,20 +109,28 @@ function FieldSurveyLogs () {
                     temp['report_narrative'] = data['Reportnarrative'];
                     temp['reporter'] = data['Reporter'];
 
-                    if (data['Attachements'] === undefined) {
+                    if (data['attachment'] === undefined) {
                         temp['attachment_path'] = "N/A";
                     } else {
-                        temp['attachment_path'] = data['Attachments'];
+                        temp['attachment_path'] = data['attachment'];
                     }
 
-                    let response = await UmiFieldSurvey.InsertFieldSurveyLogs(temp)
-
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        init();
-                        closeForm();
+                    if (isConnected != true) {
+                        alert("OFFLINE");
                     } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        setTimeout(async()=> {
+                            let upload_response = await uploadFile(temp['attachment_path']);
+                            if (upload_response.status == true) {
+                                temp['attachment_path'] = upload_response.file_path;
+                                response = await UmiFieldSurvey.InsertFieldSurveyLogs(temp)
+                                if (response.status == true) {
+                                    fetchLatestData();
+                                    setCmd('add');
+                                    closeForm();
+                                }
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            }
+                        }, 200);
                     }
                 }, 300);
             });
@@ -156,7 +194,7 @@ function FieldSurveyLogs () {
             'Exposure': data['exposure'],
             'Report narrative': data['report_narrative'],
             'Reporter': data['reporter'],
-            'Attachments': data['attachment_path']
+            'Attachment': data['attachment_path']
 
         })
         setCmd('update');
@@ -242,6 +280,17 @@ function FieldSurveyLogs () {
             )
         }
         setSelectedDate(day.dateString);
+    }
+
+    const default_fields = {
+        'Report timestamp': '',
+        'Feature': '',
+        'Materials Characterization': '',
+        'Mechanism': '',
+        'Exposure': '',
+        'Report narrative': '',
+        'Reporter': '',
+        'Attachment': 'N/A'
     }
 
     return(
