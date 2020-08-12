@@ -6,6 +6,7 @@ import { ContainerStyle } from '../../styles/container_style';
 import { LabelStyle } from '../../styles/label_style';
 import { Formik } from 'formik';
 import FilePickerManager from 'react-native-file-picker';
+import NetworkUtils from '../../utils/NetworkUtils';
 
 const Forms = (props) => {
     const { data, submitForm, deleteForm, formData, command } = props;
@@ -26,22 +27,27 @@ const Forms = (props) => {
         setCmd(command);
     },[])
 
-    const uploadFile = () => {
-        FilePickerManager.showFilePicker(null, (response) => {
-          if (response.didCancel) {
-            console.log('User cancelled file picker');
-          }
-          else if (response.error) {
-            console.log('FilePickerManager Error: ', response.error);
-          }
-          else {
-            setFilepath(response.path);
-            setFiletype(response.type);
-            setFilesize(response.size);
-            setFilename(response.fileName);
-            setConfirmUpload(true);
-          }
-        });
+    const uploadFile = async() => {
+        const isConnected = await NetworkUtils.isNetworkAvailable();
+        if (isConnected != true) {
+            ToastAndroid.showWithGravity("Failed to upload file. Please connect to the Internet / CBEWS-L Network to continue.", ToastAndroid.LONG, ToastAndroid.CENTER)
+        } else {
+            FilePickerManager.showFilePicker(null, (response) => {
+                if (response.didCancel) {
+                  console.log('User cancelled file picker');
+                }
+                else if (response.error) {
+                  console.log('FilePickerManager Error: ', response.error);
+                }
+                else {
+                  setFilepath(response.path);
+                  setFiletype(response.type);
+                  setFilesize(response.size);
+                  setFilename(response.fileName);
+                  setConfirmUpload(true);
+                }
+              });
+        }
       }
 
     return(
@@ -67,7 +73,7 @@ const Forms = (props) => {
                         Object.entries(defaultValues).map((e, l) => {
                             let key = e[0].replace(/\s/g, "");
                             let input_field = [];
-                            if (e[0].toLowerCase() == "attachment") {
+                                if (e[0].toLowerCase() == "attachment") {
                                 input_field.push(
                                     <View key={e[0]} style={{ paddingTop: '10%', alignItems: 'center' }}>
                                         <Text style={[LabelStyle.medium_label, LabelStyle.brand]} onPress={uploadFile}>Attachments: {filename}</Text>

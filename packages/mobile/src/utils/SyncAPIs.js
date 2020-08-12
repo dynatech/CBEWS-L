@@ -122,13 +122,39 @@ const UMINGAN_API_LIST = (data) => {
                 // Loading Counter
             }),
             'delete': ((data)=> {
-                alert(JSON.stringify("DELETE"))
-                alert(JSON.stringify(data));
+
             })
         }
         ,'UmiFamilyRiskProfile': {
             'add': (async (data)=> {
-
+                let response = await UmiRiskManagement.InsertFamilyRiskProfile({
+                    'NumberofMembers': data['number_of_members'],
+                    'VulnerableGroups': data['vulnerable_groups'],
+                    'NatureofVulnerability': data['nature_of_vulnerability'],
+                    'user_id': data['user_id']
+                })
+                // Loading counter
+            }),
+            'update': (async (data)=> {
+                let temp = [];
+                for (var key in data) {
+                    let obj = {};
+                    if (key != 'alterations') {
+                        obj[key] = data[key];
+                        temp.push(obj);
+                    }   
+                }
+                let response = await UmiRiskManagement.UpdateFamilyRiskProfile(temp)
+                // Loading Counter
+            }),
+            'delete': ((data)=> {
+                alert(JSON.stringify("DELETE"))
+                alert(JSON.stringify(data));
+            })
+        },
+        'UmiFieldSurveyLogs': {
+            'add': (async (data)=> {
+                
             }),
             'update': (async (data)=> {
 

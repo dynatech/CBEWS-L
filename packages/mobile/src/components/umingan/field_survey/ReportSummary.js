@@ -95,6 +95,7 @@ function ReportSummary() {
                     </View>
                 </View>
             )
+            setFieldSurveyReportDate(moment(data[0].report_date).format('MMMM Do YYYY, h:mm:ss a'));
         } else {
             temp.push(
                 <Text key={0} style={[LabelStyle.medium_label, LabelStyle.brand, {fontWeight: 'bold'}]}>
@@ -103,7 +104,6 @@ function ReportSummary() {
             )
             setDisabled(true);
         }
-        setFieldSurveyReportDate(moment(data[0].report_date).format('MMMM Do YYYY, h:mm:ss a'));
         setFieldSurveyReport(temp)
     }
 

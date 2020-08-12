@@ -37,7 +37,7 @@ function FieldSurveyLogs () {
         setTimeout( async ()=> {
             const isConnected = await NetworkUtils.isNetworkAvailable()
             if (isConnected != true) {
-                MobileCaching.getItem('UmiFiedlSurveyLogs').then(response => {
+                MobileCaching.getItem('UmiFieldSurveyLogs').then(response => {
                     init(response);
                     setFieldSurveyLogs(response);
                 });
@@ -63,7 +63,6 @@ function FieldSurveyLogs () {
         let response = await UmiFieldSurvey.GetFieldSurveyLogs()
         if (response.status == true) {
             init(response.data);
-            setFieldSurveyLogs(response.data);
             MobileCaching.setItem('UmiFieldSurveyLogs', response.data);
         } else {
             ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
@@ -116,7 +115,24 @@ function FieldSurveyLogs () {
                     }
 
                     if (isConnected != true) {
-                        alert("OFFLINE");
+                        let cached = await MobileCaching.getItem("UmiFieldSurveyLogs").then(cached_data => {
+                            temp["alterations"] = "add";
+                            cached_data.push(temp)
+                            try {
+                                MobileCaching.setItem("UmiFieldSurveyLogs", cached_data);
+                                response = {
+                                    "status": true,
+                                    "message": "Field Survey Logs is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                }
+                            } catch (err) {
+                                response = {
+                                    "status": false,
+                                    "message": "Field Survey Logs failed to save data to memory."
+                                }
+                            }
+                            init(cached_data);
+                            return response;
+                        });
                     } else {
                         setTimeout(async()=> {
                             let upload_response = await uploadFile(temp['attachment_path']);
@@ -132,7 +148,17 @@ function FieldSurveyLogs () {
                             }
                         }, 200);
                     }
+
+                    if (response.status == true) {
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        closeForm();
+                        setCmd('add');
+                    } else {
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                    }
+
                 }, 300);
+                setDataContainer([]);
             });
         } else {
             if (!Object.keys(selectedData).length) {
