@@ -122,15 +122,18 @@ class RiskAssessmentModel():
 		counter = 0
 		for x in data:
 			key = list(x)[0]
-			if 'id' == key:
-				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = '{x[key]}'"
-			else:
+			if 'id' != key:
 				if counter == 0:
 					query += f" {key} = '{x[key]}'"
 				else:
 					query += f", {key} = '{x[key]}'"
-			counter += 1
-		ret_val = DB.db_modify(query,'CBEWSL_UMI_collections', True)
+				counter += 1
+		
+		for x in data:
+			key = list(x)[0]
+			if 'id' == key:
+				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = '{x[key]}'"
+		ret_val = DB.db_modify(query, 'CBEWSL_UMI_collections', True)
 		return ret_val
 
 	def create_family_risk_profile(data):

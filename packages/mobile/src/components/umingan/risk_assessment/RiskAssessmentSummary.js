@@ -4,7 +4,6 @@ import { DataTable } from 'react-native-paper';
 import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
 import { ButtonStyle } from '../../../styles/button_style';
-import { InputStyle } from '../../../styles/input_style';
 import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';

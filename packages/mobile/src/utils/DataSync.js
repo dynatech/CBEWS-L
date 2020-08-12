@@ -16,7 +16,8 @@ const SyncKeys = {
 		'UmiRiskAssessmentSummary',
 		'UmiResourceAndCapacities',
 		'UmiHazardData',
-		'UmiFamilyRiskProfile'
+		'UmiFamilyRiskProfile',
+		'UmiFieldSurveyLogs'
 	]
 }
 
