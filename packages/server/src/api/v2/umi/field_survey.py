@@ -176,9 +176,13 @@ def upload_field_survey_logs():
     return jsonify(return_data)
 
 @FIELD_SURVEY_BLUEPRINT.route("/update/field_survey/umi/attachment", methods=["PATCH"])
-def update_field_survey_logs():
+def update_field_survey_attachment():
     try:
         # UPDATE THE FILE
+        ret_val = {
+            'status': True,
+            'message': 'test'
+        }
     except Exception as err:
         ret_val = {
             'status': False,
