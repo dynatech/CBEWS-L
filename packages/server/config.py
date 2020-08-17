@@ -25,7 +25,7 @@ class ProductionConfig(Config):
 
     DEBUG = False
 
-APP_DIR = "C:/Users/John Geliberte/Work"
+APP_DIR = "C:/Users/gelib/Work"
 
 APP_CONFIG = {
     "development": DevelopmentConfig,

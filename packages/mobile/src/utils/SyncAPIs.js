@@ -1,5 +1,6 @@
 import { MarCommunityRiskAssessment,
-         UmiRiskManagement } from '@dynaslope/commons';
+         UmiRiskManagement,
+         UmiFieldSurvey } from '@dynaslope/commons';
 
 const MARIRONG_API_LIST = (data) => {
     return {
@@ -154,13 +155,34 @@ const UMINGAN_API_LIST = (data) => {
         },
         'UmiFieldSurveyLogs': {
             'add': (async (data)=> {
-                
+                let response = await UmiFieldSurvey.InsertFieldSurveyLogs({
+                    'user_id': data['user_id'],
+                    'feature': data['feature'],
+                    'exposure': data['exposure'],
+                    'mechanism': data['mechanism'],
+                    'materials_characterization': data['materials_characterization'],
+                    'report_date': data['report_date'],
+                    'report_narrative': data['report_narrative'],
+                    'reporter': data['reporter'],
+                    'attachment_path': data['attachment_path']
+                });
+                // Loading Counter
             }),
             'update': (async (data)=> {
-
+                let temp = [];
+                for (var key in data) {
+                    let obj = {};
+                    if (key != 'alterations') {
+                        obj[key] = data[key];
+                        temp.push(obj);
+                    }   
+                }
+                let response = await UmiFieldSurvey.UpdateFieldSurveyLogs(temp);
+                // Loading Counter
             }),
             'delete': ((data)=> {
-
+                alert(JSON.stringify("DELETE"))
+                alert(JSON.stringify(data));
             })
         }
     }

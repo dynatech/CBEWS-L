@@ -9,7 +9,7 @@ import { GetAllFamilyRiskProfile, InsertFamilyRiskProfile, UpdateFamilyRiskProfi
 import { GetIncidentLogs, InsertIncidentLogs, UpdateIncidentLogs, DeleteIncidentLogs } from './src/MAR/MaintenanceLogs/IncidentLogs';
 import { GetMaintenanceLogs, InsertMaintenanceLogs, UpdateMaintenanceLogs, DeleteMaintenanceLogs } from './src/MAR/MaintenanceLogs/MaintenanceLogs';
 import { GetHazardMaps as UmiGetHazardMaps, UploadHazardMaps as UmiUploadHazardMaps } from './src/UMI/RiskAssessment/HazardMaps';
-import { GetFieldSurveyLogs, InsertFieldSurveyLogs, UpdateFieldSurveyLogs, DeleteFieldSurveyLogs } from './src/UMI/FieldSurvey/FieldSurveyLogs';
+import { GetFieldSurveyLogs, InsertFieldSurveyLogs, UpdateFieldSurveyLogs, DeleteFieldSurveyLogs, UpdateAttachmentFile } from './src/UMI/FieldSurvey/FieldSurveyLogs';
 import { GetLatestReportSummary, DownloadLatestReportSummary, EmailLatestReportSummary } from './src/UMI/FieldSurvey/ReportSummary';
 import { InsertEventsTemplate, UpdateEventsTemplate, GetAllEventsTemplate, DeleteEventsTemplate } from './src/MAR/EventsTemplate/EventsTemplate';
 import { GetCurrentSituationReport, DownloadSituationReport, EmailSituationReport } from './src/UMI/SituationReport/CurrentSituationReport';
@@ -70,6 +70,7 @@ const UmiFieldSurvey = {
     UpdateFieldSurveyLogs,
     DeleteFieldSurveyLogs,
     GetLatestReportSummary,
+    UpdateAttachmentFile,
     DownloadLatestReportSummary,
     EmailLatestReportSummary
 }
