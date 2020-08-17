@@ -25,11 +25,16 @@ function FieldSurveyLogs () {
     const [selectedDate, setSelectedDate] = useState('');
     const [defaultStrValues, setDefaultStrValues] = useState({});
 
-    const [confirmUpload, setConfirmUpload] = useState(false);
-    const [filename, setFilename] = useState("None");
-    const [filepath, setFilepath] = useState();
-    const [filetype, setFiletype] = useState();
-    const [filesize, setFilesize] = useState();
+    const default_fields = {
+        'Report timestamp': '',
+        'Feature': '',
+        'Materials Characterization': '',
+        'Mechanism': '',
+        'Exposure': '',
+        'Report narrative': '',
+        'Reporter': '',
+        'Attachment': 'N/A'
+    }
 
     let formData = useRef();
 
@@ -63,6 +68,7 @@ function FieldSurveyLogs () {
         let response = await UmiFieldSurvey.GetFieldSurveyLogs()
         if (response.status == true) {
             init(response.data);
+            setDataTableContent([]);
             MobileCaching.setItem('UmiFieldSurveyLogs', response.data);
         } else {
             ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
@@ -78,7 +84,7 @@ function FieldSurveyLogs () {
     }
 
     const uploadFile = async (attachment) => {
-        const url = 'http://192.168.0.15:5000/v2/upload/field_survey/umi/field_survey_logs'
+        const url = 'http://192.168.0.16:5000/v2/upload/field_survey/umi/field_survey_logs'
         const file = [{
           name: 'file',
           filename: attachment.filename,
@@ -98,7 +104,6 @@ function FieldSurveyLogs () {
                 let response = {};
                 setTimeout(async () => {
                     const isConnected = await NetworkUtils.isNetworkAvailable();
-
                     temp['user_id'] = credentials['user_id'];
                     temp['feature'] = data['Feature'];
                     temp['exposure'] = data['Exposure'];
@@ -144,7 +149,6 @@ function FieldSurveyLogs () {
                                     setCmd('add');
                                     closeForm();
                                 }
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                             }
                         }, 200);
                     }
@@ -190,17 +194,49 @@ function FieldSurveyLogs () {
                             temp_array.push({'user_id': credentials['user_id']})
                             temp_array.push({'id': selectedData['id']})
 
-                            let response = await UmiFieldSurvey.UpdateFieldSurveyLogs(temp_array)
 
-                            if (response.status == true) {
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                                init();
-                                closeForm();
-                                setDataContainer([]);
-                                setCmd('add');
+                            const isConnected = await NetworkUtils.isNetworkAvailable();
+                            let response = null;
+
+                            if (isConnected != true) {
+                                let temp = await MobileCaching.getItem("UmiFieldSurveyLogs").then(cached_data => {
+                                    let state_contaner = selectedData;
+                                    temp_array.forEach(element => {
+                                        let key = Object.keys(element)[0];
+                                        state_contaner[key] = element[key];
+                                    });
+                                    state_contaner['alterations'] = "update";
+                                    let index = cached_data.findIndex(x => x.id == selectedData['id']);
+                                    cached_data[index] = state_contaner;
+                                    try {
+                                        MobileCaching.setItem("UmiFieldSurveyLogs", cached_data);
+                                        response = {
+                                            "status": true,
+                                            "message": "Field Survey Logs is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                        }
+                                    } catch (err) {
+                                        response = {
+                                            "status": false,
+                                            "message": "Field Survey Logs failed to save data to memory."
+                                        }
+                                    }
+                                    init(cached_data);
+                                    return response;
+                                });
                             } else {
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                                if (selectedData['attachment_path'] != "N/A") {
+                                    // DELETE EXISTING
+                                    // 
+                                } else {
+                                    // UPLOAD NEW ONE
+                                }
+                                response = await UmiFieldSurvey.UpdateFieldSurveyLogs(temp_array);
+                                fetchLatestData();
                             }
+                            closeForm();
+                            setDataContainer([]);
+                            setCmd('add');
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                         } else {
                             ToastAndroid.showWithGravity("No changes has been made. Please double check each field or Press back button to cancel.", ToastAndroid.LONG, ToastAndroid.CENTER)
                         }
@@ -306,17 +342,6 @@ function FieldSurveyLogs () {
             )
         }
         setSelectedDate(day.dateString);
-    }
-
-    const default_fields = {
-        'Report timestamp': '',
-        'Feature': '',
-        'Materials Characterization': '',
-        'Mechanism': '',
-        'Exposure': '',
-        'Report narrative': '',
-        'Reporter': '',
-        'Attachment': 'N/A'
     }
 
     return(

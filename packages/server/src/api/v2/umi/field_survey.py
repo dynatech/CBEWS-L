@@ -174,3 +174,14 @@ def upload_field_survey_logs():
         raise err
         # return_data = { "status": False }
     return jsonify(return_data)
+
+@FIELD_SURVEY_BLUEPRINT.route("/update/field_survey/umi/attachment", methods=["PATCH"])
+def update_field_survey_logs():
+    try:
+        # UPDATE THE FILE
+    except Exception as err:
+        ret_val = {
+            'status': False,
+            'message': f"Failed to updated Field Survey Logs. Err: {err}"
+        }
+    return jsonify(ret_val)
