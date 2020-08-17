@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import MobileCaching from './MobileCaching';
-import { MarirongSync } from './SyncAPIs';
+import { MarirongSync, UminganSync } from './SyncAPIs';
 
 const SiteCodes = {
 	51: 'Marirong',
@@ -12,7 +12,13 @@ const SyncKeys = {
 	'Marirong': [
 		'MarCapacityAndVulnerability'
 	],
-	'Umingan': []
+	'Umingan': [
+		'UmiRiskAssessmentSummary',
+		'UmiResourceAndCapacities',
+		'UmiHazardData',
+		'UmiFamilyRiskProfile',
+		'UmiFieldSurveyLogs'
+	]
 }
 
 const DataSync = {
@@ -35,7 +41,6 @@ const DataSync = {
 							'delete': []
 						}
 					}
-	
 					switch(data.alterations) {
 						case 'add':
 							keyToSync.data.add.push(data)
@@ -52,19 +57,21 @@ const DataSync = {
 					}
 					toSync.push(keyToSync);
 				});
-
-				switch(site) {
-					case 'Marirong':
-						MarirongSync(toSync)
-						break;
-					default:
-						break;
-				}
+				DataSync.syncDataToCloud(site, toSync)
 			}
 		});
 	},
-	syncDataToCloud: async function () {
-
+	syncDataToCloud: async function (site, toSync) {
+		switch(site) {
+			case 'Marirong':
+				MarirongSync(toSync)
+				break;
+			case 'Umingan':
+				UminganSync(toSync)
+				break;
+			default:
+				break;
+		}
 	},
 	syncDataToServer: async function () {
 

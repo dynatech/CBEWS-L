@@ -16,9 +16,6 @@ class Users():
 		return user_id
 
 	def create_user_account(data):
-		print()
-		print("status")
-		print()
 		try:
 			firstname, lastname, middlename, \
 			mobile_number, email, age, gender, username, \
@@ -106,7 +103,6 @@ class Users():
 		query = "SELECT * FROM user_accounts INNER JOIN user_profiles USING(profile_id) " \
 				"INNER JOIN user_mobiles USING(mobile_id) INNER JOIN user_roles USING(role_id) " \
 				f"WHERE username = '{username}'"
-		print(query)
 		account = DB.db_read(query, 'cbewsl_commons_db')
 		return account
 
