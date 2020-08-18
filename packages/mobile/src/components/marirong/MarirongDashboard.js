@@ -14,7 +14,11 @@ function MarirongDashboard(props) {
   const StackNavigator = props.navigation;
   const [isSyncing, setSyncing] = useState(true);
   const [syncMessage, setSyncMessage] = useState("Syncing data to Marirong server...");
-  const [weather, setWeather] = useState({});
+  const [weather, setWeather] = useState({
+    'cloudcover': 'Fetching...',
+    'feelslike': 'Fetching...',
+    'weather_descriptions': 'Fetching...'
+  });
 
   useEffect(()=> {
     initLocation();
@@ -25,7 +29,13 @@ function MarirongDashboard(props) {
           'CBEWS-L is not connected to the internet',
           'CBEWS-L Local data will be used.',
           [
-            { text: 'Ok', onPress: () => console.log('OK Pressed'), style: 'cancel' },
+            { text: 'Ok', onPress: () => {
+              setSyncing(true);
+              setSyncMessage("Collecting local data...")
+              setTimeout(async()=> {
+                  setSyncing(false);
+              }, 1000);
+            }, style: 'cancel' },
           ]
         )
       } else {
@@ -53,17 +63,27 @@ function MarirongDashboard(props) {
     )
   }
 
-  const initLocation = () => {
-    Geolocation.getCurrentPosition(
-      (position) => {
-        const {latitude, longitude} = position.coords;
-        getWeather(latitude, longitude)
-      },
-      (error) => {
-        console.log(error.code, error.message);
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    );
+  const initLocation = async () => {
+
+    const isConnected = await NetworkUtils.isNetworkAvailable()
+    if (isConnected != true) {
+      setWeather({
+        'cloudcover': 'Not available',
+        'feelslike': 'Not available',
+        'weather_descriptions': 'Not available'
+      })
+    } else {
+      Geolocation.getCurrentPosition(
+        (position) => {
+          const {latitude, longitude} = position.coords;
+          getWeather(latitude, longitude)
+        },
+        (error) => {
+          console.log(error.code, error.message);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
+    }
   }
 
   const getWeather = (lat, lon) => {
@@ -71,6 +91,7 @@ function MarirongDashboard(props) {
     fetch(url)
     .then(response => response.json())
     .then(data => {
+      data.current.feelslike = `${data.current.feelslike} °`
         setWeather(data.current)
     })
   }
@@ -95,7 +116,7 @@ function MarirongDashboard(props) {
           <Text style={[LabelStyle.large_label, LabelStyle.branding]}>Community Based Early Warning Information for Landslides</Text>
           <View style={ContainerStyle.weather_container}>
             <Text style={[LabelStyle.weather]}>Cloud cover: {weather.cloudcover}</Text>
-            <Text style={[LabelStyle.weather]}>Feels like: {weather.feelslike}°</Text>
+            <Text style={[LabelStyle.weather]}>Feels like: {weather.feelslike}</Text>
             <Text style={[LabelStyle.weather]}>Weather update: {weather.weather_descriptions}</Text>
           </View>
           <View style={ContainerStyle.dashboard_menu}>
