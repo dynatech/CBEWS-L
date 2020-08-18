@@ -135,30 +135,38 @@ function FieldSurveyLogs () {
                                     "message": "Field Survey Logs failed to save data to memory."
                                 }
                             }
+
+                            if (response.status == true) {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                                closeForm();
+                                setCmd('add');
+                            } else {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            }
+
                             init(cached_data);
                             return response;
                         });
                     } else {
                         setTimeout(async()=> {
-                            let upload_response = await uploadFile(temp['attachment_path']);
-                            if (upload_response.status == true) {
+                            let upload_response = {};
+                            if (temp['attachment_path'] != "N/A") {
+                                upload_response = await uploadFile(temp['attachment_path']);
                                 temp['attachment_path'] = upload_response.file_path;
+                            } else {
+                                upload_response['status'] = true;
+                            }
+
+                            if (upload_response.status == true) {
                                 response = await UmiFieldSurvey.InsertFieldSurveyLogs(temp)
                                 if (response.status == true) {
                                     fetchLatestData();
-                                    setCmd('add');
                                     closeForm();
+                                    setCmd('add');
                                 }
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                             }
                         }, 200);
-                    }
-
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        closeForm();
-                        setCmd('add');
-                    } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                     }
 
                 }, 300);
@@ -171,7 +179,7 @@ function FieldSurveyLogs () {
             } else {
                 MobileCaching.getItem('user_credentials').then(credentials => {
                     setTimeout(async () => {
-                        let temp_array = []
+                        let temp_array = [];
                         if (Object.keys(data).length) {
                             Object.keys(data).forEach(key => {
                                 let temp = {};
@@ -185,6 +193,8 @@ function FieldSurveyLogs () {
                                     case "Reporttimestamp":
                                         temp['report_date'] = `${selectedDate} ${data['Reporttimestamp']}`
                                         break;
+                                    case "attachment":
+                                        temp['attachment_path'] = data['attachment'];
                                     default:
                                         temp[key.replace(" ","_").toLocaleLowerCase()] = data[key];
                                         break;
@@ -224,11 +234,17 @@ function FieldSurveyLogs () {
                                     return response;
                                 });
                             } else {
-                                if (selectedData['attachment_path'] != "N/A") {
-                                    // DELETE EXISTING
-                                    // 
-                                } else {
-                                    // UPLOAD NEW ONE
+                                let updateFile = temp_array.some(obj => obj.hasOwnProperty("attachment_path"));
+                                let file_index = temp_array.findIndex(x => x.attachment_path != null);
+                                if (updateFile == true && temp_array[file_index].attachment_path != undefined) {
+                                    let checkFile = await UmiFieldSurvey.UpdateAttachmentFile({
+                                        'id':selectedData['id'],
+                                        'file_path':temp_array[file_index].attachment_path
+                                    });
+                                    if (checkFile.status != true) {
+                                        let upload_response = await uploadFile(temp_array[file_index].attachment_path);
+                                        temp_array[file_index].attachment_path = upload_response.file_path
+                                    }
                                 }
                                 response = await UmiFieldSurvey.UpdateFieldSurveyLogs(temp_array);
                                 fetchLatestData();

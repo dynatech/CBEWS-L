@@ -38,10 +38,16 @@ class FieldSurveyModel():
 			key = list(x)[0]
 			if 'id' == key:
 				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = '{x[key]}'"
+		print(query)
 		ret_val = DB.db_modify(query, 'CBEWSL_UMI_collections', True)
 		return ret_val
 
 	def remove_field_survey_logs(id):
 		query = f"DELETE FROM field_survey WHERE id = '{id}'"
 		ret_val = DB.db_modify(query,'cbewsl_umi_collections', True)
+		return ret_val
+
+	def check_file(id):
+		query = f"SELECT attachment_path FROM field_survey WHERE id='{id}'"
+		ret_val = DB.db_read(query, 'cbewsl_umi_collections')
 		return ret_val
