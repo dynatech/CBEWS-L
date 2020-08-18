@@ -19,6 +19,7 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "formik": "^2.1.4",
+    "http-server": "^0.12.3",
     "moment": "^2.26.0",
     "mui-datatables": "^2.15.0",
     "react": "^16.13.1",
@@ -27,6 +28,7 @@
     "react-image-magnifiers": "^1.4.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "react-to-pdf": "0.0.11",
     "typeface-roboto": "0.0.75"
   },
   "scripts": {

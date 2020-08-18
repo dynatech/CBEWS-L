@@ -40,29 +40,39 @@ export default function MarBody() {
     };
 
     return (
-        <Box style={{ paddingTop: 230, paddingBottom: 100 }}>
-            <Paper square>
-                <Tabs
-                    value={value}
-                    indicatorColor="primary"
-                    textColor="primary"
-                    // variant="fullWidth"
-                    onChange={handleChange}
-                    centered
-                >
-                    <Tab value="riskAssessment" label="Risk Assessment" />
-                    <Tab value="fieldSurvey" label="Field Survey" />
-                    <Tab value="situationReport" label="Situation Report" />
-                    <Tab value="sensorMaintenance" label="Sensor Maintenance" />
-                    <Tab value="surficialData" label="Surficial Data" />
-                    <Tab value="EWI" label="EWI" />
-                    <Tab value="reports" label="Reports" />
-                </Tabs>
-            </Paper>
-
-            <Container>
+        <Grid
+            item
+            container
+            xs={12}
+            style={{ paddingTop: 220, paddingBottom: 100 }}
+            width="100%"
+        >
+            <Grid item xs={12}>
+                <Paper square>
+                    <Tabs
+                        value={value}
+                        indicatorColor="primary"
+                        textColor="primary"
+                        // variant="fullWidth"
+                        onChange={handleChange}
+                        centered
+                    >
+                        <Tab value="riskAssessment" label="Risk Assessment" />
+                        <Tab value="fieldSurvey" label="Field Survey" />
+                        <Tab value="situationReport" label="Situation Report" />
+                        <Tab
+                            value="sensorMaintenance"
+                            label="Sensor Maintenance"
+                        />
+                        <Tab value="surficialData" label="Surficial Data" />
+                        <Tab value="EWI" label="EWI" />
+                        <Tab value="reports" label="Reports" />
+                    </Tabs>
+                </Paper>
+            </Grid>
+            <Grid item xs={12}>
                 {body}
-            </Container>
-        </Box>
+            </Grid>
+        </Grid>
     );
 }

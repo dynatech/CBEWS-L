@@ -107,6 +107,7 @@ export default function Forms(props) {
 
     useEffect(() => {
         setDefaultValues(Object.assign({}, string, int, ts));
+        console.log("defaultValues", defaultValues)
         setCmd(command);
     }, []);
 

@@ -47,47 +47,45 @@ export default function CommunityRiskAssessmentPage () {
 
 
     return (
-        <Container className={classes.root}>
-            <Grid container spacing={0}>
-                <Grid item xs={2}>
-                    <Grid container direction="column" className={classes.menuContainer}>
-                        <Grid item={true} xs={3} style={{ marginTop: '15%' }} />
-                        <Grid item={true} xs={12} style={{ marginTop: '20%' }}>
-                            <Fab variant="extended"
-                                color={hm}
-                                aria-label="add"
-                                className={classes.menu}
-                                onClick={() => { handleFeatureNav("hazard_map") }}>
-                                Hazard Mapping
-                            </Fab>
-                        </Grid>
-                        <Grid item={true} xs={12} style={{ marginTop: '20%' }}>
-                            <Fab variant="extended"
-                                color={cav}
-                                aria-label="add"
-                                className={classes.menu}
-                                onClick={() => { handleFeatureNav("c_a_v") }}>
-                                Capacity and Vulnerability
-                            </Fab>
-                        </Grid>
-                        <Grid item={true} xs={12} style={{ marginTop: '20%' }}>
-                            <Fab variant="extended"
-                                color={cra}
-                                aria-label="add"
-                                className={classes.menu}
-                                onClick={() => { handleFeatureNav("c_r_a") }}>
-                                Community risk assessment
-                            </Fab>
-                        </Grid>
-                        <Grid item={true} xs={3} style={{ marginTop: '15%' }} />
+        <Grid container spacing={0} style={{ margin: "1%"}} >
+            <Grid item xs={2}>
+                <Grid container direction="column" className={classes.menuContainer}>
+                    <Grid item={true} xs={3} style={{ marginTop: '15%' }} />
+                    <Grid item={true} xs={12} style={{ marginTop: '20%' }}>
+                        <Fab variant="extended"
+                            color={hm}
+                            aria-label="add"
+                            className={classes.menu}
+                            onClick={() => { handleFeatureNav("hazard_map") }}>
+                            Hazard Mapping
+                        </Fab>
                     </Grid>
-                </Grid>
-                <Grid item xs={10} >
-                    <div style={{ height: 'auto' }}>
-                        {feature}
-                    </div>
+                    <Grid item={true} xs={12} style={{ marginTop: '20%' }}>
+                        <Fab variant="extended"
+                            color={cav}
+                            aria-label="add"
+                            className={classes.menu}
+                            onClick={() => { handleFeatureNav("c_a_v") }}>
+                            Capacity and Vulnerability
+                        </Fab>
+                    </Grid>
+                    <Grid item={true} xs={12} style={{ marginTop: '20%' }}>
+                        <Fab variant="extended"
+                            color={cra}
+                            aria-label="add"
+                            className={classes.menu}
+                            onClick={() => { handleFeatureNav("c_r_a") }}>
+                            Community risk assessment
+                        </Fab>
+                    </Grid>
+                    <Grid item={true} xs={3} style={{ marginTop: '15%' }} />
                 </Grid>
             </Grid>
-        </Container>
+            <Grid item xs={10} >
+                <div style={{ height: 'auto', paddingTop: 20 }}>
+                    {feature}
+                </div>
+            </Grid>
+        </Grid>
     )
 }

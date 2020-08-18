@@ -29,8 +29,8 @@ export default function Events() {
     const [templates, setTemplates] = useState([]);
 
     const [ewiID, setEwiId] = useState('');
-    const [tag, setTag] = useState('');
-    const [templateMessage, setTemplateMessage] = useState('');
+    const [template_name, setTemplateName] = useState('');
+    const [message_template, setTemplateMessage] = useState('');
     const [modifiedBy, setModifiedBy] = useState('');
 
     const [isNew, setIsNew] = useState(false);
@@ -48,11 +48,11 @@ export default function Events() {
 
     const classes = useStyles();
     const newTagOption = {
-        'ewi_id': 0,
-        'tag': '----NEW TEMPLATE----',
-        'template': '',
+        'id': 0,
+        'template_name': '----NEW TEMPLATE----',
+        'message_template': '',
         'ts_modified': '',
-        'modified_by': ''
+        'user_id': ''
     }
 
     const Transition = React.forwardRef(function Transition(props, ref) {
@@ -89,73 +89,45 @@ export default function Events() {
         // Leave site code for now, in preparation for umi / mar merge
         let template_container = [];
         const response = await MarEventsTemplate.GetAllEventsTemplate();
-        console.log("response", response);
         if (response.status === true) {
             response.data.forEach(element => {
-                template_container.push({
-                    "ewi_id": element[0],
-                    "tag": element[1],
-                    "template": element[2],
-                    "ts_modified": element[3],
-                    "modified_by": element[4]
-                })
+                template_container.push(element)
             });
             template_container.push(newTagOption);
-            setKey(template_container[0].tag);
+            setKey(template_container[0].template_name);
             setTemplates(template_container);
-            changeFieldValues(template_container[0].tag, template_container);
-        } else console.error("Problem in init template");
+            changeFieldValues(template_container[0].template_name, template_container);
+        } else console.error("Problem in init message_template");
     }
 
-    const modifyTemplate = () => {
+    const modifyTemplate = async () => {
         let req_url = '';
         let method = '';
         let success_message = '';
         let fail_message = '';
 
-        if (isNew == true) {
-            req_url = `${AppConfig.HOSTNAME}/api/events/template/add`;
-            method = 'POST';
-            success_message = 'Successfully added new message template';
-            fail_message = 'Failed to add message template. Please check your network connectivity.'
-        } else {
-            req_url = `${AppConfig.HOSTNAME}/api/events/template/update`;   
-            method = 'PATCH';
-            success_message = 'Successfully update message template';
-            fail_message = 'Failed to update message template. Please check your network connectivity.'
-        }
+        const data = {
+            "id": ewiID,
+            "template_name": template_name,
+            "message_template": message_template,
+            "user_id": 1
+        };
 
         if (tagHelperText.length == 0 && templateHelperText.length == 0) {
-            // Leave modified_by: 1 for testing 
-            fetch(req_url, {
-                method: method,
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    "ewi_id": ewiID,
-                    "tag": tag,
-                    "template": templateMessage,
-                    "modified_by": 1
-                }),
-            }).then((response) => response.json())
-                .then((responseJson) => {
-                    if (responseJson.status == true) {
-                        initTemplates();
-                        setOpenNotif(true);
-                        setNotifStatus("success");
-                        setNotifText(success_message);
-                    } else {
-                        setOpenNotif(true);
-                        setNotifStatus("error");
-                        setNotifText(fail_message);
-                    }
-                })
-                .catch((error) => {
-                    console.error(error);
-                }
-            );
+            // Leave user_id: 1 for testing 
+            let response;
+            if (isNew == true) response = await MarEventsTemplate.InsertEventsTemplate(data);
+            else response = await MarEventsTemplate.UpdateEventsTemplate(data);
+
+            if (response.status == true) {
+                initTemplates();
+                setOpenNotif(true);
+                setNotifStatus("success");
+            } else {
+                setOpenNotif(true);
+                setNotifStatus("error");
+            }
+            setNotifText(response.message);
         } else {
             alert("Please resolve the input issues.");
         }
@@ -163,40 +135,40 @@ export default function Events() {
 
     const deleteTemplate = async () => {
         const response = await MarEventsTemplate.DeleteEventsTemplate({
-            "ewi_id": ewiID
+            "id": ewiID
         });
         if (response.status === true) {
             initTemplates();
             handleClose();
             setOpenNotif(true);
             setNotifStatus("success");
-            setNotifText("Successfully deleted a message template.");
+            setNotifText("Successfully deleted a message message_template.");
         } else {
             handleClose();
             setOpenNotif(true);
             setNotifStatus("error");
-            setNotifText("Failed to delete message template. Please check your network connectivity.");
+            setNotifText("Failed to delete message message_template. Please check your network connectivity.");
         }
     }
 
     const resetStates = () => {
         setEwiId('');
-        setTag('');
+        setTemplateName('');
         setTemplateMessage('');
         setModifiedBy('');
     }
 
-    const checkIfExistingTag = (tag) => {
-        let obj = templates.find(o => o.tag.toLowerCase() === tag.toLowerCase());
+    const checkIfExistingTag = (template_name) => {
+        let obj = templates.find(o => o.template_name.toLowerCase() === template_name.toLowerCase());
         if (obj != undefined || obj != null) {
-            setTagHelperText('Duplicate early warning information tag');
+            setTagHelperText('Duplicate early warning information template_name');
         } else {
             setTagHelperText('');
         }
     }
 
-    const checkTemplateValidity = (template) => {
-        if (template.trim() == '') {
+    const checkTemplateValidity = (message_template) => {
+        if (message_template.trim() == '') {
             setTemplateHelperText('Template message is required');
         } else {
             setTemplateHelperText('');
@@ -204,21 +176,19 @@ export default function Events() {
     }
 
     const changeFieldValues = (template_tag, templates_container) => {
-        let obj = templates_container.find(o => o.tag === template_tag);
-        console.log(obj);
-        let {ewi_id, tag, template, ts_modified, modified_by} = obj;
-        console.log(ewi_id);
-        if (ewi_id == 0) {
+        let obj = templates_container.find(o => o.template_name === template_tag);
+        let {id, template_name, message_template, ts_modified, user_id} = obj;
+        if (id == 0) {
             setNewTemplate(true)
             setIsNew(true);
         } else {
             setNewTemplate(false)
             setIsNew(false);
         }
-        setEwiId(ewi_id)
-        setTag(tag)
-        setTemplateMessage(template)
-        setModifiedBy(modified_by)
+        setEwiId(id);
+        setTemplateName(template_name);
+        setTemplateMessage(message_template);
+        setModifiedBy(user_id);
     }
 
     const handleChange = key_template => event => {
@@ -233,7 +203,7 @@ export default function Events() {
                 <Grid container>
                     <Grid item xs={12} className={classes.header}>
                         <Typography variant="h4">
-                            Events | Message template creator
+                            Events | Message Template creator
                         </Typography>
                     </Grid>
                     <Grid item xs={4} />
@@ -253,8 +223,8 @@ export default function Events() {
                             helperText="E.g. Ground Measurement Reminder"
                         >
                         {templates.map(option => (
-                            <MenuItem key={option.tag} value={option.tag}>
-                                {option.tag}
+                            <MenuItem key={option.template_name} value={option.template_name}>
+                                {option.template_name}
                             </MenuItem>
                         ))}
                         </TextField>
@@ -265,8 +235,8 @@ export default function Events() {
                                     <Grid item xs={12}>
                                         <TextField
                                             error={tagHelperText.length == 0 ? false : true}
-                                            label="New template tag"
-                                            onChange={(event)=> { setTag(event.target.value);}}
+                                            label="New Message Template Name"
+                                            onChange={(event)=> { setTemplateName(event.target.value);}}
                                             onBlur={(event)=> {checkIfExistingTag(event.target.value)}}
                                             fullWidth
                                             helperText={tagHelperText}
@@ -287,7 +257,7 @@ export default function Events() {
                                         rows={5}
                                         fullWidth
                                         rowsMax={10}
-                                        value={templateMessage}
+                                        value={message_template}
                                         helperText={templateHelperText}
                                     />
                                 </Grid>

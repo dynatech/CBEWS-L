@@ -65,12 +65,12 @@ def fetch_day(input_date):
         response = {
             "status": True,
             "data": result,
-            "message": "Sucessfully fetched incident logs."
+            "message": "Sucessfully fetched day maintenance logs."
         }
     except Exception as err:
         response = {
             "status": False,
-            "message": f'Error fetching maintenance logs. Err: {err}'
+            "message": f'Error fetching day maintenance logs. Err: {err}'
         }
 
     return jsonify(response)
@@ -83,15 +83,15 @@ def fetch_month(start, end):
         result = maintenance.fetch_filtered_maintenance_log(start, end)
         response = {
             "status": True,
-            "message": 'Successfully fetch maintenance logs.',
+            "message": 'Successfully fetch month maintenance logs.',
             "data": result
         }
     except Exception as err:
-        raise
         response = {
             "status": False,
-            "message": f'Error fetching maintenance logs. Err: {err}'
+            "message": f'Error fetching  month maintenance logs. Err: {err}'
         }
+        raise
 
     return jsonify(response)
 
@@ -146,7 +146,7 @@ def upload_log_attachment():
         final_path = helpers.upload(file=file, file_path=file_path)
 
         response = {
-            "ok": True,
+            "status": True,
             "message": "Log attachment OKS!",
             "file_path": final_path
         }
@@ -154,7 +154,7 @@ def upload_log_attachment():
     except Exception as err:
         print(err)
         response = {
-            "ok": False,
+            "status": False,
             "message": "Log attachment NOT oks!",
             "file_path": "ERROR"
         }
@@ -171,7 +171,7 @@ def fetch_log_attachments(maintenance_log_id):
         files = helpers.fetch(file_path)
 
         response = {
-            "ok": True,
+            "status": True,
             "message": "Log attachment fetch OKS!",
             "data": files
         }
@@ -179,7 +179,7 @@ def fetch_log_attachments(maintenance_log_id):
     except Exception as err:
         print(err)
         response = {
-            "ok": False,
+            "status": False,
             "message": "Log attachment fetch NOT oks!",
             "data": []
         }

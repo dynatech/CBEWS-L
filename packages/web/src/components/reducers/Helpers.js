@@ -41,7 +41,7 @@ const Helpers = {
         const clickHandler = () => {
             setTimeout(() => {
                 URL.revokeObjectURL(url);
-                // this.removeEventListener('click', clickHandler);
+                this.removeEventListener('click', clickHandler);
             }, 150);
         };
 

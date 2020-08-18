@@ -8,16 +8,16 @@ const useStyles = makeStyles((theme) => ({
             paddingBottom: 10,
         },
         footer: {
-            top: "auto",
+            // position: "absolute",
+            // height: "calc(100% - 60px)",
             bottom: 0,
-            padding: 5,
+            width: "100%",
             alignItems: "center",
         },
         contactDetails: {
             flexGrow: 1,
             textAlign: "center",
         },
-
         root: {
             flexGrow: 1,
         },

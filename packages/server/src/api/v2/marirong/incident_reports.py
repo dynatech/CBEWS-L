@@ -124,7 +124,7 @@ def modify():
 def remove():
     data = request.get_json()
     status = maintenance.delete_incident_report(data['id'])
-    if status is not None:
+    if status:
         return_value = {
             "status": True,
             "message": "Maintenance log data successfully deleted!"

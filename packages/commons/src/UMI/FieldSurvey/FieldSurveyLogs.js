@@ -71,4 +71,22 @@ const DeleteFieldSurveyLogs = (data) => {
     );
 }
 
-export { GetFieldSurveyLogs, InsertFieldSurveyLogs, UpdateFieldSurveyLogs, DeleteFieldSurveyLogs }
+const UpdateAttachmentFile = (data) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/update/field_survey/umi/attachment`, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }).then((response) => response.json())
+        .then((responseJson) => {
+            return responseJson
+        })
+        .catch((error) => {
+            console.log(error)
+        }
+    );
+}
+
+export { GetFieldSurveyLogs, InsertFieldSurveyLogs, UpdateFieldSurveyLogs, DeleteFieldSurveyLogs, UpdateAttachmentFile }

@@ -36,7 +36,6 @@ function Alert(props) {
 export default function HazardMaps() {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
-    const [mapsContainer, setMapsContainer] = useState([]);
     const [mapPreview, setMapPreview] = useState([]);
     const [fileToUpload, setFileToUpload] = useState();
     const [filename, setFilename] = useState("");
@@ -57,17 +56,16 @@ export default function HazardMaps() {
         initHazardMaps();
     }, []);
 
-    const initHazardMaps = () => {
-        setTimeout(async () => {
-            const response = await MarCommunityRiskAssessment.GetHazardMaps();
-            if (response.status) {
-                console.log(response);
-                if (response.data.length > 0) {
-                    setMapsContainer(response.data);
-                    handleMapPreview(response.data[0]);
-                }
+    const initHazardMaps = async () => {
+        const response = await MarCommunityRiskAssessment.GetHazardMaps();
+        if (response.status) {
+            console.log(response);
+            if (response.data.length > 0) {
+                console.log();
+                setMapPreview(`http://192.168.1.2:8080/MARIRONG/MAPS/${response.data[0].filename}`);
+                // handleMapPreview(response.data[0]);
             }
-        }, 300);
+        }
     };
 
     const importAll = (require) =>
@@ -76,21 +74,16 @@ export default function HazardMaps() {
             return acc;
         }, {});
 
-    const marirongMaps = importAll(
-        require.context(
-            "C:/Users/John Louie/codes/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG/MAPS",
-            false,
-            /\.(png|jpe?g|svg)$/,
-        ),
-    );
-    const handleMapPreview = (map_data) => {
-        let temp = {
-            img: marirongMaps[map_data.filename],
-            title: "Dynaslope MAP (MAR)",
-            featured: true,
-        };
-        setMapPreview([temp]);
-    };
+    const marirongMaps = {}
+    // const handleMapPreview = (map_data) => {
+    //     console.log("marirong maps", marirongMaps);
+    //     let temp = {
+    //         img: marirongMaps[map_data.filename],
+    //         title: "Dynaslope MAP (MAR)",
+    //         featured: true,
+    //     };
+    //     setMapPreview([temp]);
+    // };
 
     const handleFileSelection = (event) => {
         const file = event.target.files[0];
@@ -98,27 +91,28 @@ export default function HazardMaps() {
         setFilename(file.name);
     };
 
-    const handleUpload = () => {
+    const handleUpload = async () => {
         const data = new FormData();
         data.append("file", fileToUpload);
-        setTimeout(async () => {
-            const response = await MarCommunityRiskAssessment.UploadHazardMaps(
-                data,
-            );
-            if (response.status === true) {
-                handleClose();
-                setFileToUpload(null);
-                setFilename("");
-                setOpenNotif(true);
-                setNotifStatus("success");
-                setNotifText("Successfully uploaded new hazard map");
-            } else {
-                setOpenNotif(true);
-                setNotifStatus("error");
-                setNotifText("Error uploading new hazard map");
-            }
-        }, 300);
+        console.log("shit")
+        const response = await MarCommunityRiskAssessment.UploadHazardMaps(
+            data,
+        );
+        if (response.status === true) {
+            initHazardMaps();
+            handleClose();
+            setFileToUpload(null);
+            setFilename("");
+            setOpenNotif(true);
+            setNotifStatus("success");
+            setNotifText("Successfully uploaded new hazard map");
+        } else {
+            setOpenNotif(true);
+            setNotifStatus("error");
+            setNotifText("Error uploading new hazard map");
+        }
     };
+    console.log(MarCommunityRiskAssessment.GetImageFromDirectory());
 
     return (
         <Fragment>
@@ -126,16 +120,12 @@ export default function HazardMaps() {
                 <Grid container spacing={2} align="center">
                     <Grid item xs={12} />
                     <Grid item xs={12}>
-                        {mapsContainer.length > 0 && (
-                            <Fragment>
-                                <Magnifier
-                                    imageSrc={marirongMaps[mapsContainer[0].filename]}
-                                    imageAlt="MAR Hazard Map"
-                                    mouseActivation={MOUSE_ACTIVATION.SINGLE_CLICK}
-                                    touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
-                                />
-                            </Fragment>
-                        )}
+                        <Magnifier
+                            imageSrc={mapPreview}
+                            imageAlt="MAR Hazard Map"
+                            mouseActivation={MOUSE_ACTIVATION.SINGLE_CLICK}
+                            touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
+                        />
                     </Grid>
                     <Grid item={true} xs={12}>
                         <Fab

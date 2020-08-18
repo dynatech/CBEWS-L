@@ -7,7 +7,7 @@ schema = "cbewsl_mar_collections"
 class CommunityRiskAssessment():
 
 	def create_cav(data):
-		query = f"INSERT INTO capacity_and_vulnerability VALUES (0, '{data['resource']}', {data['quantity']}, '{data['status']}', " \
+		query = f"INSERT INTO capacity_and_vulnerability VALUES (0, '{data['resource']}', {data['quantity']}, '{data['stat_desc']}', " \
 				f"'{data['owner']}', '{data['in_charge']}', '{data['updater']}', '{data['date']}', {data['user_id']}, '{str(dt.today())}')"
 		try:
 			id = DB.db_modify(query, schema, True)
@@ -26,20 +26,20 @@ class CommunityRiskAssessment():
 	def update_cav(data):
 		query = "UPDATE capacity_and_vulnerability SET"
 		counter = 0
+		h.var_checker("data", data)
 		for x in data:
+			h.var_checker("list(x)[0]", list(x)[0])
 			key = list(x)[0]
 			if 'id' != key:
 				if counter == 0:
 					query += f" {key} = '{x[key]}'"
 				else:
 					query += f", {key} = '{x[key]}'"
+			else:
+				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = {x[key]}"
 			counter += 1
-		
-		for x in data:
-			key = list(x)[0]
-			if 'cav_id' == key:
-				query = f"{query}, last_ts = '{str(dt.today())}' WHERE cav_id = '{x[key]}'"
-
+			
+		h.var_checker("query", query)
 		ret_val = DB.db_modify(query, schema, True)
 		return ret_val
 

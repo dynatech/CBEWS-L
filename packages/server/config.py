@@ -32,6 +32,8 @@ APP_CONFIG = {
     "production": ProductionConfig,
     "url": "http://localhost:3000",
     "MARIRONG_DIR": f"{APP_DIR}/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG",
+    "CRA_PATH": f"{APP_DIR}/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG/DOCUMENTS/",
+    "MAPS_PATH": f"{APP_DIR}/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG/MAPS/",
     "UMINGAN_DIR": f"{APP_DIR}/CBEWS-L/packages/commons/src/client-cbewsl/UMINGAN",
     "CANDIDATE_DIR": f"{APP_DIR}/CBEWS-L/packages/server/Documents/monitoringoutput/alertgen",
     "public_alert_file": f"{APP_DIR}/CBEWS-L/packages/server/Documents/monitoringoutput/alertgen/PublicAlertRefDB.json",

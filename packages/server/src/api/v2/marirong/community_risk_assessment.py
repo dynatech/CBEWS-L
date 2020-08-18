@@ -1,5 +1,6 @@
 import time
 import os
+import glob
 from stat import S_ISREG, ST_CTIME, ST_MODE
 from pathlib import Path
 from flask import Blueprint, jsonify, request, redirect, url_for, send_from_directory, send_file
@@ -88,7 +89,8 @@ def modify_capacity_and_vulnerability():
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/delete/community_risk_assessment/mar/capacity_and_vulnerability", methods=["DELETE"])
 def remove_capacity_and_vulnerability():
     data = request.get_json()
-    status = CommunityRiskAssessment.delete_cav(data["cav_id"])
+    h.var_checker("data", data)
+    status = CommunityRiskAssessment.delete_cav(data["id"])
     if status:
         return_value = {
             "status": True,
@@ -126,34 +128,29 @@ def fetch_community_risk_assessment_file():
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/upload/community_risk_assessment/mar/community_risk_assessment", methods=["POST"])
 def upload_community_risk_assessment_file():
     try:
-        if request.method == "POST":
-            h.var_checker("request", request.files)
-            file = request.files['file']
-            directory = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/"
-            filename = file.filename
+        file = request.files['file']
+        directory = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/"
+        filename = file.filename
 
-            count = filename.count(".")
-            name_list = filename.split(".", count)
-            file_type = f".{name_list[count]}"
-            name_list.pop()
-            filename = f"{'.'.join(name_list)}"
+        count = filename.count(".")
+        name_list = filename.split(".", count)
+        file_type = f".{name_list[count]}"
+        name_list.pop()
+        filename = f"{'.'.join(name_list)}"
 
-            temp = f"{filename}{file_type}"
-            uniq = 1
-            while os.path.exists(Path(directory) / temp):
-                # filename
-                temp = '%s_%d%s' % (filename, uniq, file_type)
-                uniq += 1
+        temp = f"{filename}{file_type}"
+        uniq = 1
+        while os.path.exists(Path(directory) / temp):
+            # filename
+            temp = '%s_%d%s' % (filename, uniq, file_type)
+            uniq += 1
 
-            # file.save(new_path)
-            file.save(os.path.join(Path(directory), temp))
+        # file.save(new_path)
+        file.save(os.path.join(Path(directory), temp))
 
-            return_data = { "status": True }
-        else:
-            return_data = { "status": False }
+        return_data = { "status": True }
     except Exception as err:
-        raise err
-        # return_data = { "status": False }
+        return_data = { "status": False }
     return jsonify(return_data)
 
 
@@ -162,7 +159,15 @@ def fetch_hazard_map():
     file_loc = APP_CONFIG['MARIRONG_DIR']
 
     basepath = f'{file_loc}/MAPS'
-    map_list = os.listdir(basepath)
+    # map_list = os.listdir(basepath)
+    map_list = glob.glob(basepath+"/*")
+    latest_file = max(map_list, key=os.path.getctime)
+    latest_file = latest_file.split("\\", 1)
+    map_list = [*latest_file]
+
+    h.var_checker("map_list", map_list)
+    h.var_checker("latest", latest_file)
+
     entries = ((os.stat(path), path) for path in map_list)
     # leave only regular files, insert creation date
     entries = ((stat[ST_CTIME], path)
