@@ -1,39 +1,57 @@
 import { MarCommunityRiskAssessment,
+         MarEventsTemplate,
          UmiRiskManagement,
          UmiFieldSurvey } from '@dynaslope/commons';
 
 const MARIRONG_API_LIST = (data) => {
     return {
         'MarCapacityAndVulnerability': {
-            'add': (async (cav)=> {
+            'add': (async (data)=> {
                 let result = await MarCommunityRiskAssessment.InsertCapacityAndVulnerability({
-                    'resource': cav.resource,
-                    'quantity': cav.quantity,
-                    'status': cav.stat_desc,
-                    'owner': cav.owner,
-                    'in_charge': cav.incharge,
-                    'date': cav.date,
-                    'updater': cav.updater,
+                    'resource': data.resource,
+                    'quantity': data.quantity,
+                    'status': data.stat_desc,
+                    'owner': data.owner,
+                    'in_charge': data.incharge,
+                    'date': data.date,
+                    'updater': data.updater,
                     'attachment': {},
-                    'user_id': cav.user_id
+                    'user_id': data.user_id
                 })
                 // Loading counter
             }),
-            'update': (async (cav)=> {
+            'update': (async (data)=> {
                 let temp = [];
-                for (var key in cav) {
+                for (var key in data) {
                     let obj = {};
                     if (key != 'alterations') {
-                        obj[key] = cav[key];
+                        obj[key] = data[key];
                         temp.push(obj);
                     }   
                 }
                 let response = await MarCommunityRiskAssessment.UpdateCapacityAndVulnerability(temp)
                 // Loading counter
             }),
-            'delete': ((cav)=> {
+            'delete': ((data)=> {
                 alert(JSON.stringify("DELETE"))
-                alert(JSON.stringify(cav));
+                alert(JSON.stringify(data));
+            })
+        },
+        'MarEventsTemplate': {
+            'add': (async (data)=> {
+                let response = await MarEventsTemplate.InsertEventsTemplate({
+                    'template_name': data.template_name,
+                    'message_template': data.message_template,
+                    'user_id': data.user_id
+                });
+                // Load counter
+            }),
+            'update': (async (data)=> {
+                alert(JSON.stringify(data));
+            }),
+            'delete': ((data)=> {
+                alert(JSON.stringify("DELETE"))
+                alert(JSON.stringify(data));
             })
         }
     }
