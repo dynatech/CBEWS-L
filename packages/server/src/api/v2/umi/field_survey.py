@@ -6,6 +6,7 @@ from flask import Blueprint, jsonify, request
 from src.model.v2.umi.field_survey import FieldSurveyModel
 import hashlib
 from src.api.helpers import Helpers as h
+from pprint import pprint
 
 from config import APP_CONFIG
 
@@ -166,23 +167,29 @@ def upload_field_survey_logs():
             temp = '%s_%d%s' % (filename, uniq, file_type)
             uniq += 1
 
-        # file.save(new_path)
+        # file.save(new_path) 
         file.save(os.path.join(Path(directory), temp))
 
-        return_data = { "status": True, "file_path": f"{directory}/{filename}" }
+        return_data = { "status": True, "file_path": f"{directory}/{temp}" }
     except Exception as err:
         raise err
         # return_data = { "status": False }
     return jsonify(return_data)
 
-@FIELD_SURVEY_BLUEPRINT.route("/update/field_survey/umi/attachment", methods=["PATCH"])
+@FIELD_SURVEY_BLUEPRINT.route("/update/field_survey/umi/attachment", methods=["POST"])
 def update_field_survey_attachment():
     try:
-        # UPDATE THE FILE
-        ret_val = {
-            'status': True,
-            'message': 'test'
-        }
+        data = request.get_json()
+        check_if_same = FieldSurveyModel.check_file(data['id'])
+        if data['file_path']['filename'] in check_if_same[0]['attachment_path']:
+            ret_val = {
+                'status': True
+            }
+        else:
+            os.remove(check_if_same[0]['attachment_path'])
+            ret_val = {
+                'status': False
+            }
     except Exception as err:
         ret_val = {
             'status': False,

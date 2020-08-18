@@ -73,7 +73,7 @@ const DeleteFieldSurveyLogs = (data) => {
 
 const UpdateAttachmentFile = (data) => {
     return fetch(`${AppConfig.HOSTNAME}/v2/update/field_survey/umi/attachment`, {
-        method: 'PATCH',
+        method: 'POST',
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json'
