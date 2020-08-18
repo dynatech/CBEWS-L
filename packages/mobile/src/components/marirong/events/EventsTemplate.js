@@ -101,62 +101,65 @@ function EventsTemplate() {
 
                 const isConnected = await NetworkUtils.isNetworkAvailable();
                 let response = null;
-                let temp = {};
+                let temp_data = {};
 
-                if (cmd == "add") {
-                    if (isConnected != true) {
-                        response = await MobileCaching.getItem("MarEventsTemplate").then(cached_data => {
-                            let ret_val = {}
-                            cached_data.push({
-                                'id': -1,
-                                'last_ts': null,
-                                'message_template': selectedMessageTemplate,
-                                'template_name': selectedTemplateName,
-                                'user_id': credentials['user_id'],
-                                'alterations': 'add'
-                            });
-                            try {
-                                MobileCaching.setItem("MarEventsTemplate", cached_data);
-                                ret_val = {
-                                    "status": true,
-                                    "message": "Events template is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
-                                }
-                            } catch (err) {
-                                ret_val = {
-                                    "status": false,
-                                    "message": "Events template failed to save data to memory."
-                                }
+                if (isConnected != true) {
+                    response = await MobileCaching.getItem("MarEventsTemplate").then(cached_data => {
+                        let ret_val = {};
+
+                        temp_data = {
+                            'last_ts': null,
+                            'message_template': selectedMessageTemplate,
+                            'template_name': selectedTemplateName,
+                            'user_id': credentials['user_id']
+                        };
+
+                        if (cmd == "add") {
+                            temp_data['id'] = -1;
+                            temp_data['alterations'] = 'add';
+                            cached_data.push(temp_data);
+                        } else {
+                            temp_data['id'] = selectedId;
+                            temp_data['alterations'] = 'update';
+                            let index = cached_data.findIndex(x => x.id == selectedId);
+                            cached_data[index] = temp_data;
+                        }
+
+                        try {
+                            MobileCaching.setItem("MarEventsTemplate", cached_data);
+                            ret_val = {
+                                "status": true,
+                                "message": "Events template is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
                             }
-                            cached_data.push({
-                                id: "0",
-                                template_name: 'New template',
-                                message_template: 'New template'
-                            });
-                            init(cached_data);
-                            return ret_val;
+                        } catch (err) {
+                            ret_val = {
+                                "status": false,
+                                "message": "Events template failed to save data to memory."
+                            }
+                        }
+                        cached_data.push({
+                            id: "0",
+                            template_name: 'New template',
+                            message_template: 'New template'
                         });
-                    } else {
-                        response = await MarEventsTemplate.InsertEventsTemplate({
-                            'template_name': selectedTemplateName,
-                            'message_template': selectedMessageTemplate,
-                            'user_id': credentials['user_id']
-                        });
-                        fetchLatestData();
-                    }
+                        init(cached_data);
+                        return ret_val;
+                    });
                 } else {
-                    if (isConnected != true) {
-                        temp = await MobileCaching.getItem("MarEventsTemplate").then(cached_data => {
-                            alert(JSON.stringify(cached_data));
-                        });
-                    } else {
-                        response = await MarEventsTemplate.UpdateEventsTemplate({
-                            'id': selectedId,
-                            'template_name': selectedTemplateName,
-                            'message_template': selectedMessageTemplate,
-                            'user_id': credentials['user_id']
-                        });
+                    temp_data = {
+                        'id': selectedId,
+                        'template_name': selectedTemplateName,
+                        'message_template': selectedMessageTemplate,
+                        'user_id': credentials['user_id']
                     }
+                    if (cmd == "add") {
+                        response = await MarEventsTemplate.InsertEventsTemplate(temp_data);
+                    } else {
+                        response = await MarEventsTemplate.UpdateEventsTemplate(temp_data);
+                    }
+                    fetchLatestData();
                 }
+
                 ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
             },100);
 
@@ -174,14 +177,20 @@ function EventsTemplate() {
               },
               { text: "Confirm", onPress: () => {
                 setTimeout(async ()=> {
-                    let response = await MarEventsTemplate.DeleteEventsTemplate({
-                        'id': selectedId
-                    })
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        // init();
+
+                    const isConnected = await NetworkUtils.isNetworkAvailable();
+                    if (isConnected != true) {
+                        ToastAndroid.showWithGravity('Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.', ToastAndroid.LONG, ToastAndroid.CENTER)
                     } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        let response = await MarEventsTemplate.DeleteEventsTemplate({
+                            'id': selectedId
+                        })
+                        if (response.status == true) {
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            // init();
+                        } else {
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        }
                     }
                 },300)
               }}

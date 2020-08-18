@@ -47,7 +47,13 @@ const MARIRONG_API_LIST = (data) => {
                 // Load counter
             }),
             'update': (async (data)=> {
-                alert(JSON.stringify(data));
+                let response = await MarEventsTemplate.UpdateEventsTemplate({
+                    'id': data['id'],
+                    'message_template': data['message_template'],
+                    'template_name': data['template_name'],
+                    'user_id': data['user_id']
+                });
+                // Load counter
             }),
             'delete': ((data)=> {
                 alert(JSON.stringify("DELETE"))
