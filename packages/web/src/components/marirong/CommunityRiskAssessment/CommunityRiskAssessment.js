@@ -1,5 +1,4 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import CustomGridList from '../../reducers/GridList'
 import {
     Grid, Container,
     Fab, TextField, Button
@@ -8,14 +7,13 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Input from '@material-ui/core/Input';
 import Helpers from '../../reducers/Helpers';
-import AppConfig from "../../reducers/AppConfig";
 
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 
 import { MarCommunityRiskAssessment } from '@dynaslope/commons';
+import CustomGridList from '../../reducers/GridList'
 
 function renameFileType(type) {
     const file_types = {
@@ -74,9 +72,9 @@ export default function CommunityRiskAssessment(props) {
         setTimeout(async () => {
             const data = new FormData();
             data.append("file", file_to_upload);
-    
+            console.log("file_to_upload", file_to_upload);
             let response = await MarCommunityRiskAssessment.UploadCommunityRiskAssessment(data);
-            if (response.ok) {
+            if (response.status) {
                 handleClose();
                 setFileToUpload(null);
                 setOpenNotif(true);
@@ -90,22 +88,25 @@ export default function CommunityRiskAssessment(props) {
         }, 400);
     };
 
-    const updateList = () => {
-        setTimeout(async () => {
-            const input = { path: `${AppConfig.MARIRONG_DIR}/DOCUMENTS`};
-            let response = await MarCommunityRiskAssessment.GetCommunityRiskAssessment();
-            if (response.status) {
-                setCraData(formatCRAData(response.data))
-            } else {
-                console.error("response", response);
-                console.error("Problem in fetching CRA");
-            }
-        }, 400);
+    const updateList = async () => {
+        let response = await MarCommunityRiskAssessment.GetCommunityRiskAssessment();
+        if (response.status) {
+            setCraData(formatCRAData(response.data));
+        } else {
+            console.error("response", response);
+            console.error("Problem in fetching CRA");
+        }
     };
 
 
-    const handleDelete = path => () =>  {
-        console.log("Clicked Delete! This is a pending function.")
+    const handleDelete = filename => async () =>  {
+        console.log("Clicked Delete! This is a pending function.");
+        // DO os.remove(<path>) in python
+        const response = await MarCommunityRiskAssessment.DeleteCommunityRiskAssessment(filename);
+        console.log("response", response);
+        if (response.status === true) {
+            updateList();
+        }
     }
 
     useEffect(() => {
@@ -118,8 +119,7 @@ export default function CommunityRiskAssessment(props) {
                 <CustomGridList 
                     data={cra_data}
                     type="cra_list"
-                    // handleDownload={Helpers.downloadBlob}
-                    handleDownload={() => console.log("clicked download")}
+                    handleDownload={Helpers.downloadBlob}
                     handleDelete={handleDelete} 
                 />
                 <Grid container>

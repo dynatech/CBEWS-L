@@ -16,11 +16,17 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 
 function getAddButton(title, handler) {
-    return (
-        <Button onClick={handler} arial-label="add" color="primary">
-            <AddIcon /> {`Add ${title}`}
-        </Button>
-    );
+    if (title !== "") {
+        return (
+            <Button onClick={handler} arial-label="add" color="primary">
+                <AddIcon /> {`Add ${title}`}
+            </Button>
+        );
+    } else {
+        return (
+            <span></span>
+        )
+    }
 }
 function getEditButton(handler) {
     return (

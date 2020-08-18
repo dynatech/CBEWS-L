@@ -4,6 +4,8 @@ import {
 } from "@material-ui/core";
 import AppConfig from "../reducers/AppConfig";
 
+import { MarCommunityRiskAssessment } from '@dynaslope/commons';
+
 const customGridStyle = makeStyles(theme => ({
     grid_container: {
         padding: 20
@@ -26,7 +28,7 @@ export default function GridList(props) {
     let ret_val = [];
 
     const handleDownloadInt = (item) => () => {
-        window.open(`${AppConfig.HOST_DIR}CBEWSL/MARIRONG/DOCUMENTS/${item.title}`,'_blank');
+        MarCommunityRiskAssessment.DownloadCommunityRiskAssessmentFile(item.title);
     };
 
     data.forEach((item)=> {
@@ -43,11 +45,6 @@ export default function GridList(props) {
                         </Box>
                     </Grid>
                     <Grid item xs={12}>
-                        <Typography variant="body1">
-                            {item.value}
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
                         <Typography variant="subtitle2">
                             {item.sub_title}
                         </Typography>
@@ -59,6 +56,7 @@ export default function GridList(props) {
                                 <Fab variant="extended"
                                     color="primary"
                                     aria-label="add" className={classes.button_fluid}
+                                    // onClick={handleDownload(item, item.title)}
                                     onClick={handleDownloadInt(item)}
                                 >
                                     Download
@@ -69,7 +67,7 @@ export default function GridList(props) {
                                     color="primary"
                                     aria-label="add" className={classes.button_fluid}
                                     // onClick={() => {}}
-                                    onClick={() => handleDelete}
+                                    onClick={handleDelete(item.title)}
                                 >
                                     DELETE
                                 </Fab>

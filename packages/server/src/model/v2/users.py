@@ -110,6 +110,6 @@ class Users():
 		query = "SELECT firstname, lastname FROM cbewsl_commons_db.user_profiles as cdb_up " \
 				"INNER JOIN cbewsl_commons_db.user_accounts as cdb_ua " \
 				"USING (profile_id)" \
-				f"WHERE cbd_up.profile_id = {profile_id}"
+				f"WHERE cdb_up.profile_id = {profile_id}"
 		user = DB.db_read(query, 'cbewsl_commons_db')
 		return user

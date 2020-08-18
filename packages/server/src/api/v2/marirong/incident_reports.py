@@ -1,3 +1,5 @@
+from datetime import datetime
+from calendar import monthrange
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS, cross_origin
 from connections import SOCKETIO
@@ -27,11 +29,57 @@ def add():
         }
     return jsonify(return_value)
 
+
 @INCIDENT_REPORTS_BLUEPRINT.route("/fetch/maintenance/mar/incident_logs", methods=["GET"])
 @cross_origin()
 def fetch():
     try:
-        result = maintenance.fetch_incident_report()
+        result = maintenance.fetch_all_incident_report()
+        response = {
+            "status": True,
+            "data": result,
+            "message": "Sucessfully fetched incident logs."
+        }
+
+    except Exception as err:
+        response = {
+            "status": False,
+            "data": [],
+            "message": f"Failed to fetch incident logs. Err: {err}"
+        }
+
+    return jsonify(response)
+
+
+@INCIDENT_REPORTS_BLUEPRINT.route("/fetch/day/maintenance/mar/incident_logs/<input_date>", methods=["GET"])
+@cross_origin()
+def fetch_day(input_date):
+    try:
+        input_date = h.str_to_dt(input_date)
+        start = datetime(input_date.year, input_date.month, input_date.day, 0, 0, 0)
+        end = datetime(input_date.year, input_date.month, input_date.day, 23, 59, 0)
+        result = maintenance.fetch_filtered_incident_report(start, end)
+        response = {
+            "status": True,
+            "data": result,
+            "message": "Sucessfully fetched incident logs."
+        }
+
+    except Exception as err:
+        response = {
+            "status": False,
+            "data": [],
+            "message": f"Failed to fetch incident logs. Err: {err}"
+        }
+
+    return jsonify(response)
+
+
+@INCIDENT_REPORTS_BLUEPRINT.route("/fetch/month/maintenance/mar/incident_logs/<start>/<end>", methods=["GET"])
+@cross_origin()
+def fetch_month(start, end):
+    try:
+        result = maintenance.fetch_filtered_incident_report(start, end)
         response = {
             "status": True,
             "data": result,
@@ -76,7 +124,7 @@ def modify():
 def remove():
     data = request.get_json()
     status = maintenance.delete_incident_report(data['id'])
-    if status is not None:
+    if status:
         return_value = {
             "status": True,
             "message": "Maintenance log data successfully deleted!"

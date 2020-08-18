@@ -6,10 +6,10 @@ import UmiFooter from './UmiFooter';
 
 export default function UmiDashboard (props) {
     return (
-        <div>
+        <Grid container>
             <UmiHeader {...props} />
             <UmiBody />
             <UmiFooter />
-        </div>
+        </Grid>
     )
 }

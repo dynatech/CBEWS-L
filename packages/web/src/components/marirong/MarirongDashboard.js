@@ -6,10 +6,10 @@ import MarFooter from './MarFooter';
 
 export default function MarDashboard (props) {
     return (
-        <div>
+        <Grid container>
             <MarHeader {...props} />
             <MarBody />
             <MarFooter />
-        </div>
+        </Grid>
     )
 }

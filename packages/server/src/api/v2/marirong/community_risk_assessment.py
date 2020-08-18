@@ -1,5 +1,7 @@
 import time
 import os
+import glob
+from stat import S_ISREG, ST_CTIME, ST_MODE
 from pathlib import Path
 from flask import Blueprint, jsonify, request, redirect, url_for, send_from_directory, send_file
 from connections import SOCKETIO
@@ -69,6 +71,7 @@ def fetch_one_capacity_and_vulnerability(id):
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/update/community_risk_assessment/mar/capacity_and_vulnerability", methods=["POST"])
 def modify_capacity_and_vulnerability():
     data = request.get_json()
+    h.var_checker("data", data)
     result = CommunityRiskAssessment.update_cav(data)
     if result:
         return_value = {
@@ -86,6 +89,7 @@ def modify_capacity_and_vulnerability():
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/delete/community_risk_assessment/mar/capacity_and_vulnerability", methods=["DELETE"])
 def remove_capacity_and_vulnerability():
     data = request.get_json()
+    h.var_checker("data", data)
     status = CommunityRiskAssessment.delete_cav(data["id"])
     if status:
         return_value = {
@@ -146,8 +150,7 @@ def upload_community_risk_assessment_file():
 
         return_data = { "status": True }
     except Exception as err:
-        raise err
-        # return_data = { "status": False }
+        return_data = { "status": False }
     return jsonify(return_data)
 
 
@@ -156,8 +159,20 @@ def fetch_hazard_map():
     file_loc = APP_CONFIG['MARIRONG_DIR']
 
     basepath = f'{file_loc}/MAPS'
-    map_list = os.listdir(basepath)
+    # map_list = os.listdir(basepath)
+    map_list = glob.glob(basepath+"/*")
+    latest_file = max(map_list, key=os.path.getctime)
+    latest_file = latest_file.split("\\", 1)
+    map_list = [*latest_file]
 
+    h.var_checker("map_list", map_list)
+    h.var_checker("latest", latest_file)
+
+    entries = ((os.stat(path), path) for path in map_list)
+    # leave only regular files, insert creation date
+    entries = ((stat[ST_CTIME], path)
+    for stat, path in entries if S_ISREG(stat[ST_MODE]))
+    h.var_checker("entries", entries)
     maps = []
 
     for map in map_list:
@@ -171,6 +186,8 @@ def fetch_hazard_map():
                 "file_type": file_type,
                 "file_path": basepath
             })
+
+    h.var_checker("maps", maps)
 
     return jsonify({"status": True, "data": maps})
 

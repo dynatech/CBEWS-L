@@ -6,9 +6,10 @@ import {
     Button, TableBody, TableCell, TableHead,
     TableRow, Paper, Box, Divider
 } from '@material-ui/core';
+import moment from "moment";
 import { useStyles, tableStyle } from '../../styles/general_styles';
 import AppConfig from "../reducers/AppConfig";
-import moment from "moment";
+import { AlertGeneration } from '@dynaslope/commons';
 
 // import RainfallPlot from './rainfall_plot';
 // import SurficialPlot from './surficial_plot';
@@ -98,7 +99,7 @@ function AlertValidation() {
     };
 
     const updateAlertGen = () => {
-        fetch(`${AppConfig.HOSTNAME}/v2/get/alert_gen/umi/alert_validation_data`, {
+        fetch(`${AppConfig.HOSTNAME}/v2/get/alert_gen/mar/alert_validation_data`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -192,7 +193,7 @@ function AlertValidation() {
             ts_last_retrigger: data["date_time"]
         };
 
-        fetch(`${AppConfig.HOSTNAME}/api/alert_gen/public_alerts/validate_trigger`, {
+        fetch(`${AppConfig.HOSTNAME}/v2/validate_trigger/public_alerts`, {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -242,8 +243,8 @@ function AlertValidation() {
     return (
         <Fragment>
             <Container fixed>
-                <Grid container align="center" spacing={10}>
-                    <Grid item xs={12} container spacing={5} >
+                <Grid container align="center" spacing={5}>
+                    <Grid item xs={12} container spacing={2} >
                         <Grid item={12}><Typography variant="h3"> </Typography></Grid>
                     </Grid>
 
@@ -394,19 +395,19 @@ function CurrentAlertArea(props) {
                     <Typography variant="h2" className={[classes.label_paddings, classes.alert_level, color_class]}>
                         {`Alert ${leo.public_alert_level}`}
                     </Typography>
-                    <Typography variant="h5">
+                    <Typography variant="h6">
                         {`As of ${as_of}`}
                     </Typography>
-                    {/* <Typography variant="h5">
+                    {/* <Typography variant="h6">
                         {prepareTriggers(leo.release_triggers)}
                     </Typography> */}
-                    <Typography variant="h5" className={classes.label_paddings}>
+                    <Typography variant="h6" className={classes.label_paddings}>
                         {`Event Start: ${event_start}`}
                     </Typography>
-                    <Typography variant="h5" className={classes.label_paddings}>
+                    <Typography variant="h6" className={classes.label_paddings}>
                         {`Validity: ${validity}`}
                     </Typography>
-                    <Typography variant="h5" className={classes.label_paddings}>
+                    <Typography variant="h6" className={classes.label_paddings}>
                         {`Recommended Response: ${leo.recommended_response}`}
                     </Typography>
                 </Grid>
@@ -469,27 +470,27 @@ function LatestCurrentAlert() {
     const [leo, setLeo] = useState("empty");
     const [releaseStatus, setReleaseStatus] = useState("No event on site.");
 
-    // useEffect(() => {
-    //     Helper.httpRequest(
-    //         `${AppConfig.HOSTNAME}/api/alert_gen/public_alerts/get_ongoing_and_extended_monitoring`,
-    //         "GET", [], null
-    //     )
-    //         .then(({ data, status }) => {
-    //             let key = "";
-    //             if (data.latest.length > 0) key = "latest";
-    //             else if (data.overdue.length > 0) key = "overdue";
-    //             else if (data.extended.length > 0) key = "extended";
+    useEffect(() => {
+        initLatestCurrentAlert();
+    }, []);
 
-    //             if (key in data) {
-    //                 const site_data = data[key].find(site_data => site_data.site_id === 29);
-    //                 setLeo(site_data);
-    //             } else {
-    //                 console.error("There is something wrong with the code in latest current alert");
-    //             }
-    //         })
-    //         .catch(error => console.error(`Problem in getting active envets: Here's the error => ${error}`));
+    const initLatestCurrentAlert = async () => {
+        const response = await AlertGeneration.GetOngoingAndExtendedMonitoring();
+        const { data, status } = response;
+        if (status) {
+            let key = "";
+            if (data.latest.length > 0) key = "latest";
+            else if (data.overdue.length > 0) key = "overdue";
+            else if (data.extended.length > 0) key = "extended";
 
-    // }, []);
+            if (key in data) {
+                const site_data = data[key].find(site_data => site_data.site_id === 29);
+                setLeo(site_data);
+            } else {
+                console.error("There is something wrong with the code in latest current alert");
+            }
+        }
+    }
 
     function sendEmail() {
         setModal([<TransitionalModal status={true} />])

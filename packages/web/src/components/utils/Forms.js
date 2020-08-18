@@ -107,6 +107,7 @@ export default function Forms(props) {
 
     useEffect(() => {
         setDefaultValues(Object.assign({}, string, int, ts));
+        console.log("defaultValues", defaultValues)
         setCmd(command);
     }, []);
 
@@ -124,7 +125,6 @@ export default function Forms(props) {
                         <Grid container spacing={1}>
                             {Object.entries(defaultValues).map((e, l) => {
                                 const reference = { string, int, ts };
-                                console.log("e", e);
                                 return (
                                     <ReusableInput
                                         propKey={e[0]}

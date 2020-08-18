@@ -173,7 +173,7 @@ def get_umi_alert_validation_data():
 ######################
 
 
-@PUBLIC_ALERTS_BLUEPRINT.route("/alert_gen/public_alerts/validate_trigger", methods=["POST"])
+@PUBLIC_ALERTS_BLUEPRINT.route("/validate_trigger/public_alerts", methods=["POST"])
 def validate_trigger():
     """
     """
@@ -253,19 +253,17 @@ def format_release_triggers(payload, process_one=False):
         list_to_process = [payload]
 
     for trig in list_to_process:
-        (trigger_id, release_id, trigger_type, timestamp, info) = trig
+        trigger_type = trig["trigger_type"]
         trigger_source = AG.get_internal_alert_symbol_row(trigger_type, return_col="trigger_source")
         alert_level = AG.get_internal_alert_symbol_row(trigger_type, return_col="alert_level")
-        release_trig_list.append({
-            "trigger_id": trigger_id,
-            "release_id": release_id,
-            "trigger_type": trigger_type,
+
+        release_trig = {
+            **trig,
             "trigger_source": trigger_source,
-            "trigger_alert_level": alert_level,
-            # NOTE: Unconventional
-            "trigger_timestamp": timestamp, 
-            "info": info
-        })
+            "trigger_alert_level": int(alert_level),
+            "trigger_timestamp": trig["timestamp"], 
+        }
+        release_trig_list.append(release_trig)
 
     if process_one:
         return release_trig_list[0]
@@ -331,8 +329,8 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
                 event_id = e["event_id"]
                 site_id = e["site_id"]
                 event_start = e["event_start"]
-                latest_release_id = e["latest_release_id"]
-                latest_trigger_id = e["latest_trigger_id"]
+                latest_release_id = int(e["latest_release_id"])
+                latest_trigger_id = int(e["latest_trigger_id"])
                 validity = e["validity"]
                 status = e["status"]
                 site_code = e["site_code"]
@@ -367,7 +365,7 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
                     release_time = f"{str_data_ts_ymd} {str_release_time}"
                 
                 internal_alert = internal_alert_level
-                event_data["site_id"] = site_id
+                event_data["site_id"] = int(site_id)
                 event_data["site_code"] = site_code
                 # NOTE: Unconventional
                 event_data["latest_release_id"] = release_id

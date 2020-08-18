@@ -201,7 +201,7 @@ class AlertGeneration():
         result = DB.db_read(query, schema)
 
         if result:
-            result = result[0][0]
+            result = result[0]
 
         return result
 

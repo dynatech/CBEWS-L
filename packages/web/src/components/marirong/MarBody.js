@@ -42,30 +42,37 @@ export default function MarBody() {
     };
 
     return (
-        <Box style={{ paddingTop: 100, paddingBottom: 100 }}>
-            <Paper square>
-                <Tabs
-                    value={value}
-                    indicatorColor="primary"
-                    textColor="primary"
-                    // variant="fullWidth"
-                    onChange={handleChange}
-                    centered
-                >
-                    <Tab value="home" label="Home" />
-                    <Tab value="cra" label="Community Risk Assessment" />
-                    <Tab value="alertGen" label="Alert Generation" />
-                    <Tab value="dataAnalysis" label="Data Analysis" />
-                    <Tab value="sensorData" label="Sensor Data" />
-                    <Tab value="groundData" label="Ground Data" />
-                    <Tab value="events" label="Events" />
-                    <Tab value="maintenance" label="Maintenance" />
-                </Tabs>
-            </Paper>
-
-            <Container>
+        <Grid item container xs={12}
+            style={{ paddingTop: 100, paddingBottom: 100 }}
+            width="100%"
+        >
+            <Grid item xs={12}>
+                <Paper square>
+                    <Tabs
+                        value={value}
+                        indicatorColor="primary"
+                        textColor="primary"
+                        // variant="fullWidth"
+                        onChange={handleChange}
+                        centered
+                    >
+                        <Tab value="home" label="Home" />
+                        <Tab
+                            value="cra"
+                            label="Community Risk Assessment"
+                        />
+                        <Tab value="alertGen" label="Alert Generation" />
+                        <Tab value="dataAnalysis" label="Data Analysis" />
+                        <Tab value="sensorData" label="Sensor Data" />
+                        <Tab value="groundData" label="Ground Data" />
+                        <Tab value="events" label="Events" />
+                        <Tab value="maintenance" label="Maintenance" />
+                    </Tabs>
+                </Paper>
+            </Grid>
+            <Grid item xs={12}>
                 {body}
-            </Container>
-        </Box>
+            </Grid>
+        </Grid>
     );
 }

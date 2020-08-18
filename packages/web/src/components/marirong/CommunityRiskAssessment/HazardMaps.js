@@ -5,13 +5,17 @@ import {
     Fab,
     TextField,
     Button,
-    GridList,
-    GridListTile,
-    GridListTileBar,
-    Input,
 } from "@material-ui/core/";
 import { useStyles } from "../../../styles/general_styles";
-import ImageZoom from "react-medium-image-zoom";
+
+import {
+    Magnifier,
+    GlassMagnifier,
+    SideBySideMagnifier,
+    PictureInPictureMagnifier,
+    MOUSE_ACTIVATION,
+    TOUCH_ACTIVATION,
+} from "react-image-magnifiers";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -21,7 +25,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 
-import { MarCommunityRiskAssessment } from '@dynaslope/commons';
+import { MarCommunityRiskAssessment } from "@dynaslope/commons";
 
 import AppConfig from "../../reducers/AppConfig";
 
@@ -32,7 +36,6 @@ function Alert(props) {
 export default function HazardMaps() {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
-    const [mapsContainer, setMapsContainer] = useState([]);
     const [mapPreview, setMapPreview] = useState([]);
     const [fileToUpload, setFileToUpload] = useState();
     const [filename, setFilename] = useState("");
@@ -53,17 +56,16 @@ export default function HazardMaps() {
         initHazardMaps();
     }, []);
 
-    const initHazardMaps = () => {
-        setTimeout(async () => {
-            const response = await MarCommunityRiskAssessment.GetHazardMaps();
-            if (response.status) {
-                console.log(response);
-                if (response.data.length > 0) {
-                    setMapsContainer(response.data);
-                    handleMapPreview(response.data[0]);
-                }
+    const initHazardMaps = async () => {
+        const response = await MarCommunityRiskAssessment.GetHazardMaps();
+        if (response.status) {
+            console.log(response);
+            if (response.data.length > 0) {
+                console.log();
+                setMapPreview(`http://192.168.1.2:8080/MARIRONG/MAPS/${response.data[0].filename}`);
+                // handleMapPreview(response.data[0]);
             }
-        }, 300);
+        }
     };
 
     const importAll = (require) =>
@@ -72,24 +74,16 @@ export default function HazardMaps() {
             return acc;
         }, {});
 
-    // TODO
-    // const marirongMaps = importAll(
-    //     require.context(
-    //         "../../../../client-cbewsl/MARIRONG/MAPS",
-    //         false,
-    //         /\.(png|jpe?g|svg)$/,
-    //     ),
-    // );
-    const marirongMaps = '';
-
-    const handleMapPreview = (map_data) => {
-        let temp = {
-            img: marirongMaps[map_data.filename],
-            title: "Dynaslope MAP (MAR)",
-            featured: true,
-        };
-        setMapPreview([temp]);
-    };
+    const marirongMaps = {}
+    // const handleMapPreview = (map_data) => {
+    //     console.log("marirong maps", marirongMaps);
+    //     let temp = {
+    //         img: marirongMaps[map_data.filename],
+    //         title: "Dynaslope MAP (MAR)",
+    //         featured: true,
+    //     };
+    //     setMapPreview([temp]);
+    // };
 
     const handleFileSelection = (event) => {
         const file = event.target.files[0];
@@ -97,73 +91,41 @@ export default function HazardMaps() {
         setFilename(file.name);
     };
 
-    const handleUpload = () => {
+    const handleUpload = async () => {
         const data = new FormData();
         data.append("file", fileToUpload);
-        setTimeout(async () => {
-            const response = await MarCommunityRiskAssessment.UploadHazardMaps(data);
-            if (response.status === true) {
-                handleClose();
-                setFileToUpload(null);
-                setFilename("");
-                setOpenNotif(true);
-                setNotifStatus("success");
-                setNotifText("Successfully uploaded new hazard map");
-            } else {
-                setOpenNotif(true);
-                setNotifStatus("error");
-                setNotifText("Error uploading new hazard map");
-            }
-        }, 300);
+        console.log("shit")
+        const response = await MarCommunityRiskAssessment.UploadHazardMaps(
+            data,
+        );
+        if (response.status === true) {
+            initHazardMaps();
+            handleClose();
+            setFileToUpload(null);
+            setFilename("");
+            setOpenNotif(true);
+            setNotifStatus("success");
+            setNotifText("Successfully uploaded new hazard map");
+        } else {
+            setOpenNotif(true);
+            setNotifStatus("error");
+            setNotifText("Error uploading new hazard map");
+        }
     };
+    console.log(MarCommunityRiskAssessment.GetImageFromDirectory());
 
     return (
         <Fragment>
             <Container className={classes.img_container}>
                 <Grid container spacing={2} align="center">
-                    {mapPreview.length != 0 ? (
-                        mapPreview.map((tile) => (
-                            <Grid item xs={12}>
-                                <ImageZoom
-                                    image={{
-                                        src: tile.img,
-                                        alt: tile.title,
-                                        className: classes.img_container,
-                                        style: { width: "50em", zIndex: 1000 },
-                                    }}
-                                    zoomImage={{
-                                        src: tile.img,
-                                        alt: tile.title,
-                                    }}
-                                />
-                            </Grid>
-                        ))
-                    ) : (
-                        <div></div>
-                    )}
-                    <Grid item={true} xs={12}>
-                        <GridList className={classes.thumbnail} cols={2.5}>
-                            {mapsContainer.map((tile) => (
-                                <GridListTile
-                                    key={tile.img}
-                                    onClick={() => {
-                                        handleMapPreview(tile);
-                                    }}
-                                >
-                                    <img
-                                        src={marirongMaps[tile.filename]}
-                                        alt={tile.filename}
-                                    />
-                                    <GridListTileBar
-                                        title={tile.filename}
-                                        classes={{
-                                            root: classes.thumbnailTitle,
-                                            title: classes.gridTitle,
-                                        }}
-                                    />
-                                </GridListTile>
-                            ))}
-                        </GridList>
+                    <Grid item xs={12} />
+                    <Grid item xs={12}>
+                        <Magnifier
+                            imageSrc={mapPreview}
+                            imageAlt="MAR Hazard Map"
+                            mouseActivation={MOUSE_ACTIVATION.SINGLE_CLICK}
+                            touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
+                        />
                     </Grid>
                     <Grid item={true} xs={12}>
                         <Fab

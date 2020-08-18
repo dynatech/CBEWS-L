@@ -1,7 +1,49 @@
 import AppConfig from '../../utils/AppConfig';
+import moment from 'moment';
 
 const GetMaintenanceLogs = () => {
     return fetch(`${AppConfig.HOSTNAME}/v2/fetch/maintenance/mar/maintenance_logs`, {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        return {
+            "status": false,
+            "message": error
+        }
+    });
+}
+
+const GetDayMaintenanceLogs = (timestamp) => {
+    const str_date = moment(timestamp).format("YYYY-MM-DD HH:mm:ss");
+    return fetch(`${AppConfig.HOSTNAME}/v2/fetch/day/maintenance/mar/maintenance_logs/${str_date}`, {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        return {
+            "status": false,
+            "message": error
+        }
+    });
+}
+
+const GetMonthMaintenanceLogs = (start, end) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/fetch/month/maintenance/mar/maintenance_logs/${start}/${end}`, {
         method: 'GET',
         headers: {
             Accept: 'application/json',
@@ -65,6 +107,26 @@ const DeleteMaintenanceLogs = (data) => {
     })
     .then((response) => response.json())
     .then((responseJson) => {
+        console.log(responseJson);
+        return responseJson;
+    })
+    .catch((error) => {
+        console.error("Problem in Delete CAV", error);
+    });
+}
+
+
+const FetchLogAttachments = (maintenance_log_id) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/maintenance/maintenance_logs/fetch_log_attachments/${maintenance_log_id}`, {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        console.log(responseJson);
         return responseJson;
     })
     .catch((error) => {
@@ -74,7 +136,10 @@ const DeleteMaintenanceLogs = (data) => {
 
 export {
     GetMaintenanceLogs,
+    GetDayMaintenanceLogs,
+    GetMonthMaintenanceLogs,
     InsertMaintenanceLogs,
     UpdateMaintenanceLogs,
-    DeleteMaintenanceLogs
+    DeleteMaintenanceLogs,
+    FetchLogAttachments
 }
