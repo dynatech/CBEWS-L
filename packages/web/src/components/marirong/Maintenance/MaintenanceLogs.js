@@ -352,7 +352,7 @@ export default function MaintenanceLogs() {
     };
 
     const ref = React.createRef();
-    const options = {
+    const pdf_options = {
         orientation: 'landscape',
         unit: 'in',
         format: [4,2]
@@ -386,7 +386,7 @@ export default function MaintenanceLogs() {
                                     dataType="maintenance_report"
                                 />
                                 <div>
-                                    <ReactToPdf targetRef={ref} filename="div-blue.pdf" options={options} x={.5} y={.5}>
+                                    <ReactToPdf targetRef={ref} filename="div-blue.pdf" options={pdf_options} x={.5} y={.5}>
                                         {({toPdf}) => (
                                             <button onClick={toPdf}>Generate pdf</button>
                                         )}
