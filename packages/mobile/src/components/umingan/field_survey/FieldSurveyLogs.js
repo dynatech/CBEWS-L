@@ -204,7 +204,6 @@ function FieldSurveyLogs () {
                             temp_array.push({'user_id': credentials['user_id']})
                             temp_array.push({'id': selectedData['id']})
 
-
                             const isConnected = await NetworkUtils.isNetworkAvailable();
                             let response = null;
 
