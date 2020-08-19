@@ -351,6 +351,13 @@ export default function MaintenanceLogs() {
         getMaintenanceLogsPerDay(args.date);
     };
 
+    const ref = React.createRef();
+    const options = {
+        orientation: 'landscape',
+        unit: 'in',
+        format: [4,2]
+    };
+
     return (
         <Fragment>
             <Container align="center" justify="center">
@@ -378,6 +385,14 @@ export default function MaintenanceLogs() {
                                     data={tableData}
                                     dataType="maintenance_report"
                                 />
+                                <div>
+                                    <ReactToPdf targetRef={ref} filename="div-blue.pdf" options={options} x={.5} y={.5}>
+                                        {({toPdf}) => (
+                                            <button onClick={toPdf}>Generate pdf</button>
+                                        )}
+                                    </ReactToPdf>
+                                    <div style={{width: 500, height: 500, background: 'blue'}} ref={ref}/>
+                                </div>
                             </Grid>
                             {tableData.length > 0 && (
                                 <Grid item xs={12}>

@@ -1,9 +1,16 @@
+import smtplib
 from flask import Blueprint, jsonify, request
 from datetime import datetime
 from calendar import monthrange
 from werkzeug.datastructures import ImmutableMultiDict
 from flask_cors import CORS, cross_origin
 from connections import SOCKETIO
+
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+
 from src.model.v2.mar.maintenance_logs import Maintenance as maintenance
 from src.api.helpers import Helpers as helpers
 from config import APP_CONFIG
@@ -182,6 +189,48 @@ def fetch_log_attachments(maintenance_log_id):
             "status": False,
             "message": "Log attachment fetch NOT oks!",
             "data": []
+        }
+
+    return jsonify(response)
+
+
+@MAINTENANCE_LOGS_BLUEPRINT.route("/send/email/maintenance_logs", methods=["GET", "POST"])
+def send_maintenance_log_report_via_email():
+    data = request.form
+    try:
+        date = data["date"]
+
+        email = "dynaslopeswat@gmail.com"
+        password = "dynaslopeswat"
+        send_to_email = data["email"]
+        subject = "Field Survey : " + str(date)
+
+        message = "<b>Maintenance report for:</b> " + date + "<br>"
+        file_location = 'test.pdf'
+
+        msg = MIMEMultipart()
+        msg['From'] = email
+        msg['To'] = send_to_email
+        msg['Subject'] = subject
+
+        msg.attach(MIMEText(message, 'html'))
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(email, password)
+        text = msg.as_string()
+        server.sendmail(email, send_to_email, text)
+        server.quit()
+
+        response = {
+            "status": True,
+            "message": "Email sent successfully!"
+        }
+    except Exception as err:
+        print(err)
+        response = {
+            "status": False,
+            "message": "Failed sending email! Backend concerns."
         }
 
     return jsonify(response)
