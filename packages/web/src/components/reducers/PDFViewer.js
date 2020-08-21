@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import { Grid, Paper, Typography, Box } from '@material-ui/core';
+import { Grid, Paper, Typography, Box, Fab } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Table from '@material-ui/core/Table';
@@ -45,60 +45,51 @@ function convertToSimpleTable(data_type, rows) {
     // const classes = useStyles();
 
     return (
-        <TableContainer component={Paper}>
-            <Table
-                // className={classes.table}
-                aria-label="simple table">
-                <TableHead>
-                    {
-                        data_type === "incident_report" ? (
-                            <TableRow>
-                                <TableCell align="center">Date</TableCell>
-                                <TableCell align="center">Report Narrative</TableCell>
-                                <TableCell align="center">Reporter</TableCell>
-                                <TableCell align="center">Last TS</TableCell>
-                            </TableRow>
-                        ) : (
-                                <TableRow>
-                                    <TableCell align="center">Date</TableCell>
-                                    <TableCell align="center">Type</TableCell>
-                                    <TableCell align="center">Remarks</TableCell>
-                                    <TableCell align="center">In-Charge</TableCell>
-                                    <TableCell align="center">Updater</TableCell>
-                                </TableRow>
-                            )
-                    }
-                </TableHead>
-                <TableBody>
-                    {rows.map((row) => {
-                        return data_type === "incident_report" ? (
-                            <TableRow key={`report-${row.id}`}>
-                                <TableCell align="center">{row.incident_date}</TableCell>
-                                <TableCell align="center">{row.incident_report_narrative}</TableCell>
-                                <TableCell align="center">{row.reporter}</TableCell>
-                                <TableCell align="center">{row.last_ts}</TableCell>
-                                {/* <TableCell align="center">{row.attachments}</TableCell> */}
-                            </TableRow>
-                        ) : (
-                            <TableRow key={`report-${row.id}`}>
-                                <TableCell align="center">{row.maintenance_date}</TableCell>
-                                <TableCell align="center">{row.type}</TableCell>
-                                <TableCell align="center">{row.remarks}</TableCell>
-                                <TableCell align="center">{row.in_charge}</TableCell>
-                                <TableCell align="center">{row.updater}</TableCell>
-                            </TableRow>
-                        )
-                    })}
-                </TableBody>
-            </Table>
-        </TableContainer>
-    );
+        <table style={{border: "1px solid black", width: "100%", borderSpacing: "5px"}}>
+            {
+                data_type === "incident_report" ? (
+                    <tr>
+                        <th>Date</th>
+                        <th>Report Narrative</th>
+                        <th>Reporter</th>
+                    </tr>
+                ) : (
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Remarks</th>
+                        <th>In-Charge</th>
+                        <th>Updater</th>
+                    </tr>
+                )
+            }
+            {
+                rows.map((row) => {
+                    return data_type === "incident_report" ? (
+                        <tr id={`report-${row.id}`}>
+                            <td>{row.incident_date}</td>
+                            <td>{row.incident_report_narrative}</td>
+                            <td>{row.reporter}</td>
+                        </tr>
+                    ) : (
+                        <tr id={`log-${row.id}`}>
+                            <td>{row.maintenance_date}</td>
+                            <td>{row.type}</td>
+                            <td>{row.remarks}</td>
+                            <td>{row.in_charge}</td>
+                            <td>{row.updater}</td>
+                        </tr>
+                    )
+                })
+            }
+        </table>
+    )
 }
 
 function PDFPreviewer(props) {
     const img = imageStyle();
     const summary = summaryStyle();
-    const { data, dataType: data_type, noImport } = props;
+    const { data, dataType: data_type, noImport, classes, handleDownload } = props;
 
     const html = data.length > 0 ? convertToSimpleTable(data_type, data) : (<Typography>No data</Typography>);
 
@@ -119,6 +110,39 @@ function PDFPreviewer(props) {
                     </Grid>
                 )}
             </Paper>
+            {data.length > 0 && (
+                <Grid item xs={12}>
+                    <Grid
+                        container
+                        align="center"
+                        style={{ paddingTop: 20 }}
+                    >
+                        <Grid item xs={3} />
+                        <Grid item xs={3}>
+                            <Fab
+                                variant="extended"
+                                color="primary"
+                                aria-label="add"
+                                className={classes.button_fluid}
+                                onClick={handleDownload(html)}
+                            >
+                                Download
+                            </Fab>
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Fab
+                                variant="extended"
+                                color="primary"
+                                aria-label="add"
+                                className={classes.button_fluid}
+                                onClick={() => {}}
+                            >
+                                Print
+                            </Fab>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            )}
         </Box>
     );
 }

@@ -34,6 +34,7 @@ class RiskAssessmentModel():
 	def create_summary(data):
 		query = f"INSERT INTO risk_assessment VALUES (0, '{data['location']}', '{data['impact']}', " \
 				f"'{data['adaptive_capacity']}', '{data['vulnerability']}', '{str(dt.today())}', '{data['user_id']}')"
+		h.var_checker("query", query)
 		ret_val = DB.db_modify(query,'CBEWSL_UMI_collections', True)
 		return ret_val
 

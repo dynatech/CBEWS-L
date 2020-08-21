@@ -113,7 +113,6 @@ export default function IncidentLogs() {
             label: "Incident Report Narrative",
         },
         { name: "reporter", label: "Reporter" },
-        { name: "last_ts", label: "Last TS" },
     ];
 
     const calendarRenderHandler = (args) => {
@@ -328,7 +327,11 @@ export default function IncidentLogs() {
         getIncidentLogsPerDay(args.date);
     };
 
-
+    const handleDownloadReport = (html) => () => {
+        const file_date = moment(defaultTSValues["Maintenance Date"]).format("YYYY-MM-DD");
+        const filename = `${file_date}_maintenance_log`
+        MarMaintenanceLogs.DownloadPDF(filename, html);
+    };
 
     return (
         <Fragment>
@@ -354,6 +357,8 @@ export default function IncidentLogs() {
                                 <PDFPreviewer
                                     data={tableData}
                                     dataType="incident_report"
+                                    classes={classes}
+                                    handleDownload={handleDownloadReport}
                                 />
                             </Grid>
                             {tableData.length > 0 && (

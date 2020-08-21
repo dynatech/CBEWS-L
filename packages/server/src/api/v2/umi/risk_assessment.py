@@ -36,6 +36,7 @@ def get_summary(id):
 def add_summary():
     try:
         data = request.get_json()
+        h.var_checker("data", data)
         request_data = {
             'location': data['Location'],
             'impact': data['Impact'],

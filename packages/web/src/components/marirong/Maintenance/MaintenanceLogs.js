@@ -14,7 +14,6 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-// import '../../../../node_modules/@fullcalendar/core/main.css';
 import "../../../../node_modules/@fullcalendar/daygrid/main.css";
 
 import Dialog from "@material-ui/core/Dialog";
@@ -23,7 +22,6 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContentText from "@material-ui/core/DialogContentText";
 
-import AttachmentsGridList from "../../reducers/AttachmentList";
 import PDFPreviewer from "../../reducers/PDFViewer";
 import AppConfig from "../../reducers/AppConfig";
 
@@ -37,6 +35,9 @@ import FabMuiTable from "../../utils/MuiTable";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import { useCookies } from "react-cookie";
+
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import ReactPDF from '@react-pdf/renderer';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -66,14 +67,6 @@ function getWindowDimensions() {
         height,
     };
 }
-
-const defaultVars = {
-    maintenance_date: moment().format("YYYY-MM-DD hh:mm:ss"),
-    type: "",
-    remarks: "",
-    in_charge: "",
-    updater: "",
-};
 
 export default function MaintenanceLogs() {
     const cmd = "update-delete";
@@ -229,9 +222,7 @@ export default function MaintenanceLogs() {
         }
     };
 
-    ////////////////////////////////////////
-    ///////////// GREAT SUBMIT /////////////
-    ////////////////////////////////////////
+
     const submit = async () => {
         let json = formData.current;
         json.user_id = cookies.credentials.user_id;
@@ -348,14 +339,16 @@ export default function MaintenanceLogs() {
     };
 
     const dateClickHandler = (args) => {
+        setDefaultTSValues({
+            "Maintenance Date": args.date,
+        });
         getMaintenanceLogsPerDay(args.date);
     };
 
-    const ref = React.createRef();
-    const pdf_options = {
-        orientation: 'landscape',
-        unit: 'in',
-        format: [4,2]
+    const handleDownloadReport = (html) => () => {
+        const file_date = moment(defaultTSValues["Maintenance Date"]).format("YYYY-MM-DD");
+        const filename = `${file_date}_maintenance_log`
+        MarMaintenanceLogs.DownloadPDF(filename, html);
     };
 
     return (
@@ -365,9 +358,7 @@ export default function MaintenanceLogs() {
                     <Grid item xs={7}>
                         <FullCalendar
                             datesSet={calendarRenderHandler}
-                            dateClick={(args) =>
-                                getMaintenanceLogsPerDay(args.date)
-                            }
+                            dateClick={dateClickHandler}
                             plugins={[
                                 dayGridPlugin,
                                 timeGridPlugin,
@@ -384,49 +375,10 @@ export default function MaintenanceLogs() {
                                 <PDFPreviewer
                                     data={tableData}
                                     dataType="maintenance_report"
+                                    classes={classes}
+                                    handleDownload={handleDownloadReport}
                                 />
-                                <div>
-                                    <ReactToPdf targetRef={ref} filename="div-blue.pdf" options={pdf_options} x={.5} y={.5}>
-                                        {({toPdf}) => (
-                                            <button onClick={toPdf}>Generate pdf</button>
-                                        )}
-                                    </ReactToPdf>
-                                    <div style={{width: 500, height: 500, background: 'blue'}} ref={ref}/>
-                                </div>
                             </Grid>
-                            {tableData.length > 0 && (
-                                <Grid item xs={12}>
-                                    <Grid
-                                        container
-                                        align="center"
-                                        style={{ paddingTop: 20 }}
-                                    >
-                                        <Grid item xs={3} />
-                                        <Grid item xs={3}>
-                                            <Fab
-                                                variant="extended"
-                                                color="primary"
-                                                aria-label="add"
-                                                className={classes.button_fluid}
-                                                onClick={() => {}}
-                                            >
-                                                Download
-                                            </Fab>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Fab
-                                                variant="extended"
-                                                color="primary"
-                                                aria-label="add"
-                                                className={classes.button_fluid}
-                                                onClick={() => {}}
-                                            >
-                                                Print
-                                            </Fab>
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-                            )}
                         </Grid>
                     </Grid>
                     <Grid item xs={12}>

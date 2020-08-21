@@ -39,7 +39,7 @@ export default function RiskAssessment(props) {
                             <Button>Family Risk Profile</Button>
                         </ButtonGroup>
                     </Grid>
-                    {<RiskAssessmentSummary {...props} classes={classes} />}
+                    <RiskAssessmentSummary {...props} classes={classes} />
                     <Grid item xs={12}>
                         <Paper elevation={3} className={classes.raPaper}>
                             <Typography variant="h6">
@@ -48,9 +48,9 @@ export default function RiskAssessment(props) {
                         </Paper>
                         <br />
                     </Grid>
-                    {<HazardData {...props} classes={classes} />}
-                    {<ResourcesAndCapacities {...props} classes={classes} />}
-                    {<FamilyRiskProfile {...props} classes={classes} />}
+                    <HazardData {...props} classes={classes} />
+                    <ResourcesAndCapacities {...props} classes={classes} />
+                    <FamilyRiskProfile {...props} classes={classes} />
                 </Grid>
             </Container>
         </Fragment>
