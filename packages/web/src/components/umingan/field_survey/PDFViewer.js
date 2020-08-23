@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { renderToString } from 'react-dom/server';
 import { Grid, Paper, Typography, Box, Fab } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-
+import { UmiFieldSurvey } from '@dynaslope/commons';
+ 
 const imageStyle = makeStyles(theme => ({
     img_size: {
         height: '100%',
@@ -28,43 +29,23 @@ function getWindowDimensions() {
     };
 }
 
-function convertToSimpleTable(data_type, rows) {
+function convertToSimpleTable(rows) {
     // const classes = useStyles();
 
     return (
         <table style={{border: "1px solid black", width: "100%", borderSpacing: "5px"}}>
-            {
-                data_type === "incident_report" ? (
-                    <tr>
-                        <th>Date</th>
-                        <th>Report Narrative</th>
-                        <th>Reporter</th>
-                    </tr>
-                ) : (
-                    <tr>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Remarks</th>
-                        <th>In-Charge</th>
-                        <th>Updater</th>
-                    </tr>
-                )
-            }
+            <tr>
+                <th>Date</th>
+                <th>Report Narrative</th>
+                <th>Reporter</th>
+            </tr>
             {
                 rows.map((row) => {
-                    return data_type === "incident_report" ? (
+                    return (
                         <tr id={`report-${row.id}`}>
                             <td>{row.incident_date}</td>
                             <td>{row.incident_report_narrative}</td>
                             <td>{row.reporter}</td>
-                        </tr>
-                    ) : (
-                        <tr id={`log-${row.id}`}>
-                            <td>{row.maintenance_date}</td>
-                            <td>{row.type}</td>
-                            <td>{row.remarks}</td>
-                            <td>{row.in_charge}</td>
-                            <td>{row.updater}</td>
                         </tr>
                     )
                 })
@@ -76,16 +57,25 @@ function convertToSimpleTable(data_type, rows) {
 function PDFPreviewer(props) {
     const img = imageStyle();
     const summary = summaryStyle();
-    const { data, dataType: data_type, noImport, classes, handleDownload } = props;
+    const { data, noImport, classes, handleDownload } = props;
 
-    const html = data.length > 0 ? convertToSimpleTable(data_type, data) : (<Typography>No data</Typography>);
+    const html = data.length > 0 ? convertToSimpleTable(data) : (<Typography>No data</Typography>);
+
+    useEffect(() => {
+        initPDFViewer();
+    }, []);
+
+    const initPDFViewer = async () => {
+        const response = await UmiFieldSurvey.GetLatestReportSummary();
+        console.log("response", response);
+    };
 
     return (
         <Box width="100%">
             <Paper>
                 {!noImport && (
                     <Grid item xs={12}>
-                        <img src={require('../../assets/letter_header.png')} className={img.img_size} alt="footer" />
+                        <img src={require('../../../assets/letter_header.png')} className={img.img_size} alt="footer" />
                     </Grid>
                 )}
                 <Grid item xs={12} className={summary.content}>
@@ -93,7 +83,7 @@ function PDFPreviewer(props) {
                 </Grid>
                 {!noImport && (
                     <Grid item xs={12}>
-                        <img src={require('../../assets/letter_footer.png')} className={img.img_size} alt="footer" />
+                        <img src={require('../../../assets/letter_footer.png')} className={img.img_size} alt="footer" />
                     </Grid>
                 )}
             </Paper>
