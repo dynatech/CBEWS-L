@@ -27,7 +27,7 @@ function IncidentLogs () {
     let formData = useRef();
 
     useEffect(() => {
-        init();
+        // init();
     }, [])
 
     const init = async () => {

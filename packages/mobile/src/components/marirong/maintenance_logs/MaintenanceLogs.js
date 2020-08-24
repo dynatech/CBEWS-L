@@ -8,6 +8,7 @@ import { MarMaintenanceLogs } from '@dynaslope/commons';
 import { Calendar } from 'react-native-calendars';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
+import NetworkUtils from '../../../utils/NetworkUtils';
 
 function MaintenanceLogs () {
 
@@ -29,23 +30,46 @@ function MaintenanceLogs () {
     let formData = useRef();
 
     useEffect(() => {
-        init();
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+              Alert.alert(
+                'CBEWS-L is not connected to the internet',
+                'CBEWS-L Local data will be used.',
+                [
+                  { text: 'Ok', onPress: () => {
+                    MobileCaching.getItem('MarMaintenanceLogs').then(response => {
+                        init(response);
+                    });
+                  }, style: 'cancel' },
+                ]
+              )
+            } else {
+                fetchLatestData();
+            }
+          },100);
     }, [])
 
-    const init = async () => {
+    const fetchLatestData = async () => {
         let response = await MarMaintenanceLogs.GetMaintenanceLogs()
         if (response.status === true) {
-            let temp = {};
-            response.data.forEach(element => {
-                temp[element.maintenance_date] = {
-                    selected: true
-                }
-            });
-            setMaintenanceLogs(response.data);
-            setMarkedDates(temp);
+            init(response.data);
+            MobileCaching.setItem('MarMaintenanceLogs', response.data);
         } else {
             ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
         }
+    }
+
+    const init = async (data) => {
+        let temp = {};
+        data.forEach(element => {
+            temp[element.maintenance_date] = {
+                selected: true
+            }
+        });
+        setDataContainer([]);
+        setMaintenanceLogs(data);
+        setMarkedDates(temp);
     }
 
     const showForm = () => {
@@ -61,23 +85,53 @@ function MaintenanceLogs () {
         if (!Object.keys(selectedData).length) {
             MobileCaching.getItem('user_credentials').then(credentials => {
                 let temp = {};
+                let response = {};
                 setTimeout(async () => {
-                    temp['user_id'] = credentials['user_id'];
-                    temp['maintenance_date'] = selectedDate;
-                    temp['type'] = data['MaintenanceActivity'];
-                    temp['remarks'] = data['Remarks'];
-                    temp['in_charge'] = data['In-charge'];
-                    temp['updater'] = data['Updater'];
+                    setTimeout(async () => {
+                        const isConnected = await NetworkUtils.isNetworkAvailable();
+                        temp['user_id'] = credentials['user_id'];
+                        temp['maintenance_date'] = selectedDate;
+                        temp['type'] = data['MaintenanceActivity'];
+                        temp['remarks'] = data['Remarks'];
+                        temp['in_charge'] = data['In-charge'];
+                        temp['updater'] = data['Updater'];
 
-                    let response = await MarMaintenanceLogs.InsertMaintenanceLogs(temp)
- 
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        init();
-                        closeForm();
-                    } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                    }
+                        if (isConnected != true) {
+                            let cached = await MobileCaching.getItem("MarMaintenanceLogs").then(cached_data => {
+                                temp["alterations"] = "add";
+                                cached_data.push(temp);
+                                
+                                try {
+                                    MobileCaching.setItem("MarMaintenanceLogs", cached_data);
+                                    response = {
+                                        "status": true,
+                                        "message": "Maintenance Logs is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                    }
+                                } catch (err) {
+                                    response = {
+                                        "status": false,
+                                        "message": `Maintenance Logs failed to save data to memory. Err: ${err}`
+                                    }
+                                }
+
+                                if (response.status == true) {
+                                    closeForm();
+                                    setCmd('add');
+                                    init(cached_data);
+                                }
+
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                                return response;
+                            });
+                        } else {
+                            response = await MarMaintenanceLogs.InsertMaintenanceLogs(temp);
+                            if (response.status == true) {
+                                fetchLatestData();
+                                closeForm();
+                            }
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        }
+                    }, 100);
                 }, 300);
             });
         } else {
@@ -85,38 +139,69 @@ function MaintenanceLogs () {
                 ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.LONG, ToastAndroid.CENTER)
                 closeForm();
             } else {
+
                 MobileCaching.getItem('user_credentials').then(credentials => {
                     setTimeout(async () => {
-                        let temp_array = []
-                        if (Object.keys(data).length) {
-                            Object.keys(data).forEach(key => {
-                                let temp = {};
-                                switch(key) {
-                                    case "MaintenanceActivity":
-                                        temp['type'] = data['MaintenanceActivity'];
-                                        break;
-                                    default:
-                                        temp[key.replace(" ","_").toLocaleLowerCase()] = data[key];
-                                        break;
-                                }
-                                temp_array.push(temp);
-                            });
-                            temp_array.push({'user_id': credentials['user_id']})
-                            temp_array.push({'id': selectedData['id']})
-                            let response = await MarMaintenanceLogs.UpdateMaintenanceLogs(temp_array)
-                            if (response.status == true) {
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                                init();
-                                closeForm();
-                                setDataContainer([]);
-                                setCmd('add');
-                            } else {
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        const isConnected = await NetworkUtils.isNetworkAvailable();
+                        let temp_array = [];
+                        let response = {};
+
+                        Object.keys(data).forEach(key => {
+                            let temp = {};
+                            switch(key) {
+                                case "MaintenanceActivity":
+                                    temp['type'] = data['MaintenanceActivity'];
+                                    break;
+                                case "In-charge":
+                                    temp['in_charge'] = data['In-charge'];
+                                default:
+                                    temp[key.replace(" ","_").toLocaleLowerCase()] = data[key];
+                                    break;
                             }
+                            if (key != 'attachment') {
+                                temp_array.push(temp);
+                            }
+                        });
+                        
+                        temp_array.push({'user_id': credentials['user_id']})
+                        temp_array.push({'id': selectedData['id']})
+
+                        if (isConnected != true) {
+                            response = await MobileCaching.getItem("MarMaintenanceLogs").then(cached_data => {
+                                let temp_response = {};
+                                let state_contaner = selectedData;
+                                temp_array.forEach(element => {
+                                    let key = Object.keys(element)[0];
+                                    state_contaner[key] = element[key];
+                                });
+                                state_contaner['alterations'] = "update";
+                                let index = cached_data.findIndex(x => x.id == selectedData['id']);
+                                cached_data[index] = state_contaner;
+                                try {
+                                    MobileCaching.setItem("MarMaintenanceLogs", cached_data);
+                                    temp_response = {
+                                        "status": true,
+                                        "message": "Maintenance Logs is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                    }
+                                } catch (err) {
+                                    temp_response = {
+                                        "status": false,
+                                        "message": "Maintenance Logs failed to save data to memory."
+                                    }
+                                }
+                                init(cached_data);
+                                return temp_response;
+                            });
                         } else {
-                            ToastAndroid.showWithGravity("No changes has been made. Please double check each field or Press back button to cancel.", ToastAndroid.LONG, ToastAndroid.CENTER)
+                            response = await MarMaintenanceLogs.UpdateMaintenanceLogs(temp_array);
+                            if (response.status == true) {
+                                fetchLatestData();
+                            }
                         }
-                    }, 300);
+                        closeForm();
+                        setCmd('add');
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                    }, 100)
                 });
             }
         }
@@ -203,7 +288,6 @@ function MaintenanceLogs () {
                 </View>
             )
         } else {
-            console.log("go heres")
             setDataContainer(
                 <View style={{flex: 1, alignItems: 'center', padding: 10}}>
                     <Text style={[LabelStyle.large_label, LabelStyle.brand, {padding: 20}]}>No data available.</Text>

@@ -72,7 +72,7 @@ function SituationReportLogs () {
                 setTimeout(async () => {
                     let response = null;
                     if ('attachment' in data) {
-                        const url = 'http://192.168.0.15:5000/v2/upload/situation_report/umi/situation_report_logs'
+                        const url = 'http://192.168.150.221:5000/v2/upload/situation_report/umi/situation_report_logs'
                         const file = [{
                           name: 'file',
                           filename: data.attachment['filename'],
