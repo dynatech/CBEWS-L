@@ -123,7 +123,7 @@ def create_app():
 	from src.api.v2.umi.situation_report import SITUATION_REPORT_BLUEPRINT
 	app.register_blueprint(SITUATION_REPORT_BLUEPRINT, url_prefix="/v2")
 
-    from src.api.v2.file_management.file_management import FILE_MANAGEMENT_BLUEPRINT
-    app.register_blueprint(FILE_MANAGEMENT_BLUEPRINT, url_prefix="/v2")
+	from src.api.v2.file_management.file_management import FILE_MANAGEMENT_BLUEPRINT
+	app.register_blueprint(FILE_MANAGEMENT_BLUEPRINT, url_prefix="/v2")
 
-    return app
+	return app

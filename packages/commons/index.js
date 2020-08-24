@@ -15,7 +15,7 @@ import { InsertEventsTemplate, UpdateEventsTemplate, GetAllEventsTemplate, Delet
 import { GetCurrentSituationReport, DownloadSituationReport, EmailSituationReport } from './src/UMI/SituationReport/CurrentSituationReport';
 import { GetSituationReport, InsertSituationReport, UpdateSituationReport, DeleteSituationReport, UploadSituationReport} from './src/UMI/SituationReport/SituationReport';
 import { GetOngoingAndExtendedMonitoring } from './src/AlertGeneration/PublicAlerts';
-import { DownloadPDF, SendPDFReportViaEmail } from './src/MAR/FileManager/PDFManager';
+import { RenderPDF, DownloadPDF, SendPDFReportViaEmail } from './src/MAR/FileManager/PDFManager';
 
 const UserManagement = {
     AuthRegistration,
@@ -56,6 +56,7 @@ const MarMaintenanceLogs = {
     UpdateMaintenanceLogs,
     DeleteMaintenanceLogs,
     FetchLogAttachments,
+    RenderPDF,
     DownloadPDF,
     SendPDFReportViaEmail,
 }

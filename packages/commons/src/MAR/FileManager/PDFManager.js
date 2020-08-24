@@ -1,15 +1,16 @@
 import AppConfig from '../../utils/AppConfig';
 import moment from 'moment';
 
-const DownloadPDF = (html_string) => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/write/report/pdf`, {
+const RenderPDF = (filename, html_string) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/write_pdf`, {
         method: 'POST',
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            html: html_string
+            html: html_string,
+            filename
         })
     })
     .then((response) => response.json())
@@ -24,9 +25,9 @@ const DownloadPDF = (html_string) => {
     });
 }
 
-// const DownloadPDF = (html_string) => {
-//     window.location.href = `${AppConfig.HOSTNAME}/v2/write/report/pdf2/${html_string}`;
-// }
+const DownloadPDF = (html_string) => {
+    window.location.href = `${AppConfig.HOSTNAME}/v2/download/mar/maintenance_log/${html_string}`;
+}
 
 
 const SendPDFReportViaEmail = (data) => {
@@ -51,4 +52,4 @@ const SendPDFReportViaEmail = (data) => {
     });
 }
 
-export { DownloadPDF, SendPDFReportViaEmail }
+export { RenderPDF, DownloadPDF, SendPDFReportViaEmail }

@@ -46,7 +46,7 @@ export default function FieldSurveyLogs(props) {
         'Materials Characterization': '',
     });
     const [defaultTSValues, setDefaultTSValues] = useState({
-        'Report Date': '',
+        'Report Date': moment(),
     });
     const [defaultIntValues, setDefaultIntValues] = useState({});
 
@@ -95,7 +95,7 @@ export default function FieldSurveyLogs(props) {
             'Materials Characterization': '',
         });
         setDefaultTSValues({
-            'Report Date': '',
+            'Report Date': moment(),
         })
         setCommand("add");
     };
@@ -154,19 +154,47 @@ export default function FieldSurveyLogs(props) {
                 defaultTSValues,
                 json,
             );
+            json.exposure = json["Exposure"]
+            json.materials_characterization = json["MaterialsCharacterization"]
+            json.mechanism = json["Mechanism"]
+            json.report_narrative = json["ReportNarrative"]
+            json.report_date = moment(json["Report Date"]).format("YYYY-MM-DD HH:mm:ss");
+            json.reporter = json["Reporter"]
+            json.feature = json["Feature"]
+            json.attachment_path = "n/a"
             response = await UmiFieldSurvey.InsertFieldSurveyLogs(json);
         } else {
             // EDIT
             hasModifiedRow = true;
             json.id = selectedData.id;
             json.user_id = cookies.credentials.user_id;
+            json.last_ts = moment().format("YYYY-MM-DD HH:mm:ss");
+            json.attachment_path = "n/a";
             let temp_array = [];
             console.log("json", json);
             Object.keys(json).forEach((key) => {
                 let temp = {};
                 switch (key) {
-                    case "AdaptiveCapacity":
-                        temp["adaptive_capacity"] = json[key]
+                    case "Exposure":
+                        temp["exposure"] = json[key]
+                        break;
+                    case "MaterialsCharacterization":
+                        temp["materials_characterization"] = json[key]
+                        break;
+                    case "Mechanism":
+                        temp["mechanism"] = json[key]
+                        break;
+                    case "ReportNarrative":
+                        temp["report_narrative"] = json[key]
+                        break;
+                    case "Report Date":
+                        temp["report_date"] = moment(json[key]).format("YYYY-MM-DD HH:mm:ss");
+                        break;
+                    case "Reporter":
+                        temp["reporter"] = json[key]
+                        break;
+                    case "Feature":
+                        temp["feature"] = json[key]
                         break;
                     default:
                         temp[key.replace(" ", "_").toLocaleLowerCase()] = json[key];
@@ -198,7 +226,7 @@ export default function FieldSurveyLogs(props) {
         const input = {
             id: selectedData.id,
         };
-        const response = await UmiRiskManagement.UpdateSummary(input);
+        const response = await UmiFieldSurvey.DeleteFieldSurveyLogs(input);
         if (response.status === true) {
             initTable();
             setOpen(false);

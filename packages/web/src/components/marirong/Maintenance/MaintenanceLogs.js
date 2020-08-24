@@ -345,10 +345,15 @@ export default function MaintenanceLogs() {
         getMaintenanceLogsPerDay(args.date);
     };
 
-    const handleDownloadReport = (html) => () => {
+    const handleDownloadReport = (html) => async () => {
         const file_date = moment(defaultTSValues["Maintenance Date"]).format("YYYY-MM-DD");
         const filename = `${file_date}_maintenance_log`
-        MarMaintenanceLogs.DownloadPDF(filename, html);
+        console.log("html", html);
+        console.log("filename", filename);
+        const response = await MarMaintenanceLogs.RenderPDF(filename, html);
+        if (response.status === true) {
+            MarMaintenanceLogs.DownloadPDF(filename);
+        }
     };
 
     return (

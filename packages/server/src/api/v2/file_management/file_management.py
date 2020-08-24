@@ -32,10 +32,11 @@ FILE_MANAGEMENT_BLUEPRINT = Blueprint("file_management_blueprint", __name__)
 
 #     return jsonify(response)
     
-@FILE_MANAGEMENT_BLUEPRINT.route("/download/community_risk_assessment/mar/community_risk_assessment/<string:filename>")
+@FILE_MANAGEMENT_BLUEPRINT.route("/download/mar/maintenance_log/<string:filename>")
 def download_mar_community_risk_assessment(filename):
     try:
-        return send_from_directory(APP_CONFIG["CRA_PATH"], filename=filename, as_attachment=True )
+        directory = Path(f"{APP_CONFIG['MARIRONG_DIR']}/MAINTENANCE/MAINTENANCE_LOG/")
+        return send_from_directory(directory, filename=filename, as_attachment=True )
     except FileNotFoundError:
         abort(404)
 

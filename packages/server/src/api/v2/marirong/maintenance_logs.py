@@ -268,13 +268,16 @@ def write_pdf():
         </tbody>
         </table>
         """
-        html = request.get_json()["html"]
+        json = request.get_json()
+        html = json["html"]
+        filename = json["filename"]
 
         pdf = MyFPDF()
         #First page
         pdf.add_page()
         pdf.write_html(html)
-        path = Path('C:/Users/John Louie/codes/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG/temp/html.pdf')
+        directory = f"{APP_CONFIG['MARIRONG_DIR']}/MAINTENANCE/MAINTENANCE_LOG/"
+        path = Path(f"{directory}{filename}")
         pdf.output(path, 'F')
 
         helpers.var_checker("pdf", pdf)

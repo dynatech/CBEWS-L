@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 import { Grid, Paper, Typography, Box, Fab } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -29,27 +29,41 @@ function getWindowDimensions() {
     };
 }
 
-function convertToSimpleTable(rows) {
+function convertToSimpleTable(data) {
     // const classes = useStyles();
 
     return (
-        <table style={{border: "1px solid black", width: "100%", borderSpacing: "5px"}}>
+        <table style={{width: "30%", borderSpacing: "5px", marginLeft: "10%"}}>
             <tr>
-                <th>Date</th>
-                <th>Report Narrative</th>
-                <th>Reporter</th>
+                <td><strong>Date:</strong></td>
+                <td>{data.report_date}</td>
+                <td>&nbsp;</td>
             </tr>
-            {
-                rows.map((row) => {
-                    return (
-                        <tr id={`report-${row.id}`}>
-                            <td>{row.incident_date}</td>
-                            <td>{row.incident_report_narrative}</td>
-                            <td>{row.reporter}</td>
-                        </tr>
-                    )
-                })
-            }
+            <tr>
+                <td><strong>Features:</strong></td>
+                <td>{data.feature}</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td><strong>Materials Characterization:</strong></td>
+                <td>{data.materials_characterization}</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td><strong>Mechanism:</strong></td>
+                <td>{data.mechanism}</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td><strong>Exposure:</strong></td>
+                <td>{data.exposure}</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td><strong>Report Narrative:</strong></td>
+                <td>{data.report_narrative}</td>
+                <td>&nbsp;</td>
+            </tr>
         </table>
     )
 }
@@ -57,9 +71,10 @@ function convertToSimpleTable(rows) {
 function PDFPreviewer(props) {
     const img = imageStyle();
     const summary = summaryStyle();
-    const { data, noImport, classes, handleDownload } = props;
+    const { noImport, classes, handleDownload } = props;
+    const [data, setData] = useState([]);
 
-    const html = data.length > 0 ? convertToSimpleTable(data) : (<Typography>No data</Typography>);
+    const html = data.length > 0 ? convertToSimpleTable(data[0]) : (<Typography>No data</Typography>);
 
     useEffect(() => {
         initPDFViewer();
@@ -68,6 +83,10 @@ function PDFPreviewer(props) {
     const initPDFViewer = async () => {
         const response = await UmiFieldSurvey.GetLatestReportSummary();
         console.log("response", response);
+        if (response.status === true) {
+            setData(response.data);
+        }
+
     };
 
     return (
@@ -87,7 +106,7 @@ function PDFPreviewer(props) {
                     </Grid>
                 )}
             </Paper>
-            {data.length > 0 && (
+            {/* {data.length > 0 && (
                 <Grid item xs={12}>
                     <Grid
                         container
@@ -119,7 +138,7 @@ function PDFPreviewer(props) {
                         </Grid>
                     </Grid>
                 </Grid>
-            )}
+            )} */}
         </Box>
     );
 }
