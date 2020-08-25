@@ -32,7 +32,7 @@ class Maintenance():
 					query += f" {key} = '{x[key]}'"
 				else:
 					query += f", {key} = '{x[key]}'"
-			counter += 1
+				counter += 1
 		
 		for x in data:
 			key = list(x)[0]
@@ -67,15 +67,18 @@ class Maintenance():
 		counter = 0
 		for x in data:
 			key = list(x)[0]
-			if 'id' == key:
-				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = '{x[key]}'"
-			else:
+			if 'id' != key:
 				if counter == 0:
 					query += f" {key} = '{x[key]}'"
 				else:
 					query += f", {key} = '{x[key]}'"
-			counter += 1
-		ret_val = DB.db_modify(query,'cbewsl_mar_collections', True)
+				counter += 1
+		
+		for x in data:
+			key = list(x)[0]
+			if 'id' == key:
+				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = '{x[key]}'"
+		ret_val = DB.db_modify(query, 'cbewsl_mar_collections', True)
 		return ret_val
 
 	def delete_incident_report(id):

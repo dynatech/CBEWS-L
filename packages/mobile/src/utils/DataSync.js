@@ -12,7 +12,8 @@ const SyncKeys = {
 	'Marirong': [
 		'MarCapacityAndVulnerability',
 		'MarEventsTemplate',
-		'MarMaintenanceLogs'
+		'MarMaintenanceLogs',
+		'MarIncidentLogs'
 	],
 	'Umingan': [
 		'UmiRiskAssessmentSummary',
