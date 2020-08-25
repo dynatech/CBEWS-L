@@ -11,7 +11,9 @@ const SiteCodes = {
 const SyncKeys = {
 	'Marirong': [
 		'MarCapacityAndVulnerability',
-		'MarEventsTemplate'
+		'MarEventsTemplate',
+		'MarMaintenanceLogs',
+		'MarIncidentLogs'
 	],
 	'Umingan': [
 		'UmiRiskAssessmentSummary',
