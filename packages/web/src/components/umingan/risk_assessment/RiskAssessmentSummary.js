@@ -171,7 +171,7 @@ export default function RiskAssessmentSummary(props) {
         const input = {
             id: selectedData.id,
         };
-        const response = await UmiRiskManagement.UpdateSummary(input);
+        const response = await UmiRiskManagement.DeleteSummary(input);
         if (response.status === true) {
             initTable();
             setOpen(false);

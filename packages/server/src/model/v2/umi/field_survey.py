@@ -37,9 +37,9 @@ class FieldSurveyModel():
 		for x in data:
 			key = list(x)[0]
 			if 'id' == key:
-				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = '{x[key]}'"
+				query = f"{query}, last_ts = '{h.dt_to_str(dt.today())}' WHERE id = {int(x[key])}"
 		print(query)
-		ret_val = DB.db_modify(query, 'CBEWSL_UMI_collections', True)
+		ret_val = DB.db_modify(query, 'cbewsl_umi_collections', True)
 		return ret_val
 
 	def remove_field_survey_logs(id):

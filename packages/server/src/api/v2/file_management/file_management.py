@@ -8,34 +8,33 @@ from src.api.helpers import Helpers as h
 from config import APP_CONFIG
 
 FILE_MANAGEMENT_BLUEPRINT = Blueprint("file_management_blueprint", __name__)
-
-# @FILE_MANAGEMENT_BLUEPRINT.route("/download/file/", methods=["POST"])
-# def download_file():
-#     try:
-#         json = request.get_json()
-#         print(json)
-#         response = send_from_directory(json["path"], filename=json["filename"], as_attachment=True)
-#         print(response)
-
-#         response = {
-#             "status": True,
-#             "message": "File download okay",
-#             "data": response
-#         }
-#     except FileNotFoundError:
-#         response = {
-#             "status": False,
-#             "message": "File missing",
-#             "data": None
-#         }
-#         abort(404)
-
-#     return jsonify(response)
     
-@FILE_MANAGEMENT_BLUEPRINT.route("/download/mar/maintenance_log/<string:filename>")
+@FILE_MANAGEMENT_BLUEPRINT.route("/download/mar/maintenance_log/<path:filename>", methods=["GET"])
+def download_mar_maintenance_log(filename):
+    try:
+        directory = Path(f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOG/")
+        response = send_from_directory(directory, filename=filename, as_attachment=True)
+        response.cache_control.max_age = 5
+        return response
+    except FileNotFoundError:
+        abort(404)
+
+
+@FILE_MANAGEMENT_BLUEPRINT.route("/download/mar/incident_log/<string:filename>")
+def download_mar_incident_log(filename):
+    try:
+        directory = Path(f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/INCIDENT_LOG/")
+        response = send_from_directory(directory, filename=filename, as_attachment=True)
+        response.cache_control.max_age = 5
+        return response
+    except FileNotFoundError:
+        abort(404)
+
+
+@FILE_MANAGEMENT_BLUEPRINT.route("/download/community_risk_assessment/mar/community_risk_assessment/<string:filename>")
 def download_mar_community_risk_assessment(filename):
     try:
-        directory = Path(f"{APP_CONFIG['MARIRONG_DIR']}/MAINTENANCE/MAINTENANCE_LOG/")
+        directory = Path(f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/")
         return send_from_directory(directory, filename=filename, as_attachment=True )
     except FileNotFoundError:
         abort(404)
@@ -63,23 +62,45 @@ def delete_mar_community_risk_assessment():
 
     return jsonify(return_data)
 
-@FILE_MANAGEMENT_BLUEPRINT.route("/display/mar/hazard_map")
-def display_mar_hazmap():
-    # directory = APP_CONFIG["MAPS_PATH"]
-    # full_path = Path(directory) / filename
-    # return redirect(url_for('static', filename=full_path), code=301)
 
+### UTIL ###
+def send_email(recipients_list, subject, message, file_location):
+    data = request.form
     try:
-        file_loc = APP_CONFIG['MARIRONG_DIR']
+        date = data["date"]
 
-        basepath = f'{file_loc}/MAPS'
-        map_list = glob.glob(basepath+"/*")
-        latest_file = max(map_list, key=os.path.getctime)
-        latest_file = latest_file.split("\\", 1)
-        print()
-        print(latest_file)
-        print()
+        email = "dynaslopeswat@gmail.com"
+        password = "dynaslopeswat"
+        send_to_email = recipients_list
+        # send_to_email = data["email"]
+        # subject = "Field Survey : " + str(date)
+
+        # message = "<b>Maintenance report for:</b> " + date + "<br>"
+        # file_location = 'test.pdf'
+
+        msg = MIMEMultipart()
+        msg['From'] = email
+        msg['To'] = send_to_email
+        msg['Subject'] = subject
+
+        msg.attach(MIMEText(message, 'html'))
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(email, password)
+        text = msg.as_string()
+        server.sendmail(email, send_to_email, text)
+        server.quit()
+
+        response = {
+            "status": True,
+            "message": "Email sent successfully!"
+        }
     except Exception as err:
         print(err)
-        raise
-    return send_from_directory(APP_CONFIG["CRA_PATH"], filename=latest_file[1], as_attachment=True )
+        response = {
+            "status": False,
+            "message": "Failed sending email! Backend concerns."
+        }
+
+    return jsonify(response)

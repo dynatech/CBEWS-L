@@ -36,8 +36,7 @@ import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import { useCookies } from "react-cookie";
 
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
-import ReactPDF from '@react-pdf/renderer';
+import { renderToString } from "react-dom/server";
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -347,12 +346,21 @@ export default function MaintenanceLogs() {
 
     const handleDownloadReport = (html) => async () => {
         const file_date = moment(defaultTSValues["Maintenance Date"]).format("YYYY-MM-DD");
-        const filename = `${file_date}_maintenance_log`
-        console.log("html", html);
-        console.log("filename", filename);
-        const response = await MarMaintenanceLogs.RenderPDF(filename, html);
+        const filename = `${file_date}_maintenance_log.pdf`;
+        const response = await MarMaintenanceLogs.RenderPDF(filename, renderToString(html));
         if (response.status === true) {
             MarMaintenanceLogs.DownloadPDF(filename);
+        }
+    };
+
+    const handleEmailReport = (html, email_data) => async () => {
+        console.log("handleEmail", html, email_data);
+        const response = await MarMaintenanceLogs.SendPDFReportViaEmail({
+            "email_data": email_data,
+            "html": renderToString(html)
+        });
+        if (response.status === true) {
+            console.log("test")
         }
     };
 
@@ -382,6 +390,7 @@ export default function MaintenanceLogs() {
                                     dataType="maintenance_report"
                                     classes={classes}
                                     handleDownload={handleDownloadReport}
+                                    handleEmail={handleEmailReport}
                                 />
                             </Grid>
                         </Grid>

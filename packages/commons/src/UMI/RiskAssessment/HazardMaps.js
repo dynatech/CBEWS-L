@@ -1,7 +1,7 @@
 import AppConfig from '../../utils/AppConfig';
 
 const GetHazardMaps = () => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/get/community_risk_assessment/umi/hazard_map`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/get/risk_assessment/umi/hazard_map`, {
         method: "GET",
         headers: {
             Accept: "application/json",
@@ -16,7 +16,7 @@ const GetHazardMaps = () => {
 };
 
 const UploadHazardMaps = (data) => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/upload/community_risk_assessment/umi/hazard_map`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/upload/risk_assessment/umi/hazard_map`, {
         method: "POST",
         body: data,
     })

@@ -15,9 +15,6 @@ const GetHazardMaps = () => {
     .catch((error) => console.error("Problem in commons GetHazMap", error));
 };
 
-const GetImageFromDirectory = (filename) => {
-    return `${AppConfig.HOSTNAME}/v2/display/mar/hazard_map`;
-};
 
 const UploadHazardMaps = (data) => {
     return fetch(`${AppConfig.HOSTNAME}/v2/upload/community_risk_assessment/mar/hazard_map`, {
@@ -33,6 +30,5 @@ const UploadHazardMaps = (data) => {
 
 export {
     GetHazardMaps,
-    GetImageFromDirectory,
     UploadHazardMaps,
 }

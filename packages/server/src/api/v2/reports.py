@@ -14,8 +14,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 
-from fpdf import FPDF, HTMLMixin
-
 from config import APP_CONFIG
 from src.api.helpers import Helpers as helpers
 
@@ -78,30 +76,3 @@ def field_survey_data_via_email():
         "message": message
     }
     return jsonify(feedback)
-
-# HELPER
-class MyFPDF(FPDF, HTMLMixin):
-    pass
-
-def download_pdf_report(site_code, html):
-    """
-    """
-    try:
-        if site_code == "mar":
-            path = APP_CONFIG["CRA_PATH"]
-        else:
-            path = APP_CONFIG["RA_PATH"]
-
-        pdf = MyFPDF()
-        pdf.add_page()
-        pdf.write_html(html)
-        filename = "html.pdf"
-        path = Path(f"{path}temp/{filename}")
-        pdf.output(path, 'F')
-
-        helpers.var_checker("pdf", pdf)
-        path = f"{APP_CONFIG["CRA_PATH"]}temp/"
-        return send_from_directory(path, filename=filename, as_attachment=True )
-
-    except FileNotFoundError:
-        abort(404)

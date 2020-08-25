@@ -34,7 +34,7 @@ class SituationReportModel():
 				else:
 					query += f", {key} = '{x[key]}'"
 			counter += 1
-		ret_val = DB.db_modify(query,'CBEWSL_UMI_collections', True)
+		ret_val = DB.db_modify(query,'cbewsl_umi_collections', True)
 		return ret_val
 
 	def remove_situation_report_log(id):

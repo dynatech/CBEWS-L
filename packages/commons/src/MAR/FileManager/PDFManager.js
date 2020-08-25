@@ -25,31 +25,8 @@ const RenderPDF = (filename, html_string) => {
     });
 }
 
-const DownloadPDF = (html_string) => {
-    window.location.href = `${AppConfig.HOSTNAME}/v2/download/mar/maintenance_log/${html_string}`;
+const DownloadPDF = (filename) => {
+    console.log(`${AppConfig.HOSTNAME}/v2/download/mar/maintenance_log/${filename}`);
+    window.location.href = `${AppConfig.HOSTNAME}/v2/download/mar/maintenance_log/${filename}`;
 }
-
-
-const SendPDFReportViaEmail = (data) => {
-    // Data -> html, recipient, subject
-    return fetch(`${AppConfig.HOSTNAME}/v2/send/report/pdf`, {
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    })
-    .then((response) => response.json())
-    .then((responseJson) => {
-        return responseJson;
-    })
-    .catch((error) => {
-        return {
-            "status": false,
-            "message": error
-        }
-    });
-}
-
-export { RenderPDF, DownloadPDF, SendPDFReportViaEmail }
+export { RenderPDF, DownloadPDF, }

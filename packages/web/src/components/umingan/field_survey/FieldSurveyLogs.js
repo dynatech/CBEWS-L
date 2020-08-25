@@ -144,7 +144,6 @@ export default function FieldSurveyLogs(props) {
         let json = formData.current;
         console.log("json", json);
         json.user_id = cookies.credentials.user_id;
-        json.last_ts = moment().format("YYYY-MM-DD HH:mm:ss");
         let hasModifiedRow = false;
         let response;
         if (!Object.keys(selectedData).length) {
@@ -168,7 +167,6 @@ export default function FieldSurveyLogs(props) {
             hasModifiedRow = true;
             json.id = selectedData.id;
             json.user_id = cookies.credentials.user_id;
-            json.last_ts = moment().format("YYYY-MM-DD HH:mm:ss");
             json.attachment_path = "n/a";
             let temp_array = [];
             console.log("json", json);
@@ -187,7 +185,7 @@ export default function FieldSurveyLogs(props) {
                     case "ReportNarrative":
                         temp["report_narrative"] = json[key]
                         break;
-                    case "Report Date":
+                    case "ReportDate":
                         temp["report_date"] = moment(json[key]).format("YYYY-MM-DD HH:mm:ss");
                         break;
                     case "Reporter":

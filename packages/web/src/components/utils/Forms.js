@@ -45,6 +45,7 @@ function ReusableInput(props) {
                     onChange={handleChange(`${key}`)}
                     onBlur={handleBlur(`${key}`)}
                     defaultValue={value}
+                    required
                 />
             </Grid>
         );

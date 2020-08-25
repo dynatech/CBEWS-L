@@ -30,7 +30,6 @@ function getWindowDimensions() {
 }
 
 function convertToSimpleTable(data) {
-    // const classes = useStyles();
 
     return (
         <table style={{width: "30%", borderSpacing: "5px", marginLeft: "10%"}}>
@@ -86,7 +85,6 @@ function PDFPreviewer(props) {
         if (response.status === true) {
             setData(response.data);
         }
-
     };
 
     return (
@@ -106,39 +104,6 @@ function PDFPreviewer(props) {
                     </Grid>
                 )}
             </Paper>
-            {/* {data.length > 0 && (
-                <Grid item xs={12}>
-                    <Grid
-                        container
-                        align="center"
-                        style={{ paddingTop: 20 }}
-                    >
-                        <Grid item xs={3} />
-                        <Grid item xs={3}>
-                            <Fab
-                                variant="extended"
-                                color="primary"
-                                aria-label="add"
-                                className={classes.button_fluid}
-                                onClick={handleDownload(html)}
-                            >
-                                Download
-                            </Fab>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <Fab
-                                variant="extended"
-                                color="primary"
-                                aria-label="add"
-                                className={classes.button_fluid}
-                                onClick={() => {}}
-                            >
-                                Print
-                            </Fab>
-                        </Grid>
-                    </Grid>
-                </Grid>
-            )} */}
         </Box>
     );
 }

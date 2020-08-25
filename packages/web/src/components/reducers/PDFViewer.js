@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { renderToString } from 'react-dom/server';
 import { Grid, Paper, Typography, Box, Fab } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import EmailModal from './EmailModal';
 
 const imageStyle = makeStyles(theme => ({
     img_size: {
@@ -32,39 +33,39 @@ function convertToSimpleTable(data_type, rows) {
     // const classes = useStyles();
 
     return (
-        <table style={{border: "1px solid black", width: "100%", borderSpacing: "5px"}}>
+        <table border={1}>
             {
                 data_type === "incident_report" ? (
                     <tr>
-                        <th>Date</th>
-                        <th>Report Narrative</th>
-                        <th>Reporter</th>
+                        <th width={300}>Date</th>
+                        <th width={200}>Report Narrative</th>
+                        <th width={200}>Reporter</th>
                     </tr>
                 ) : (
                     <tr>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Remarks</th>
-                        <th>In-Charge</th>
-                        <th>Updater</th>
+                        <th width={200}>Date</th>
+                        <th width={200}>Type</th>
+                        <th width={200}>Remarks</th>
+                        <th width={200}>In-Charge</th>
+                        <th width={200}>Updater</th>
                     </tr>
                 )
             }
             {
                 rows.map((row) => {
                     return data_type === "incident_report" ? (
-                        <tr id={`report-${row.id}`}>
-                            <td>{row.incident_date}</td>
-                            <td>{row.incident_report_narrative}</td>
-                            <td>{row.reporter}</td>
+                        <tr>
+                            <td width={300}>{row.incident_date}</td>
+                            <td width={200}>{row.incident_report_narrative}</td>
+                            <td width={200}>{row.reporter}</td>
                         </tr>
                     ) : (
-                        <tr id={`log-${row.id}`}>
-                            <td>{row.maintenance_date}</td>
-                            <td>{row.type}</td>
-                            <td>{row.remarks}</td>
-                            <td>{row.in_charge}</td>
-                            <td>{row.updater}</td>
+                        <tr>
+                            <td width={200}>{row.maintenance_date}</td>
+                            <td width={200}>{row.type}</td>
+                            <td width={200}>{row.remarks}</td>
+                            <td width={200}>{row.in_charge}</td>
+                            <td width={200}>{row.updater}</td>
                         </tr>
                     )
                 })
@@ -76,9 +77,30 @@ function convertToSimpleTable(data_type, rows) {
 function PDFPreviewer(props) {
     const img = imageStyle();
     const summary = summaryStyle();
-    const { data, dataType: data_type, noImport, classes, handleDownload } = props;
+    const { data, dataType: data_type, noImport, classes, handleDownload, handleEmail } = props;
+    const [email_data, setEmailData] = useState({
+        "recipient_list": [],
+        "subject": "",
+        "email_body": ""
+    });
+    const [emailOpen, setEmailOpen] = useState(false);
+    const [html, setHtml] = useState("");
 
-    const html = data.length > 0 ? convertToSimpleTable(data_type, data) : (<Typography>No data</Typography>);
+    // useEffect(() => {
+    //     console.log("data", data);
+    //     const html_string = data.length > 0 ? convertToSimpleTable(data_type, data) : (<Typography>No data</Typography>);
+    //     console.log("html", html_string);
+    //     setHtml(html_string);
+    // }, []);
+    const html_string = data.length > 0 ? convertToSimpleTable(data_type, data) : (<Typography>No data</Typography>);
+
+    const handleEmailChange = (key) => (event) => {
+        const value = event.target.value;
+        setEmailData({
+            ...email_data,
+            [key]: value 
+        });
+    };
 
     return (
         <Box width="100%">
@@ -89,7 +111,7 @@ function PDFPreviewer(props) {
                     </Grid>
                 )}
                 <Grid item xs={12} className={summary.content}>
-                    {html}
+                    {html_string}
                 </Grid>
                 {!noImport && (
                     <Grid item xs={12}>
@@ -122,12 +144,21 @@ function PDFPreviewer(props) {
                                 color="primary"
                                 aria-label="add"
                                 className={classes.button_fluid}
-                                onClick={() => {}}
+                                onClick={() => setEmailOpen(true)}
                             >
-                                Print
+                                Email
                             </Fab>
                         </Grid>
+                        <Grid item xs={3} />
                     </Grid>
+                    <EmailModal
+                        open={emailOpen}
+                        setOpen={setEmailOpen}
+                        data={email_data}
+                        html={html_string}
+                        handleSubmit={handleEmail}
+                        handleChange={handleEmailChange}
+                    />
                 </Grid>
             )}
         </Box>

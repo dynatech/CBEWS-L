@@ -59,11 +59,9 @@ export default function HazardMaps() {
     const initHazardMaps = async () => {
         const response = await MarCommunityRiskAssessment.GetHazardMaps();
         if (response.status) {
-            console.log(response);
             if (response.data.length > 0) {
                 console.log();
-                setMapPreview(`http://192.168.1.2:8080/MARIRONG/MAPS/${response.data[0].filename}`);
-                // handleMapPreview(response.data[0]);
+                setMapPreview(`http://192.168.150.244:8080/MARIRONG/MAPS/${response.data[0].filename}`);
             }
         }
     };
@@ -112,7 +110,6 @@ export default function HazardMaps() {
             setNotifText("Error uploading new hazard map");
         }
     };
-    console.log(MarCommunityRiskAssessment.GetImageFromDirectory());
 
     return (
         <Fragment>

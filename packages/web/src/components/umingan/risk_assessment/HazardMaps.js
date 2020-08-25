@@ -1,10 +1,8 @@
 import React, { Fragment, useState, useEffect } from "react";
 import Container from "@material-ui/core/Container";
 import {
-    Grid,
-    Fab,
-    TextField,
-    Button,
+    Grid, Fab, TextField, Button,
+    Paper, Typography,
 } from "@material-ui/core/";
 import { useStyles } from "../../../styles/general_styles";
 
@@ -59,11 +57,8 @@ export default function HazardMaps() {
     const initHazardMaps = async () => {
         const response = await UmiRiskManagement.GetHazardMaps();
         if (response.status) {
-            console.log(response);
             if (response.data.length > 0) {
-                console.log();
-                setMapPreview(`http://192.168.1.2:8080/UMINGAN/MAPS/${response.data[0].filename}`);
-                // handleMapPreview(response.data[0]);
+                setMapPreview(`http://192.168.150.244:8080/UMINGAN/MAPS/${response.data[0].filename}`);
             }
         }
     };
@@ -74,17 +69,6 @@ export default function HazardMaps() {
             return acc;
         }, {});
 
-    const marirongMaps = {}
-    // const handleMapPreview = (map_data) => {
-    //     console.log("marirong maps", marirongMaps);
-    //     let temp = {
-    //         img: marirongMaps[map_data.filename],
-    //         title: "Dynaslope MAP (MAR)",
-    //         featured: true,
-    //     };
-    //     setMapPreview([temp]);
-    // };
-
     const handleFileSelection = (event) => {
         const file = event.target.files[0];
         setFileToUpload(file);
@@ -94,7 +78,6 @@ export default function HazardMaps() {
     const handleUpload = async () => {
         const data = new FormData();
         data.append("file", fileToUpload);
-        console.log("shit")
         const response = await UmiRiskManagement.UploadHazardMaps(
             data,
         );
@@ -112,100 +95,105 @@ export default function HazardMaps() {
             setNotifText("Error uploading new hazard map");
         }
     };
-    console.log(UmiRiskManagement.GetImageFromDirectory());
 
     return (
-        <Fragment>
-            <Container className={classes.img_container}>
-                <Grid container spacing={2} align="center">
-                    <Grid item xs={12} />
-                    <Grid item xs={12}>
-                        <Magnifier
-                            imageSrc={mapPreview}
-                            imageAlt="MAR Hazard Map"
-                            mouseActivation={MOUSE_ACTIVATION.SINGLE_CLICK}
-                            touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
-                        />
-                    </Grid>
-                    <Grid item={true} xs={12}>
-                        <Fab
-                            variant="extended"
-                            color={"primary"}
-                            aria-label="add"
-                            onClick={handleClickOpen}
-                        >
-                            Upload map
+        <Grid item xs={12}>
+            <Paper elevation={3} className={classes.raPaper}>
+                <Typography variant="h6">
+                    Hazard Map
+                </Typography>
+                <Container className={classes.img_container}>
+                    <Grid container spacing={2} align="center">
+                        <Grid item xs={12} />
+                        <Grid item xs={12}>
+                            <Magnifier
+                                imageSrc={mapPreview}
+                                imageAlt="MAR Hazard Map"
+                                mouseActivation={MOUSE_ACTIVATION.SINGLE_CLICK}
+                                touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
+                            />
+                        </Grid>
+                        <Grid item={true} xs={12}>
+                            <Fab
+                                variant="extended"
+                                color={"primary"}
+                                aria-label="add"
+                                onClick={handleClickOpen}
+                            >
+                                Upload map
                         </Fab>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </Container>
+                </Container>
 
-            <Dialog
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="form-dialog-title"
-            >
-                <DialogTitle id="form-dialog-title">File upload</DialogTitle>
-                <DialogContent>
-                    <Grid container>
-                        <Grid item xs={8}>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                id="filename"
-                                label="File path"
-                                value={filename}
-                                fullWidth
-                            />
-                        </Grid>
-                        <Grid item xs={4}>
-                            <input
-                                accept="image/*"
-                                style={{ display: "none" }}
-                                id="raised-button-file"
-                                multiple
-                                type="file"
-                                onChange={handleFileSelection}
-                            />
-                            <label htmlFor="raised-button-file">
-                                <Button
-                                    variant="raised"
-                                    component="span"
-                                    color="primary"
-                                >
-                                    Browse
+                <Dialog
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="form-dialog-title"
+                >
+                    <DialogTitle id="form-dialog-title">File upload</DialogTitle>
+                    <DialogContent>
+                        <Grid container>
+                            <Grid item xs={8}>
+                                <TextField
+                                    autoFocus
+                                    margin="dense"
+                                    id="filename"
+                                    label="File path"
+                                    value={filename}
+                                    fullWidth
+                                />
+                            </Grid>
+                            <Grid item xs={4}>
+                                <input
+                                    accept="image/*"
+                                    style={{ display: "none" }}
+                                    id="raised-button-file"
+                                    multiple
+                                    type="file"
+                                    onChange={handleFileSelection}
+                                />
+                                <label htmlFor="raised-button-file">
+                                    <Button
+                                        variant="raised"
+                                        component="span"
+                                        color="primary"
+                                    >
+                                        Browse
                                 </Button>
-                            </label>
+                                </label>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose} color="primary">
-                        Cancel
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} color="primary">
+                            Cancel
                     </Button>
-                    <Button onClick={handleUpload} color="primary">
-                        Confirm
+                        <Button onClick={handleUpload} color="primary">
+                            Confirm
                     </Button>
-                </DialogActions>
-            </Dialog>
-            <Snackbar
-                open={openNotif}
-                autoHideDuration={3000}
-                onClose={() => {
-                    setOpenNotif(false);
-                }}
-                anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                key={"top,right"}
-            >
-                <Alert
+                    </DialogActions>
+                </Dialog>
+                <Snackbar
+                    open={openNotif}
+                    autoHideDuration={3000}
                     onClose={() => {
                         setOpenNotif(false);
                     }}
-                    severity={notifStatus}
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                    key={"top,right"}
                 >
-                    {notifText}
-                </Alert>
-            </Snackbar>
-        </Fragment>
+                    <Alert
+                        onClose={() => {
+                            setOpenNotif(false);
+                        }}
+                        severity={notifStatus}
+                    >
+                        {notifText}
+                    </Alert>
+                </Snackbar>
+            </Paper>
+            <br />
+        </Grid>
     );
 }

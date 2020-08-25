@@ -19,6 +19,8 @@ from src.model.v2.mar.maintenance_logs import Maintenance as maintenance
 from src.api.helpers import Helpers as helpers
 from config import APP_CONFIG
 
+from src.api.v2.file_management import file_management
+
 MAINTENANCE_LOGS_BLUEPRINT = Blueprint(
     "maintenance_logs_blueprint", __name__)
 
@@ -198,89 +200,37 @@ def fetch_log_attachments(maintenance_log_id):
     return jsonify(response)
 
 
-@MAINTENANCE_LOGS_BLUEPRINT.route("/send/email/maintenance_logs", methods=["GET", "POST"])
-def send_maintenance_log_report_via_email():
-    data = request.form
-    try:
-        date = data["date"]
-
-        email = "dynaslopeswat@gmail.com"
-        password = "dynaslopeswat"
-        send_to_email = data["email"]
-        subject = "Field Survey : " + str(date)
-
-        message = "<b>Maintenance report for:</b> " + date + "<br>"
-        file_location = 'test.pdf'
-
-        msg = MIMEMultipart()
-        msg['From'] = email
-        msg['To'] = send_to_email
-        msg['Subject'] = subject
-
-        msg.attach(MIMEText(message, 'html'))
-
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(email, password)
-        text = msg.as_string()
-        server.sendmail(email, send_to_email, text)
-        server.quit()
-
-        response = {
-            "status": True,
-            "message": "Email sent successfully!"
-        }
-    except Exception as err:
-        print(err)
-        response = {
-            "status": False,
-            "message": "Failed sending email! Backend concerns."
-        }
-
-    return jsonify(response)
-
 class MyFPDF(FPDF, HTMLMixin):
+    def header(self):
+        # Logo
+        self.image('/home/louie-cbews/CODES/CBEWS-L/packages/web/src/assets/letter_header.png', 0, 10, 210)
+        # Arial bold 15
+        self.set_font('Arial', 'B', 15)
+        # Move to the right
+        self.cell(80)
+        # Line break
+        self.ln(20)
+    def footer(self):
+        self.image('/home/louie-cbews/CODES/CBEWS-L/packages/web/src/assets/letter_footer.png', 0, 270, 210)
+        self.set_y(-15)
     pass
+    
 
 @MAINTENANCE_LOGS_BLUEPRINT.route("/write_pdf", methods=["POST"])
-def write_pdf(): 
+def write_pdf():
     try:
-        html = """
-        <H1 align="center">html2fpdf</H1>
-        <h2>Basic usage</h2>
-        <p>You can now easily print text mixing different
-        styles : <B>bold</B>, <I>italic</I>, <U>underlined</U>, or
-        <B><I><U>all at once</U></I></B>!<BR>You can also insert links
-        on text, such as <A HREF="http://www.fpdf.org">www.fpdf.org</A>,
-        or on an image: click on the logo.<br>
-        <center>
-        </center>
-        <h3>Sample List</h3>
-        <ul><li>option 1</li>
-        <ol><li>option 2</li></ol>
-        <li>option 3</li></ul>
-
-        <table border="0" align="center" width="50%">
-        <thead><tr><th width="30%">Header 1</th><th width="70%">header 2</th></tr></thead>
-        <tbody>
-        <tr><td>cell 1</td><td>cell 2</td></tr>
-        <tr><td>cell 2</td><td>cell 3</td></tr>
-        </tbody>
-        </table>
-        """
         json = request.get_json()
-        html = json["html"]
+        header = """<img width=530 src="/home/louie-cbews/CODES/CBEWS-L/packages/web/src/assets/letter_header.png" />"""
+        html2 = f"""{json["html"]}"""
         filename = json["filename"]
 
         pdf = MyFPDF()
         #First page
         pdf.add_page()
-        pdf.write_html(html)
-        directory = f"{APP_CONFIG['MARIRONG_DIR']}/MAINTENANCE/MAINTENANCE_LOG/"
+        pdf.write_html(html2)
+        directory = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOG/"
         path = Path(f"{directory}{filename}")
         pdf.output(path, 'F')
-
-        helpers.var_checker("pdf", pdf)
 
         response = {
             "status": True,
@@ -295,5 +245,75 @@ def write_pdf():
             "path": None
         }
         raise
+
+    return jsonify(response)
+
+
+def write_pdf_internal(json):
+    try:
+        header = """<img width=530 src="/home/louie-cbews/CODES/CBEWS-L/packages/web/src/assets/letter_header.png" />"""
+        html2 = f"""{json["html"]}"""
+        filename = json["filename"]
+
+        pdf = MyFPDF()
+        #First page
+        pdf.add_page()
+        pdf.write_html(html2)
+        directory = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOG/"
+        path = Path(f"{directory}{filename}")
+        pdf.output(path, 'F')
+
+        response = {
+            "status": True,
+            "message": "Success",
+            "path": path
+        }
+    except Exception as err:
+        print(err)
+        response = {
+            "status": False,
+            "message": "Failed",
+            "path": None
+        }
+        raise
+
+    return jsonify(response)
+
+
+@MAINTENANCE_LOGS_BLUEPRINT.route("/send/maintenance_logs/report", methods=["POST"])
+def send_maintenance_logs_pdf_via_email():
+    """
+    """
+    try:
+        json = request.get_json()
+        recipients_list = json["recipient_list"]
+        subject = json["subject"]
+        date = json["date"]
+        message = json["message"]
+
+        response = write_pdf_internal({
+            "html": json["html"],
+            "filename": "file_to_send.pdf"
+        })
+        file_location = response["path"]
+        
+        response = file_management.send_email(recipients_list, subject, message, file_location)
+
+        if response["status"] == True:
+            response = {
+                "status": True,
+                "message": "Success",
+                "data": []
+            }
+        else:
+            raise Exception("test")
+    
+    except Exception as err:
+        raise err
+        response = {
+            "status": False,
+            "message": "Failed",
+            "data": []
+        }
 
     return jsonify(response)
