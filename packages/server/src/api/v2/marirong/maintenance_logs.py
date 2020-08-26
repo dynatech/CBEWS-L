@@ -1,4 +1,3 @@
-import smtplib
 import os
 from pathlib import Path
 from flask import Blueprint, jsonify, request
@@ -9,11 +8,6 @@ from flask_cors import CORS, cross_origin
 from connections import SOCKETIO
 
 from fpdf import FPDF, HTMLMixin
-
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email import encoders
 
 from src.model.v2.mar.maintenance_logs import Maintenance as maintenance
 from src.api.helpers import Helpers as helpers
@@ -203,7 +197,8 @@ def fetch_log_attachments(maintenance_log_id):
 class MyFPDF(FPDF, HTMLMixin):
     def header(self):
         # Logo
-        self.image('/home/louie-cbews/CODES/CBEWS-L/packages/web/src/assets/letter_header.png', 0, 10, 210)
+        self.image('C:\\Users\\John Louie\\codes\\CBEWS-L\\packages\\web\\src\\assets\\letter_header.png', 0, 10, 210)
+        # self.image('/home/louie-cbews/CODES/CBEWS-L/packages/web/src/assets/letter_header.png', 0, 10, 210)
         # Arial bold 15
         self.set_font('Arial', 'B', 15)
         # Move to the right
@@ -211,7 +206,8 @@ class MyFPDF(FPDF, HTMLMixin):
         # Line break
         self.ln(20)
     def footer(self):
-        self.image('/home/louie-cbews/CODES/CBEWS-L/packages/web/src/assets/letter_footer.png', 0, 270, 210)
+        self.image('C:\\Users\\John Louie\\codes\\CBEWS-L\\packages\\web\\src\\assets\\letter_footer.png', 0, 270, 210)
+        # self.image('/home/louie-cbews/CODES/CBEWS-L/packages/web/src/assets/letter_footer.png', 0, 270, 210)
         self.set_y(-15)
     pass
     
@@ -220,7 +216,7 @@ class MyFPDF(FPDF, HTMLMixin):
 def write_pdf():
     try:
         json = request.get_json()
-        header = """<img width=530 src="/home/louie-cbews/CODES/CBEWS-L/packages/web/src/assets/letter_header.png" />"""
+        print("json", json)
         html2 = f"""{json["html"]}"""
         filename = json["filename"]
 
@@ -277,7 +273,7 @@ def write_pdf_internal(json):
         }
         raise
 
-    return jsonify(response)
+    return response
 
 
 @MAINTENANCE_LOGS_BLUEPRINT.route("/send/maintenance_logs/report", methods=["POST"])
@@ -286,18 +282,24 @@ def send_maintenance_logs_pdf_via_email():
     """
     try:
         json = request.get_json()
-        recipients_list = json["recipient_list"]
-        subject = json["subject"]
         date = json["date"]
-        message = json["message"]
+        email_data = json["email_data"]
+        recipients_list = email_data["recipient_list"]
+        subject = email_data["subject"]
+        email_body = email_data["email_body"]
 
         response = write_pdf_internal({
             "html": json["html"],
             "filename": "file_to_send.pdf"
         })
+        helpers.var_checker("response1", response)
         file_location = response["path"]
+
+        email_body = f"""<b>Maintenance report for:</b> {date}<br>{email_body}"""
+        helpers.var_checker("email_body", email_body) 
         
-        response = file_management.send_email(recipients_list, subject, message, file_location)
+        response = file_management.send_email(recipients_list, subject, email_body, file_location)
+        helpers.var_checker("response send email", response)
 
         if response["status"] == True:
             response = {

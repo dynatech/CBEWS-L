@@ -167,9 +167,6 @@ def fetch_hazard_map():
         latest_file = latest_file.split("\\", 1)
         map_list = [*latest_file]
 
-        h.var_checker("map_list", map_list)
-        h.var_checker("latest", latest_file)
-
         entries = ((os.stat(path), path) for path in map_list)
         # leave only regular files, insert creation date
         entries = ((stat[ST_CTIME], path)

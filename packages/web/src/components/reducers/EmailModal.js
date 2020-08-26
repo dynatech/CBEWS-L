@@ -20,9 +20,30 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import AppConfig from "./AppConfig";
 import { MarMaintenanceLogs } from "@dynaslope/commons";
 import { useStyles, tableStyles } from "../../styles/general_styles";
+import ChipInput from 'material-ui-chip-input';
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 export default function EmailModal(props) {
-    const { open, setOpen, data, html, handleChange, handleSubmit } = props;
+    const { open, setOpen, html, handleSubmit } = props;
+    const [recipient_list, setRecipientList] = useState([]);
+    const [subject, setSubject] = useState("");
+    const [email_body, setEmailBody] = useState("");
+
+    const handleChipAdd = (chip) => {
+        if (!recipient_list.includes(chip)) {
+            const temp = recipient_list;
+            temp.push(chip);
+            setRecipientList(temp);
+        }
+    };
+    const handleDeleteChip = (chip, index) => {
+        if (recipient_list.includes(chip)) {
+            const temp = recipient_list;
+            temp.splice(index, 1);
+            setRecipientList(temp);
+        }
+    };
 
     return (
         <Dialog
@@ -37,14 +58,10 @@ export default function EmailModal(props) {
                 <form>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <TextField
-                                required
-                                id="outlined-required"
-                                label="Email Recipients"
-                                defaultValue=""
-                                variant="outlined"
-                                value={data["recipient_list"]}
-                                onChange={handleChange("recipient_list")}
+                            <ChipInput
+                                value={recipient_list}
+                                onAdd={(chip) => handleChipAdd(chip)}
+                                onDelete={(chip, index) => handleDeleteChip(chip, index)}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -54,26 +71,21 @@ export default function EmailModal(props) {
                                 label="Subject"
                                 defaultValue=""
                                 variant="outlined"
-                                value={data["subject"]}
-                                onChange={handleChange("subject")}
+                                value={subject}
+                                onChange={event => setSubject(event.target.value)}
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField
-                                required
-                                id="outlined-required"
-                                label="Body"
-                                defaultValue=""
-                                variant="outlined"
-                                value={data["email_body"]}
-                                onChange={handleChange("email_body")}
-                            />
+                            
+                            <ReactQuill theme="snow" value={email_body} onChange={setEmailBody}/>
                         </Grid>
                     </Grid>
                 </form>
             </DialogContent>
             <DialogActions>
-                <Button variant="contained" onClick={handleSubmit(html, data)}>Send Email</Button>
+                <Button variant="contained" onClick={handleSubmit(html, {
+                    email_body, subject, recipient_list
+                })}>Send Email</Button>
             </DialogActions>
         </Dialog>
     );
