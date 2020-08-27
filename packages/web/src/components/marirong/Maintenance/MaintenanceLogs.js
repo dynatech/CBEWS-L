@@ -353,17 +353,6 @@ export default function MaintenanceLogs() {
         }
     };
 
-    const handleEmailReport = (html, email_data) => async () => {
-        console.log("handleEmail", html, email_data);
-        const response = await MarMaintenanceLogs.SendPDFReportViaEmail({
-            "email_data": email_data,
-            "html": renderToString(html)
-        });
-        if (response.status === true) {
-            console.log("test")
-        }
-    };
-
     return (
         <Fragment>
             <Container align="center" justify="center">
@@ -386,11 +375,11 @@ export default function MaintenanceLogs() {
                         <Grid container>
                             <Grid item xs={12} style={{ paddingTop: 40 }}>
                                 <PDFPreviewer
+                                    date={defaultTSValues["Maintenance Date"]}
                                     data={tableData}
                                     dataType="maintenance_report"
                                     classes={classes}
                                     handleDownload={handleDownloadReport}
-                                    handleEmail={handleEmailReport}
                                 />
                             </Grid>
                         </Grid>

@@ -3,6 +3,8 @@ import { renderToString } from 'react-dom/server';
 import { Grid, Paper, Typography, Box, Fab } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import EmailModal from './EmailModal';
+import moment from "moment";
+import { MarMaintenanceLogs } from "@dynaslope/commons";
 
 const imageStyle = makeStyles(theme => ({
     img_size: {
@@ -77,29 +79,24 @@ function convertToSimpleTable(data_type, rows) {
 function PDFPreviewer(props) {
     const img = imageStyle();
     const summary = summaryStyle();
-    const { data, dataType: data_type, noImport, classes, handleDownload, handleEmail } = props;
-    const [email_data, setEmailData] = useState({
-        "recipient_list": [],
-        "subject": "",
-        "email_body": ""
-    });
+    const { date, data, dataType: data_type, noImport, classes, handleDownload } = props;
     const [emailOpen, setEmailOpen] = useState(false);
-    const [html, setHtml] = useState("");
 
-    // useEffect(() => {
-    //     console.log("data", data);
-    //     const html_string = data.length > 0 ? convertToSimpleTable(data_type, data) : (<Typography>No data</Typography>);
-    //     console.log("html", html_string);
-    //     setHtml(html_string);
-    // }, []);
     const html_string = data.length > 0 ? convertToSimpleTable(data_type, data) : (<Typography>No data</Typography>);
 
-    const handleEmailChange = (key) => (event) => {
-        const value = event.target.value;
-        setEmailData({
-            ...email_data,
-            [key]: value 
+    const handleSendEmail = (html_string, email_data) => async () => {
+        const response = await MarMaintenanceLogs.SendPDFReportViaEmail({
+            "email_data": email_data,
+            "html": renderToString(html_string),
+            "date": moment(date).format("YYYY-MM-DD hh:mm:ss")
         });
+        if (response.status === true) {
+            console.log("Success in sending PDF");
+            alert(response.message);
+            setEmailOpen(false);
+        } else {
+            console.log("problem in PDF");
+        }
     };
 
     return (
@@ -133,7 +130,7 @@ function PDFPreviewer(props) {
                                 color="primary"
                                 aria-label="add"
                                 className={classes.button_fluid}
-                                onClick={handleDownload(html)}
+                                onClick={handleDownload(html_string)}
                             >
                                 Download
                             </Fab>
@@ -154,10 +151,8 @@ function PDFPreviewer(props) {
                     <EmailModal
                         open={emailOpen}
                         setOpen={setEmailOpen}
-                        data={email_data}
                         html={html_string}
-                        handleSubmit={handleEmail}
-                        handleChange={handleEmailChange}
+                        handleSubmit={handleSendEmail}
                     />
                 </Grid>
             )}

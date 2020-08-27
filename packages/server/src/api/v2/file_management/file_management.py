@@ -1,9 +1,16 @@
-import time
 import os
+import time
 import glob
+import smtplib
+import ntpath
 from pathlib import Path
 from flask import Blueprint, jsonify, request, send_file, send_from_directory, safe_join, abort, url_for, redirect
 from src.api.helpers import Helpers as h
+
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 
 from config import APP_CONFIG
 
@@ -65,32 +72,45 @@ def delete_mar_community_risk_assessment():
 
 ### UTIL ###
 def send_email(recipients_list, subject, message, file_location):
-    data = request.form
     try:
-        date = data["date"]
-
         email = "dynaslopeswat@gmail.com"
         password = "dynaslopeswat"
         send_to_email = recipients_list
-        # send_to_email = data["email"]
-        # subject = "Field Survey : " + str(date)
 
         # message = "<b>Maintenance report for:</b> " + date + "<br>"
         # file_location = 'test.pdf'
+        path, filename = ntpath.split(file_location)
+        h.var_checker("Sending email to", send_to_email)
 
         msg = MIMEMultipart()
         msg['From'] = email
-        msg['To'] = send_to_email
+        msg['To'] = ", ".join(recipients_list)
         msg['Subject'] = subject
 
         msg.attach(MIMEText(message, 'html'))
+
+        with open(file_location, "rb") as attachment:
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
+
+        encoders.encode_base64(part)
+
+        part.add_header(
+            "Content-Disposition",
+            f"attachment; filename= {filename}",
+        )
+        msg.attach(part)
 
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(email, password)
         text = msg.as_string()
-        server.sendmail(email, send_to_email, text)
-        server.quit()
+        try:
+            server.sendmail(email, recipients_list, text)
+        except Exception as e:
+            print(e)
+        finally:
+            server.quit()
 
         response = {
             "status": True,
@@ -103,4 +123,4 @@ def send_email(recipients_list, subject, message, file_location):
             "message": "Failed sending email! Backend concerns."
         }
 
-    return jsonify(response)
+    return response
