@@ -1,7 +1,8 @@
 import { MarCommunityRiskAssessment,
          MarEventsTemplate,
          UmiRiskManagement,
-         UmiFieldSurvey } from '@dynaslope/commons';
+         UmiFieldSurvey,
+         MarMaintenanceLogs as MarirongMaintenanceLogs } from '@dynaslope/commons';
 
 const MARIRONG_API_LIST = (data) => {
     return {
@@ -57,6 +58,61 @@ const MARIRONG_API_LIST = (data) => {
             }),
             'delete': ((data)=> {
                 alert(JSON.stringify("DELETE"))
+                alert(JSON.stringify(data));
+            })
+        },
+        'MarMaintenanceLogs': {
+            'add': (async (data)=> {
+                let response = await MarirongMaintenanceLogs.InsertMaintenanceLogs({
+                    'user_id': data['user_id'],
+                    'maintenance_date': data['maintenance_date'],
+                    'type': data['type'],
+                    'remarks': data['remarks'],
+                    'in_charge': data['in_charge'],
+                    'updater': data['updater']
+                });
+                // Load counter
+            }),
+            'update': (async (data)=> {
+                let temp = [];
+                for (var key in data) {
+                    let obj = {};
+                    if (key != 'alterations') {
+                        obj[key] = data[key];
+                        temp.push(obj);
+                    }   
+                }
+                let response = await MarirongMaintenanceLogs.UpdateMaintenanceLogs(temp)
+                // Load counter
+            }),
+            'delete': ((data)=> {
+                alert(JSON.stringify("DELETE"))
+                alert(JSON.stringify(data));
+            })
+        },
+        'MarIncidentLogs': {
+            'add': (async(data)=> {
+                let response = await MarirongMaintenanceLogs.InsertIncidentLogs({
+                    'user_id': data['user_id'],
+                    'incident_date': data['incident_date'],
+                    'incident_report_narrative': data['incident_report_narrative'],
+                    'reporter': data['reporter']
+                });
+                // Load counter
+            }),
+            'update': (async(data)=> {
+                let temp = [];
+                for (var key in data) {
+                    let obj = {};
+                    if (key != 'alterations') {
+                        obj[key] = data[key];
+                        temp.push(obj);
+                    }   
+                }
+                let response = await MarirongMaintenanceLogs.UpdateIncidentLogs(temp)
+                // Load counter
+            }),
+            'delete': (async(data)=> {
                 alert(JSON.stringify(data));
             })
         }
