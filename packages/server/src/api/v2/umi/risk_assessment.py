@@ -354,9 +354,6 @@ def delete_family_risk_profile():
         }
     return jsonify(ret_val)
 
-
-
-
 @RISK_ASSESSMENT_BLUEPRINT.route("/get/risk_assessment/umi/hazard_map", methods=["GET"])
 def fetch_hazard_map():
     file_loc = APP_CONFIG['UMINGAN_DIR']

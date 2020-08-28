@@ -100,31 +100,53 @@ def add_situation_report():
 
 @SITUATION_REPORT_BLUEPRINT.route("/upload/situation_report/umi/situation_report_logs", methods=["POST"])
 def upload_situation_report_log_file():
-	try:
-		file = request.files['file']
-		directory = f"{APP_CONFIG['UMINGAN_DIR']}/DOCUMENTS/Situation-Reports"
-		filename = file.filename
+    try:
+        file = request.files['file']
+        directory = f"{APP_CONFIG['UMINGAN_DIR']}/DOCUMENTS/Situation-Reports"
+        filename = file.filename
 
-		count = filename.count(".")
-		name_list = filename.split(".", count)
-		file_type = f".{name_list[count]}"
-		name_list.pop()
-		filename = f"{'.'.join(name_list)}"
+        count = filename.count(".")
+        name_list = filename.split(".", count)
+        file_type = f".{name_list[count]}"
+        name_list.pop()
+        filename = f"{'.'.join(name_list)}"
 
-		temp = f"{filename}{file_type}"
-		uniq = 1
-		while os.path.exists(Path(directory) / temp):
-			temp = '%s_%d%s' % (filename, uniq, file_type)
-			uniq += 1
+        temp = f"{filename}{file_type}"
+        uniq = 1
+        while os.path.exists(Path(directory) / temp):
+            # filename
+            temp = '%s_%d%s' % (filename, uniq, file_type)
+            uniq += 1
 
-		file_path = Path(directory)
-		file.save(os.path.join(file_path, temp))
-		return_data = { "status": True, 'file_path': str(file_path) }
+        # file.save(new_path) 
+        file.save(os.path.join(Path(directory), temp))
 
-	except Exception as err:
-		raise err
-		return_data = { "status": False }
-	return jsonify(return_data)
+        return_data = { "status": True, "file_path": f"{directory}/{temp}" }
+    except Exception as err:
+        raise err
+        # return_data = { "status": False }
+    return jsonify(return_data)
+
+@SITUATION_REPORT_BLUEPRINT.route("/update/situation_report/umi/attachment", methods=["POST"])
+def update_situation_report_attachment():
+    try:
+        data = request.get_json()
+        check_if_same = SituationReportModel.check_file(data['id'])
+        if data['file_path']['filename'] in check_if_same[0]['attachment_path']:
+            ret_val = {
+                'status': True
+            }
+        else:
+            os.remove(check_if_same[0]['attachment_path'])
+            ret_val = {
+                'status': False
+            }
+    except Exception as err:
+        ret_val = {
+            'status': False,
+            'message': f"Failed to updated Situation Report. Err: {err}"
+        }
+    return jsonify(ret_val)
 
 @SITUATION_REPORT_BLUEPRINT.route("/update/situation_report/umi/situation_report_logs", methods=["PATCH"])
 def update_situation_report_logs():
