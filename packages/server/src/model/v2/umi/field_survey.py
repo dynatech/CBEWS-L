@@ -38,7 +38,6 @@ class FieldSurveyModel():
 			key = list(x)[0]
 			if 'id' == key:
 				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = '{x[key]}'"
-		print(query)
 		ret_val = DB.db_modify(query, 'CBEWSL_UMI_collections', True)
 		return ret_val
 

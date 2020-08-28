@@ -13,7 +13,7 @@ import { GetFieldSurveyLogs, InsertFieldSurveyLogs, UpdateFieldSurveyLogs, Delet
 import { GetLatestReportSummary, DownloadLatestReportSummary, EmailLatestReportSummary } from './src/UMI/FieldSurvey/ReportSummary';
 import { InsertEventsTemplate, UpdateEventsTemplate, GetAllEventsTemplate, DeleteEventsTemplate } from './src/MAR/EventsTemplate/EventsTemplate';
 import { GetCurrentSituationReport, DownloadSituationReport, EmailSituationReport } from './src/UMI/SituationReport/CurrentSituationReport';
-import { GetSituationReport, InsertSituationReport, UpdateSituationReport, DeleteSituationReport, UploadSituationReport} from './src/UMI/SituationReport/SituationReport';
+import { GetSituationReport, InsertSituationReport, UpdateSituationReport, DeleteSituationReport, UploadSituationReport, UpdateSituationReportAttachmentFile} from './src/UMI/SituationReport/SituationReport';
 import { GetOngoingAndExtendedMonitoring } from './src/AlertGeneration/PublicAlerts';
 
 const UserManagement = {
@@ -104,7 +104,8 @@ const UmiSituationReport = {
     UploadSituationReport,
     InsertSituationReport,
     UpdateSituationReport,
-    DeleteSituationReport
+    DeleteSituationReport,
+    UpdateSituationReportAttachmentFile
 }
 
 export {

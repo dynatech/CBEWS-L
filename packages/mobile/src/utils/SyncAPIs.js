@@ -2,7 +2,8 @@ import { MarCommunityRiskAssessment,
          MarEventsTemplate,
          UmiRiskManagement,
          UmiFieldSurvey,
-         MarMaintenanceLogs as MarirongMaintenanceLogs } from '@dynaslope/commons';
+         MarMaintenanceLogs as MarirongMaintenanceLogs,
+         UmiSituationReport } from '@dynaslope/commons';
 
 const MARIRONG_API_LIST = (data) => {
     return {
@@ -261,6 +262,33 @@ const UMINGAN_API_LIST = (data) => {
                 // Loading Counter
             }),
             'delete': ((data)=> {
+                alert(JSON.stringify("DELETE"))
+                alert(JSON.stringify(data));
+            })
+        },
+        'UmiSituationReport': {
+            'add': (async (data) => {
+                let response = await UmiSituationReport.InsertSituationReport({
+                    'user_id': data['user_id'],
+                    'report_summary': data['report_summary'],
+                    'attachment_path': data['attachment_path'],
+                    'report_ts': data['report_ts']
+                });
+                // Loading Counter
+            }),
+            'update': (async (data) => {
+                let temp = [];
+                for (var key in data) {
+                    let obj = {};
+                    if (key != 'alterations') {
+                        obj[key] = data[key];
+                        temp.push(obj);
+                    }   
+                }
+                let response = await UmiSituationReport.UpdateSituationReport(temp);
+                // Loading Counter
+            }),
+            'delete': (async (data) => {
                 alert(JSON.stringify("DELETE"))
                 alert(JSON.stringify(data));
             })

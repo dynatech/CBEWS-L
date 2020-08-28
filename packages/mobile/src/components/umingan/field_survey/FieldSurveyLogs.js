@@ -11,7 +11,6 @@ import moment from 'moment';
 import MobileCaching from '../../../utils/MobileCaching';
 import NetworkUtils from '../../../utils/NetworkUtils';
 import Uploader from '../../utils/Uploader';
-import FilePickerManager from 'react-native-file-picker';
 
 function FieldSurveyLogs () {
 
