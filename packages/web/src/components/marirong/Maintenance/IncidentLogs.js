@@ -362,6 +362,7 @@ export default function IncidentLogs() {
                         <Grid container>
                             <Grid item xs={12} style={{ paddingTop: 40 }}>
                                 <PDFPreviewer
+                                    date={defaultTSValues["Incident Date"]}
                                     data={tableData}
                                     dataType="incident_report"
                                     classes={classes}
