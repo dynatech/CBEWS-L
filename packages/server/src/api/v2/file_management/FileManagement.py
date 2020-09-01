@@ -77,10 +77,9 @@ def send_email(recipients_list, subject, message, file_location):
         password = "dynaslopeswat"
         send_to_email = recipients_list
 
-        # message = "<b>Maintenance report for:</b> " + date + "<br>"
-        # file_location = 'test.pdf'
-        path, filename = ntpath.split(file_location)
-        h.var_checker("Sending email to", send_to_email)
+        if file_location:
+            path, filename = ntpath.split(file_location)
+            h.var_checker("Sending email to", send_to_email)
 
         msg = MIMEMultipart()
         msg['From'] = email
@@ -89,11 +88,13 @@ def send_email(recipients_list, subject, message, file_location):
 
         msg.attach(MIMEText(message, 'html'))
 
-        with open(file_location, "rb") as attachment:
-            part = MIMEBase("application", "octet-stream")
-            part.set_payload(attachment.read())
 
-        encoders.encode_base64(part)
+        if file_location:
+            with open(file_location, "rb") as attachment:
+                part = MIMEBase("application", "octet-stream")
+                part.set_payload(attachment.read())
+
+            encoders.encode_base64(part)
 
         part.add_header(
             "Content-Disposition",
@@ -124,3 +125,91 @@ def send_email(recipients_list, subject, message, file_location):
         }
 
     return response
+
+
+###################
+# WRITE_PDF STUFF #
+###################
+class MyFPDF(FPDF, HTMLMixin):
+    def header(self):
+        self.image(f"{APP_CONFIG['WEB_ASSETS_DIR']}/assets/letter_header.png", 0, 10, 210)
+        self.set_font('Arial', 'B', 15)
+        self.cell(80)
+        self.ln(20)
+    def footer(self):
+        self.image(f"{APP_CONFIG['WEB_ASSETS_DIR']}/assets/letter_footer.png", 0, 270, 210)
+        self.set_y(-15)
+    pass
+
+
+def write_pdf_internal(json):
+    try:
+        html = f"""{json["html"]}"""
+        filename = json["filename"]
+
+        pdf = MyFPDF()
+        #First page
+        pdf.add_page()
+        pdf.write_html(html)
+        directory = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOG/"
+        path = Path(f"{directory}{filename}")
+        pdf.output(path, "F")
+
+        response = {
+            "status": True,
+            "message": "Success",
+            "path": path
+        }
+    except Exception as err:
+        print(err)
+        response = {
+            "status": False,
+            "message": "Failed",
+            "path": None
+        }
+        raise
+
+    return response
+
+
+@MAINTENANCE_LOGS_BLUEPRINT.route("/send/maintenance_logs/report", methods=["POST"])
+def send_maintenance_logs_pdf_via_email():
+    """
+    """
+    try:
+        json = request.get_json()
+        date = json["date"]
+        email_data = json["email_data"]
+        recipients_list = email_data["recipient_list"]
+        subject = email_data["subject"]
+        email_body = email_data["email_body"]
+
+        response = write_pdf_internal({
+            "html": json["html"],
+            "filename": "file_to_send.pdf"
+        })
+        file_location = response["path"]
+
+        email_body = f"""<b>Maintenance report for:</b> {date}<br>{email_body}"""
+        
+        response = file_management.send_email(recipients_list, subject, email_body, file_location)
+        
+        if response["status"] == True:
+            response = {
+                "status": True,
+                "message": "Success",
+                "data": []
+            }
+        else:
+            raise Exception("test")
+    
+    except Exception as err:
+        raise err
+        response = {
+            "status": False,
+            "message": "Failed",
+            "data": []
+        }
+
+    return jsonify(response)
+

@@ -5,9 +5,8 @@ import {
     Container,
     Fab,
     Button,
-    Typography,
     TextField,
-    Input,
+    Input
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import FullCalendar from "@fullcalendar/react";
@@ -22,15 +21,13 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContentText from "@material-ui/core/DialogContentText";
 
-import PDFViewer from "../../reducers/PDFViewer";
-import AppConfig from "../../reducers/AppConfig";
+import AttachmentsGridList from "../../reducers/AttachmentList";
 
-import { MarMaintenanceLogs } from "@dynaslope/commons";
+import { UmiSituationReport } from "@dynaslope/commons";
 
 import { useStyles, tableStyles } from "../../../styles/general_styles";
 
 import Forms from "../../utils/Forms";
-import FabMuiTable from "../../utils/MuiTable";
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
@@ -42,32 +39,7 @@ function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const imageStyle = makeStyles((theme) => ({
-    img_size: {
-        height: "100%",
-        width: "100%",
-    },
-    summary_content: {
-        minHeight: 500,
-    },
-}));
-
-const summaryStyle = makeStyles((theme) => ({
-    content: {
-        minHeight: getWindowDimensions().height * 0.415,
-        maxHeight: getWindowDimensions().height * 0.415,
-    },
-}));
-
-function getWindowDimensions() {
-    const { innerWidth: width, innerHeight: height } = window;
-    return {
-        width,
-        height,
-    };
-}
-
-export default function MaintenanceLogs() {
+export default function IncidentLogs() {
     const cmd = "update-delete";
     const [cookies, setCookie] = useCookies(["credentials"]);
     const classes = useStyles();
@@ -95,88 +67,65 @@ export default function MaintenanceLogs() {
     const [tableData, setTableData] = useState([]);
     const [events, setEvents] = useState([]);
     const [defaultStringValues, setDefaultStrValues] = useState({
-        Type: "",
-        Remarks: "",
-        "In Charge": "",
-        Updater: "",
+        "Report Summary": "",
     });
     const [defaultTSValues, setDefaultTSValues] = useState({
-        "Maintenance Date": moment(),
+        "Report TS": moment(),
     });
-
-    const options = {
-        filterType: "checkbox",
-    };
-    const columns = [
-        { name: "maintenance_date", label: "Maintenance Date" },
-        {
-            name: "type",
-            label: "type",
-        },
-        { name: "in_charge", label: "In Charge" },
-        { name: "remarks", label: "Remarks" },
-        { name: "updater", label: "Updater" },
-        { name: "last_ts", label: "Last TS" },
-    ];
 
     const calendarRenderHandler = (args) => {
         const { startStr, endStr } = args;
         const start = moment(startStr).format("YYYY-MM-DD hh:mm:ss");
         const end = moment(endStr).format("YYYY-MM-DD hh:mm:ss");
-        getMaintenanceLogsPerMonth(start, end);
+        getIncidentLogsPerMonth(start, end);
     };
 
-    const getMaintenanceLogsPerDay = async (timestamp) => {
-        const response = await MarMaintenanceLogs.GetDayMaintenanceLogs(
-            timestamp,
-        );
-        if (response.status === true) {
-            setTableData(response.data);
-        } else {
-            console.error("PROBLEM IN INCIDAY");
-        }
-    };
-
-    const getMaintenanceLogsPerMonth = async (start, end) => {
+    const getIncidentLogsPerMonth = async (start, end) => {
         setStartRange(start);
         setEndRange(end);
-        const response = await MarMaintenanceLogs.GetMonthMaintenanceLogs(
-            start,
-            end,
-        );
+        // const response = await UmiSituationReport.GetSituationReport(start, end);
+        const response = await UmiSituationReport.GetSituationReport();
         if (response.status === true) {
             setEvents(
                 response.data.map((row) => ({
-                    title: row.type,
-                    date: moment(row.maintenance_date).format("YYYY-MM-DD"),
+                    title: row.report_summary,
+                    date: moment(row.report_ts).format("YYYY-MM-DD"),
+                    data: row,
                 })),
             );
-        } else console.error("Problem in getMaintenanceLogsPerMonth backend");
+        } else console.error("Problem in getIncidentLogsPerMonth backend");
     };
 
-    const handleAdd = () => {
+    const handleAdd = (args) => {
         resetState();
+        setDefaultTSValues({
+            "Report TS": args.date
+        });
         setOpen(true);
     };
 
-    const handleEdit = (data) => {
-        setSelectedData(data);
-        setDefaultStrValues({
-            Type: data["type"],
-            Remarks: data["remarks"],
-            "In Charge": data["in_charge"],
-            Updater: data["updater"],
-        });
-        setDefaultTSValues({
-            "Maintenance Date": data["maintenance_date"],
-        });
-        setOpen(true);
-        setCommand("edit");
+    const handleEdit = (info) => {
+        info.jsEvent.preventDefault();
+
+        if (info.event.extendedProps) {
+            const data = info.event.extendedProps.data;
+            console.log(data)
+
+            setSelectedData(data);
+            setDefaultStrValues({
+                "Report Summary": data["report_summary"],
+            });
+            setDefaultTSValues({
+                "Report TS": data["report_ts"],
+            });
+            setOpen(true);
+            setCommand("edit");
+        }
     };
 
     const handleClose = () => {
-        resetState();
         setOpen(false);
+        resetState();
     };
 
     const handleDelete = (data) => {
@@ -199,25 +148,25 @@ export default function MaintenanceLogs() {
         const input = {
             id: selectedData.id,
         };
-        const response = await MarMaintenanceLogs.DeleteMaintenanceLogs(input);
+        const response = await UmiSituationReport.DeleteSituationReport(
+            input,
+        );
         if (response.status === true) {
-            getMaintenanceLogsPerMonth(startRange, endRange);
-            getMaintenanceLogsPerDay(selectedData.last_ts);
+            getIncidentLogsPerMonth(startRange, endRange);
             setOpen(false);
             setOpenDelete(false);
             resetState();
             setOpenNotif(true);
             setNotifStatus("success");
-            setNotifText("Successfully deleted maintenance log data.");
+            setNotifText("Successfully deleted incident log data.");
         } else {
             setOpenNotif(true);
             setNotifStatus("error");
             setNotifText(
-                "Failed to delete maintenance log data. Please contact the developers or file a bug report",
+                "Failed to delete incident log data. Please contact the developers or file a bug report",
             );
         }
     };
-
 
     const submit = async () => {
         let json = formData.current;
@@ -226,20 +175,21 @@ export default function MaintenanceLogs() {
         let hasModifiedRow = false;
         let response;
         if (!Object.keys(selectedData).length) {
-            // ADD
             const temp_ts = {
-                maintenance_date: moment(json["MaintenanceDate"]).format(
-                    "YYYY-MM-DD HH:mm:ss",
-                ),
+                report_ts: moment(json["ReportTS"]).format("YYYY-MM-DD HH:mm:ss"),
             };
-            json = Object.assign(defaultStringValues, temp_ts, json);
-            json.type = json.Type;
-            json.remarks = json.Remarks;
-            json.in_charge = json.InCharge;
-            json.updater = json.Updater;
-            response = await MarMaintenanceLogs.InsertMaintenanceLogs(json);
+            json = Object.assign(
+                defaultStringValues,
+                temp_ts,
+                json,
+            );
+            json.report_summary = json.ReportSummary;
+            json.report_ts = moment(json["ReportTS"]).format("YYYY-MM-DD HH:mm:ss");
+            json.attachment = "n/a";
+            response = await UmiSituationReport.InsertSituationReport(
+                json,
+            );
         } else {
-            // EDIT
             hasModifiedRow = true;
             json.id = selectedData.id;
             json.user_id = cookies.credentials.user_id;
@@ -247,17 +197,11 @@ export default function MaintenanceLogs() {
             Object.keys(json).forEach((key) => {
                 let temp = {};
                 switch (key) {
-                    case "StatDesc":
-                        temp["stat_desc"] = json[key];
+                    case "ReportSummary":
+                        temp["report_summary"] = json[key];
                         break;
-                    case "MaintenanceDate":
-                        temp["maintenance_date"] = json[key];
-                        break;
-                    case "Type":
-                        temp["type"] = json[key];
-                        break;
-                    case "InCharge":
-                        temp["in_charge"] = json[key];
+                    case "ReportTS":
+                        temp["report_ts"] = json[key];
                         break;
                     default:
                         temp[key.replace(" ", "_").toLocaleLowerCase()] =
@@ -265,26 +209,24 @@ export default function MaintenanceLogs() {
                         break;
                 }
                 temp_array.push(temp);
-            });
-            response = await MarMaintenanceLogs.UpdateMaintenanceLogs(
-                temp_array,
-            );
+            }); 
+            console.log("temp_array", temp_array);
+            response = await UmiSituationReport.UpdateSituationReport(temp_array);
         }
         if (response.status === true) {
-            getMaintenanceLogsPerMonth(startRange, endRange);
-            getMaintenanceLogsPerDay(selectedData.maintenance_date);
+            getIncidentLogsPerMonth(startRange, endRange);
             handleClose();
             setOpenNotif(true);
             setNotifStatus("success");
             if (!hasModifiedRow)
-                setNotifText("Successfully added new Maintenance logs data.");
-            else setNotifText("Successfully updated Maintenance logs data.");
+                setNotifText("Successfully added new incident logs data.");
+            else setNotifText("Successfully updated incident logs data.");
         } else {
             handleClose();
             setOpenNotif(true);
             setNotifStatus("error");
             setNotifText(
-                "Failed to update Maintenance log data. Please review your updates.",
+                "Failed to update incident log data. Please review your updates.",
             );
         }
     };
@@ -292,13 +234,10 @@ export default function MaintenanceLogs() {
     const resetState = () => {
         setSelectedData({});
         setDefaultStrValues({
-            Type: "",
-            Remarks: "",
-            "In Charge": "",
-            Updater: "",
+            "Report Summary": "",
         });
         setDefaultTSValues({
-            "Maintenance Date": moment(),
+            "Report TS": moment(),
         });
     };
 
@@ -313,7 +252,7 @@ export default function MaintenanceLogs() {
         data.append("file", file_to_upload);
         data.append("ir_id", ir_id);
 
-        const response = await MarMaintenanceLogs.UploadReportAttachment(data);
+        const response = await UmiSituationReport.UploadReportAttachment(data);
         if (response.status === true) {
             handleUploadClose();
             setFileToUpload(null);
@@ -321,6 +260,7 @@ export default function MaintenanceLogs() {
         } else console.error("Problem in click upload");
         alert(response.message);
     };
+
 
     const handleUploadOpen = () => {
         setUploadOpen(true);
@@ -333,29 +273,21 @@ export default function MaintenanceLogs() {
     };
 
     const dateClickHandler = (args) => {
+        handleAdd();
         setDefaultTSValues({
-            "Maintenance Date": args.date,
+            "Report TS": args.date
         });
-        getMaintenanceLogsPerDay(args.date);
-    };
-
-    const handleDownloadReport = (html) => async () => {
-        const file_date = moment(defaultTSValues["Maintenance Date"]).format("YYYY-MM-DD");
-        const filename = `${file_date}_maintenance_log.pdf`;
-        const response = await MarMaintenanceLogs.RenderPDF(filename, renderToString(html));
-        if (response.status === true) {
-            MarMaintenanceLogs.DownloadPDF(filename);
-        }
     };
 
     return (
         <Fragment>
             <Container align="center" justify="center">
                 <Grid container spacing={2}>
-                    <Grid item xs={7}>
+                    <Grid item xs={2} />
+                    <Grid item xs={8}>
                         <FullCalendar
                             datesSet={calendarRenderHandler}
-                            dateClick={dateClickHandler}
+                            dateClick={handleAdd}
                             plugins={[
                                 dayGridPlugin,
                                 timeGridPlugin,
@@ -363,46 +295,12 @@ export default function MaintenanceLogs() {
                             ]}
                             initialView="dayGridMonth"
                             events={events}
+                            eventClick={handleEdit}
                         />
                     </Grid>
+                    <Grid item xs={2} />
 
-                    <Grid item xs={5}>
-                        <Grid container>
-                            <Grid item xs={12} style={{ paddingTop: 40 }}>
-                                <PDFViewer
-                                    date={defaultTSValues["Maintenance Date"]}
-                                    data={tableData}
-                                    dataType="mar_maintenance_report"
-                                    classes={classes}
-                                    handleDownload={handleDownloadReport}
-                                />
-                            </Grid>
-                        </Grid>
-                    </Grid>
                     <Grid item xs={12}>
-                        <Grid item xs={12}>
-                            <FabMuiTable
-                                classes={{}}
-                                addLabel=""
-                                data={{
-                                    columns: columns,
-                                    rows: tableData,
-                                }}
-                                handlers={{
-                                    handleAdd,
-                                    handleEdit,
-                                    handleDelete,
-                                }}
-                                options={options}
-                                cmd={cmd}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Typography variant="subtitle2">
-                                * click row to Raise/Modify/Remove Maintenance
-                                log data.
-                            </Typography>
-                        </Grid>
                         <Grid container align="center">
                             <Grid item xs={4} />
                             <Grid item xs={4}>
@@ -421,13 +319,14 @@ export default function MaintenanceLogs() {
                     </Grid>
                 </Grid>
             </Container>
+
             <Dialog
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="form-dialog-title"
             >
                 <DialogTitle id="form-dialog-title">
-                    Maintenance Log
+                    Situation Logs
                 </DialogTitle>
                 <DialogContent>
                     <Forms
@@ -455,8 +354,8 @@ export default function MaintenanceLogs() {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Removing this Maintenance Log data cannot be undone. Are
-                        you sure you want to remove this entry?
+                        Removing this Incident Log data cannot be
+                        undone. Are you sure you want to remove this entry?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

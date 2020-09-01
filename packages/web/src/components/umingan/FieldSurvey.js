@@ -1,6 +1,5 @@
 import React, { useState, Fragment } from "react";
-import { AlertValidation, CurrentAlert } from "./EWIFeature";
-import PDFViewer from './field_survey/PDFViewer'
+import LatestReportSummary from './field_survey/LatestReportSummary'
 import FieldSurveyLogs from './field_survey/FieldSurveyLogs'
 
 import PropTypes from "prop-types";
@@ -8,7 +7,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 
 function TabPanel(props) {
@@ -76,11 +74,8 @@ export default function FieldSurvey() {
                 </Tabs>
             </AppBar>
             <TabPanel value={value} index={0}>
-                <PDFViewer 
-                    data={[]}
-                    noImport={false} 
+                <LatestReportSummary
                     classes={classes}
-                    handleDownload={() => console.log("download")}
                 />
             </TabPanel>
             <TabPanel value={value} index={1}>

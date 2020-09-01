@@ -364,7 +364,7 @@ export default function IncidentLogs() {
                                 <PDFPreviewer
                                     date={defaultTSValues["Incident Date"]}
                                     data={tableData}
-                                    dataType="incident_report"
+                                    dataType="mar_incident_report"
                                     classes={classes}
                                     handleDownload={handleDownloadReport}
                                 />

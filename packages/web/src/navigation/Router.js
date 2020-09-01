@@ -26,7 +26,6 @@ function RouterApp() {
     )
   }
   const site_id = "credentials" in cookies && "site_id" in cookies.credentials ? cookies.credentials.site_id : null;
-  console.log("credentials", cookies);
   return (
     <BrowserRouter>
       <Switch>

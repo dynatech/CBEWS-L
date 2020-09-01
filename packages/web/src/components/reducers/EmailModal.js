@@ -76,7 +76,6 @@ export default function EmailModal(props) {
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            
                             <ReactQuill theme="snow" value={email_body} onChange={setEmailBody}/>
                         </Grid>
                     </Grid>
