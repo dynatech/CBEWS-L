@@ -51,6 +51,7 @@ function LogoSeries(props) {
                 </Fragment>
             );
     }
+    console.log("site_preference", site_preference)
     return (
         <Container className={classes.logo_container}>
             <Grid container spacing={0} alignItems="center" justify="center">
@@ -61,15 +62,7 @@ function LogoSeries(props) {
                     <CardMedia />
                     <img className={classes.xs_image} src={dynaslope_seal} />
                 </Grid>
-                <Grid item xs={4} md={2}>
-                    <img className={classes.xs_image} src={mar_seal} />
-                </Grid>
-                <Grid item xs={4} md={2}>
-                    <img className={classes.xs_image} src={leon_seal} />
-                </Grid>
-                <Grid item xs={4} md={2}>
-                    <img className={classes.xs_image} src={umi_seal} />
-                </Grid>
+                {site_preference}
             </Grid>
         </Container>
     );

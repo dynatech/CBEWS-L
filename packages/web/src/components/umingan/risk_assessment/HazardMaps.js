@@ -58,7 +58,7 @@ export default function HazardMaps() {
         const response = await UmiRiskManagement.GetHazardMaps();
         if (response.status) {
             if (response.data.length > 0) {
-                setMapPreview(`http://192.168.150.244:8080/UMINGAN/MAPS/${response.data[0].filename}`);
+                setMapPreview(`${AppConfig.HOST_DIR}:8080/UMINGAN/MAPS/${response.data[0].filename}`);
             }
         }
     };
@@ -105,7 +105,7 @@ export default function HazardMaps() {
                 <Container className={classes.img_container}>
                     <Grid container spacing={2} align="center">
                         <Grid item xs={12} />
-                        <Grid item xs={12}>
+                        <Grid item xs={8}>
                             <Magnifier
                                 imageSrc={mapPreview}
                                 imageAlt="MAR Hazard Map"
@@ -113,6 +113,7 @@ export default function HazardMaps() {
                                 touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
                             />
                         </Grid>
+                        <Grid item xs={4}/>
                         <Grid item={true} xs={12}>
                             <Fab
                                 variant="extended"

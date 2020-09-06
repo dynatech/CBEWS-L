@@ -11,10 +11,11 @@ from fpdf import FPDF, HTMLMixin
 
 from src.model.v2.mar.maintenance_logs import Maintenance as maintenance
 from src.api.helpers import Helpers as helpers
-from src.api.v2.file_management import FileManagement
+from src.api.v2.file_management.file_management import (
+    write_pdf_internal
+)
 from config import APP_CONFIG
 
-from src.api.v2.file_management import file_management
 
 MAINTENANCE_LOGS_BLUEPRINT = Blueprint(
     "maintenance_logs_blueprint", __name__)
@@ -198,7 +199,9 @@ def write_maintenance_log_pdf():
         json = request.get_json()
 
         json["directory"] = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOG/"
-        response = FileManagement.write_pdf_internal(json)
+        response = write_pdf_internal(json)
+
+    except Exception as err:
+        print(err)
 
     return jsonify(response)
-

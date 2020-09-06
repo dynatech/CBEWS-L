@@ -58,10 +58,13 @@ export default function HazardMaps() {
 
     const initHazardMaps = async () => {
         const response = await MarCommunityRiskAssessment.GetHazardMaps();
+        console.log("response")
         if (response.status) {
             if (response.data.length > 0) {
-                console.log();
-                setMapPreview(`http://192.168.150.244:8080/MARIRONG/MAPS/${response.data[0].filename}`);
+                console.log(response.message);
+                setMapPreview(`${AppConfig.HOST_DIR}:8080/MARIRONG/MAPS/${response.data[0].filename}`);
+            } else {
+                console.error(response.message);
             }
         }
     };
@@ -116,7 +119,7 @@ export default function HazardMaps() {
             <Container className={classes.img_container}>
                 <Grid container spacing={2} align="center">
                     <Grid item xs={12} />
-                    <Grid item xs={12}>
+                    <Grid item xs={9}>
                         <Magnifier
                             imageSrc={mapPreview}
                             imageAlt="MAR Hazard Map"
@@ -124,7 +127,8 @@ export default function HazardMaps() {
                             touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
                         />
                     </Grid>
-                    <Grid item={true} xs={12}>
+                    <Grid item xs={3} />
+                    <Grid item xs={12}>
                         <Fab
                             variant="extended"
                             color={"primary"}

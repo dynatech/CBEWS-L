@@ -62,6 +62,8 @@ export default function EmailModal(props) {
                                 value={recipient_list}
                                 onAdd={(chip) => handleChipAdd(chip)}
                                 onDelete={(chip, index) => handleDeleteChip(chip, index)}
+                                fullWidth
+                                label="Email Recipients"
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -73,6 +75,7 @@ export default function EmailModal(props) {
                                 variant="outlined"
                                 value={subject}
                                 onChange={event => setSubject(event.target.value)}
+                                fullWidth
                             />
                         </Grid>
                         <Grid item xs={12}>

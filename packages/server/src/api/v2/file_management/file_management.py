@@ -4,6 +4,7 @@ import glob
 import smtplib
 import ntpath
 from pathlib import Path
+from fpdf import FPDF, HTMLMixin
 from flask import Blueprint, jsonify, request, send_file, send_from_directory, safe_join, abort, url_for, redirect
 from src.api.helpers import Helpers as h
 
@@ -172,7 +173,7 @@ def write_pdf_internal(json):
     return response
 
 
-@MAINTENANCE_LOGS_BLUEPRINT.route("/send/maintenance_logs/report", methods=["POST"])
+@FILE_MANAGEMENT_BLUEPRINT.route("/send/maintenance_logs/report", methods=["POST"])
 def send_maintenance_logs_pdf_via_email():
     """
     """

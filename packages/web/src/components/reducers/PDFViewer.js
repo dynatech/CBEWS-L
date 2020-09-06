@@ -53,6 +53,7 @@ function convertToSimpleHTML(data_type, data) {
                 break;
             case "umi_field_survey":
                 const survey_rep = data[0];
+                console.log("survey_rep", survey_rep);
                 return_element = (
                     <table style={{width: "30%", borderSpacing: "5px", marginLeft: "10%"}}>
                         <tr>
