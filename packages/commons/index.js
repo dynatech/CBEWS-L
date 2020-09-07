@@ -11,6 +11,7 @@ import { GetMaintenanceLogs, GetDayMaintenanceLogs, GetMonthMaintenanceLogs, Ins
 import { GetHazardMaps as UmiGetHazardMaps, UploadHazardMaps as UmiUploadHazardMaps } from './src/UMI/RiskAssessment/HazardMaps';
 import { GetFieldSurveyLogs, InsertFieldSurveyLogs, UpdateFieldSurveyLogs, DeleteFieldSurveyLogs, UpdateAttachmentFile } from './src/UMI/FieldSurvey/FieldSurveyLogs';
 import { GetLatestReportSummary, DownloadLatestReportSummary, EmailLatestReportSummary } from './src/UMI/FieldSurvey/ReportSummary';
+import { GetReportsByRange } from './src/UMI/Reports/ReportManager';
 import { InsertEventsTemplate, UpdateEventsTemplate, GetAllEventsTemplate, DeleteEventsTemplate } from './src/MAR/EventsTemplate/EventsTemplate';
 import { GetCurrentSituationReport, DownloadSituationReport, EmailSituationReport } from './src/UMI/SituationReport/CurrentSituationReport';
 import { GetSituationReport, InsertSituationReport, UpdateSituationReport, DeleteSituationReport, UploadSituationReport, UpdateSituationReportAttachmentFile} from './src/UMI/SituationReport/SituationReport';
@@ -108,6 +109,10 @@ const UmiSituationReport = {
     UpdateSituationReportAttachmentFile
 }
 
+const UmiReports = {
+    GetReportsByRange
+}
+
 export {
     AlertGeneration,
     UserManagement,
@@ -116,5 +121,6 @@ export {
     MarEventsTemplate,
     UmiRiskManagement,
     UmiFieldSurvey,
-    UmiSituationReport
+    UmiSituationReport,
+    UmiReports
 }
