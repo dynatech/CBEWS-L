@@ -9,6 +9,7 @@ import moment from 'moment';
 import { Calendar } from 'react-native-calendars';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
+import NetworkUtils from '../../../utils/NetworkUtils';
 
 function CurrentSituationReport() {
 
@@ -17,11 +18,11 @@ function CurrentSituationReport() {
     const [situationReportDate, setSituationReportDate] = useState(moment().format('MMMM Do YYYY, h:mm:ss a'));
     const [isDisabled, setDisabled] = useState(false);
 
-    const init = async () => {
-        let response = await UmiSituationReport.GetSituationReport()
-        let temp = [];
-        if (response.status === true) {
-            if (response.data.length != 0) {
+
+    useEffect(() => {
+        MobileCaching.getItem('UmiSituationReport').then(response => {
+            let temp = [];
+            if (response.length != 0) {
                 temp.push(
                     <View key={'container'}>
                         <View key={'feature_container'}>
@@ -29,7 +30,7 @@ function CurrentSituationReport() {
                                 Situation Report Summary
                             </Text>
                             <Text key={'feature_value'}style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
-                                { response.data[0].report_summary }
+                                { response[0].report_summary }
                             </Text>
                         </View>
                         <View key={'attachments'}>
@@ -37,12 +38,12 @@ function CurrentSituationReport() {
                                 Attachments
                             </Text>
                             <Text key={'materials_characterization_value'}style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
-                                { response.data[0].attachment_path }
+                                { response[0].attachment_path }
                             </Text>
                         </View>
                     </View>
                 )
-                setSituationReportDate(moment(response.data[0].report_ts).format('MMMM Do YYYY, h:mm:ss a'));
+                setSituationReportDate(moment(response[0].report_ts).format('MMMM Do YYYY, h:mm:ss a'));
             } else {
                 temp.push(
                     <Text key={0} style={[LabelStyle.medium_label, LabelStyle.brand, {fontWeight: 'bold'}]}>
@@ -51,11 +52,14 @@ function CurrentSituationReport() {
                 )
                 setDisabled(true);
             }
-            setSituationReport(response.data);
+            setSituationReport(response);
             setSituationReportContainer(temp)
-        } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-        }
+        });
+    }, [])
+
+
+    const init = (data) => {
+
     }
 
     const download = async () => {

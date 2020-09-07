@@ -4,12 +4,13 @@ import { DataTable } from 'react-native-paper';
 import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
 import { ButtonStyle } from '../../../styles/button_style';
-import { UmiSituationReport, UmiFieldSurvey } from '@dynaslope/commons';
+import { UmiSituationReport } from '@dynaslope/commons';
 import { Calendar } from 'react-native-calendars';
 import Forms from '../../utils/Forms';
 import moment from 'moment';
-import Uploader from '../../utils/Uploader';
 import MobileCaching from '../../../utils/MobileCaching';
+import NetworkUtils from '../../../utils/NetworkUtils';
+import Uploader from '../../utils/Uploader';
 
 function SituationReportLogs () {
 
@@ -22,31 +23,47 @@ function SituationReportLogs () {
     const [markedDates, setMarkedDates] = useState({});
     const [selectedDate, setSelectedDate] = useState('');
     const [defaultStrValues, setDefaultStrValues] = useState({});
-
-    let formData = useRef();
-
-    useEffect(() => {
-        init();
-        setDefaultStrValues(default_fields);
-    }, [])
-
     const default_fields = {
         'Report timestamp': '',
         'Situation Report Summary': '',
         'Attachment': 'N/A'
     }
 
-    const init = async () => {
+
+    let formData = useRef();
+
+    useEffect(() => {
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+                MobileCaching.getItem('UmiSituationReport').then(response => {
+                    init(response);
+                    setSituationReportLogs(response);
+                });
+            } else {
+                fetchLatestData();
+            }
+          },100);
+    }, [])
+
+    const init = async (data) => {
+        let temp = {};
+        data.forEach(element => {
+            temp[moment(element.report_ts).format('YYYY-MM-DD')] = {
+                selected: true
+            }
+        });
+        setSituationReportLogs(data);
+        setMarkedDates(temp);
+        setDataContainer([]);
+        setDefaultStrValues(default_fields);
+    }
+
+    const fetchLatestData = async () => {
         let response = await UmiSituationReport.GetSituationReport()
-        if (response.status === true) {
-            let temp = {};
-            response.data.forEach(element => {
-                temp[moment(element.report_ts).format('YYYY-MM-DD')] = {
-                    selected: true
-                }
-            });
-            setSituationReportLogs(response.data);
-            setMarkedDates(temp);
+        if (response.status == true) {
+            init(response.data);
+            MobileCaching.setItem('UmiSituationReport', response.data);
         } else {
             ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
         }
@@ -64,42 +81,71 @@ function SituationReportLogs () {
         let data = formData.current;
         if (!Object.keys(selectedData).length) {
             MobileCaching.getItem('user_credentials').then(credentials => {
-                let temp = {
-                    'report_ts': `${selectedDate} ${data['Reporttimestamp']}`,
-                    'report_summary': data['SituationReportSummary'],
-                    'user_id': credentials['user_id']
-                };
+
+                let temp = {};
+                let response = {};
                 setTimeout(async () => {
-                    let response = null;
-                    if ('attachment' in data) {
-                        const url = 'http://192.168.150.221:5000/v2/upload/situation_report/umi/situation_report_logs'
-                        const file = [{
-                          name: 'file',
-                          filename: data.attachment['filename'],
-                          filepath: data.attachment['filepath'],
-                          filetype: data.attachment['filetype'],
-                          filesize: data.attachment['filesize']
-                        }];
-                        
-                        let upload_status = await Uploader(url, file);
-                        if (upload_status.status == true) {
-                            temp['attachment'] = upload_status.file_path;
-                            response = await UmiSituationReport.InsertSituationReport(temp);
-                        } else {
-                          ToastAndroid.showWithGravity(upload_status.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        }
+                    const isConnected = await NetworkUtils.isNetworkAvailable();
+                    temp['report_ts'] = `${selectedDate} ${data['Reporttimestamp']}`;
+                    temp['report_summary'] = data['SituationReportSummary'];
+                    temp['user_id'] = credentials['user_id'];
+
+                    if (data['attachment'] === undefined) {
+                        temp['attachment_path'] = "N/A";
                     } else {
-                        temp['attachment'] = 'N/A';
-                        response = await UmiSituationReport.InsertSituationReport(temp);
+                        temp['attachment_path'] = data['attachment'];
                     }
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        init();
-                        closeForm();
+
+                    if (isConnected != true) {
+                        let cached = await MobileCaching.getItem("UmiSituationReport").then(cached_data => {
+                            temp["alterations"] = "add";
+                            cached_data.push(temp)
+                            try {
+                                MobileCaching.setItem("UmiSituationReport", cached_data);
+                                response = {
+                                    "status": true,
+                                    "message": "Situation Reports is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                }
+                            } catch (err) {
+                                response = {
+                                    "status": false,
+                                    "message": "Situation Reports failed to save data to memory."
+                                }
+                            }
+
+                            if (response.status == true) {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                                closeForm();
+                                setCmd('add');
+                            } else {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            }
+
+                            init(cached_data);
+                            return response;
+                        });
                     } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        setTimeout(async()=> {
+                            let upload_response = {};
+                            if (temp['attachment_path'] != "N/A") {
+                                upload_response = await uploadFile(temp['attachment_path']);
+                                temp['attachment_path'] = upload_response.file_path;
+                            } else {
+                                upload_response['status'] = true;
+                            }
+
+                            if (upload_response.status == true) {
+                                response = await UmiSituationReport.InsertSituationReport(temp)
+                                if (response.status == true) {
+                                    fetchLatestData();
+                                    closeForm();
+                                    setCmd('add');
+                                }
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            }
+                        }, 200);
                     }
-                }, 300);
+                }, 100);
             });
         } else {
             if (!Object.keys(selectedData).length) {
@@ -114,10 +160,13 @@ function SituationReportLogs () {
                                 let temp = {};
                                 switch(key) {
                                     case "Reporttimestamp":
-                                        temp['report_ts'] = data['Reporttimestamp'];
+                                        temp['report_ts'] = `${selectedDate} ${data['Reporttimestamp']}`
                                         break;
                                     case "Situationreportsummary":
                                         temp['report_summary'] = data['Situationreportsummary'];
+                                        break;
+                                    case "attachment":
+                                        temp['attachment_path'] = data['attachment'];
                                         break;
                                     default:
                                         temp[key.replace(" ","_").toLocaleLowerCase()] = data[key];
@@ -128,17 +177,57 @@ function SituationReportLogs () {
                             temp_array.push({'user_id': credentials['user_id']})
                             temp_array.push({'id': selectedData['id']})
 
-                            let response = await UmiSituationReport.UpdateSituationReport(temp_array)
 
-                            if (response.status == true) {
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                                init();
-                                closeForm();
-                                setDataContainer([]);
-                                setCmd('add');
+                            const isConnected = await NetworkUtils.isNetworkAvailable();
+                            let response = null;
+
+                            if (isConnected != true) {
+                                let temp = await MobileCaching.getItem("UmiSituationReport").then(cached_data => {
+                                    let state_contaner = selectedData;
+                                    temp_array.forEach(element => {
+                                        let key = Object.keys(element)[0];
+                                        state_contaner[key] = element[key];
+                                    });
+                                    state_contaner['alterations'] = "update";
+                                    state_contaner['attachment_path'] = selectedData['attachment_path']['filename'];
+                                    let index = cached_data.findIndex(x => x.id == selectedData['id']);
+                                    cached_data[index] = state_contaner;
+                                    try {
+                                        MobileCaching.setItem("UmiSituationReport", cached_data);
+                                        response = {
+                                            "status": true,
+                                            "message": "Situation Report is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                        }
+                                    } catch (err) {
+                                        response = {
+                                            "status": false,
+                                            "message": "Situation Report failed to save data to memory."
+                                        }
+                                    }
+                                    init(cached_data);
+                                    return response;
+                                });
                             } else {
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                                let updateFile = temp_array.some(obj => obj.hasOwnProperty("attachment_path"));
+                                let file_index = temp_array.findIndex(x => x.attachment_path != null);
+                                if (updateFile == true && temp_array[file_index].attachment_path != undefined) {
+                                    let checkFile = await UmiSituationReport.UpdateSituationReportAttachmentFile({
+                                        'id':selectedData['id'],
+                                        'file_path':temp_array[file_index].attachment_path
+                                    });
+                                    if (checkFile.status != true) {
+                                        let upload_response = await uploadFile(temp_array[file_index].attachment_path);
+                                        temp_array[file_index].attachment_path = upload_response.file_path
+                                    }
+                                }
+                                response = await UmiSituationReport.UpdateSituationReport(temp_array);
+                                fetchLatestData();
                             }
+
+                            closeForm();
+                            setDataContainer([]);
+                            setCmd('add');
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                         } else {
                             ToastAndroid.showWithGravity("No changes has been made. Please double check each field or Press back button to cancel.", ToastAndroid.LONG, ToastAndroid.CENTER)
                         }
@@ -148,7 +237,21 @@ function SituationReportLogs () {
         }
     }
 
+    const uploadFile = async (attachment) => {
+        const url = 'http://192.168.150.221:5000/v2/upload/situation_report/umi/situation_report_logs'
+        const file = [{
+          name: 'file',
+          filename: attachment.filename,
+          filepath: attachment.filepath,
+          filetype: attachment.filetype,
+          filesize: attachment.filesize
+        }];
+        let upload_status = await Uploader(url, file);
+        return upload_status
+    }
+
     const modifySummary = (data) => {
+        alert(JSON.stringify(data['attachment_path']));
         setSelectedData(data)
         setDefaultStrValues({
             'Report timestamp': moment(data['report_ts']).format("HH:mm:ss"),

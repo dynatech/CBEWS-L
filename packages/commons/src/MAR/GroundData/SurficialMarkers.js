@@ -35,7 +35,7 @@ const UpdateSurficialMarkerData = (data) => {
 };
 
 const GetSurficialMarkersData = () => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/mar  /surficial_markers`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/mar/surficial_markers`, {
         method: 'GET',
         headers: {
             Accept: 'application/json',

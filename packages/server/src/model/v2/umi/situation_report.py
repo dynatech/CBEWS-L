@@ -15,9 +15,8 @@ class SituationReportModel():
 		return ret_val
 		
 	def create_situation_report_logs(data):
-		print(data)
 		query = f"INSERT INTO situation_report VALUES (0, '{data['report_ts']}', '{data['report_summary']}', " \
-				f"'{data['attachment']}', '{data['user_id']}' , '{str(dt.today())}')"
+				f"'{data['attachment_path']}', '{data['user_id']}' , '{str(dt.today())}')"
 		ret_val = DB.db_modify(query,'cbewsl_umi_collections', True)
 		return ret_val
 
@@ -26,9 +25,7 @@ class SituationReportModel():
 		counter = 0
 		for x in data:
 			key = list(x)[0]
-			if 'id' == key:
-				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = '{x[key]}'"
-			else:
+			if 'id' != key:
 				if counter == 0:
 					query += f" {key} = '{x[key]}'"
 				else:
@@ -36,8 +33,12 @@ class SituationReportModel():
 			counter += 1
 		ret_val = DB.db_modify(query,'cbewsl_umi_collections', True)
 		return ret_val
-
 	def remove_situation_report_log(id):
 		query = f"DELETE FROM situation_report WHERE id = '{id}'"
 		ret_val = DB.db_modify(query,'cbewsl_umi_collections', True)
+		return ret_val
+
+	def check_file(id):
+		query = f"SELECT attachment_path FROM situation_report WHERE id='{id}'"
+		ret_val = DB.db_read(query, 'cbewsl_umi_collections')
 		return ret_val

@@ -82,4 +82,22 @@ const UploadSituationReport = async (data) => {
     return await Uploader(`${AppConfig.HOSTNAME}/v2/upload/situation_report/umi/situation_report_logs`, file);
 }
 
-export { GetSituationReport, InsertSituationReport, UpdateSituationReport, DeleteSituationReport, UploadSituationReport }
+const UpdateSituationReportAttachmentFile = (data) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/update/situation_report/umi/attachment`, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }).then((response) => response.json())
+        .then((responseJson) => {
+            return responseJson
+        })
+        .catch((error) => {
+            console.log(error)
+        }
+    );
+}
+
+export { GetSituationReport, InsertSituationReport, UpdateSituationReport, DeleteSituationReport, UploadSituationReport, UpdateSituationReportAttachmentFile }

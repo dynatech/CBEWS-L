@@ -106,21 +106,21 @@ function SurficialMarker() {
             let temp_dr = []
             let temp = []
 
-            setMarkerNames(responseJson.markers);
+            setMarkerNames(response.data);
 
-            responseJson.markers.forEach(element => {
+            response.data.forEach(element => {
                 temp_th.push(
                     <TableCell>{element[1].toUpperCase()}</TableCell>
                 )
             });
 
             setMarkersTH(temp_th);
-            responseJson.data.forEach(element => {
+            response.data.forEach(element => {
                 let temp_obj = {};
                 let marker_data = Object.values(element)[0];
 
                 temp_obj['ts'] = marker_data.ts
-                responseJson.markers.forEach(marker_element => {
+                response.markers.forEach(marker_element => {
                     temp_obj[marker_element[1]] = marker_data[marker_element[1]]
                 });
                 temp_obj['weather'] = marker_data.weather
@@ -135,7 +135,7 @@ function SurficialMarker() {
                         <TableCell component="th" scope="row">
                             {element.ts}
                         </TableCell>
-                        {responseJson.markers.forEach(marker_element => {
+                        {response.markers.forEach(marker_element => {
                             temp.push(<TableCell>{element[marker_element[1]]}</TableCell>)
                         })}
                         {temp}

@@ -29,7 +29,7 @@ const ButtonStyle = makeStyles((theme) => ({
         elevation: 20,
         marginRight: 10,
         marginLeft: 10,
-        width: width / 3,
+        width: "100%",
     },
     small2: {
         backgroundColor: "#083451",

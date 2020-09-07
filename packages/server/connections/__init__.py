@@ -76,8 +76,8 @@ def create_app():
 	from src.api.reports import REPORTS_BLUEPRINT
 	app.register_blueprint(REPORTS_BLUEPRINT, url_prefix="/api")
 
-    # from src.api.events.template_creator import TEMPLATE_CREATOR_BLUEPRINT
-    # app.register_blueprint(TEMPLATE_CREATOR_BLUEPRINT, url_prefix="/api")
+	# from src.api.events.template_creator import TEMPLATE_CREATOR_BLUEPRINT
+	# app.register_blueprint(TEMPLATE_CREATOR_BLUEPRINT, url_prefix="/api")
 
 	# from src.api.ground_data.on_demand import ON_DEMAND_BLUEPRINT
 	# app.register_blueprint(ON_DEMAND_BLUEPRINT, url_prefix="/api")
@@ -125,5 +125,8 @@ def create_app():
 
 	from src.api.v2.file_management.file_management import FILE_MANAGEMENT_BLUEPRINT
 	app.register_blueprint(FILE_MANAGEMENT_BLUEPRINT, url_prefix="/v2")
+
+	from src.api.v2.ground_data.surficial_markers import SURFICIAL_MARKERS_BLUEPRINT
+	app.register_blueprint(SURFICIAL_MARKERS_BLUEPRINT, url_prefix="/v2")
 
 	return app

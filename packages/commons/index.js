@@ -105,6 +105,7 @@ import {
   DownloadLatestReportSummary,
   EmailLatestReportSummary,
 } from "./src/UMI/FieldSurvey/ReportSummary";
+import { GetReportsByRange } from './src/UMI/Reports/ReportManager';
 import {
   GetCurrentSituationReport,
   DownloadSituationReport,
@@ -116,6 +117,7 @@ import {
   UpdateSituationReport,
   DeleteSituationReport,
   UploadSituationReport,
+  UpdateSituationReportAttachmentFile,
 } from "./src/UMI/SituationReport/SituationReport";
 
 import { GetOngoingAndExtendedMonitoring } from "./src/AlertGeneration/PublicAlerts";
@@ -226,16 +228,22 @@ const UmiSituationReport = {
   InsertSituationReport,
   UpdateSituationReport,
   DeleteSituationReport,
+  UpdateSituationReportAttachmentFile,
 };
 
+const UmiReports = {
+    GetReportsByRange
+}
+
 export {
-  AlertGeneration,
-  UserManagement,
-  MarCommunityRiskAssessment,
-  MarMaintenanceLogs,
-  MarEventsTemplate,
-  MarGroundData,
-  UmiRiskManagement,
-  UmiFieldSurvey,
-  UmiSituationReport,
-};
+    AlertGeneration,
+    UserManagement,
+    MarCommunityRiskAssessment,
+    MarMaintenanceLogs,
+    MarEventsTemplate,
+    MarGroundData,
+    UmiRiskManagement,
+    UmiFieldSurvey,
+    UmiSituationReport,
+    UmiReports
+}

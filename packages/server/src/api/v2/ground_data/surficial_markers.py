@@ -4,6 +4,7 @@ import sys
 from datetime import datetime as dt
 from src.model.ground_data import GroundData
 from config import APP_CONFIG
+from src.api.helpers import Helpers as h
 
 SURFICIAL_MARKERS_BLUEPRINT = Blueprint("surficial_markers_blueprint", __name__)
 
@@ -13,9 +14,9 @@ def fetch(site_code):
     try:
         site_list = APP_CONFIG["site_ids"]
         site_id = site_list[site_code]
-        temp_ts = ""
         temp_item = {}
         temp_dt_row = []
+        
         surficial_data = GroundData.fetch_surficial_data(site_id)
         surficial_markers = GroundData.fetch_surficial_markers(site_id)
         for row in surficial_data:
@@ -37,18 +38,18 @@ def fetch(site_code):
                 temp_item = {
                     ts: temp_dt_item
                 }
-        surficial = {
+        response = {
             "data": temp_dt_row,
             "markers": surficial_markers,
             "status": True,
             "message": "Fetch success!"
         }
     except Exception as err:
-        surficial = {
+        response = {
             "status": False,
             "message": f"Failed to fetch surficial data. Error: {err}"
         }
-    return jsonify(surficial)
+    return jsonify(response)
 
 
 @SURFICIAL_MARKERS_BLUEPRINT.route("/modify/ground_data/surficial_markers", methods=["PATCH"])
@@ -67,15 +68,12 @@ def modify():
             }
         else:
             mo_ret_val = GroundData.fetch_surficial_mo_id(data['ref_ts'], data['site_id'])
-            # marker_ids = dict(map(reversed, GroundData.fetch_marker_ids_v_moid(mo_ret_val[0][0])))
             marker_ids = dict(map(reversed, GroundData.fetch_marker_ids_v_moid(mo_ret_val[0]["mo_id"])))
             for x in data['marker_values']:
-                # status = GroundData.update_surficial_marker_values(mo_ret_val[0][0], marker_ids[x], data['marker_values'][x])
                 status = GroundData.update_surficial_marker_values(mo_ret_val[0]["mo_id"], marker_ids[x], data['marker_values'][x])
                 if status == None:
                     marker_values_update = False
             if marker_values_update == True:
-                # status = GroundData.update_surficial_marker_observation(mo_ret_val[0][0], 
                 status = GroundData.update_surficial_marker_observation(mo_ret_val[0]["mo_id"], 
                         data['new_ts'], data['weather'], data['observer'], data['site_id'])
                 if status != None:
@@ -103,12 +101,7 @@ def add():
         mo_status = GroundData.insert_marker_observation(data)
         missing_marker = []
         if mo_status['status'] == True:
-            if mo_status['mo_id'] != None:
-                surficial_value = []
-                surficial = {
-                    "status": True,
-                    "message": "Successfully added new surficial data."
-                }
+            if mo_status['mo_id'] is not None:
                 marker_ids = GroundData.fetch_surficial_markers(data['site_id'])
                 for id in marker_ids:
                     marker_status = GroundData.insert_marker_values(id[0], 
