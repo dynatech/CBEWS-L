@@ -129,4 +129,13 @@ def create_app():
 	from src.api.v2.ground_data.surficial_markers import SURFICIAL_MARKERS_BLUEPRINT
 	app.register_blueprint(SURFICIAL_MARKERS_BLUEPRINT, url_prefix="/v2")
 
+	from src.api.v2.data_analysis.surficial_analysis import SURFICIAL_ANALYSIS_BLUEPRINT
+	app.register_blueprint(SURFICIAL_ANALYSIS_BLUEPRINT, url_prefix="/v2")
+
+	from src.api.v2.data_analysis.rainfall_analysis import RAINFALL_ANALYSIS_BLUEPRINT
+	app.register_blueprint(RAINFALL_ANALYSIS_BLUEPRINT, url_prefix="/v2")
+
+	from src.api.v2.data_analysis.subsurface_analysis import SUBSURFACE_ANALYSIS_BLUEPRINT
+	app.register_blueprint(SUBSURFACE_ANALYSIS_BLUEPRINT, url_prefix="/v2")
+
 	return app
