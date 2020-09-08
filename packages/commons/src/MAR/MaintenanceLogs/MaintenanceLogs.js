@@ -134,6 +134,29 @@ const FetchLogAttachments = (maintenance_log_id) => {
     });
 }
 
+
+const SendPDFReportViaEmail = (data) => {
+    console.log("data", data);
+    return fetch(`${AppConfig.HOSTNAME}/v2/send/maintenance_logs/report`, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        return {
+            "status": false,
+            "message": error
+        };
+    });
+}
+
 export {
     GetMaintenanceLogs,
     GetDayMaintenanceLogs,
@@ -141,5 +164,6 @@ export {
     InsertMaintenanceLogs,
     UpdateMaintenanceLogs,
     DeleteMaintenanceLogs,
-    FetchLogAttachments
+    FetchLogAttachments,
+    SendPDFReportViaEmail,
 }

@@ -47,9 +47,9 @@ export default function CommunityRiskAssessmentPage () {
 
 
     return (
-        <Grid container spacing={0} style={{ margin: "1%"}} >
+        <Grid container spacing={0} style={{ margin: "1%", marginLeft: "5%"}} >
             <Grid item xs={2}>
-                <Grid container direction="column" className={classes.menuContainer}>
+                <Grid container direction="column" className={classes.menuContainer} spacing={0}>
                     <Grid item={true} xs={3} style={{ marginTop: '15%' }} />
                     <Grid item={true} xs={12} style={{ marginTop: '20%' }}>
                         <Fab variant="extended"

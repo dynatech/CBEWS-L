@@ -1,12 +1,21 @@
+import os
+from pathlib import Path
 from flask import Blueprint, jsonify, request
 from datetime import datetime
 from calendar import monthrange
 from werkzeug.datastructures import ImmutableMultiDict
 from flask_cors import CORS, cross_origin
 from connections import SOCKETIO
+
+from fpdf import FPDF, HTMLMixin
+
 from src.model.v2.mar.maintenance_logs import Maintenance as maintenance
 from src.api.helpers import Helpers as helpers
+from src.api.v2.file_management.file_management import (
+    write_pdf_internal
+)
 from config import APP_CONFIG
+
 
 MAINTENANCE_LOGS_BLUEPRINT = Blueprint(
     "maintenance_logs_blueprint", __name__)
@@ -117,11 +126,8 @@ def update():
 @MAINTENANCE_LOGS_BLUEPRINT.route("/delete/maintenance/mar/maintenance_logs", methods=["DELETE"])
 @cross_origin()
 def remove():
-    print("SHIIIIIIIIIIIIIT")
     data = request.get_json()
-    helpers.var_checker("data", data)
     status = maintenance.delete_maintenance_log(data['id'])
-    helpers.var_checker("status", status)
     if status == "0":
         return_value = {
             "status": True,
@@ -183,5 +189,19 @@ def fetch_log_attachments(maintenance_log_id):
             "message": "Log attachment fetch NOT oks!",
             "data": []
         }
+
+    return jsonify(response)
+
+
+@MAINTENANCE_LOGS_BLUEPRINT.route("/write/maintenance_log/pdf", methods=["POST"])
+def write_maintenance_log_pdf():
+    try:
+        json = request.get_json()
+
+        json["directory"] = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOG/"
+        response = write_pdf_internal(json)
+
+    except Exception as err:
+        print(err)
 
     return jsonify(response)

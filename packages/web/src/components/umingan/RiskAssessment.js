@@ -12,6 +12,7 @@ import {
 } from "@material-ui/core";
 
 import { useStyles, tableStyles } from "../../styles/general_styles";
+import HazardMaps from './risk_assessment/HazardMaps';
 import HazardData from './risk_assessment/HazardData';
 import FamilyRiskProfile from './risk_assessment/FamilyRiskProfile';
 import ResourcesAndCapacities from './risk_assessment/ResourcesAndCapacities';
@@ -39,18 +40,11 @@ export default function RiskAssessment(props) {
                             <Button>Family Risk Profile</Button>
                         </ButtonGroup>
                     </Grid>
-                    {<RiskAssessmentSummary {...props} classes={classes} />}
-                    <Grid item xs={12}>
-                        <Paper elevation={3} className={classes.raPaper}>
-                            <Typography variant="h6">
-                                Hazard Map <Link>[edit]</Link>
-                            </Typography>
-                        </Paper>
-                        <br />
-                    </Grid>
-                    {<HazardData {...props} classes={classes} />}
-                    {<ResourcesAndCapacities {...props} classes={classes} />}
-                    {<FamilyRiskProfile {...props} classes={classes} />}
+                    <RiskAssessmentSummary {...props} classes={classes} />
+                    <HazardMaps {...props} classes={classes} />
+                    <HazardData {...props} classes={classes} />
+                    <ResourcesAndCapacities {...props} classes={classes} />
+                    <FamilyRiskProfile {...props} classes={classes} />
                 </Grid>
             </Container>
         </Fragment>

@@ -7,7 +7,7 @@ class GroundData():
     def fetch_surficial_data(site_id):
         query = f'SELECT ts, measurement, marker_name, observer_name, weather ' \
                 f'FROM senslopedb.site_markers INNER JOIN ' \
-                f'commons_db.sites USING (site_id) INNER JOIN ' \
+                f'cbewsl_commons_db.sites USING (site_id) INNER JOIN ' \
                 f'senslopedb.marker_data USING (marker_id) INNER JOIN senslopedb.marker_observations USING (mo_id) ' \
                 f'WHERE sites.site_id = "{site_id}" ORDER BY ts desc limit 100;'
         schema = DB.db_switcher(site_id)
@@ -23,19 +23,17 @@ class GroundData():
 
     def fetch_surficial_markers(site_id):
         query = f'SELECT marker_id, marker_name ' \
-            f'FROM senslopedb.site_markers INNER JOIN commons_db.sites USING (site_id) ' \
+            f'FROM senslopedb.site_markers INNER JOIN cbewsl_commons_db.sites USING (site_id) ' \
             f'WHERE sites.site_id = "{site_id}" ORDER BY marker_name;'
 
         schema = DB.db_switcher(site_id)
         result = DB.db_read(query, schema)
         return result
 
-
     def update_surficial_marker_values(mo_id, marker_id, value):
         query = f'UPDATE marker_data set measurement="{value}" WHERE marker_id = "{marker_id}" AND mo_id = "{mo_id}";'
         result = DB.db_modify(query, 'senslopedb', True)
         return result
-    
 
     def update_surficial_marker_observation(mo_id, ts, weather, observer, site_id):
         try:
@@ -49,7 +47,6 @@ class GroundData():
         finally:
             return result
 
-
     def insert_marker_observation(data):
         try:
             (ts, weather, observer, marker_value, site_id) = data.values()
@@ -62,20 +59,17 @@ class GroundData():
         finally:
             return result
 
-
     def fetch_marker_ids_v_moid(mo_id):
         query = f'SELECT marker_id, marker_name FROM senslopedb.marker_data ' \
             f'INNER JOIN senslopedb.marker_names ON marker_id = name_id where mo_id = "{mo_id}";'
         result = DB.db_read(query, 'senslopedb')
         return result
 
-
     def fetch_surficial_mo_id(ts, site_id):
         query = f'SELECT mo_id FROM senslopedb.marker_observations WHERE ts = "{ts}" and site_id = "{site_id}" limit 1;'
         schema = DB.db_switcher(site_id)
         result = DB.db_read(query, schema)
         return result
-
 
     def insert_marker_values(id, value, mo_id):
         try:
@@ -86,7 +80,6 @@ class GroundData():
             result = {"status": False, "message": err}
         finally:
             return result
-
 
     def delete_marker_observation(surficial_data):
         try:
@@ -109,17 +102,16 @@ class GroundData():
         finally:
             return result
 
-
     def delete_marker_values(mo_id):
         try:
             query = f'DELETE FROM marker_data WHERE mo_id = "{mo_id}"'
             status = DB.db_modify(query, 'senslopedb', True)
             result = {"status": True, "message": "Successfully delete surficial data."}
         except Exception as err:
+            print(err)
             result = {"status": False, "message": "Failed to delete surficial data."}      
         finally:
             return result
-
 
     def fetch_moms(site_id):
         try:
@@ -128,10 +120,10 @@ class GroundData():
                     f'WHERE site_id = "{site_id}" ORDER BY observance_ts DESC;'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
+            print(err)
             result = {"status": False, "message": "Failed to delete surficial data."} 
         finally:
             return result
-
 
     def insert_moms_instance(site_id, feature_id, feature_name, 
                             location, reporter):
@@ -141,10 +133,10 @@ class GroundData():
             status = DB.db_modify(query, 'senslopedb', True)
             result = status
         except Exception as err:
+            print(err)
             result = {"status": False, "message": "Failed to add MoMs data."}      
         finally:
             return result
-
 
     def insert_moms_record(instance, ts, remarks,
                             reporter_id, alert_level=0, validator_id=None):
@@ -177,7 +169,6 @@ class GroundData():
         finally:
             return result
 
-
     def fetch_feature_name(feature_id, feature, site_id):
         try:
             if isinstance(feature, str) and feature != '':
@@ -188,6 +179,7 @@ class GroundData():
                     f'site_id = {site_id} AND feature_id = {feature_id}'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
+            print(err)
             result = {"status": False, "message": "Failed to retrieve MoMs data."} 
         finally:
             return result
@@ -222,30 +214,14 @@ class GroundData():
         finally:
             return result
 
-
     def get_latest_od_events(site_id):
         query = "SELECT id, ts, site_id, reason, reporter, alert_level FROM public_alert_on_demand " 
         query += f"WHERE site_id = {site_id} " 
         query += "ORDER BY ts DESC"
-        print(query)
 
         od_data = DB.db_read(query, 'senslopedb')
 
-        return_list = []
-        if od_data:
-            return_list = []
-            for row in od_data:
-                return_list.append({
-                    "id": row[0],
-                    "ts": Helpers.dt_to_str(row[1]),
-                    "site_id": row[2],
-                    "reason": row[3],
-                    "reporter": row[4],
-                    "alert_level": row[5]
-                })
-
-        return return_list
-
+        return od_data
 
     def insert_on_demand_alert(ts, site_id, reason, reporter, alert_level):
         """

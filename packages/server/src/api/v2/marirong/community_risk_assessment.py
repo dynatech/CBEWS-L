@@ -1,6 +1,7 @@
 import time
 import os
 import glob
+import ntpath
 from stat import S_ISREG, ST_CTIME, ST_MODE
 from pathlib import Path
 from flask import Blueprint, jsonify, request, redirect, url_for, send_from_directory, send_file
@@ -156,40 +157,42 @@ def upload_community_risk_assessment_file():
 
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/community_risk_assessment/mar/hazard_map", methods=["GET"])
 def fetch_hazard_map():
-    file_loc = APP_CONFIG['MARIRONG_DIR']
+    try:
+        file_loc = APP_CONFIG['MARIRONG_DIR']
 
-    basepath = f'{file_loc}/MAPS'
-    # map_list = os.listdir(basepath)
-    map_list = glob.glob(basepath+"/*")
-    latest_file = max(map_list, key=os.path.getctime)
-    latest_file = latest_file.split("\\", 1)
-    map_list = [*latest_file]
+        basepath = f'{file_loc}/MAPS'
+        # map_list = os.listdir(basepath)
+        map_list = glob.glob(basepath+"/*")
+        latest_file = max(map_list, key=os.path.getctime)
+        latest_file = latest_file.split("\\", 1)
+        map_list = [*latest_file]
 
-    h.var_checker("map_list", map_list)
-    h.var_checker("latest", latest_file)
+        entries = ((os.stat(path), path) for path in map_list)
+        # leave only regular files, insert creation date
+        entries = ((stat[ST_CTIME], path)
+        for stat, path in entries if S_ISREG(stat[ST_MODE]))
+        h.var_checker("entries", entries)
 
-    entries = ((os.stat(path), path) for path in map_list)
-    # leave only regular files, insert creation date
-    entries = ((stat[ST_CTIME], path)
-    for stat, path in entries if S_ISREG(stat[ST_MODE]))
-    h.var_checker("entries", entries)
-    maps = []
+        maps = []
+        for map in map_list:
+            path = Path(basepath)
+            filepath = path / map
+            if not os.path.isdir(filepath):
+                file_type = map.split(".")[1]
+                head, filename = ntpath.split(map)
+                maps.append({
+                    "filename": filename,
+                    "file_type": file_type,
+                    "file_path": basepath
+                })
 
-    for map in map_list:
-        # path = os.path.join(basepath, map)
-        path = Path(basepath)
-        filepath = path / map
-        if not os.path.isdir(filepath):
-            file_type = map.split(".")[1]
-            maps.append({
-                "filename": map,
-                "file_type": file_type,
-                "file_path": basepath
-            })
+        response = {"status": True, "data": maps, "message": "Success loading map"}
+    except ValueError as val_err:
+        response = {"status": True, "data": [], "message": "No maps found"}
+    except Exception as err:
+        response = {"status": False, "data": maps, "message": "Failed loading map"}
 
-    h.var_checker("maps", maps)
-
-    return jsonify({"status": True, "data": maps})
+    return jsonify(response)
 
 
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/upload/community_risk_assessment/mar/hazard_map", methods=["POST"])

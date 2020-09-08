@@ -5,12 +5,12 @@ from src.api.helpers import Helpers as h
 class FieldSurveyModel():
 
 	def fetch_latest_field_survey():
-		query = "SELECT * FROM field_survey order by report_date desc limit 1;"
+		query = "SELECT * FROM field_survey ORDER BY report_date DESC LIMIT 1"
 		ret_val = DB.db_read(query, 'cbewsl_umi_collections')
 		return ret_val
 
 	def fetch_field_survey_logs():
-		query = "SELECT * FROM field_survey order by report_date"
+		query = "SELECT * FROM field_survey ORDER BY report_date DESC"
 		ret_val = DB.db_read(query, 'cbewsl_umi_collections')
 		return ret_val
 
@@ -37,8 +37,8 @@ class FieldSurveyModel():
 		for x in data:
 			key = list(x)[0]
 			if 'id' == key:
-				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = '{x[key]}'"
-		ret_val = DB.db_modify(query, 'CBEWSL_UMI_collections', True)
+				query = f"{query}, last_ts = '{h.dt_to_str(dt.today())}' WHERE id = {int(x[key])}"
+		ret_val = DB.db_modify(query, 'cbewsl_umi_collections', True)
 		return ret_val
 
 	def remove_field_survey_logs(id):

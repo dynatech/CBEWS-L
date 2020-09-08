@@ -128,7 +128,7 @@ export default function RiskAssessmentSummary(props) {
                 defaultTSValues,
                 json,
             );
-            response = await UmiRiskManagement.InsertFamilyRiskProfile(json);
+            response = await UmiRiskManagement.InsertSummary(json);
         } else {
             // EDIT
             hasModifiedRow = true;
@@ -142,8 +142,7 @@ export default function RiskAssessmentSummary(props) {
                         temp["adaptive_capacity"] = json[key]
                         break;
                     default:
-                        temp[key.replace(" ", "_").toLocaleLowerCase()] =
-                            json[key];
+                        temp[key.replace(" ", "_").toLocaleLowerCase()] = json[key];
                         break;
                 }
                 temp_array.push(temp);
@@ -172,7 +171,7 @@ export default function RiskAssessmentSummary(props) {
         const input = {
             id: selectedData.id,
         };
-        const response = await UmiRiskManagement.UpdateSummary(input);
+        const response = await UmiRiskManagement.DeleteSummary(input);
         if (response.status === true) {
             initTable();
             setOpen(false);

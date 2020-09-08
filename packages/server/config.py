@@ -25,12 +25,14 @@ class ProductionConfig(Config):
 
     DEBUG = False
 
-APP_DIR = "C:/Users/John Louie/codes"
+# APP_DIR = "C:/Users/John Louie/codes"
+APP_DIR = "/home/louie-cbews/CODES"
 
 APP_CONFIG = {
     "development": DevelopmentConfig,
     "production": ProductionConfig,
     "url": "http://localhost:3000",
+    "WEB_ASSETS_DIR": f"{APP_DIR}/CBEWS-L/packages/web/src/assets",
     "MARIRONG_DIR": f"{APP_DIR}/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG",
     "CRA_PATH": f"{APP_DIR}/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG/DOCUMENTS/",
     "MAPS_PATH": f"{APP_DIR}/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG/MAPS/",

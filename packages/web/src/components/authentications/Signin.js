@@ -54,7 +54,6 @@ export default function SignInSide(props) {
 
     useEffect(() => {
         if ("credentials" in cookies && "site_id" in cookies.credentials) {
-            console.log("cookies", cookies);
             handleChangeRoute("dashboard");
         }
     }, []);
@@ -112,12 +111,9 @@ export default function SignInSide(props) {
                         onSubmit={(values, { setSubmitting }) => {
                             setTimeout(async () => {
                                 let response = await UserManagement.UserAuthentication(values);
-                                console.log("response", response);
                                 if (response.status === true) {
-                                    console.log("signed in");
                                     setCookie('credentials', response.user_data, { path: "/" });
                                     loginSeverityRef.current = (<Alert onClose={handleClose} severity="success">{response.message}</Alert>);
-                                    console.log("loginSeverityRef", loginSeverityRef);
                                     handleChangeRoute('dashboard');
                                 } else {
                                     console.error("problem signing in");

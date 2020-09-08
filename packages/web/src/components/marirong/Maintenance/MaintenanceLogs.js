@@ -14,7 +14,6 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-// import '../../../../node_modules/@fullcalendar/core/main.css';
 import "../../../../node_modules/@fullcalendar/daygrid/main.css";
 
 import Dialog from "@material-ui/core/Dialog";
@@ -23,8 +22,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContentText from "@material-ui/core/DialogContentText";
 
-import AttachmentsGridList from "../../reducers/AttachmentList";
-import PDFPreviewer from "../../reducers/PDFViewer";
+import PDFViewer from "../../reducers/PDFViewer";
 import AppConfig from "../../reducers/AppConfig";
 
 import { MarMaintenanceLogs } from "@dynaslope/commons";
@@ -37,6 +35,8 @@ import FabMuiTable from "../../utils/MuiTable";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import { useCookies } from "react-cookie";
+
+import { renderToString } from "react-dom/server";
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -66,14 +66,6 @@ function getWindowDimensions() {
         height,
     };
 }
-
-const defaultVars = {
-    maintenance_date: moment().format("YYYY-MM-DD hh:mm:ss"),
-    type: "",
-    remarks: "",
-    in_charge: "",
-    updater: "",
-};
 
 export default function MaintenanceLogs() {
     const cmd = "update-delete";
@@ -138,7 +130,6 @@ export default function MaintenanceLogs() {
         const response = await MarMaintenanceLogs.GetDayMaintenanceLogs(
             timestamp,
         );
-        console.log("response", response);
         if (response.status === true) {
             setTableData(response.data);
         } else {
@@ -153,7 +144,6 @@ export default function MaintenanceLogs() {
             start,
             end,
         );
-        console.log("response", response);
         if (response.status === true) {
             setEvents(
                 response.data.map((row) => ({
@@ -170,7 +160,6 @@ export default function MaintenanceLogs() {
     };
 
     const handleEdit = (data) => {
-        console.log("data", data);
         setSelectedData(data);
         setDefaultStrValues({
             Type: data["type"],
@@ -229,9 +218,7 @@ export default function MaintenanceLogs() {
         }
     };
 
-    ////////////////////////////////////////
-    ///////////// GREAT SUBMIT /////////////
-    ////////////////////////////////////////
+
     const submit = async () => {
         let json = formData.current;
         json.user_id = cookies.credentials.user_id;
@@ -250,7 +237,6 @@ export default function MaintenanceLogs() {
             json.remarks = json.Remarks;
             json.in_charge = json.InCharge;
             json.updater = json.Updater;
-            console.log("json", json);
             response = await MarMaintenanceLogs.InsertMaintenanceLogs(json);
         } else {
             // EDIT
@@ -280,7 +266,6 @@ export default function MaintenanceLogs() {
                 }
                 temp_array.push(temp);
             });
-            console.log("temp_array", temp_array);
             response = await MarMaintenanceLogs.UpdateMaintenanceLogs(
                 temp_array,
             );
@@ -348,7 +333,19 @@ export default function MaintenanceLogs() {
     };
 
     const dateClickHandler = (args) => {
+        setDefaultTSValues({
+            "Maintenance Date": args.date,
+        });
         getMaintenanceLogsPerDay(args.date);
+    };
+
+    const handleDownloadReport = (html) => async () => {
+        const file_date = moment(defaultTSValues["Maintenance Date"]).format("YYYY-MM-DD");
+        const filename = `${file_date}_maintenance_log.pdf`;
+        const response = await MarMaintenanceLogs.RenderPDF(filename, renderToString(html));
+        if (response.status === true) {
+            MarMaintenanceLogs.DownloadPDF(filename);
+        }
     };
 
     return (
@@ -358,9 +355,7 @@ export default function MaintenanceLogs() {
                     <Grid item xs={7}>
                         <FullCalendar
                             datesSet={calendarRenderHandler}
-                            dateClick={(args) =>
-                                getMaintenanceLogsPerDay(args.date)
-                            }
+                            dateClick={dateClickHandler}
                             plugins={[
                                 dayGridPlugin,
                                 timeGridPlugin,
@@ -374,44 +369,14 @@ export default function MaintenanceLogs() {
                     <Grid item xs={5}>
                         <Grid container>
                             <Grid item xs={12} style={{ paddingTop: 40 }}>
-                                <PDFPreviewer
+                                <PDFViewer
+                                    date={defaultTSValues["Maintenance Date"]}
                                     data={tableData}
-                                    dataType="maintenance_report"
+                                    dataType="mar_maintenance_report"
+                                    classes={classes}
+                                    handleDownload={handleDownloadReport}
                                 />
                             </Grid>
-                            {tableData.length > 0 && (
-                                <Grid item xs={12}>
-                                    <Grid
-                                        container
-                                        align="center"
-                                        style={{ paddingTop: 20 }}
-                                    >
-                                        <Grid item xs={3} />
-                                        <Grid item xs={3}>
-                                            <Fab
-                                                variant="extended"
-                                                color="primary"
-                                                aria-label="add"
-                                                className={classes.button_fluid}
-                                                onClick={() => {}}
-                                            >
-                                                Download
-                                            </Fab>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Fab
-                                                variant="extended"
-                                                color="primary"
-                                                aria-label="add"
-                                                className={classes.button_fluid}
-                                                onClick={() => {}}
-                                            >
-                                                Print
-                                            </Fab>
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-                            )}
                         </Grid>
                     </Grid>
                     <Grid item xs={12}>
@@ -456,12 +421,6 @@ export default function MaintenanceLogs() {
                     </Grid>
                 </Grid>
             </Container>
-            {console.log(
-                "defaultStringValues",
-                defaultStringValues,
-                "defaultTSValues",
-                defaultTSValues,
-            )}
             <Dialog
                 open={open}
                 onClose={handleClose}

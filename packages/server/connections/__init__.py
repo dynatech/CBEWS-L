@@ -34,11 +34,11 @@ def create_app():
 	SOCKETIO.init_app(app)
 	Talisman(app)
 
-	from src.api.users.user_account import USER_ACCOUNT_BLUEPRINT
-	app.register_blueprint(USER_ACCOUNT_BLUEPRINT, url_prefix="/api")
+	# from src.api.users.user_account import USER_ACCOUNT_BLUEPRINT
+	# app.register_blueprint(USER_ACCOUNT_BLUEPRINT, url_prefix="/api")
 
-	from src.api.users.user import USER_BLUEPRINT
-	app.register_blueprint(USER_BLUEPRINT, url_prefix="/api")
+	# from src.api.users.user import USER_BLUEPRINT
+	# app.register_blueprint(USER_BLUEPRINT, url_prefix="/api")
 
 	# from src.api.risk_assessment.cav import CAPACITY_AND_VULNERABILITY_BLUEPRINT
 	# app.register_blueprint(CAPACITY_AND_VULNERABILITY_BLUEPRINT, url_prefix="/api")
@@ -46,8 +46,8 @@ def create_app():
 	# from src.api.risk_assessment.cra import COMMUNITY_RISK_ASSESSMENT_BLUEPRINT
 	# app.register_blueprint(COMMUNITY_RISK_ASSESSMENT_BLUEPRINT, url_prefix="/api")
 
-	from src.api.ground_data.surficial_markers import SURFICIAL_MARKERS_BLUEPRINT
-	app.register_blueprint(SURFICIAL_MARKERS_BLUEPRINT, url_prefix="/api")
+	# from src.api.ground_data.surficial_markers import SURFICIAL_MARKERS_BLUEPRINT
+	# app.register_blueprint(SURFICIAL_MARKERS_BLUEPRINT, url_prefix="/api")
 
 	# from src.api.ground_data.manifestation_of_movements import MANIFESTATION_OF_MOVEMENTS_BLUEPRINT
 	# app.register_blueprint(MANIFESTATION_OF_MOVEMENTS_BLUEPRINT, url_prefix="/api")
@@ -55,17 +55,17 @@ def create_app():
 	# from src.api.alert_generation.public_alerts import PUBLIC_ALERTS_BLUEPRINT
 	# app.register_blueprint(PUBLIC_ALERTS_BLUEPRINT, url_prefix="/api")
 
-	from src.api.data_analysis.rainfall_analysis import RAINFALL_ANALYSIS_BLUEPRINT
-	app.register_blueprint(RAINFALL_ANALYSIS_BLUEPRINT, url_prefix="/api")
+	# from src.api.data_analysis.rainfall_analysis import RAINFALL_ANALYSIS_BLUEPRINT
+	# app.register_blueprint(RAINFALL_ANALYSIS_BLUEPRINT, url_prefix="/api")
 
-	from src.api.data_analysis.surficial_analysis import SURFICIAL_ANALYSIS_BLUEPRINT
-	app.register_blueprint(SURFICIAL_ANALYSIS_BLUEPRINT, url_prefix="/api")
+	# from src.api.data_analysis.surficial_analysis import SURFICIAL_ANALYSIS_BLUEPRINT
+	# app.register_blueprint(SURFICIAL_ANALYSIS_BLUEPRINT, url_prefix="/api")
 
-	from src.api.data_analysis.subsurface_analysis import SUBSURFACE_ANALYSIS_BLUEPRINT
-	app.register_blueprint(SUBSURFACE_ANALYSIS_BLUEPRINT, url_prefix="/api")
+	# from src.api.data_analysis.subsurface_analysis import SUBSURFACE_ANALYSIS_BLUEPRINT
+	# app.register_blueprint(SUBSURFACE_ANALYSIS_BLUEPRINT, url_prefix="/api")
 
-	from src.api.sensor_data.earthquake import EARTHQUAKE_BLUEPRINT
-	app.register_blueprint(EARTHQUAKE_BLUEPRINT, url_prefix="/api")
+	# from src.api.sensor_data.earthquake import EARTHQUAKE_BLUEPRINT
+	# app.register_blueprint(EARTHQUAKE_BLUEPRINT, url_prefix="/api")
 
 	#from src.api.maintenance.maintenance_logs import MAINTENANCE_LOGS_BLUEPRINT
 	#app.register_blueprint(MAINTENANCE_LOGS_BLUEPRINT, url_prefix="/api")
@@ -125,5 +125,8 @@ def create_app():
 
 	from src.api.v2.file_management.file_management import FILE_MANAGEMENT_BLUEPRINT
 	app.register_blueprint(FILE_MANAGEMENT_BLUEPRINT, url_prefix="/v2")
+
+	from src.api.v2.ground_data.surficial_markers import SURFICIAL_MARKERS_BLUEPRINT
+	app.register_blueprint(SURFICIAL_MARKERS_BLUEPRINT, url_prefix="/v2")
 
 	return app

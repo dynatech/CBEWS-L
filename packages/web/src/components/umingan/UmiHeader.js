@@ -66,7 +66,6 @@ export default function UmiHeader(props) {
     });
 
     const handleSignout = () => {
-        console.log("props", props);
         removeCookie(["credentials"]);
         alert("Signing out!");
         props.history.push("/");

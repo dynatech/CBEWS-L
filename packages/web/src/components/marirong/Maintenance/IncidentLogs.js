@@ -38,6 +38,8 @@ import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import { useCookies } from "react-cookie";
 
+import { renderToString } from "react-dom/server";
+
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -113,7 +115,6 @@ export default function IncidentLogs() {
             label: "Incident Report Narrative",
         },
         { name: "reporter", label: "Reporter" },
-        { name: "last_ts", label: "Last TS" },
     ];
 
     const calendarRenderHandler = (args) => {
@@ -328,7 +329,16 @@ export default function IncidentLogs() {
         getIncidentLogsPerDay(args.date);
     };
 
-
+    const handleDownloadReport = (html) => async () => {
+        const file_date = moment(defaultTSValues["Incident Date"]).format("YYYY-MM-DD");
+        const filename = `${file_date}_incident_log.pdf`
+        const response = await MarMaintenanceLogs.RenderPDF(filename, renderToString(html));
+        if (response.status === true) {
+            console.log("response", response);
+            console.log("filename", filename);
+            MarMaintenanceLogs.DownloadPDF(filename);
+        }
+    };
 
     return (
         <Fragment>
@@ -352,43 +362,13 @@ export default function IncidentLogs() {
                         <Grid container>
                             <Grid item xs={12} style={{ paddingTop: 40 }}>
                                 <PDFPreviewer
+                                    date={defaultTSValues["Incident Date"]}
                                     data={tableData}
-                                    dataType="incident_report"
+                                    dataType="mar_incident_report"
+                                    classes={classes}
+                                    handleDownload={handleDownloadReport}
                                 />
                             </Grid>
-                            {tableData.length > 0 && (
-                                <Grid item xs={12}>
-                                    <Grid
-                                        container
-                                        align="center"
-                                        style={{ paddingTop: 20 }}
-                                    >
-                                        <Grid item xs={3} />
-                                        <Grid item xs={3}>
-                                            <Fab
-                                                variant="extended"
-                                                color="primary"
-                                                aria-label="add"
-                                                className={classes.button_fluid}
-                                                onClick={() => {}}
-                                            >
-                                                Download
-                                            </Fab>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Fab
-                                                variant="extended"
-                                                color="primary"
-                                                aria-label="add"
-                                                className={classes.button_fluid}
-                                                onClick={() => {}}
-                                            >
-                                                Print
-                                            </Fab>
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-                            )}
                         </Grid>
                     </Grid>
                     <Grid item xs={12}>
