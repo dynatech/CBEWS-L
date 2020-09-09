@@ -20,7 +20,7 @@ def fetch(site_code):
         surficial_data = GroundData.fetch_surficial_data(site_id)
         surficial_markers = GroundData.fetch_surficial_markers(site_id)
         for row in surficial_data:
-            (ts, measurement, marker, observer, weather) = row
+            (ts, measurement, marker, observer, weather) = row.values()
             ts = str(ts)
             if ts in temp_item:
                 if not marker in temp_item[ts]:
