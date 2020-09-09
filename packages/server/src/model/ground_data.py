@@ -10,8 +10,7 @@ class GroundData():
                 f'cbewsl_commons_db.sites USING (site_id) INNER JOIN ' \
                 f'senslopedb.marker_data USING (marker_id) INNER JOIN senslopedb.marker_observations USING (mo_id) ' \
                 f'WHERE sites.site_id = "{site_id}" ORDER BY ts desc limit 100;'
-        schema = DB.db_switcher(site_id)
-        result = DB.db_read(query, schema)
+        result = DB.db_read(query, "senslopedb")
         return result
 
     def fetch_surficial_plot_data(marker_id, site_code, start, end):
@@ -26,8 +25,7 @@ class GroundData():
             f'FROM senslopedb.site_markers INNER JOIN cbewsl_commons_db.sites USING (site_id) ' \
             f'WHERE sites.site_id = "{site_id}" ORDER BY marker_name;'
 
-        schema = DB.db_switcher(site_id)
-        result = DB.db_read(query, schema)
+        result = DB.db_read(query, "senslopedb")
         return result
 
     def update_surficial_marker_values(mo_id, marker_id, value):
@@ -67,8 +65,7 @@ class GroundData():
 
     def fetch_surficial_mo_id(ts, site_id):
         query = f'SELECT mo_id FROM senslopedb.marker_observations WHERE ts = "{ts}" and site_id = "{site_id}" limit 1;'
-        schema = DB.db_switcher(site_id)
-        result = DB.db_read(query, schema)
+        result = DB.db_read(query, "senslopedb")
         return result
 
     def insert_marker_values(id, value, mo_id):
