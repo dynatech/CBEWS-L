@@ -13,7 +13,7 @@ import NetworkUtils from '../../utils/NetworkUtils';
 function Signin(props) {
     const navigator = props.navigation;
     const site_navigator = {
-        '51': 'MarirongDashboardStack',
+        '29': 'MarirongDashboardStack',
         '50': 'UminganDashboardStack'
     }
 

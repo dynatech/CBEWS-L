@@ -323,7 +323,7 @@ function FieldSurveyLogs () {
             setDataContainer(
                     <View style={[ContainerStyle.datatable_content, {paddingTop: 20}]}>
                         <ScrollView horizontal={true}>
-                            <DataTable style={{width: 500, padding: 10 }}>
+                            <DataTable style={{ width: 500, padding: 10 }}>
                                 <DataTable.Header>
                                     <DataTable.Title>Report Date</DataTable.Title>
                                     <DataTable.Title>Feature</DataTable.Title>
