@@ -118,9 +118,9 @@ export default function MOMS() {
         if (response.status === true) {
             let moms_container = [];
             response.data.forEach(element => {
-                const [feature_id, instance_id, site_id, feature_name,
+                const { feature_id, instance_id, site_id, feature_name,
                     location, reporter, moms_id, observace_ts, reporter_id,
-                    remarks, validator, op_trigger, feature_type, feature_desc] = element
+                    remarks, validator, op_trigger, feature_type, feature_desc } = element;
                 let temp = {
                     "instance_id": instance_id,
                     "site_id": site_id,

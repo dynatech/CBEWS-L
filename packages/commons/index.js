@@ -63,6 +63,15 @@ import {
     RaiseOnDemandAlert,
     InsertOnDemandData,
 } from "./src/MAR/GroundData/OnDemand";
+import {
+  GetRainfallPlotData
+} from "./src/MAR/DataAnalysis/RainfallAnalysis";
+import {
+  GetSurficialPlotData
+} from "./src/MAR/DataAnalysis/SurficialAnalysis";
+import {
+  GetSubsurfacePlotData
+} from "./src/MAR/DataAnalysis/SubsurfaceAnalysis";
 
 // UMI
 import {
@@ -130,6 +139,12 @@ const UserManagement = {
 
 const AlertGeneration = {
   GetOngoingAndExtendedMonitoring,
+};
+
+const MarDataAnalysis = {
+  GetRainfallPlotData,
+  GetSurficialPlotData,
+  GetSubsurfacePlotData,
 };
 
 const MarGroundData = {
@@ -242,6 +257,7 @@ export {
     MarMaintenanceLogs,
     MarEventsTemplate,
     MarGroundData,
+    MarDataAnalysis,
     UmiRiskManagement,
     UmiFieldSurvey,
     UmiSituationReport,
