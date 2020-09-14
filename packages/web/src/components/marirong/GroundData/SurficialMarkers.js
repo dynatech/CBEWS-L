@@ -100,28 +100,25 @@ function SurficialMarker() {
     const initSurficialMarker = async () => {
         const response = await MarGroundData.GetSurficialMarkersData();
         if (response.status === true) {
-            const responseJson = response.data;
             let temp_th = []
             let temp_tr = []
             let temp_dr = []
             let temp = []
 
-            setMarkerNames(response.data);
-
-            response.data.forEach(element => {
-                temp_th.push(
-                    <TableCell>{element[1].toUpperCase()}</TableCell>
-                )
+            setMarkerNames(response.markers);
+            response.markers.forEach(marker => {
+                temp_th.push( <TableCell id={`marker_id_${marker.marker_id}`}>{marker.marker_name.toUpperCase()}</TableCell> );
             });
-
             setMarkersTH(temp_th);
+
             response.data.forEach(element => {
                 let temp_obj = {};
                 let marker_data = Object.values(element)[0];
 
                 temp_obj['ts'] = marker_data.ts
                 response.markers.forEach(marker_element => {
-                    temp_obj[marker_element[1]] = marker_data[marker_element[1]]
+                    const name = marker_element.marker_name;
+                    temp_obj[name] = marker_data[name]
                 });
                 temp_obj['weather'] = marker_data.weather
                 temp_obj['observer'] = marker_data.observer
@@ -136,7 +133,7 @@ function SurficialMarker() {
                             {element.ts}
                         </TableCell>
                         {response.markers.forEach(marker_element => {
-                            temp.push(<TableCell>{element[marker_element[1]]}</TableCell>)
+                            temp.push(<TableCell>{element[marker_element.marker_name]}</TableCell>)
                         })}
                         {temp}
                         <TableCell>{element.weather}</TableCell>

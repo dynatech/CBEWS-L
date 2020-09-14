@@ -27,6 +27,8 @@ import moment from 'moment';
 import { useCookies } from 'react-cookie';
 import AppConfig from '../../reducers/AppConfig';
 
+import { MarGroundData } from '@dynaslope/commons'
+
 const tableStyle = makeStyles(theme => ({
     root: {
         width: '100%',
@@ -110,45 +112,38 @@ export default function MOMS() {
         initMoms(cookies.credentials.site_id);
     }, []);
 
-    const initMoms = (site_id = 29) => {
-        fetch(`${AppConfig.HOSTNAME}/api/ground_data/moms/fetch/${site_id}`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            }
-        }).then((response) => response.json())
-            .then((responseJson) => {
-                let moms_container = [];
-                responseJson.data.forEach(element => {
-                    const [feature_id, instance_id, site_id, feature_name,
-                        location, reporter, moms_id, observace_ts, reporter_id,
-                        remarks, validator, op_trigger, feature_type, feature_desc] = element
-                    let temp = {
-                        "instance_id": instance_id,
-                        "site_id": site_id,
-                        "feature_id": feature_id,
-                        "feature_name": feature_name,
-                        "location": location,
-                        "reporter": reporter,
-                        "moms_id": moms_id,
-                        "observance_ts": moment(observace_ts).format('YYYY-MM-DD HH:mm:ss'),
-                        "reporter_id": reporter_id,
-                        "remarks": remarks,
-                        "validator": validator,
-                        "op_trigger": op_trigger,
-                        "feature_type": feature_type,
-                        "feature_desc": feature_desc
-                    }
-                    moms_container.push(temp)
-                });
-                setMomsContainer(moms_container);
-                setDatatable(moms_container);
-            })
-            .catch((error) => {
-                console.log(error);
-            }
-            );
+    const initMoms = async (site_id = 29) => {
+        const response = await MarGroundData.GetMOMSData(site_id);
+        console.log("response", response)
+        if (response.status === true) {
+            let moms_container = [];
+            response.data.forEach(element => {
+                const [feature_id, instance_id, site_id, feature_name,
+                    location, reporter, moms_id, observace_ts, reporter_id,
+                    remarks, validator, op_trigger, feature_type, feature_desc] = element
+                let temp = {
+                    "instance_id": instance_id,
+                    "site_id": site_id,
+                    "feature_id": feature_id,
+                    "feature_name": feature_name,
+                    "location": location,
+                    "reporter": reporter,
+                    "moms_id": moms_id,
+                    "observance_ts": moment(observace_ts).format('YYYY-MM-DD HH:mm:ss'),
+                    "reporter_id": reporter_id,
+                    "remarks": remarks,
+                    "validator": validator,
+                    "op_trigger": op_trigger,
+                    "feature_type": feature_type,
+                    "feature_desc": feature_desc
+                }
+                moms_container.push(temp)
+            });
+            setMomsContainer(moms_container);
+            setDatatable(moms_container);
+        } else {
+            console.error(response.message);
+        }
     }
 
     const handleMomsModification = (data) => {
@@ -241,9 +236,10 @@ export default function MOMS() {
         setSelectedFeatureName(feature_details);
     }
 
-    const submitNewMoms = () => {
+    const submitNewMoms = async () => {
         let api_func = '';
         let json = '';
+        let response;
         if (modificationDisabled === true) {
             api_func = 'update';
             json = {
@@ -258,6 +254,7 @@ export default function MOMS() {
                 "alert_level": selectedAlertLevel,
                 "moms_id": selectedMomsID
             }
+            response = await MarGroundData.UpdateMOMSData(json);
         } else {
             api_func = 'add';
             json = {
@@ -271,69 +268,44 @@ export default function MOMS() {
                 "user_id": cookies.credentials.user_id,
                 "alert_level": selectedAlertLevel
             }
+            response = await MarGroundData.InsertMOMSData(json);
         }
 
-        fetch(`${AppConfig.HOSTNAME}/api/ground_data/moms/${api_func}`, {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(json),
-          }).then((response) => response.json())
-            .then((responseJson) => {
-              if (responseJson.status === true) {
-                initMoms();
-                handleCloseForm();
-                setOpenNotif(true);
-                setNotifStatus("success");
-                if (api_func == 'add') {
-                    setNotifText("Successfully added new manifestation of movements.");
-                } else {
-                    setNotifText("Successfully updated manifestation of movements.");
-                }
-              } else {
+        if (response.status === true) {
+            initMoms();
+            handleCloseForm();
+            setOpenNotif(true);
+            setNotifStatus("success");
+            if (api_func == 'add') {
+                setNotifText("Successfully added new manifestation of movements.");
+            } else {
+                setNotifText("Successfully updated manifestation of movements.");
+            }
+            } else {
                 setOpenNotif(true);
                 setNotifStatus("error");
-                if (api_func == 'add') {
-                    setNotifText("Failed to add manifestation of movements.");
-                } else {
-                    setNotifText("Failed to update manifestation of movements.");
-                }
-              }
-            })
-            .catch((error) => {
-              console.log(error);
+            if (api_func == 'add') {
+                setNotifText("Failed to add manifestation of movements.");
+            } else {
+                setNotifText("Failed to update manifestation of movements.");
             }
-        );
+        }
+
     }
 
-    const deleteMoms = () => {
-        fetch(`${AppConfig.HOSTNAME}/api/ground_data/moms/delete`, {
-            method: 'DELETE',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({"moms_id": selectedMomsID}),
-          }).then((response) => response.json())
-            .then((responseJson) => {
-              if (responseJson.status === true) {
-                initMoms();
-                handleCloseForm();
-                setOpenNotif(true);
-                setNotifStatus("success");
-                setNotifText("Successfully deleted manifestation of movements.");
-              } else {
-                setOpenNotif(true);
-                setNotifStatus("error");
-                setNotifText("Failed to delete manifestation of movements.");
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            }
-        );
+    const deleteMoms = async () => {
+        const response = await MarGroundData.DeleteMOMSData({"moms_id": selectedMomsID});
+        if (response.status === true) {
+            initMoms();
+            handleCloseForm();
+            setOpenNotif(true);
+            setNotifStatus("success");
+            setNotifText("Successfully deleted manifestation of movements.");
+        } else {
+            setOpenNotif(true);
+            setNotifStatus("error");
+            setNotifText("Failed to delete manifestation of movements.");
+        }
     }
 
     return (
