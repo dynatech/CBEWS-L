@@ -18,12 +18,14 @@ def fetch(site_code):
         site_id = site_dict[site_code]
         od_list = GroundData.get_latest_od_events(site_id=site_id)
         od = {
-            "ok": True,
-            "data": od_list
+            "status": True,
+            "data": od_list,
+            "message": "Successfully fetched on demand data.",
         }
     except Exception as err:
         od = {
-            "ok": False,
+            "status": False,
+            "data": [],
             "message": f"Failed to fetch od data. Error: {err}"
         }
     return jsonify(od)
@@ -39,19 +41,18 @@ def add():
 
         if result['status']:
             od_data_return = {
-                "ok": True,
+                "status": True,
                 "message": "Successfully added new on demand data.",
                 "data": result['data']
             }
         else:
             od_data_return = {
-                "ok": False,
+                "status": False,
                 "message": f"Failed to add OD data."
             }
     except Exception as err:
-        raise(err)
         od_data_return = {
-            "ok": False,
+            "status": False,
             "message": f"Failed to add OD data."
         }
     return jsonify(od_data_return)
@@ -91,13 +92,13 @@ def raise_on_demand():
             )
 
         od_data_return = {
-            "ok": True,
+            "status": True,
             "message": "Successfully added new on demand data."
         }
     except Exception as err:
         raise(err)
         od_data_return = {
-            "ok": False,
+            "status": False,
             "message": f"Failed to add OD data."
         }
     return jsonify(od_data_return)

@@ -32,6 +32,7 @@ def fetch(site_code):
         surficial_plot_data = GroundData.fetch_surficial_plot_data(marker_id, site_code, ts_start, ts_end)
         for row in surficial_plot_data:
             row["x"] = h.str_to_dt(row["x"]).timestamp()
+            row["y"] = float(row["y"])
             prelim_data['data'].append(row)
         surficial_plot.append(prelim_data)
 

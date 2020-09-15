@@ -1,7 +1,7 @@
 import AppConfig from '../../utils/AppConfig';
 
 const InsertMOMSData = (data) => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/add/ground_data/mar/moms`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/add/ground_data/umi/moms`, {
         method: 'POST',
         headers: {
             Accept: 'application/json',
@@ -35,7 +35,7 @@ const UpdateMOMSData = (data) => {
 };
 
 const GetMOMSData = () => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/mar/moms`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/umi/moms`, {
         method: 'GET',
         headers: {
             Accept: 'application/json',
