@@ -3,7 +3,7 @@ import {
     Grid, Paper, Container,
     Fab, makeStyles, Table,
     TableBody, TableCell, TableHead,
-    TableRow, TextField, Button, TablePagination
+    TableRow, TextField, Button, TablePagination, Typography
 } from "@material-ui/core";
 
 import Dialog from '@material-ui/core/Dialog';
@@ -158,8 +158,8 @@ function SurficialMarker() {
                         autoFocus
                         margin="dense"
                         id={element[0]}
-                        label={`Marker ${element[1]}`}
-                        onChange={(e)=> {handleOnChangeAddMarkerValues(element[1], e.target.value)}}
+                        label={`Marker ${element.marker_name}`}
+                        onChange={(e)=> {handleOnChangeAddMarkerValues(element.marker_name, e.target.value)}}
                         type="text"
                         fullWidth
                     />
@@ -328,6 +328,7 @@ function SurficialMarker() {
             "marker_value": markerValueRef.current,
             "site_id": cookies.credentials.site_id
           }
+        console.log("json_input", json_input);
         const response = await MarGroundData.InsertSurficialMarkersData(json_input);
         if (response.status == true) {
           initSurficialMarker();
@@ -340,6 +341,8 @@ function SurficialMarker() {
         setNotifText(response.message);
         handleClose();
     }
+
+    if (dtRow.length === 0) setDtRow(<span align="center"><Typography>No Surficial Data available</Typography></span> )
 
     return (
         <Fragment>

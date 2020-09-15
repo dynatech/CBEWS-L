@@ -1,16 +1,14 @@
-import React, { useState, useEffect,Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import TransitionalModal from '../../reducers/loading';
-// import moment from "moment";
+import moment from "moment";
 import {
     Grid, Paper, Container, Fab, makeStyles, Typography
 } from "@material-ui/core";
 import AppConfig from "../../reducers/AppConfig";
 import { useCookies } from 'react-cookie';
-import { MarDataAnalysis } from "@dynaslope/commons";
-
-var moment = require('moment-timezone');
+import { UmiDataAnalysis } from "@dynaslope/commons";
 
 require("highcharts/modules/exporting")(Highcharts);
 
@@ -32,8 +30,7 @@ function prepareOptions(input, data, width) {
     
     data.forEach(element => {
         element.data.forEach(row => {
-            row.x = Date.parse(moment.unix(row.x).add(8, "hours").format("YYYY-MM-DD HH:mm:ss"));
-            // row.x = Date.parse(moment.unix(row.x).tz("Asia/Manila").format())
+            row.x =  Date.parse(moment.unix(row.x).format("YYYY-MM-DD HH:mm:ss"))
         });
     });
 
@@ -71,7 +68,6 @@ function prepareOptions(input, data, width) {
             }
         },
         xAxis: {
-            ordinal: false,
             min:  Date.parse(start_date),
             max: Date.parse(end_date),
             type: "datetime",
@@ -114,6 +110,9 @@ function prepareOptions(input, data, width) {
 
 function createSurficialGraph(input, surficial_data, chartRef, width = "md") {
     const options = prepareOptions(input, surficial_data, width);
+    console.log("input", input);
+    console.log("surficial_data", surficial_data);
+    console.log("options", options);
     return <HighchartsReact
         highcharts={Highcharts}
         options={options}
@@ -121,7 +120,10 @@ function createSurficialGraph(input, surficial_data, chartRef, width = "md") {
     />;
 }
 
-export default function SurficialPlot(props) {
+export default function Summary(props) {
+    const { latestMeas, latestMoms } = props;
+    console.log("latestMeas", latestMeas);
+    console.log("latestMoms", latestMoms);
     const chartRef = React.useRef(null);
     const [timestamps, setTimestamps] = useState();
     const [modal, setModal] = useState([<TransitionalModal status={false} />])
@@ -135,7 +137,8 @@ export default function SurficialPlot(props) {
     }, [])
 
     const initSurficial = async () => {
-        const response = await MarDataAnalysis.GetSurficialPlotData();
+        const response = await UmiDataAnalysis.GetSurficialPlotData();
+        console.log("response", response);
         if (response.status === true) {
             let {site_code, ts_start, ts_end} = response;
             let timestamps = {start: ts_start, end: ts_end};
@@ -151,17 +154,51 @@ export default function SurficialPlot(props) {
 
     return (
         <Fragment>
-            <Container align="center" justify="center" style={{ marginTop: 24 }}>
-                <Grid Container>
-                    <Grid item xs={12}>
-                        <Paper>
+            {/* <Container style={{ marginTop: 24 }}> */}
+            <Container>
+                <Paper style={{ padding: "2%" }}>
+                    <Grid container alignItems="flex-start" justify="flex-end" direction="row" spacing={2}>
+                        <Grid item xs={12}>
+                            <Typography variant="h5">Surficial Measurement</Typography>
                             {
-                                load ? graphComponent : <Typography>Loading</Typography>
+                                latestMeas !== null ? (
+                                    <Typography variant="subtitle2">Latest surficial data was received last {latestMeas.data.ts}</Typography>
+                                ) : (
+                                    <Typography variant="subtitle2">No surficial data available.</Typography>
+                                )
                             }
-                        </Paper>
+                            
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography variant="h5">Manifestation of Movements</Typography>
+                            {
+                                latestMoms !== null ? (
+                                    <Fragment>
+                                        <Typography variant="h7">Type of feature: {latestMoms.feature_type}</Typography>
+                                        <br/>
+                                        <Typography variant="h7">Description: {latestMoms.description}</Typography>
+                                        <br/>
+                                        <Typography variant="h7">Name of Feature: {latestMoms.feature_name}</Typography>
+                                        <br/>
+                                        <Typography variant="h7">Last Date Time: {latestMoms.observance_ts}</Typography>
+                                    </Fragment>
+                                ) : (
+                                    <Typography variant="h7">No MOMS data available.</Typography>
+                                )
+                            }
+                        </Grid>
+
+                    </Grid>
+                    {
+                        load ? graphComponent : <Typography>Loading</Typography>
+                    }
+                </Paper>
+                {/* <Grid Container>
+                    <Grid item xs={12}>
+
                     </Grid>
 
-                </Grid>
+                </Grid> */}
             </Container>
             {modal}
         </Fragment>

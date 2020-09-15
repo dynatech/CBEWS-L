@@ -129,6 +129,30 @@ import {
   UpdateSituationReportAttachmentFile,
 } from "./src/UMI/SituationReport/SituationReport";
 
+import {
+  GetMOMSData as UMIGetMOMSData,
+  UpdateMOMSData as UMIUpdateMOMSData,
+  InsertMOMSData as UMIInsertMOMSData,
+  DeleteMOMSData as UMIDeleteMOMSData,
+} from "./src/UMI/GroundData/MOMS";
+
+import {
+  GetSurficialMarkersData as UMIGetSurficialMarkersData,
+  UpdateSurficialMarkerData as UMIUpdateSurficialMarkerData,
+  InsertSurficialMarkersData as UMIInsertSurficialMarkersData,
+  DeleteSurficialMarkersData as UMIDeleteSurficialMarkersData,
+} from "./src/UMI/GroundData/SurficialData";
+
+import {
+  GetRainfallPlotData as UMIGetRainfallPlotData
+} from "./src/UMI/DataAnalysis/RainfallAnalysis";
+import {
+  GetSurficialPlotData as UMIGetSurficialPlotData
+} from "./src/UMI/DataAnalysis/SurficialAnalysis";
+import {
+  GetSubsurfacePlotData as UMIGetSubsurfacePlotData
+} from "./src/UMI/DataAnalysis/SubsurfaceAnalysis";
+
 import { GetOngoingAndExtendedMonitoring } from "./src/AlertGeneration/PublicAlerts";
 import { RenderPDF, DownloadPDF } from "./src/MAR/FileManager/PDFManager";
 
@@ -250,6 +274,23 @@ const UmiReports = {
     GetReportsByRange
 }
 
+const UmiDataAnalysis = {
+  GetRainfallPlotData: UMIGetRainfallPlotData,
+  GetSurficialPlotData: UMIGetSurficialPlotData,
+  GetSubsurfacePlotData: UMIGetSubsurfacePlotData,
+};
+
+const UmiGroundData = {
+  GetMOMSData: UMIGetMOMSData,
+  UpdateMOMSData: UMIUpdateMOMSData,
+  InsertMOMSData: UMIInsertMOMSData,
+  DeleteMOMSData: UMIDeleteMOMSData,
+  GetSurficialMarkersData: UMIGetSurficialMarkersData,
+  UpdateSurficialMarkerData: UMIUpdateSurficialMarkerData,
+  InsertSurficialMarkersData: UMIInsertSurficialMarkersData,
+  DeleteSurficialMarkersData: UMIDeleteSurficialMarkersData,
+};
+
 export {
     AlertGeneration,
     UserManagement,
@@ -261,5 +302,7 @@ export {
     UmiRiskManagement,
     UmiFieldSurvey,
     UmiSituationReport,
-    UmiReports
+    UmiReports,
+    UmiDataAnalysis,
+    UmiGroundData,
 }
