@@ -53,6 +53,7 @@ import {
     DeleteSurficialMarkersData,
 } from "./src/MAR/GroundData/SurficialMarkers";
 import {
+    FetchMOMSFeatures,
     GetMOMSData,
     UpdateMOMSData,
     InsertMOMSData,
@@ -176,6 +177,7 @@ const MarGroundData = {
     UpdateSurficialMarkerData,
     InsertSurficialMarkersData,
     DeleteSurficialMarkersData,
+    FetchMOMSFeatures,
     GetMOMSData,
     UpdateMOMSData,
     InsertMOMSData,

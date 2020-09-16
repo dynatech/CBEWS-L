@@ -1,4 +1,5 @@
 import React, {Fragment, useEffect, useState} from 'react';
+import { useCookies } from 'react-cookie';
 import {
     Grid, Paper, Container,
     Fab, makeStyles, Table,
@@ -66,6 +67,7 @@ export default function OnDemand() {
     const [openNotif, setOpenNotif] = useState(false);
     const [notifText, setNotifText] = useState("");
     const [notifStatus, setNotifStatus] = useState('success');
+    const [cookies, setCookie] = useCookies(['credentials']);
 
     useEffect(() => {
         initOnDemand();
@@ -89,6 +91,7 @@ export default function OnDemand() {
     };
   
     const handleClose = () => {
+      setODInput(default_vars);   
       setOpen(false);
     };
 
@@ -98,6 +101,7 @@ export default function OnDemand() {
     };
   
     const handleCloseRaise = () => {
+      setODInput(default_vars);
       setOpenRaise(false);
     };
 
@@ -117,6 +121,7 @@ export default function OnDemand() {
     };
 
     const handleSubmit = async () => {
+        od_input.site_id = parseInt(cookies.credentials.site_id);
         const response = await MarGroundData.InsertOnDemandData(od_input);
         console.log(response);
         if (response.status === true) {

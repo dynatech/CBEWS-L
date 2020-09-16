@@ -72,8 +72,8 @@ function prepareOptions(input, data, width) {
         },
         xAxis: {
             ordinal: false,
-            min:  Date.parse(start_date),
-            max: Date.parse(end_date),
+            min:  Date.parse(start_date.add(8, "hours")),
+            max: Date.parse(end_date.add(8, "hours")),
             type: "datetime",
             dateTimeLabelFormats: {
                 month: "%e. %b %Y",
@@ -137,9 +137,9 @@ export default function SurficialPlot(props) {
     const initSurficial = async () => {
         const response = await MarDataAnalysis.GetSurficialPlotData();
         if (response.status === true) {
-            let {site_code, ts_start, ts_end} = response;
-            let timestamps = {start: ts_start, end: ts_end};
-            let input = {site_code, timestamps};
+            let { site_code, ts_start, ts_end } = response;
+            let timestamps = { start: ts_start, end: ts_end };
+            let input = { site_code, timestamps };
             let graph = createSurficialGraph(input, response.surficial_plot, chartRef)
             setGraphComponent(graph);
             setTimestamps(timestamps);
