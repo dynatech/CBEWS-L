@@ -59,7 +59,7 @@ def add():
         feature_name = data["feature_name"]
         reporter = data["reporter"]
         location = data["location"]
-        description = data["description"]
+        remarks = data["remarks"]
         site_id = data["site_id"]
         user_id = data["user_id"]
         alert_level = data["alert_level"]
@@ -71,7 +71,7 @@ def add():
         else:
             instance = instance[0]["instance_id"]
         moms_id = GroundData.insert_moms_record(
-            instance=instance, ts=ts, remarks=description,
+            instance=instance, ts=ts, remarks=remarks,
             reporter_id=user_id, alert_level=alert_level
         )
 

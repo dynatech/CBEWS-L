@@ -2,8 +2,8 @@ from flask import Blueprint, jsonify, request
 from connections import SOCKETIO
 import sys
 from datetime import datetime as dt
-from src.model.ground_data import GroundData
-from src.model.alert_generation import AlertGeneration as AlertGen
+from src.model.v2.ground_data import GroundData
+from src.model.v2.alert_generation import AlertGeneration as AlertGen
 from src.api.helpers import Helpers as H
 from config import APP_CONFIG
 
@@ -34,9 +34,13 @@ def fetch(site_code):
 @ON_DEMAND_BLUEPRINT.route("/add/ground_data/on_demand", methods=["POST"])
 def add():
     try:
-        print(request.get_json())
-        (alert_level, reason, reporter, site_id, ts) = request.get_json().values()
-
+        json = request.get_json()
+        alert_level = json["alert_level"]
+        reason = json["reason"]
+        reporter = json["reporter"]
+        site_id = json["site_id"]
+        ts = json["ts"]
+        
         result = GroundData.insert_on_demand_alert(ts, site_id, reason, reporter, alert_level)
 
         if result['status']:
@@ -51,6 +55,7 @@ def add():
                 "message": f"Failed to add OD data."
             }
     except Exception as err:
+        raise(err)
         od_data_return = {
             "status": False,
             "message": f"Failed to add OD data."

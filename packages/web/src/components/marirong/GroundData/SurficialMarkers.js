@@ -92,7 +92,6 @@ function SurficialMarker() {
     };
 
     const handleChangeRowsPerPage = event => {
-        console.log(parseInt(event.target.value, 10));
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
@@ -327,8 +326,7 @@ function SurficialMarker() {
             "observer": addObserver,
             "marker_value": markerValueRef.current,
             "site_id": cookies.credentials.site_id
-          }
-        console.log("json_input", json_input);
+        }
         const response = await MarGroundData.InsertSurficialMarkersData(json_input);
         if (response.status == true) {
           initSurficialMarker();
