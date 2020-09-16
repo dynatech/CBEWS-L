@@ -52,8 +52,8 @@ const GetSurficialMarkersData = () => {
 };
 
 const DeleteSurficialMarkersData = (data) => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/delete/mar/events_template`, {
-        method: 'DELETE',
+    return fetch(`${AppConfig.HOSTNAME}/v2/remove/ground_data/surficial_markers`, {
+        method: 'POST',
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',

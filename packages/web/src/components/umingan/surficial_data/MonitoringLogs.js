@@ -60,7 +60,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export default function MOMS() {
+export default function MonitoringLogs() {
     function createData(date_time, feature, reporter, description) {
         return { date_time, feature, reporter, description };
     }
