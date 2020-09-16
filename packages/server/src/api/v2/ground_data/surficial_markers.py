@@ -14,32 +14,31 @@ def fetch(site_code):
     try:
         site_list = APP_CONFIG["site_ids"]
         site_id = site_list[site_code]
-        temp_item = {}
-        temp_dt_row = []
+        data_list = []
+        ts_list = []
         
         surficial_data = GroundData.fetch_surficial_data(site_id)
         surficial_markers = GroundData.fetch_surficial_markers(site_id)
         for row in surficial_data:
             (ts, measurement, marker, observer, weather) = row.values()
             ts = str(ts)
-            if ts in temp_item:
-                if not marker in temp_item[ts]:
-                    temp_item[ts][marker] = measurement
-            else:
-                if temp_item:
-                    temp_dt_row.append(temp_item)
 
-                temp_dt_item = {
-                    "ts": ts,
-                    "weather": weather,
-                    "observer": observer,
-                    marker: measurement
-                }
-                temp_item = {
-                    ts: temp_dt_item
-                }
+            if ts not in ts_list:
+                data_list.append({
+                    ts: {
+                        "ts": ts,
+                        "weather": weather,
+                        "observer": observer,
+                        marker: measurement
+                    }
+                })
+                ts_list.append(ts)
+            else:
+                ts_index = ts_list.index(ts)
+                data_list[ts_index][ts][marker] = measurement
+
         response = {
-            "data": temp_dt_row,
+            "data": data_list,
             "markers": surficial_markers,
             "status": True,
             "message": "Fetch success!"
