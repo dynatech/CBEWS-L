@@ -138,4 +138,7 @@ def create_app():
 	from src.api.v2.data_analysis.subsurface_analysis import SUBSURFACE_ANALYSIS_BLUEPRINT
 	app.register_blueprint(SUBSURFACE_ANALYSIS_BLUEPRINT, url_prefix="/v2")
 
+	from src.api.v2.umi.sensor_maintenance import SENSOR_MAINTENANCE_BLUEPRINT
+	app.register_blueprint(SENSOR_MAINTENANCE_BLUEPRINT, url_prefix="/v2")
+
 	return app
