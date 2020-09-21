@@ -47,7 +47,11 @@ class GroundData():
 
     def insert_marker_observation(data):
         try:
-            (ts, weather, observer, marker_value, site_id) = data.values()
+            ts = data["ts"]
+            weather = data["weather"]
+            observer = data["observer"]
+            site_id = data["site_id"]
+
             query = f'INSERT INTO marker_observations VALUES (0, "{site_id}", "{ts}", "EVENT", ' \
                 f'"{observer}", "APP", 1, "{weather}");'
             mo_id = DB.db_modify(query, 'senslopedb', True)
@@ -81,10 +85,14 @@ class GroundData():
     def delete_marker_observation(surficial_data):
         try:
             if 'mo_id' in surficial_data:
-                (site_id, mo_id) = surficial_data.values()
+                mo_id = surficial_data['mo_id']
+                site_id = surficial_data['site_id']
                 query = f'DELETE FROM marker_observations WHERE mo_id="{mo_id}" AND site_id="{site_id}'
             else:
-                (ts, weather, observer, site_id) = surficial_data.values()
+                ts = surficial_data['ts']
+                weather = surficial_data['weather']
+                observer = surficial_data['observer']
+                site_id = surficial_data['site_id']
                 query = f'DELETE FROM marker_observations WHERE ts="{ts}" ' \
                         f'AND weather="{weather}" AND observer_name="{observer}" AND site_id = "{site_id}" ' \
                         'AND IFNULL(mo_id, 0) = LAST_INSERT_ID(mo_id);'

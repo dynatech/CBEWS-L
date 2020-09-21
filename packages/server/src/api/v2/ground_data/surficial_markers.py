@@ -147,8 +147,14 @@ def remove():
     try:
         data = request.get_json()
         mo_id = GroundData.delete_marker_observation(data)
-        del_status = GroundData.delete_marker_values(mo_id)
-        surficial = del_status
+        if mo_id[status]:
+            del_status = GroundData.delete_marker_values(mo_id)
+            surficial = del_status
+        else:
+            surficial = {
+                "status": False,
+                "message": f"Failed to modify surficial data. Error: {err}"
+            }
     except Exception as err:
         raise(err)
         surficial = {
