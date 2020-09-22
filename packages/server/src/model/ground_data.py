@@ -188,6 +188,11 @@ class GroundData():
             result = {"status": False, "message": "Failed to retrieve MoMs data."} 
         finally:
             return result
+
+    def fetch_feature_names():
+        query = "SELECT feature_id, feature_type FROM moms_features;"
+        result = DB.db_read(query, 'senslopedb')
+        return result
     
     def update_moms_instance(instance_id, location, reporter):
         try:

@@ -219,3 +219,15 @@ def fetch_feature(feature_id, site_id):
             "message": f"Failed to fetch moms data. Error: {err}"
         }
     return jsonify(moms)
+
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/moms/features", methods=["GET"])
+def fetch_features():
+    try:
+        feature_names = GroundData.fetch_feature_names()
+        moms = {"status": True, "data": feature_names}
+    except Exception as err:
+        moms = {
+            "status": False,
+            "message": f"Failed to fetch moms data. Error: {err}"
+        }
+    return jsonify(moms)

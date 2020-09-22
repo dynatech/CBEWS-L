@@ -50,7 +50,6 @@ def fetch(site_code):
         }
     return jsonify(response)
 
-
 @SURFICIAL_MARKERS_BLUEPRINT.route("/modify/ground_data/surficial_markers", methods=["PATCH"])
 def modify():
     try:
@@ -140,7 +139,6 @@ def add():
         }
     finally:
         return jsonify(surficial)
-
 
 @SURFICIAL_MARKERS_BLUEPRINT.route("/remove/ground_data/surficial_markers", methods=["POST"])
 def remove():
