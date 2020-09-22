@@ -238,7 +238,7 @@ function SituationReportLogs () {
     }
 
     const uploadFile = async (attachment) => {
-        const url = 'http://192.168.150.221:5000/v2/upload/situation_report/umi/situation_report_logs'
+        const url = 'http://192.168.0.10:5000/v2/upload/situation_report/umi/situation_report_logs'
         const file = [{
           name: 'file',
           filename: attachment.filename,

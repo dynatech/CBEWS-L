@@ -10,6 +10,8 @@ class GroundData():
                 f'cbewsl_commons_db.sites USING (site_id) INNER JOIN ' \
                 f'senslopedb.marker_data USING (marker_id) INNER JOIN senslopedb.marker_observations USING (mo_id) ' \
                 f'WHERE sites.site_id = "{site_id}" ORDER BY ts desc limit 100;'
+        print("HEY")
+        print(query)
         schema = DB.db_switcher(site_id)
         result = DB.db_read(query, schema)
         return result
@@ -91,21 +93,25 @@ class GroundData():
     def delete_marker_observation(surficial_data):
         try:
             if 'mo_id' in surficial_data:
-                (site_id, mo_id) = surficial_data.values()
+                site_id = surficial_data["site_id"]
+                mo_id = surficial_data["mo_id"]
                 query = f'DELETE FROM marker_observations WHERE mo_id="{mo_id}" AND site_id="{site_id}'
             else:
-                (ts, weather, observer, site_id) = surficial_data.values()
+                ts = surficial_data["ts"] 
+                weather = surficial_data["weather"] 
+                observer = surficial_data["observer"] 
+                site_id = surficial_data["site_id"]
+
                 query = f'DELETE FROM marker_observations WHERE ts="{ts}" ' \
                         f'AND weather="{weather}" AND observer_name="{observer}" AND site_id = "{site_id}" ' \
                         'AND IFNULL(mo_id, 0) = LAST_INSERT_ID(mo_id);'
             mo_status = DB.db_modify(query, 'senslopedb', True)
             if mo_status is None:
-                result = {"status": True, "mo_id": mo_id}
+                result = { "status": True, "mo_id": mo_id, "message": "mo_status none" }
             else:
-                result = {"status": True, "mo_id": mo_status}
+                result = { "status": True, "mo_id": mo_status, "message": "mo_status is not none" }
         except Exception as err:
-            print(err)
-            result = {"status": False, "mo_id": None}
+            result = {"status": False, "mo_id": None, "message": err}
         finally:
             return result
 
@@ -114,9 +120,9 @@ class GroundData():
         try:
             query = f'DELETE FROM marker_data WHERE mo_id = "{mo_id}"'
             status = DB.db_modify(query, 'senslopedb', True)
-            result = {"status": True, "message": "Successfully delete surficial data."}
+            result = { "status": True, "message": f"Successfully delete surficial data. => {status}" } 
         except Exception as err:
-            result = {"status": False, "message": "Failed to delete surficial data."}      
+            result = { "status": False, "message": f"Failed to delete surficial data. => {err}" }      
         finally:
             return result
 
@@ -128,7 +134,7 @@ class GroundData():
                     f'WHERE site_id = "{site_id}" ORDER BY observance_ts DESC;'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
-            result = {"status": False, "message": "Failed to delete surficial data."} 
+            result = {"status": False, "message": f"Failed to delete surficial data. => {err}"} 
         finally:
             return result
 
@@ -141,7 +147,7 @@ class GroundData():
             status = DB.db_modify(query, 'senslopedb', True)
             result = status
         except Exception as err:
-            result = {"status": False, "message": "Failed to add MoMs data."}      
+            result = {"status": False, "message": f"Failed to add MoMs data. => {err}"}      
         finally:
             return result
 
@@ -188,15 +194,26 @@ class GroundData():
                     f'site_id = {site_id} AND feature_id = {feature_id}'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
-            result = {"status": False, "message": "Failed to retrieve MoMs data."} 
+            result = {"status": False, "message": f"Failed to retrieve MoMs data. => {err}"} 
         finally:
             return result
-    
+
+
+    def fetch_feature_types():
+        try:
+            query = 'SELECT feature_id, feature_type, description FROM moms_features'
+            result = DB.db_read(query, 'senslopedb')
+        except Exception as err:
+            result = {"status": False, "message": f"Failed to retrieve MoMs data. => {err}"} 
+        finally:
+            return result
+
+
     def update_moms_instance(instance_id, location, reporter):
         try:
             query = f'UPDATE moms_instances SET location = "{location}", reporter = "{reporter}" WHERE instance_id = {instance_id}'
             update_status = DB.db_modify(query, 'senslopedb', True)
-            result = {"status": True, "data": update_status}
+            result = {"status": True, "data": update_status, "message": "Success"}
         except Exception as err:
             result = {"status": False, "message": err}
         finally:
@@ -207,7 +224,7 @@ class GroundData():
             query = f'UPDATE monitoring_moms SET remarks = "{remarks}" WHERE moms_id = {moms_id}'
             print(query)
             update_status = DB.db_modify(query, 'senslopedb', True)
-            result = {"status": True, "data": update_status}
+            result = {"status": True, "data": update_status, "message": "Success"}
         except Exception as err:
             result = {"status": False, "message": err}
         finally:
@@ -217,7 +234,7 @@ class GroundData():
         try:
             query = f'DELETE FROM monitoring_moms WHERE moms_id = {moms_id}'
             update_status = DB.db_modify(query, 'senslopedb', True)
-            result = {"status": True, "data": update_status}
+            result = {"status": True, "data": update_status, "message": "Success"}
         except Exception as err:
             result = {"status": False, "message": err}
         finally:
@@ -256,9 +273,9 @@ class GroundData():
             query = "INSERT INTO public_alert_on_demand (ts, site_id, reason, reporter, alert_level) " \
                     f"VALUES ('{ts}', {site_id}, '{reason}', '{reporter}', {alert_level})"
             od_id = DB.db_modify(query, "senslopedb", last_insert_id=True)
-            result = { "status": True, "data": od_id }
+            result = { "status": True, "data": od_id, "message": "Success" }
         except Exception as err:
             print(err)
-            result = { "status": False, "data": None }
+            result = { "status": False, "data": None, "message": err }
 
         return result

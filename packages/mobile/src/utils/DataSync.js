@@ -4,7 +4,7 @@ import MobileCaching from './MobileCaching';
 import { MarirongSync, UminganSync } from './SyncAPIs';
 
 const SiteCodes = {
-	51: 'Marirong',
+	29: 'Marirong',
 	50: 'Umingan'
 }
 

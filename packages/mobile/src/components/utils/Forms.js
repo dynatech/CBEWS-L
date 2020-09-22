@@ -73,7 +73,7 @@ const Forms = (props) => {
                         Object.entries(defaultValues).map((e, l) => {
                             let key = e[0].replace(/\s/g, "");
                             let input_field = [];
-                                if (e[0].toLowerCase() == "attachment") {
+                            if (e[0].toLowerCase() == "attachment") {
                                 input_field.push(
                                     <View key={e[0]} style={{ paddingTop: '10%', alignItems: 'center' }}>
                                         <Text style={[LabelStyle.medium_label, LabelStyle.brand]} onPress={uploadFile}>Attachments: {filename}</Text>

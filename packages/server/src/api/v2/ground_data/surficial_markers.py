@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from connections import SOCKETIO
 import sys
 from datetime import datetime as dt
-from src.model.ground_data import GroundData
+from src.model.v2.ground_data import GroundData
 from config import APP_CONFIG
 from src.api.helpers import Helpers as h
 
@@ -49,7 +49,6 @@ def fetch(site_code):
             "message": f"Failed to fetch surficial data. Error: {err}"
         }
     return jsonify(response)
-
 
 @SURFICIAL_MARKERS_BLUEPRINT.route("/modify/ground_data/surficial_markers", methods=["PATCH"])
 def modify():
@@ -141,14 +140,19 @@ def add():
     finally:
         return jsonify(surficial)
 
-
 @SURFICIAL_MARKERS_BLUEPRINT.route("/remove/ground_data/surficial_markers", methods=["POST"])
 def remove():
     try:
         data = request.get_json()
         mo_id = GroundData.delete_marker_observation(data)
-        del_status = GroundData.delete_marker_values(mo_id)
-        surficial = del_status
+        if mo_id[status]:
+            del_status = GroundData.delete_marker_values(mo_id)
+            surficial = del_status
+        else:
+            surficial = {
+                "status": False,
+                "message": f"Failed to modify surficial data. Error: {err}"
+            }
     except Exception as err:
         raise(err)
         surficial = {
