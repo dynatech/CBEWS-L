@@ -5,7 +5,7 @@ import json
 import time
 from datetime import datetime as dt
 from datetime import timedelta as td
-from src.model.ground_data import GroundData
+from src.model.v2.ground_data import GroundData
 from src.api.helpers import Helpers as h
 from config import APP_CONFIG
 
