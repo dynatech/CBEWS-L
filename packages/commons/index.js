@@ -153,6 +153,14 @@ import {
 import {
   GetSubsurfacePlotData as UMIGetSubsurfacePlotData
 } from "./src/UMI/DataAnalysis/SubsurfaceAnalysis";
+import {
+  GetSensorMaintenanceLogs,
+  GetDaySensorMaintenanceLogs,
+  GetMonthSensorMaintenanceLogs,
+  InsertSensorMaintenanceLogs,
+  UpdateSensorMaintenanceLogs,
+  DeleteSensorMaintenanceLogs,
+} from "./src/UMI/SensorMaintenance/SensorMaintenance";
 
 import { GetOngoingAndExtendedMonitoring } from "./src/AlertGeneration/PublicAlerts";
 import { RenderPDF, DownloadPDF } from "./src/MAR/FileManager/PDFManager";
@@ -293,6 +301,15 @@ const UmiGroundData = {
   DeleteSurficialMarkersData: UMIDeleteSurficialMarkersData,
 };
 
+const UmiSensorMaintenance = {
+  GetSensorMaintenanceLogs,
+  GetDaySensorMaintenanceLogs,
+  GetMonthSensorMaintenanceLogs,
+  InsertSensorMaintenanceLogs,
+  UpdateSensorMaintenanceLogs,
+  DeleteSensorMaintenanceLogs,
+}
+
 export {
     AlertGeneration,
     UserManagement,
@@ -307,4 +324,5 @@ export {
     UmiReports,
     UmiDataAnalysis,
     UmiGroundData,
+    UmiSensorMaintenance,
 }
