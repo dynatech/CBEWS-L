@@ -25,7 +25,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import PDFViewer from "../../reducers/PDFViewer";
 import AppConfig from "../../reducers/AppConfig";
 
-import { MarMaintenanceLogs } from "@dynaslope/commons";
+import { UmiSensorMaintenance } from "@dynaslope/commons";
 
 import { useStyles, tableStyles } from "../../../styles/general_styles";
 
@@ -95,28 +95,26 @@ export default function MaintenanceLogs() {
     const [tableData, setTableData] = useState([]);
     const [events, setEvents] = useState([]);
     const [defaultStringValues, setDefaultStrValues] = useState({
-        Type: "",
         Remarks: "",
-        "In Charge": "",
-        Updater: "",
+        "Rain Gauge Status": "",
+    });
+    const [defaultIntValues, setDefaultIntValues] = useState({
+        "Working Nodes": 0,
+        "Anomalous Nodes": 0,
     });
     const [defaultTSValues, setDefaultTSValues] = useState({
-        "Maintenance Date": moment(),
+        "Timestamp": moment(),
     });
 
     const options = {
         filterType: "checkbox",
     };
     const columns = [
-        { name: "maintenance_date", label: "Maintenance Date" },
-        {
-            name: "type",
-            label: "type",
-        },
-        { name: "in_charge", label: "In Charge" },
+        { name: "timestamp", label: "Timestamp" },
         { name: "remarks", label: "Remarks" },
-        { name: "updater", label: "Updater" },
-        { name: "last_ts", label: "Last TS" },
+        { name: "working_nodes", label: "Working Nodes" },
+        { name: "anomalous_nodes", label: "Anomalous Nodes" },
+        { name: "rain_gauge_status", label: "Rain Gauge Status" },
     ];
 
     const calendarRenderHandler = (args) => {
@@ -127,7 +125,7 @@ export default function MaintenanceLogs() {
     };
 
     const getMaintenanceLogsPerDay = async (timestamp) => {
-        const response = await MarMaintenanceLogs.GetDayMaintenanceLogs(
+        const response = await UmiSensorMaintenance.GetDaySensorMaintenanceLogs(
             timestamp,
         );
         if (response.status === true) {
@@ -140,15 +138,15 @@ export default function MaintenanceLogs() {
     const getMaintenanceLogsPerMonth = async (start, end) => {
         setStartRange(start);
         setEndRange(end);
-        const response = await MarMaintenanceLogs.GetMonthMaintenanceLogs(
+        const response = await UmiSensorMaintenance.GetMonthSensorMaintenanceLogs(
             start,
             end,
         );
         if (response.status === true) {
             setEvents(
                 response.data.map((row) => ({
-                    title: row.type,
-                    date: moment(row.maintenance_date).format("YYYY-MM-DD"),
+                    title: row.remarks,
+                    date: moment(row.timestamp).format("YYYY-MM-DD"),
                 })),
             );
         } else console.error("Problem in getMaintenanceLogsPerMonth backend");
@@ -162,13 +160,15 @@ export default function MaintenanceLogs() {
     const handleEdit = (data) => {
         setSelectedData(data);
         setDefaultStrValues({
-            Type: data["type"],
             Remarks: data["remarks"],
-            "In Charge": data["in_charge"],
-            Updater: data["updater"],
+            "Rain Gauge Status": data["rain_gauge_status"],
+        });
+        setDefaultIntValues({
+            "Working Nodes": data["working_nodes"],
+            "Anomalous Nodes": data["anomalous_nodes"],
         });
         setDefaultTSValues({
-            "Maintenance Date": data["maintenance_date"],
+            "Timestamp": data["timestamp"],
         });
         setOpen(true);
         setCommand("edit");
@@ -199,65 +199,58 @@ export default function MaintenanceLogs() {
         const input = {
             id: selectedData.id,
         };
-        const response = await MarMaintenanceLogs.DeleteMaintenanceLogs(input);
+        const response = await UmiSensorMaintenance.DeleteSensorMaintenanceLogs(input);
         if (response.status === true) {
             getMaintenanceLogsPerMonth(startRange, endRange);
             getMaintenanceLogsPerDay(selectedData.last_ts);
             setOpen(false);
             setOpenDelete(false);
             resetState();
-            setOpenNotif(true);
-            setNotifStatus("success");
-            setNotifText("Successfully deleted maintenance log data.");
         } else {
-            setOpenNotif(true);
             setNotifStatus("error");
-            setNotifText(
-                "Failed to delete maintenance log data. Please contact the developers or file a bug report",
-            );
         }
+        setOpenNotif(true);
+        setNotifText(response.message);
     };
 
 
     const submit = async () => {
         let json = formData.current;
-        json.user_id = cookies.credentials.user_id;
         json.last_ts = moment().format("YYYY-MM-DD HH:mm:ss");
         let hasModifiedRow = false;
         let response;
         if (!Object.keys(selectedData).length) {
             // ADD
             const temp_ts = {
-                maintenance_date: moment(json["MaintenanceDate"]).format(
+                timestamp: moment(json["Timestamp"]).format(
                     "YYYY-MM-DD HH:mm:ss",
                 ),
             };
-            json = Object.assign(defaultStringValues, temp_ts, json);
-            json.type = json.Type;
+            json = Object.assign(defaultStringValues, defaultIntValues, temp_ts, json);
             json.remarks = json.Remarks;
-            json.in_charge = json.InCharge;
-            json.updater = json.Updater;
-            response = await MarMaintenanceLogs.InsertMaintenanceLogs(json);
+            json.rain_gauge_status = json.RainGaugeStatus;
+            json.working_nodes = json.WorkingNodes;
+            json.anomalous_nodes = json.AnomalousNodes;
+            response = await UmiSensorMaintenance.InsertSensorMaintenanceLogs(json);
         } else {
             // EDIT
             hasModifiedRow = true;
             json.id = selectedData.id;
-            json.user_id = cookies.credentials.user_id;
             let temp_array = [];
             Object.keys(json).forEach((key) => {
                 let temp = {};
                 switch (key) {
-                    case "StatDesc":
-                        temp["stat_desc"] = json[key];
+                    case "Timestamp":
+                        temp["timestamp"] = json[key];
                         break;
-                    case "MaintenanceDate":
-                        temp["maintenance_date"] = json[key];
+                    case "RainGaugeStatus":
+                        temp["rain_gauge_status"] = json[key];
                         break;
-                    case "Type":
-                        temp["type"] = json[key];
+                    case "WorkingNodes":
+                        temp["working_nodes"] = json[key];
                         break;
-                    case "InCharge":
-                        temp["in_charge"] = json[key];
+                    case "AnomalousNodes":
+                        temp["anomalous_nodes"] = json[key];
                         break;
                     default:
                         temp[key.replace(" ", "_").toLocaleLowerCase()] =
@@ -266,39 +259,35 @@ export default function MaintenanceLogs() {
                 }
                 temp_array.push(temp);
             });
-            response = await MarMaintenanceLogs.UpdateMaintenanceLogs(
+            response = await UmiSensorMaintenance.UpdateSensorMaintenanceLogs(
                 temp_array,
             );
         }
         if (response.status === true) {
             getMaintenanceLogsPerMonth(startRange, endRange);
-            getMaintenanceLogsPerDay(selectedData.maintenance_date);
+            getMaintenanceLogsPerDay(selectedData.timestamp);
             handleClose();
-            setOpenNotif(true);
             setNotifStatus("success");
-            if (!hasModifiedRow)
-                setNotifText("Successfully added new Maintenance logs data.");
-            else setNotifText("Successfully updated Maintenance logs data.");
         } else {
             handleClose();
-            setOpenNotif(true);
             setNotifStatus("error");
-            setNotifText(
-                "Failed to update Maintenance log data. Please review your updates.",
-            );
         }
+        setOpenNotif(true);
+        setNotifText(response.message);
     };
 
     const resetState = () => {
         setSelectedData({});
         setDefaultStrValues({
-            Type: "",
             Remarks: "",
-            "In Charge": "",
-            Updater: "",
+            "Rain Gauge Status": "",
+        });
+        setDefaultIntValues({
+            "Working Nodes": 0,
+            "Anomalous Nodes": 0,
         });
         setDefaultTSValues({
-            "Maintenance Date": moment(),
+            "Timestamp": moment(),
         });
     };
 
@@ -310,16 +299,17 @@ export default function MaintenanceLogs() {
 
     const handleClickUpload = (ir_id) => async () => {
         const data = new FormData();
-        data.append("file", file_to_upload);
-        data.append("ir_id", ir_id);
+        console.log("TO DO");
+        // data.append("file", file_to_upload);
+        // data.append("ir_id", ir_id);
 
-        const response = await MarMaintenanceLogs.UploadReportAttachment(data);
-        if (response.status === true) {
-            handleUploadClose();
-            setFileToUpload(null);
-            setFilename("");
-        } else console.error("Problem in click upload");
-        alert(response.message);
+        // const response = await UmiSensorMaintenance.UploadReportAttachment(data);
+        // if (response.status === true) {
+        //     handleUploadClose();
+        //     setFileToUpload(null);
+        //     setFilename("");
+        // } else console.error("Problem in click upload");
+        // alert(response.message);
     };
 
     const handleUploadOpen = () => {
@@ -334,18 +324,19 @@ export default function MaintenanceLogs() {
 
     const dateClickHandler = (args) => {
         setDefaultTSValues({
-            "Maintenance Date": args.date,
+            "Timestamp": args.date,
         });
         getMaintenanceLogsPerDay(args.date);
     };
 
     const handleDownloadReport = (html) => async () => {
-        const file_date = moment(defaultTSValues["Maintenance Date"]).format("YYYY-MM-DD");
-        const filename = `${file_date}_maintenance_log.pdf`;
-        const response = await MarMaintenanceLogs.RenderPDF(filename, renderToString(html));
-        if (response.status === true) {
-            MarMaintenanceLogs.DownloadPDF(filename);
-        }
+        const file_date = moment(defaultTSValues["Timestamp"]).format("YYYY-MM-DD");
+        console.log("TO DO");
+        // const filename = `${file_date}_maintenance_log.pdf`;
+        // const response = await UmiSensorMaintenance.RenderPDF(filename, renderToString(html));
+        // if (response.status === true) {
+        //     UmiSensorMaintenance.DownloadPDF(filename);
+        // }
     };
 
     return (
@@ -370,7 +361,7 @@ export default function MaintenanceLogs() {
                         <Grid container>
                             <Grid item xs={12} style={{ paddingTop: 40 }}>
                                 <PDFViewer
-                                    date={defaultTSValues["Maintenance Date"]}
+                                    date={defaultTSValues["Timestamp"]}
                                     data={tableData}
                                     dataType="mar_maintenance_report"
                                     classes={classes}
@@ -433,7 +424,7 @@ export default function MaintenanceLogs() {
                     <Forms
                         data={{
                             string: defaultStringValues,
-                            int: {},
+                            int: defaultIntValues,
                             ts: defaultTSValues,
                         }}
                         formData={formData}

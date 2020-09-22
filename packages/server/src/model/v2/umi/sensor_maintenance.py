@@ -5,7 +5,6 @@ from src.api.helpers import Helpers as h
 class SensorMaintenanceModel():
 
 	def create_sensor_maintenance_log(data):
-		h.var_checker("data", data)
 		remarks = data["remarks"] 
 		working_nodes = data["working_nodes"] 
 		anomalous_nodes = data["anomalous_nodes"] 
