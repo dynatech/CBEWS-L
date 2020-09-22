@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from connections import SOCKETIO
 import sys
 from datetime import datetime as dt
-from src.model.ground_data import GroundData
+from src.model.v2.ground_data import GroundData
 from config import APP_CONFIG
 from src.api.helpers import Helpers as h
 

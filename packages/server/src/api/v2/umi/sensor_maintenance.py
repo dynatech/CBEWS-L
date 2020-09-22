@@ -10,7 +10,9 @@ from pprint import pprint
 
 from config import APP_CONFIG
 
+
 SENSOR_MAINTENANCE_BLUEPRINT = Blueprint("sensor_maintenance", __name__)
+
 
 @SENSOR_MAINTENANCE_BLUEPRINT.route("/get/field_survey/umi/latest_report", methods=["GET"])
 def get_latest_report_summary():
@@ -27,6 +29,7 @@ def get_latest_report_summary():
             'message': "Failed to get Latest Field Survey Report."
         }
     return jsonify(ret_val)
+
 
 @SENSOR_MAINTENANCE_BLUEPRINT.route("/download/field_survey/umi/latest_report", methods=["POST"])
 def download_latest_report_summary():
@@ -48,6 +51,7 @@ def download_latest_report_summary():
         'status': True
     })
 
+
 @SENSOR_MAINTENANCE_BLUEPRINT.route("/email/field_survey/umi/latest_report", methods=["POST"])
 def email_latest_report_summary():
     try:
@@ -59,17 +63,17 @@ def email_latest_report_summary():
         #     'message': "Successfully loaded Latest Field Survey Report",
         #     'data': summary
         # }
+        ret_val = { 'status': True }
     except Exception as err:
         ret_val = {
             'status': False,
             'message': "Failed to get Latest Field Survey Report."
         }
-    return jsonify({
-        'status': True
-    })
+    return jsonify(ret_val)
+
 
 @SENSOR_MAINTENANCE_BLUEPRINT.route("/get/field_survey/umi/field_survey_logs", methods=["GET"])
-def get_all_sensor_maintenance_logs_logs():
+def get_all_sensor_maintenance_logs():
     try:
         summary = SensorMaintenanceModel.fetch_sensor_maintenance_logs()
         ret_val = {
@@ -84,8 +88,9 @@ def get_all_sensor_maintenance_logs_logs():
         }
     return jsonify(ret_val)
 
+
 @SENSOR_MAINTENANCE_BLUEPRINT.route("/add/field_survey/umi/field_survey_logs", methods=["POST"])
-def add_sensor_maintenance_logs_logs():
+def add_sensor_maintenance_logs():
     try:
         data = request.get_json()
         h.var_checker("data", data)
@@ -102,8 +107,9 @@ def add_sensor_maintenance_logs_logs():
         }
     return jsonify(ret_val)
 
+
 @SENSOR_MAINTENANCE_BLUEPRINT.route("/update/field_survey/umi/field_survey_logs", methods=["PATCH"])
-def update_sensor_maintenance_logs_logs():
+def update_sensor_maintenance_logs():
     try:
         data = request.get_json()
         summary_status = SensorMaintenanceModel.modify_sensor_maintenance_logs(data)
@@ -125,8 +131,9 @@ def update_sensor_maintenance_logs_logs():
         }
     return jsonify(ret_val)
 
+
 @SENSOR_MAINTENANCE_BLUEPRINT.route("/delete/field_survey/umi/field_survey_logs", methods=["DELETE"])
-def delete_sensor_maintenance_logs_logs():
+def delete_sensor_maintenance_logs():
     try:
         data = request.get_json()
         summary_status = SensorMaintenanceModel.remove_sensor_maintenance_logs(data['id'])
@@ -148,8 +155,9 @@ def delete_sensor_maintenance_logs_logs():
         }
     return jsonify(ret_val)
 
+
 @SENSOR_MAINTENANCE_BLUEPRINT.route("/upload/field_survey/umi/field_survey_logs", methods=["POST"])
-def upload_sensor_maintenance_logs_logs():
+def upload_sensor_maintenance_logs():
     try:
         file = request.files['file']
         directory = f"{APP_CONFIG['UMINGAN_DIR']}/DOCUMENTS/Field-Survey"
@@ -176,6 +184,7 @@ def upload_sensor_maintenance_logs_logs():
         raise err
         # return_data = { "status": False }
     return jsonify(return_data)
+
 
 @SENSOR_MAINTENANCE_BLUEPRINT.route("/update/field_survey/umi/attachment", methods=["POST"])
 def update_sensor_maintenance_logs_attachment():

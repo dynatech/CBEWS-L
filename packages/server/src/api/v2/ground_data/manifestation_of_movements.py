@@ -14,10 +14,10 @@ def modify_ts_format(entry):
     return entry
 
 
-@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/mar/moms", methods=["GET"])
-def fetch_mar_moms():
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/<site_code>/moms", methods=["GET"])
+def fetch_moms(site_code):
     try:
-        site_id = APP_CONFIG["site_ids"]["mar"]
+        site_id = APP_CONFIG["site_ids"][site_code]
         moms_list = GroundData.fetch_moms(site_id)
         moms_list = list(map(modify_ts_format, moms_list))
         moms = {
@@ -27,25 +27,7 @@ def fetch_mar_moms():
     except Exception as err:
         moms = {
             "status": False,
-            "message": f"Failed to fetch moms data. Error: {err}"
-        }
-    return jsonify(moms)
-
-
-@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/umi/moms", methods=["GET"])
-def fetch_umi_moms():
-    try:
-        site_id = 50
-        moms_list = GroundData.fetch_moms(site_id)
-        moms_list = list(map(modify_ts_format, moms_list))
-        moms = {
-            "status": True,
-            "data": moms_list
-        }
-    except Exception as err:
-        moms = {
-            "status": False,
-            "message": f"Failed to fetch moms data. Error: {err}"
+            "message": f"Failed to fetch {site_code.upper()} moms data. Error: {err}"
         }
     return jsonify(moms)
 
@@ -220,14 +202,19 @@ def fetch_feature(feature_id, site_id):
         }
     return jsonify(moms)
 
-@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/moms/features", methods=["GET"])
-def fetch_features():
+
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/moms/feature/types", methods=["GET"])
+def fetch_moms_feature_types():
     try:
-        feature_names = GroundData.fetch_feature_names()
-        moms = {"status": True, "data": feature_names}
+        feature_types = GroundData.fetch_feature_types()
+        response = {
+            "status": True,
+            "data": feature_types,
+            "message": "Successfully retrieved feature types"
+        }
     except Exception as err:
-        moms = {
+        response = {
             "status": False,
             "message": f"Failed to fetch moms data. Error: {err}"
         }
-    return jsonify(moms)
+    return jsonify(response)
