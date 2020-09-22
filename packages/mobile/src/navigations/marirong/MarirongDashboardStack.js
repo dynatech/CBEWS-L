@@ -5,6 +5,7 @@ import MarirongDashboard from '../../components/marirong/MarirongDashboard';
 import CRATabStack from '../marirong/CRATabStack';
 import MaintenanceLogsTabStack from '../marirong/MaintenanceLogsTabStack';
 import EventsTemplate from '../../components/marirong/events/EventsTemplate';
+import GroundDataTabStack from '../marirong/GroundDataTabStack';
 
 const Stack = createStackNavigator();
 
@@ -28,6 +29,13 @@ function MarirongDashboardStack() {
                     textAlign: 'center',
                   },
             }} component={MaintenanceLogsTabStack} />
+            <Stack.Screen name="GroundDataTabStack" options={{
+                title: 'Ground Data',
+                headerLeft: null,
+                headerTitleStyle: {
+                    textAlign: 'center',
+                  },
+            }} component={GroundDataTabStack} />
             <Stack.Screen name="EventsTemplate" options={{
                 title: 'Events',
                 headerLeft: null,

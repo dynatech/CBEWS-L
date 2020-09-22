@@ -10,6 +10,8 @@ class GroundData():
                 f'cbewsl_commons_db.sites USING (site_id) INNER JOIN ' \
                 f'senslopedb.marker_data USING (marker_id) INNER JOIN senslopedb.marker_observations USING (mo_id) ' \
                 f'WHERE sites.site_id = "{site_id}" ORDER BY ts desc limit 100;'
+        print("HEY")
+        print(query)
         schema = DB.db_switcher(site_id)
         result = DB.db_read(query, schema)
         return result
