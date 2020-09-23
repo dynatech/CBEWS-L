@@ -37,23 +37,36 @@ def add():
     try:
         data = request.get_json()
         ts = data["ts"]
-        feature_id = data["feature_id"]
+        # feature_id = data["feature_id"]
+        feature_type = data["feature_type"]
         feature_name = data["feature_name"]
+
         reporter = data["reporter"]
         location = data["location"]
         remarks = data["remarks"]
         site_id = data["site_id"]
         user_id = data["user_id"]
         alert_level = data["alert_level"]
+        try:
+            description = data["description"]
+        except KeyError:
+            description = None
 
-        instance = GroundData.fetch_feature_name(feature_id, feature_name, site_id)
-        if len(instance) == 0:
-            instance = GroundData.insert_moms_instance(site_id, feature_id, feature_name, 
-                                                            location, reporter)
+        feature_type_temp = GroundData.fetch_feature_id(feature_type, site_id)
+        if feature_type_temp:
+            feature_id = feature_type_temp[0]["feature_id"]
         else:
-            instance = instance[0]["instance_id"]
+            feature_id = GroundData.insert_moms_feature(feature_type=feature_type, site_id=site_id, description=description)
+
+        moms_instance = GroundData.fetch_feature_name(feature_id, feature_name, site_id)
+        if moms_instance:
+            instance_id = moms_instance[0]["instance_id"]
+        else:
+            instance_id = GroundData.insert_moms_instance(site_id, feature_id, feature_name, 
+                                                            location, reporter)
+
         moms_id = GroundData.insert_moms_record(
-            instance=instance, ts=ts, remarks=remarks,
+            instance_id=instance_id, ts=ts, remarks=remarks,
             reporter_id=user_id, alert_level=alert_level
         )
 
@@ -83,6 +96,7 @@ def add():
                 trig_sym_id=trigger_sym_id,
                 ts_updated=ts
             )
+
         if moms_id['status'] == True:
             moms = {
                 "status": True,
@@ -112,7 +126,7 @@ def update():
         moms_id = data["moms_id"]
         remarks = data["remarks"]
         ts = data["ts"]
-        feature_id = data["feature_id"]
+        feature_type = data["feature_type"]
         feature_name = data["feature_name"]
         reporter = data["reporter"]
         location = data["location"]
@@ -120,14 +134,25 @@ def update():
         user_id = data["user_id"]
         alert_level = data["alert_level"]
 
-        instance = GroundData.fetch_feature_name(feature_id, feature_name, site_id)
-        if len(instance) == 0:
-            instance = GroundData.insert_moms_instance(site_id, feature_id, feature_name, 
-                                                            location, reporter)
+        try:
+            description = data["description"]
+        except KeyError:
+            description = None
+
+        feature_type_temp = GroundData.fetch_feature_id(feature_type, site_id)
+        if feature_type_temp:
+            feature_id = feature_type_temp[0]["feature_id"]
         else:
-            instance = instance[0]["instance_id"]
-        moms_instance_update = GroundData.update_moms_instance(instance, location, reporter)
-        if moms_instance_update['status'] == True:
+            feature_id = GroundData.insert_moms_feature(feature_type=feature_type, site_id=site_id, description=description)
+
+        moms_instance = GroundData.fetch_feature_name(feature_id, feature_name, site_id)
+        if moms_instance:
+            instance_id = moms_instance[0]["instance_id"]
+        else:
+            instance_id = GroundData.insert_moms_instance(site_id, feature_id, feature_name, 
+                                                            location, reporter)
+
+        if instance_id:
             moms_monitoring_update = GroundData.update_monitoring_moms(moms_id, remarks)
             if moms_monitoring_update['status'] == True:
                 moms = {
