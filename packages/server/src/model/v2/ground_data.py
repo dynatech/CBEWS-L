@@ -81,6 +81,35 @@ class GroundData():
         finally:
             return result
 
+    def fetch_feature_id(feature_type, site_id=None):
+        """
+            Returns {"feature_id": <feature_id value>} of searched feature type
+        """
+        try:
+            query = f"SELECT feature_id FROM moms_features WHERE feature_type = '{feature_type}'"
+            feature_id = DB.db_read(query, 'senslopedb')
+        except Exception as err:
+            raise(err)
+        
+        return feature_id
+
+
+    def insert_moms_feature(feature_type, site_id=None, description=None):
+        """
+            Returns feature_id of inserted feature type
+        """
+        try:
+            if description:
+                temp_desc = f"'{description}'"
+            else:
+                temp_desc = f"NULL"
+            query = f"INSERT INTO moms_features (feature_id, feature_type, description) VALUES (0, '{feature_type}', {temp_desc})"
+            print(query)
+            feature_id = DB.db_modify(query, 'senslopedb', True)
+        except Exception as err:
+            raise(err)
+        
+        return feature_id
 
     def delete_marker_observation(surficial_data):
         try:
@@ -143,13 +172,13 @@ class GroundData():
             return result
 
 
-    def insert_moms_record(instance, ts, remarks,
+    def insert_moms_record(instance_id, ts, remarks,
                             reporter_id, alert_level=0, validator_id=None):
         """
         Inserts monitoring_moms row
 
         Args:
-            instance (int) - instance_id of the feature to be reported
+            instance_id (int) - instance_id of the feature to be reported
             ts (str/datetime) - observance_ts of the moms report
             remarks (str) - remarks of the moms report
             reporter_id (int) - in CBEWSL, one reporter and
@@ -165,7 +194,7 @@ class GroundData():
                 validator = reporter_id
             query = "INSERT INTO monitoring_moms "
             query += "(instance_id, observance_ts, reporter_id, remarks, validator, op_trigger)"
-            query += f"VALUES ({instance}, '{ts}', {reporter_id}, '{remarks}', {validator}, {alert_level})"
+            query += f"VALUES ({instance_id}, '{ts}', {reporter_id}, '{remarks}', {validator}, {alert_level})"
 
             status = DB.db_modify(query, 'senslopedb', True)
             result = {"status": True, "data": status}
