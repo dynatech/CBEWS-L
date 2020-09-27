@@ -190,14 +190,14 @@ class GroundData():
             return result
 
 
-    def insert_moms_record(instance_id, ts, remarks,
+    def insert_moms_record(instance_id, observance_ts, remarks,
                            reporter_id, alert_level=0, validator_id=None):
         """
         Inserts monitoring_moms row
 
         Args:
             instance_id (int) - instance_id of the feature to be reported
-            ts (str/datetime) - observance_ts of the moms report
+            observance_ts (str/datetime) - observance_ts of the moms report
             remarks (str) - remarks of the moms report
             reporter_id (int) - in CBEWSL, one reporter and
                                 validator is enough - user_id
@@ -206,13 +206,14 @@ class GroundData():
                                 validator is enough - user_id
         """
         try:
-            if isinstance(ts, str):
-                ts = Helpers.str_to_dt(ts)
+            if isinstance(observance_ts, str):
+                observance_ts = Helpers.str_to_dt(observance_ts)
             if not validator_id:
                 validator = reporter_id
+            last_ts = Helpers.dt_to_str(dt.today())
             query = "INSERT INTO monitoring_moms "
-            query += "(instance_id, observance_ts, reporter_id, remarks, validator, op_trigger)"
-            query += f"VALUES ({instance_id}, '{ts}', {reporter_id}, '{remarks}', {validator}, {alert_level})"
+            query += "(instance_id, observance_ts, reporter_id, remarks, validator, op_trigger, last_ts)"
+            query += f"VALUES ({instance_id}, '{observance_ts}', {reporter_id}, '{remarks}', {validator}, {alert_level}, '{last_ts}')"
 
             status = DB.db_modify(query, 'senslopedb', True)
             result = {"status": True, "data": status}

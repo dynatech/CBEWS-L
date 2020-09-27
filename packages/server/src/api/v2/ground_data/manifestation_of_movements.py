@@ -18,18 +18,19 @@ def modify_ts_format(entry):
 # MONITORING_MOMS (MOMS REPORTS/OBSERVATIONS)
 ##############################
 
-@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/add/ground_data/mar/moms", methods=["POST"])
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/add/ground_data/moms", methods=["POST"])
 def add():
     try:
         data = request.get_json()
-        ts = data["ts"]
+        observance_ts = data["observance_ts"]
         instance_id = data["instance_id"]
         remarks = data["remarks"]
         reporter_id = data["reporter_id"]
         alert_level = data["alert_level"]
+        site_id = data["site_id"]
 
         moms_id = GroundData.insert_moms_record(
-            instance_id=instance_id, ts=ts, remarks=remarks,
+            instance_id=instance_id, observance_ts=observance_ts, remarks=remarks,
             reporter_id=reporter_id, alert_level=alert_level
         )
 
@@ -49,7 +50,7 @@ def add():
             trigger_id = AlertGen.insert_operational_trigger(
                 site_id=site_id,
                 trig_sym_id=trigger_sym_id,
-                ts_updated=ts
+                ts_updated=observance_ts
             )
         # Else update especially ts in database:
         else:
@@ -57,21 +58,15 @@ def add():
             result = AlertGen.update_operational_trigger(
                 op_trig_id=trigger_id,
                 trig_sym_id=trigger_sym_id,
-                ts_updated=ts
+                ts_updated=observance_ts
             )
 
-        if moms_id['status'] == True:
-            moms = {
-                "status": True,
-                "message": "Successfully added new Manifestation of Movements data.",
-                "moms_id": moms_id['data'],
-                "trigger_id": trigger_id
-            }
-        else:
-            moms = {
-                "status": False,
-                "message": f"Failed to add moms data."
-            }
+        moms = {
+            "status": True,
+            "message": "Successfully added new Manifestation of Movements data.",
+            "moms_id": moms_id,
+            "trigger_id": trigger_id
+        }
     except Exception as err:
         raise(err)
         moms = {
