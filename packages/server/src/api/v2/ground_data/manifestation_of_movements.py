@@ -165,7 +165,7 @@ def insert_moms_instance():
     return jsonify(return_value)
 
 
-@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/moms/feature/<feature_id>/<site_id>", methods=["GET"])
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/moms/instance/<feature_id>/<site_id>", methods=["GET"])
 def fetch_moms_instances(feature_id, site_id):
     try:
         name_container = []
