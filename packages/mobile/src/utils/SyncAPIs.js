@@ -116,6 +116,17 @@ const MARIRONG_API_LIST = (data) => {
             'delete': (async(data)=> {
                 alert(JSON.stringify(data));
             })
+        },
+        'MarSurficialData': {
+            'add': (async(data)=> {
+                // alert(JSON.stringify(data));
+            }),
+            'update': (async(data)=> {
+
+            }),
+            'delete': (async(data)=> {
+                alert(JSON.stringify(data));
+            })
         }
     }
 };

@@ -241,7 +241,7 @@ class GroundData():
 
     def fetch_feature_types():
         try:
-            query = 'SELECT feature_id, feature_type, description FROM moms_features'
+            query = 'SELECT feature_id, feature_type FROM moms_features'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,

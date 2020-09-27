@@ -89,7 +89,7 @@ const InsertMomsFeatureType = (data) => {
     });
 };
 
-const FetchMomsFeatures = (data) => {
+const FetchMoMSFeatures = (data) => {
   // return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types/${site_id}`, {
   return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types`, {
     method: "GET",
@@ -181,5 +181,5 @@ const UpdateMomsInstance = (data) => {
 export { 
   InsertMOMSData, GetMOMSData, UpdateMOMSData, DeleteMOMSData,
   InsertMomsFeatureType, FetchMomsInstances, UpdateMomsFeatureType,
-  InsertMomsInstance, FetchMomsFeatures, UpdateMomsInstance,
+  InsertMomsInstance, FetchMoMSFeatures, UpdateMomsInstance,
 };
