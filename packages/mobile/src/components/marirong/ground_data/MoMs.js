@@ -5,19 +5,46 @@ import { DataTable } from 'react-native-paper';
 import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
 import { ButtonStyle } from '../../../styles/button_style';
-import Forms from '../../utils/Forms';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Formik } from 'formik';
+import { Input } from 'react-native-elements';
 import NetworkUtils from '../../../utils/NetworkUtils';
 import MobileCaching from '../../../utils/MobileCaching';
+import moment from 'moment';
 
 function MoMs() {
 
     const [openModal, setOpenModal] = useState(false);
+    const [openFeatureType, setOpenFeatureType] = useState(false);
+    const [openFeatureName, setOpenFeatureName] = useState(false);
     const [momsData, setMomsData] = useState([]);
+    const [obsTs, setObsTS] = useState([]);
+    const [observanceTs, setObservanceTS] = useState((new Date()));
     const [dataTableContent, setDataTableContent] = useState([]);
-    const [featureTypeList, setFeatureTypeList] = useState([]);
+
     const [selectedData, setSelectedData] = useState({});
     const [cmd, setCmd] = useState('add');
-    const [defaultStrValues, setDefaultStrValues] = useState({});
+    const [defaultFeatureType, setDefaultFeatureType] = useState({
+        "feature_type": "",
+        "description": ""
+    });
+    const [defaultFeatureName, setDefaultFeatureName] = useState({
+        "feature_type": "",
+        "feature_name": "",
+        "location": "",
+        "reporter": ""
+    });
+    const [defaultStrValues, setDefaultStrValues] = useState({
+        "ts": "",
+        "feature_type": "",
+        "feature_name": "",
+        "reporter": "",
+        "description": "",
+        "alert_level": "",
+        "location": "",
+        "remarks": "",
+        "validator": "",
+    });
 
     let formData = useRef();
     let feature_types = useRef();
@@ -76,22 +103,35 @@ function MoMs() {
     }
 
     const modifySummary = (data) => {
-        let temp_types = feature_types.current;
-        temp_types.push({default_val: data['feature_type']})
-        setSelectedData(data);
-        setDefaultStrValues({
-            "Observance timestamp": data['observance_ts'],
-            "Feature Type": temp_types,
-            "Feature Name": data['feature_name'],
-            "Reporter": data['reporter'],
-            "Description": data['description'],
-            "Alert Level": [0,1,2,3, {default_val: data['op_trigger']}],
-            "Location": data['location'],
-            "Remarks": data['remarks'],
-            "Validator": data['validator'],
-        })
-        setCmd('update')
-        showForm();
+        // let temp_types = feature_types.current;
+        // temp_types.push({default_val: data['feature_type']})
+        // setSelectedData(data);
+        // setDefaultStrValues({
+        //     "Observance timestamp": data['observance_ts'],
+        //     "Feature Type": temp_types,
+        //     "Feature Name": data['feature_name'],
+        //     "Reporter": data['reporter'],
+        //     "Description": data['description'],
+        //     "Alert Level": [0,1,2,3, {default_val: data['op_trigger']}],
+        //     "Location": data['location'],
+        //     "Remarks": data['remarks'],
+        //     "Validator": data['validator'],
+        // })
+        // setCmd('update')
+        // showForm();
+    }
+
+    const showDatePicker = (entity, selectedDate) => {
+        setObsTS(
+            <DateTimePicker
+                value={observanceTs}
+                mode={'datetime'}
+                display="default"
+                onChange={(i,v)=> {
+                    setObservanceTS(v);
+                }}
+            />
+        )
     }
 
     const fetchLatestData = async () => {
@@ -100,18 +140,18 @@ function MoMs() {
             let response = await MarGroundData.GetMOMSData();
 
             if (response.status == true) {
-                setDefaultStrValues({
-                    "Observance timestamp": "",
-                    "Feature Type": features.data,
-                    "Feature Name": "",
-                    "Reporter": "",
-                    "Description": "",
-                    "Alert Level": [0,1,2,3],
-                    "Location": "",
-                    "Remarks": "",
-                    "Reporter": "",
-                    "Validator": "",
-                });
+                // setDefaultStrValues({
+                //     "Observance timestamp": "",
+                //     "Feature Type": features.data,
+                //     "Feature Name": "",
+                //     "Reporter": "",
+                //     "Description": "",
+                //     "Alert Level": [0,1,2,3],
+                //     "Location": "",
+                //     "Remarks": "",
+                //     "Reporter": "",
+                //     "Validator": "",
+                // });
                 MobileCaching.setItem('MarMoMs', response.data);
                 feature_types.current = features.data;
                 init(response.data);
@@ -275,6 +315,14 @@ function MoMs() {
         }
     }
 
+    const openFeatureTypeCreator = () => {
+        setOpenFeatureType(true);
+    }
+
+    const openFeatureNameCreator = () => {
+        setOpenFeatureName(true);
+    }
+
     return(
         <ScrollView>
             <View style={ContainerStyle.content}>
@@ -311,31 +359,239 @@ function MoMs() {
             <Modal animationType="slide"
                 visible={openModal}
                 onRequestClose={() => { 
-                    setDefaultStrValues({
-                        "Observance timestamp": "",
-                        "Feature Type": feature_types.current,
-                        "Feature Name": "",
-                        "Reporter": "",
-                        "Description": "",
-                        "Alert Level": [0,1,2,3],
-                        "Location": "",
-                        "Remarks": "",
-                        "Reporter": "",
-                        "Validator": "",
-                    })
                     setCmd('add');
                     setOpenModal(false);
                 }}>
-                <Forms data={{
-                    string: defaultStrValues,
-                    int: {}
-                }}
-                    formData={formData}
-                    command={cmd}
-                    closeForm={() => { closeForm() }}
-                    submitForm={() => { submitForm() }}
-                    deleteForm={() => { deleteForm() }} />
+                <ScrollView style={[ContainerStyle.content]}>
+                    <Formik
+                        initialValues={defaultStrValues}
+                        onSubmit={values => {
+                            alert(JSON.stringify(values));
+                        }}
+                    >
+                        {({ handleChange, handleBlur, handleSubmit, values }) => (
+                            <View style={{ alignItems: 'center', flex: 1, paddingTop: 20 }}>
+                                <Input 
+                                    key={"ts"}
+                                    name={"ts"}
+                                    label={"Observance Timestamp"}
+                                    defaultValue={moment(observanceTs).format("YYYY-MM-DD HH:mm:ss")}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onFocus={showDatePicker} />
+                                <Input 
+                                    key={"feature_type"}
+                                    name={"feature_type"}
+                                    label={"Feature Type"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('feature_type')} />
+                                <View style={{ alignItems: 'center', marginTop: -20, marginBottom: 10 }}>
+                                    <Text style={[LabelStyle.medium_label, { textAlign: 'center', color: "blue" }]} onPress={openFeatureTypeCreator}>New feature type? Click here!</Text>
+                                </View>
+                                <Input 
+                                    key={"feature_name"}
+                                    name={"feature_name"}
+                                    label={"Feature Name"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('feature_name')} />
+                                <View style={{ alignItems: 'center', marginTop: -20, marginBottom: 10}}>
+                                    <Text style={[LabelStyle.medium_label, { textAlign: 'center', color: "blue" }]} onPress={openFeatureNameCreator}>New feature name? Click here!</Text>
+                                </View>
+                                <Input 
+                                    key={"alert_level"}
+                                    name={"alert_level"}
+                                    label={"Alert Level"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('alert_level')} />
+                                <Input 
+                                    key={"location"}
+                                    name={"location"}
+                                    label={"Location"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('location')} />
+                                <Input 
+                                    key={"description"}
+                                    name={"description"}
+                                    label={"Description"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('description')} />
+                                <Input 
+                                    key={"reporter"}
+                                    name={"reporter"}
+                                    label={"Reporter(s)"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('reporter')} />
+                                <Input 
+                                    key={"validator"}
+                                    name={"validator"}
+                                    label={"Validator(s)"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('validator')} />
+                                <Input 
+                                    key={"remarks"}
+                                    name={"remarks"}
+                                    label={"Remarks"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('remarks')} />
+                                <View style={{ alignItems: 'center', paddingTop: 25, paddingBottom: 25 }}>
+                                    <Text style={[LabelStyle.small_label, { textAlign: 'center' }]}>* All fields are required</Text>
+                                    <Text style={[LabelStyle.small_label, { textAlign: 'center' }]}>* Please review your details before submitting</Text>
+                                </View>
+                                <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+                                    <TouchableOpacity style={ButtonStyle.small} onPress={handleSubmit}>
+                                        <Text style={ButtonStyle.medium_text}>Submit</Text>
+                                    </TouchableOpacity>
+                                    {
+                                        cmd != "add" &&
+                                        <TouchableOpacity style={ButtonStyle.small} onPress={(deleteForm)}>
+                                            <Text style={ButtonStyle.medium_text}>Delete</Text>
+                                        </TouchableOpacity>
+                                    }
+                                </View>
+                            </View>
+                        )}
+                    </Formik>
+                </ScrollView>
             </Modal>
+
+            <Modal animationType="slide"
+                visible={openFeatureType}
+                onRequestClose={() => { 
+                    setCmd('add');
+                    setOpenFeatureType(false);
+                }}>
+                <ScrollView style={[ContainerStyle.content]}>
+                    <Formik
+                        initialValues={defaultFeatureType}
+                        onSubmit={values => {
+                            alert(JSON.stringify(values));
+                        }}
+                    >
+                        {({ handleChange, handleBlur, handleSubmit, values }) => (
+                            <View style={{ alignItems: 'center', flex: 1, paddingTop: 20 }}>
+                                <Input 
+                                    key={"feature_type"}
+                                    name={"feature_type"}
+                                    label={"Feature Type"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('feature_type')} />
+                                <Input 
+                                    key={"description"}
+                                    name={"description"}
+                                    label={"Description"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('description')} />
+                                <View style={{ alignItems: 'center', paddingTop: 25, paddingBottom: 25 }}>
+                                    <Text style={[LabelStyle.small_label, { textAlign: 'center' }]}>* All fields are required</Text>
+                                    <Text style={[LabelStyle.small_label, { textAlign: 'center' }]}>* Please review your details before submitting</Text>
+                                </View>
+                                <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+                                    <TouchableOpacity style={ButtonStyle.small} onPress={handleSubmit}>
+                                        <Text style={ButtonStyle.medium_text}>Submit</Text>
+                                    </TouchableOpacity>
+                                    {
+                                        cmd != "add" &&
+                                        <TouchableOpacity style={ButtonStyle.small} onPress={(deleteForm)}>
+                                            <Text style={ButtonStyle.medium_text}>Delete</Text>
+                                        </TouchableOpacity>
+                                    }
+                                </View>
+                            </View>
+                        )}
+                    </Formik>
+                </ScrollView>
+            </Modal>
+
+            <Modal animationType="slide"
+                visible={openFeatureName}
+                onRequestClose={() => { 
+                    setCmd('add');
+                    setOpenFeatureName(false);
+                }}>
+                <ScrollView style={[ContainerStyle.content]}>
+                    <Formik
+                        initialValues={defaultFeatureName}
+                        onSubmit={values => {
+                            alert(JSON.stringify(values));
+                        }}
+                    >
+                        {({ handleChange, handleBlur, handleSubmit, values }) => (
+                            <View style={{ alignItems: 'center', flex: 1, paddingTop: 20 }}>
+                                <Input 
+                                    key={"feature_type"}
+                                    name={"feature_type"}
+                                    label={"Feature Type"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('feature_type')} />
+                                <Input 
+                                    key={"feature_name"}
+                                    name={"feature_name"}
+                                    label={"Feature Name"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('ts')} />
+                                <Input 
+                                    key={"location"}
+                                    name={"location"}
+                                    label={"Location"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('ts')} />
+                                <Input 
+                                    key={"reporter"}
+                                    name={"reporter"}
+                                    label={"Reporter"}
+                                    defaultValue={""}
+                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
+                                    inputStyle={{ textAlign: 'center', padding: 0 }}
+                                    onChangeText={handleChange('ts')} />
+                                <View style={{ alignItems: 'center', paddingTop: 25, paddingBottom: 25 }}>
+                                    <Text style={[LabelStyle.small_label, { textAlign: 'center' }]}>* All fields are required</Text>
+                                    <Text style={[LabelStyle.small_label, { textAlign: 'center' }]}>* Please review your details before submitting</Text>
+                                </View>
+                                <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+                                    <TouchableOpacity style={ButtonStyle.small} onPress={handleSubmit}>
+                                        <Text style={ButtonStyle.medium_text}>Submit</Text>
+                                    </TouchableOpacity>
+                                    {
+                                        cmd != "add" &&
+                                        <TouchableOpacity style={ButtonStyle.small} onPress={(deleteForm)}>
+                                            <Text style={ButtonStyle.medium_text}>Delete</Text>
+                                        </TouchableOpacity>
+                                    }
+                                </View>
+                            </View>
+                        )}
+                    </Formik>
+                </ScrollView>
+            </Modal>
+
+            { obsTs }
+
         </ScrollView>
     )
 }

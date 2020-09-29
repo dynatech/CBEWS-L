@@ -14,7 +14,6 @@ const SyncKeys = {
 		'MarEventsTemplate',
 		'MarMaintenanceLogs',
 		'MarIncidentLogs',
-		'MarSurficialData'
 	],
 	'Umingan': [
 		'UmiRiskAssessmentSummary',
