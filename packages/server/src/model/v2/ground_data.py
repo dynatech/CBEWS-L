@@ -251,6 +251,17 @@ class GroundData():
             return result
 
 
+    def fetch_feature_types_by_type(f_type):
+        try:
+            query = f'SELECT feature_id, feature_type, description FROM moms_features WHERE feature_type = "{f_type}"'
+            result = DB.db_read(query, 'senslopedb')
+        except Exception as err:
+            result = {"status": False,
+                "message": f"Failed to retrieve MoMs data. => {err}"}
+        finally:
+            return result
+
+
     def fetch_feature_id(feature_type, site_id=None):
         """
             Returns {"feature_id": <feature_id value>} of searched feature type
@@ -266,9 +277,24 @@ class GroundData():
 
     def fetch_moms(site_id):
         try:
-            query = 'SELECT * FROM moms_instances INNER ' \
-                    'JOIN monitoring_moms USING (instance_id) INNER JOIN moms_features USING (feature_id) ' \
-                    f'WHERE site_id = "{site_id}" ORDER BY observance_ts DESC;'
+            query = f"""
+                SELECT 
+                    monitoring_moms.*, moms_features.feature_type, moms_instances.*, CONCAT(user_prof.firstname, " ", user_prof.lastname) as moms_reporter
+                FROM
+                    moms_instances
+                        INNER JOIN
+                    monitoring_moms USING (instance_id)
+                        INNER JOIN
+                    moms_features USING (feature_id)
+                        INNER JOIN
+                    cbewsl_commons_db.user_accounts AS users ON users.user_id = monitoring_moms.reporter_id 
+                        INNER JOIN
+                    cbewsl_commons_db.user_profiles AS user_prof ON user_prof.profile_id = users.profile_id
+                WHERE
+                    moms_instances.site_id = {site_id}
+                ORDER BY observance_ts DESC;
+            """
+            Helpers.var_checker("query", query)
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -390,6 +416,31 @@ class GroundData():
             result = {"status": True,
                 "data": update_status, "message": "Success"}
         except Exception as err:
+            print(err)
+            result = {"status": False, "message": err}
+        finally:
+            return result
+
+
+    def delete_moms_feature(feature_id):
+        try:
+            query = f'DELETE FROM moms_features WHERE feature_id = {feature_id}'
+            update_status = DB.db_modify(query, 'senslopedb', True)
+            result = {"status": True, "data": update_status, "message": "Success"}
+        except Exception as err:
+            print(err)
+            result = {"status": False, "message": err}
+        finally:
+            return result
+
+
+    def delete_moms_instance(instance_id):
+        try:
+            query = f'DELETE FROM moms_instances WHERE instance_id = {instance_id}'
+            update_status = DB.db_modify(query, 'senslopedb', True)
+            result = {"status": True, "data": update_status, "message": "Success"}
+        except Exception as err:
+            print(err)
             result = {"status": False, "message": err}
         finally:
             return result

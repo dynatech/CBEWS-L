@@ -12,7 +12,6 @@ import {
     Button,
     TextField,
 } from "@material-ui/core";
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import MomentUtils from "@date-io/moment";
 import moment from "moment";
 
@@ -36,22 +35,20 @@ function ReusableInput(props) {
 
     let component;
     if (propKey in reference.string) {
-        if (Object.prototype.toString.call(value) !== "[object Object]") {
-            component = (
-                <Grid item xs={12}>
-                    <TextField
-                        variant="outlined"
-                        fullWidth
-                        id={propKey}
-                        label={label}
-                        onChange={handleChange(`${key}`)}
-                        onBlur={handleBlur(`${key}`)}
-                        defaultValue={value}
-                        required
-                    />
-                </Grid>
-            );
-        }
+        component = (
+            <Grid item xs={12}>
+                <TextField
+                    variant="outlined"
+                    fullWidth
+                    id={propKey}
+                    label={label}
+                    onChange={handleChange(`${key}`)}
+                    onBlur={handleBlur(`${key}`)}
+                    defaultValue={value}
+                    required
+                />
+            </Grid>
+        );
     } else if (propKey in reference.int) {
         component = (
             <Grid item xs={6}>
@@ -69,6 +66,21 @@ function ReusableInput(props) {
     } else if (propKey in reference.ts) {
         const val = moment(value).format("YYYY-MM-DD HH:mm:ss");
         component = (
+            // <Grid item xs={6}>
+            //     <MuiPickersUtilsProvider utils={MomentUtils}>
+            //         <DateTimePicker
+            //             autoOk
+            //             style={{paddingTop: 5}}
+            //             ampm={false}
+            //             disableFuture
+            //             defaultValue={moment()}
+            //             format="YYYY-MM-DD HH:mm:ss"
+            //             // onChange={}
+            //             label="Date time"
+            //             fullWidth
+            //         />
+            //     </MuiPickersUtilsProvider>
+            // </Grid>
             <Grid item xs={6}>
                 <TextField
                     variant="outlined"
@@ -81,22 +93,6 @@ function ReusableInput(props) {
                 />
             </Grid>
         );
-    } else if (Array.isArray(value)) {
-        console.log("ARRAY!")
-        const { defaultProps } = props;
-        component = (
-            <Grid item xs={6}>
-                <Autocomplete
-                    {...defaultProps}
-                    id="debug"
-                    debug
-                    renderInput={(params) => {
-                        console.log("params", params);
-                        return (<TextField {...params} label="debug" margin="normal" />)
-                    }}
-                />
-            </Grid>
-        );
     } else component = <Typography>Error</Typography>
 
     return component;
@@ -106,15 +102,13 @@ export default function Forms(props) {
     const classes = ButtonStyle();
     const { data, submitForm, deleteForm, formData, command } = props;
     const { string, int, ts } = data;
-
-
     // const [defaultValues, setDefaultValues] = useState(Object.assign({}, string, int, ts));
-    const [defaultValues, setDefaultValues] = useState(Object.assign({}, string, int, ts));
+    const [defaultValues, setDefaultValues] = useState({});
     const [cmd, setCmd] = useState("");
 
     useEffect(() => {
-        // setDefaultValues();
-        // console.log("defaultValues", defaultValues)
+        setDefaultValues(Object.assign({}, string, int, ts));
+        console.log("defaultValues", defaultValues)
         setCmd(command);
     }, []);
 

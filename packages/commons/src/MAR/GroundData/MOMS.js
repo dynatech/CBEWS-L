@@ -107,6 +107,24 @@ const FetchMomsFeatures = (data) => {
     });
 }
 
+const FetchOneMomsFeatures = (feature_type, site_id) => {
+  // return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types/${site_id}`, {
+  return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types/${feature_type}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      return responseJson;
+    })
+    .catch((error) => {
+      console.error("Error on fetching all moms feature types. Err: ", error);
+    });
+}
+
 const UpdateMomsFeatureType = (data) => {
   return fetch(`${AppConfig.HOSTNAME}/v2/update/ground_data/moms/feature/types`, {
     method: "PATCH",
@@ -122,6 +140,24 @@ const UpdateMomsFeatureType = (data) => {
     })
     .catch((error) => {
       console.error("Error on updating moms feature. Err: ", error);
+    });
+};
+
+const DeleteMomsFeature = (data) => {
+  return fetch(`${AppConfig.HOSTNAME}/v2/delete/ground_data/moms/feature`, {
+    method: "DELETE",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      return responseJson;
+    })
+    .catch((error) => {
+      console.error("Error on deleting moms feature data. Err: ", error);
     });
 };
 
@@ -178,8 +214,26 @@ const UpdateMomsInstance = (data) => {
     });
 };
 
+const DeleteMomsInstance = (data) => {
+  return fetch(`${AppConfig.HOSTNAME}/v2/delete/ground_data/moms/instance`, {
+    method: "DELETE",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      return responseJson;
+    })
+    .catch((error) => {
+      console.error("Error on deleting moms instance data. Err: ", error);
+    });
+};
+
 export { 
   InsertMOMSData, GetMOMSData, UpdateMOMSData, DeleteMOMSData,
-  InsertMomsFeatureType, FetchMomsInstances, UpdateMomsFeatureType,
-  InsertMomsInstance, FetchMomsFeatures, UpdateMomsInstance,
+  InsertMomsFeatureType, FetchMomsInstances, UpdateMomsFeatureType, DeleteMomsFeature,
+  InsertMomsInstance, FetchMomsFeatures, FetchOneMomsFeatures, UpdateMomsInstance, DeleteMomsInstance,
 };
