@@ -66,7 +66,7 @@ function MomsInstances () {
 
     const initTable = async () => {
         const response = await MarGroundData.FetchMomsFeatures();
-        response.status ? setTableData(response.data) : console.error("problem retrieving capacity and vulnerability."); 
+        response.status ? setTableData(response.data) : console.error("problem retrieving MOMS."); 
     }
 
     const resetState = () => {
@@ -84,9 +84,10 @@ function MomsInstances () {
 
     const handleEdit = (data) => {
         setSelectedData(data);
+        console.log(data);
         setDefaultStrValues({
             "Feature Type": data["feature_type"],
-            "Description": data["description"],
+            "Remarks": data["remarks"],
         });
         setOpen(true);
         setCommand("edit");
@@ -232,7 +233,7 @@ function MomsInstances () {
                 </Grid>
                 <Grid item xs={12}>
                     <Typography variant="subtitle2">
-                        * click row to Raise/Modify/Remove Capacity and Vulnerability data.
+                        * click row to Raise/Modify/Remove MOMS data.
                     </Typography>
                 </Grid>
                 <Grid container align="center">
@@ -250,7 +251,7 @@ function MomsInstances () {
             </Grid>
         </Container>
         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-            <DialogTitle id="form-dialog-title">Capacity and Vulnerability</DialogTitle>
+            <DialogTitle id="form-dialog-title">MOMS</DialogTitle>
             <DialogContent>
                 <Forms data={{
                         string: defaultStringValues,
@@ -274,7 +275,7 @@ function MomsInstances () {
             <DialogTitle id="alert-dialog-title">{"Are you sure you want to remove this entry?"}</DialogTitle>
             <DialogContent>
             <DialogContentText id="alert-dialog-description">
-                Removing this capacity and vulnerability data cannot be undone. Are you sure you want to remove this entry?
+                Removing this MOMS data cannot be undone. Are you sure you want to remove this entry?
             </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -329,8 +330,8 @@ export default function MOMS() {
     const [tableData, setTableData] = useState([]);
     const [defaultStringValues, setDefaultStrValues] = useState({
         "Remarks": "",
-        "Feature Type": "",
-        "Feature Name": ""
+        "Feature Type": null,
+        "Feature Name": null
     });
     const [defaultTSValues, setDefaultTSValues] = useState({
         "Observance TS": moment(),
@@ -358,7 +359,7 @@ export default function MOMS() {
 
     const initTable = async () => {
         const response = await MarGroundData.GetMOMSData();
-        response.status ? setTableData(response.data) : console.error("problem retrieving capacity and vulnerability."); 
+        response.status ? setTableData(response.data) : console.error("problem retrieving MOMS."); 
 
         if (response.status) {
             const feature_types = await MarGroundData.FetchMomsFeatures();
@@ -366,7 +367,8 @@ export default function MOMS() {
             if (feature_types.status) {
                 const temp = feature_types.data.map((element, index) => {
                     return ({
-                        "type": element.feature_type
+                        "type": element.feature_type,
+                        "default_val": false
                     })
                 });
                 setDefaultStrValues({
@@ -390,7 +392,7 @@ export default function MOMS() {
                 const new_response = await MarGroundData.FetchMomsInstances(feature_id, site_id);
                 console.log("new_response", new_response);
                 if (new_response.status) {
-                    defaultStringValues({
+                    setDefaultStrValues({
                         ...defaultStringValues,
                         "Feature Names": new_response.data
                     })
@@ -404,9 +406,7 @@ export default function MOMS() {
     };
 
     const handleFeatureNameChange = async (feature_name) => {
-        setDefaultStrValues({
-            ...current
-        })
+        console.log(formData);
     };
 
     const resetState = () => {
@@ -429,11 +429,19 @@ export default function MOMS() {
 
     const handleEdit = (data) => {
         setSelectedData(data);
+        console.log("data", data);
+        console.log("formData", formData);
+        console.log("defaultStringValues", defaultStringValues);
         // GET moms_features and moms_instances
+        const temp_type_values = defaultStringValues["Feature Type"];
+        console.log("temp_type_values", temp_type_values);
+        const type_index = temp_type_values.findIndex(element => element.type === data.feature_type);
+        if (type_index !== -1) temp_type_values[type_index]["default_val"] = true;
+
         setDefaultStrValues({
+            ...defaultStringValues,
             "Remarks": data["remarks"],
-            "Feature Type": [{"default_val": data.feature_type}, ...defaultStringValues["Feature Type"]],
-            "Feature Name": [{"default_val": data.feature_name}, ...defaultStringValues["Feature Name"]]
+            "Feature Type": temp_type_values,
         });
         setDefaultIntValues({
             "Alert Level": data["op_trigger"],
@@ -441,7 +449,6 @@ export default function MOMS() {
         setDefaultTSValues({
             "Observance TS": data["observance_ts"],
         });
-        console.log(defaultStringValues, defaultTSValues);
         setOpen(true);
         setCommand("edit");
     };
@@ -485,7 +492,7 @@ export default function MOMS() {
             setNotifStatus("success");
         } else {
             setNotifStatus("error");
-            setNotifText("Failed to delete capacity and vunerability data. Please contact the developers or file a bug report");
+            setNotifText("Failed to delete moms data. Please contact the developers or file a bug report");
         }
         setNotifText(response.message);
         setOpenNotif(true);
@@ -591,7 +598,7 @@ export default function MOMS() {
                 </Grid>
                 <Grid item xs={12}>
                     <Typography variant="subtitle2">
-                        * click row to Raise/Modify/Remove Capacity and Vulnerability data.
+                        * click row to Raise/Modify/Remove MOMS data.
                     </Typography>
                 </Grid>
                 <Grid container align="center">
@@ -609,7 +616,7 @@ export default function MOMS() {
             </Grid>
         </Container>
         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-            <DialogTitle id="form-dialog-title">Capacity and Vulnerability</DialogTitle>
+            <DialogTitle id="form-dialog-title">MOMS</DialogTitle>
             <DialogContent>
                 <Forms data={{
                         string: defaultStringValues,
@@ -633,7 +640,7 @@ export default function MOMS() {
             <DialogTitle id="alert-dialog-title">{"Are you sure you want to remove this entry?"}</DialogTitle>
             <DialogContent>
             <DialogContentText id="alert-dialog-description">
-                Removing this capacity and vulnerability data cannot be undone. Are you sure you want to remove this entry?
+                Removing this MOMS data cannot be undone. Are you sure you want to remove this entry?
             </DialogContentText>
             </DialogContent>
             <DialogActions>

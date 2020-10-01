@@ -34,24 +34,50 @@ function ReusableInput(props) {
     label = label.replace("_", " ");
     const key = propKey.replace(/\s/g, "");
 
-    let component;
-    if (propKey in reference.string) {
+    let component;    
+    if (Array.isArray(value)) {
+        console.log("ARRAY!");
+        console.log("value", value);
         if (Object.prototype.toString.call(value) !== "[object Object]") {
-            component = (
-                <Grid item xs={12}>
-                    <TextField
-                        variant="outlined"
-                        fullWidth
-                        id={propKey}
-                        label={label}
-                        onChange={handleChange(`${key}`)}
-                        onBlur={handleBlur(`${key}`)}
-                        defaultValue={value}
-                        required
+            return (
+                <Grid item xs={6}>
+                    <Autocomplete
+                        freeSolo
+                        id="freeSoloCombo"
+                        disableClearable
+                        options={value.map((option) => option.type)}
+                        renderInput={(params) => {
+                            return (
+                                <TextField
+                                    {...params}
+                                    label="Search input"
+                                    margin="normal"
+                                    variant="outlined"
+                                    InputProps={{ ...params.InputProps, type: 'search' }}
+                                />
+                            )
+                        }}
                     />
                 </Grid>
             );
+        } else {
+            console.log("OBject");
         }
+    } else if (propKey in reference.string) {
+        component = (
+            <Grid item xs={12}>
+                <TextField
+                    variant="outlined"
+                    fullWidth
+                    id={propKey}
+                    label={label}
+                    onChange={handleChange(`${key}`)}
+                    onBlur={handleBlur(`${key}`)}
+                    defaultValue={value}
+                    required
+                />
+            </Grid>
+        );
     } else if (propKey in reference.int) {
         component = (
             <Grid item xs={6}>
@@ -81,22 +107,6 @@ function ReusableInput(props) {
                 />
             </Grid>
         );
-    } else if (Array.isArray(value)) {
-        console.log("ARRAY!")
-        const { defaultProps } = props;
-        component = (
-            <Grid item xs={6}>
-                <Autocomplete
-                    {...defaultProps}
-                    id="debug"
-                    debug
-                    renderInput={(params) => {
-                        console.log("params", params);
-                        return (<TextField {...params} label="debug" margin="normal" />)
-                    }}
-                />
-            </Grid>
-        );
     } else component = <Typography>Error</Typography>
 
     return component;
@@ -113,8 +123,6 @@ export default function Forms(props) {
     const [cmd, setCmd] = useState("");
 
     useEffect(() => {
-        // setDefaultValues();
-        // console.log("defaultValues", defaultValues)
         setCmd(command);
     }, []);
 
