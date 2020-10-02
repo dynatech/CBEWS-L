@@ -326,12 +326,18 @@ export default function MOMS() {
     const [selectedData, setSelectedData] = useState({});
     const [command, setCommand] = useState("add");
 
-    const formData = useRef();
+    const formData = useRef({
+        "form_data": {}, 
+        "custom_values": { 
+            "Feature Name": [], 
+            "Feature Type": []
+        }
+    });
     const [tableData, setTableData] = useState([]);
     const [defaultStringValues, setDefaultStrValues] = useState({
         "Remarks": "",
-        "Feature Type": null,
-        "Feature Name": null
+        "Feature Type": [],
+        "Feature Name": []
     });
     const [defaultTSValues, setDefaultTSValues] = useState({
         "Observance TS": moment(),
@@ -382,7 +388,8 @@ export default function MOMS() {
         }
     }
 
-    const handleFeatureTypeChange = async (feature_type) => {
+    const handleFeatureTypeChange = async (feature_type, fData) => {
+        console.log("CHANGING feature_type", feature_type);
         const site_id = cookies.credentials.site_id;
         const response = await MarGroundData.FetchOneMomsFeatures(feature_type, site_id);
         console.log("response", response);
@@ -392,10 +399,15 @@ export default function MOMS() {
                 const new_response = await MarGroundData.FetchMomsInstances(feature_id, site_id);
                 console.log("new_response", new_response);
                 if (new_response.status) {
-                    setDefaultStrValues({
-                        ...defaultStringValues,
-                        "Feature Names": new_response.data
-                    })
+                    const temp = new_response.data.map((element, index) => {
+                        return ({
+                            "type": element.feature_name,
+                            "default_val": false
+                        })
+                    });
+                    formData.current.custom_values["Feature Name"] = temp;
+                    console.log("defaultStringValues", defaultStringValues);
+                    console.log("formData.current", formData.current);
                 } else {
                     console.error("Problem retrieving f names")
                 }
@@ -405,14 +417,16 @@ export default function MOMS() {
         }
     };
 
-    const handleFeatureNameChange = async (feature_name) => {
-        console.log(formData);
+    const handleFeatureNameChange = async (feature_name, fData) => {
+        console.log("feature_name", feature_name);
     };
 
     const resetState = () => {
         setSelectedData({});    
         setDefaultStrValues({
             "Remarks": "",
+            "Feature Type": [],
+            "Feature Name": []
         });
         setDefaultTSValues({
             "Observance TS": moment(),
@@ -438,10 +452,12 @@ export default function MOMS() {
         const type_index = temp_type_values.findIndex(element => element.type === data.feature_type);
         if (type_index !== -1) temp_type_values[type_index]["default_val"] = true;
 
+        formData.current.custom_values["Feature Type"] = temp_type_values;
+
         setDefaultStrValues({
             ...defaultStringValues,
             "Remarks": data["remarks"],
-            "Feature Type": temp_type_values,
+            // "Feature Type": temp_type_values,
         });
         setDefaultIntValues({
             "Alert Level": data["op_trigger"],
@@ -588,10 +604,6 @@ export default function MOMS() {
                             handleEdit,
                             handleDelete,
                         }}
-                        customHandlers={{
-                            moms_feature: handleFeatureTypeChange,
-                            moms_instance: handleFeatureNameChange
-                        }}
                         options={options}
                         cmd={cmd}
                     />
@@ -627,6 +639,11 @@ export default function MOMS() {
                     closeForm={() => handleClose()}
                     submitForm={() => submit()}
                     deleteForm={() => deleteMoms()} 
+                    customHandlers={{
+                        type: "moms",
+                        "Feature Type": handleFeatureTypeChange,
+                        "Feature Name": handleFeatureNameChange
+                    }}
                 />
             </DialogContent>
         </Dialog>
