@@ -29,6 +29,7 @@ function ReusableInput(props) {
         handleBlur,
         handleChange,
         reference,
+        originalProps
     } = props;
     let label = temp[0].toUpperCase() + temp.slice(1);
     label = label.replace("_", " ");
@@ -36,32 +37,47 @@ function ReusableInput(props) {
 
     let component;    
     if (Array.isArray(value)) {
-        console.log("ARRAY!");
         console.log("value", value);
-        if (Object.prototype.toString.call(value) !== "[object Object]") {
-            return (
-                <Grid item xs={6}>
-                    <Autocomplete
-                        freeSolo
-                        id="freeSoloCombo"
-                        disableClearable
-                        options={value.map((option) => option.type)}
-                        renderInput={(params) => {
-                            return (
-                                <TextField
-                                    {...params}
-                                    label="Search input"
-                                    margin="normal"
-                                    variant="outlined"
-                                    InputProps={{ ...params.InputProps, type: 'search' }}
-                                />
-                            )
-                        }}
-                    />
-                </Grid>
-            );
-        } else {
-            console.log("OBject");
+        if ("customHandlers" in originalProps) {
+            const { customHandlers } = originalProps;
+            let auto_handler = console.log("This is the autohandler");
+            let option = [];
+            switch (customHandlers.type) {
+                case "moms":
+                    auto_handler = customHandlers[label];
+                    option = props.fData.current.custom_values[label];
+                    break;
+                default:
+                    console.log("does not exist!");
+            }
+
+            if (Object.prototype.toString.call(value) !== "[object Object]") {
+                return (
+                    <Grid item xs={6}>
+                        <Autocomplete
+                            freeSolo
+                            id="freeSoloCombo"
+                            disableClearable
+                            options={option.map((option) => option.type)}
+                            onChange={(event) => auto_handler(event.target.innerText, props.fData)}
+                            renderInput={(params) => {
+                                return (
+                                    <TextField
+                                        {...params}
+                                        label={label}
+                                        margin="normal"
+                                        variant="outlined"
+                                        InputProps={{ ...params.InputProps, type: 'search' }}
+                                        onChange={(event) => { console.log("selected", event.target.value) }}
+                                    />
+                                )
+                            }}
+                        />
+                    </Grid>
+                );
+            } else {
+                console.log("OBject");
+            }
         }
     } else if (propKey in reference.string) {
         component = (
@@ -117,10 +133,11 @@ export default function Forms(props) {
     const { data, submitForm, deleteForm, formData, command } = props;
     const { string, int, ts } = data;
 
-
     // const [defaultValues, setDefaultValues] = useState(Object.assign({}, string, int, ts));
     const [defaultValues, setDefaultValues] = useState(Object.assign({}, string, int, ts));
     const [cmd, setCmd] = useState("");
+
+    console.log("formData", formData);
 
     useEffect(() => {
         setCmd(command);
@@ -130,7 +147,7 @@ export default function Forms(props) {
         <Formik
             initialValues={defaultValues}
             onSubmit={(values) => {
-                formData.current = values;
+                formData.current.form_data = values;
                 submitForm();
             }}
         >
@@ -148,6 +165,8 @@ export default function Forms(props) {
                                         reference={reference}
                                         handleBlur={handleBlur}
                                         handleChange={handleChange}
+                                        originalProps={props}
+                                        fData={formData}
                                     />
                                 );
                             })}
