@@ -192,6 +192,29 @@ def update_moms_instance():
     return jsonify(return_value)
 
 
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/delete/ground_data/moms/instance", methods=["delete"])
+def delete_moms_instance():
+    try:
+        data = request.get_json()
+        moms_delete = GroundData.delete_moms_instance(data['instance_id'])
+        moms = {
+            "status": True,
+            "message": "Successfully deleted instance data."
+        }
+        if moms_delete["status"]:
+            moms = {
+                "status": False,
+                "message": f"Failed to fetch moms instance data. Error: {moms_delete['message']}"
+            }
+    except Exception as err:
+        print(err)
+        moms = {
+            "status": False,
+            "message": f"Failed to fetch moms instance data. Error: {err}"
+        }
+    return jsonify(moms)
+
+
 ##############################
 # MOMS FEATURES (TYPES)
 ##############################
@@ -216,9 +239,13 @@ def insert_moms_feature():
 
 
 @MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/moms/feature/types", methods=["GET"])
-def fetch_moms_feature_types():
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/moms/feature/types/<f_type>", methods=["GET"])
+def fetch_moms_feature_types(f_type=None):
     try:
-        feature_types = GroundData.fetch_feature_types()
+        if f_type:
+            feature_types = GroundData.fetch_feature_types_by_type(f_type)
+        else:
+            feature_types = GroundData.fetch_feature_types()
         response = {
             "status": True,
             "data": feature_types,
@@ -248,3 +275,28 @@ def update_moms_feature():
             "message": f"Failed to update moms feature -> {err}"
         }
     return jsonify(return_value)
+
+
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/delete/ground_data/moms/feature", methods=["delete"])
+def delete_moms_feature():
+    try:
+        data = request.get_json()
+        moms_delete = GroundData.delete_moms_feature(data['feature_id'])
+        moms = {
+            "status": True,
+            "message": "Successfully deleted moms feature data."
+        }
+        if moms_delete["status"]:
+            moms = {
+                "status": False,
+                "message": f"Failed to fetch moms feature data. Error: {moms_delete['message']}"
+            }
+    except KeyError:
+        pass
+    except Exception as err:
+        print(err)
+        moms = {
+            "status": False,
+            "message": f"Failed to fetch moms feature data. Error: {err}"
+        }
+    return jsonify(moms)

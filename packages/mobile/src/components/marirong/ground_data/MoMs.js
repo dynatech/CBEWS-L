@@ -6,6 +6,7 @@ import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
 import { ButtonStyle } from '../../../styles/button_style';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-community/picker';
 import { Formik } from 'formik';
 import { Input } from 'react-native-elements';
 import NetworkUtils from '../../../utils/NetworkUtils';
@@ -17,7 +18,11 @@ function MoMs() {
     const [openModal, setOpenModal] = useState(false);
     const [openFeatureType, setOpenFeatureType] = useState(false);
     const [openFeatureName, setOpenFeatureName] = useState(false);
+
     const [momsData, setMomsData] = useState([]);
+    const [featureData, setFeatureData] = useState([]);
+    const [featureNameData, setFeatureNameData] = useState([]);
+
     const [obsTs, setObsTS] = useState([]);
     const [observanceTs, setObservanceTS] = useState((new Date()));
     const [dataTableContent, setDataTableContent] = useState([]);
@@ -137,6 +142,7 @@ function MoMs() {
     const fetchLatestData = async () => {
         try {
             let features = await MarGroundData.FetchMoMSFeatures();
+            let names = await MarGroundData.FetchMomsInstances();
             let response = await MarGroundData.GetMOMSData();
 
             if (response.status == true) {
@@ -153,8 +159,12 @@ function MoMs() {
                 //     "Validator": "",
                 // });
                 MobileCaching.setItem('MarMoMs', response.data);
+                MobileCaching.setItem('MarMomsFeatures', features.data);
+
                 feature_types.current = features.data;
                 init(response.data);
+                setFeatureData(features.data);
+                setFeatureNameData(null);
             } else {
                 ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
             }
@@ -379,18 +389,25 @@ function MoMs() {
                                     containerStyle={{ width: '80%', borderColor: '#f5981c' }}
                                     inputStyle={{ textAlign: 'center', padding: 0 }}
                                     onFocus={showDatePicker} />
-                                <Input 
-                                    key={"feature_type"}
-                                    name={"feature_type"}
-                                    label={"Feature Type"}
-                                    defaultValue={""}
-                                    containerStyle={{ width: '80%', borderColor: '#f5981c' }}
-                                    inputStyle={{ textAlign: 'center', padding: 0 }}
-                                    onChangeText={handleChange('feature_type')} />
-                                <View style={{ alignItems: 'center', marginTop: -20, marginBottom: 10 }}>
+                                <Text style={{width: '80%', paddingLeft: 10, fontSize: 16, fontWeight: 'bold', color: '#86939e'}} >Feature Type</Text>
+                                <View style={{borderColor: '#86939e', borderBottomWidth: 1, width: '75%'}}>
+                                    <Picker
+                                        selectedValue={defaultStrValues.feature_type}
+                                        style={{height: 50, width: '100%'}}
+                                        onValueChange={(itemValue, itemIndex) =>
+                                            setDefaultStrValues({...defaultStrValues, feature_type: itemValue})
+                                        }>
+                                            {
+                                                featureData.map((element)=> {
+                                                    return <Picker.Item key={element.feature_type} label={element.feature_type} value={element.feature_type} />
+                                                })
+                                            }
+                                    </Picker>
+                                </View>
+                                <View style={{ alignItems: 'center', marginBottom: 10 }}>
                                     <Text style={[LabelStyle.medium_label, { textAlign: 'center', color: "blue" }]} onPress={openFeatureTypeCreator}>New feature type? Click here!</Text>
                                 </View>
-                                <Input 
+                                <Input
                                     key={"feature_name"}
                                     name={"feature_name"}
                                     label={"Feature Name"}

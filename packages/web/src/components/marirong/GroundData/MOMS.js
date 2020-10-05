@@ -1,675 +1,684 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, {Fragment, useState, useEffect, useRef} from 'react';
 import {
-    Grid,
-    Paper,
-    Container,
-    Fab,
-    makeStyles,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Button,
-    InputLabel,
-    TextField,
-    Typography,
-    Box,
+    Grid, Paper, Container,
+    Fab, Table,
+    TableBody, TableCell, TableHead,
+    TableRow, Button, Typography
 } from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
 
-import MenuItem from "@material-ui/core/MenuItem";
-import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import { useStyles, tableStyles } from '../../../styles/general_styles';
 
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert from "@material-ui/lab/Alert";
+import Forms from '../../utils/Forms';
+import FabMuiTable from "../../utils/MuiTable";
 
-import { MuiPickersUtilsProvider, DateTimePicker } from "@material-ui/pickers";
-import MomentUtils from "@date-io/moment";
-import moment from "moment";
+import moment from 'moment';
 
-import { useCookies } from "react-cookie";
-import AppConfig from "../../reducers/AppConfig";
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import { useCookies } from 'react-cookie';
 
-import { MarGroundData } from "@dynaslope/commons";
+import { MarCommunityRiskAssessment, MarGroundData } from '@dynaslope/commons';
 
-const tableStyle = makeStyles((theme) => ({
-    root: {
-        width: "100%",
-        marginTop: theme.spacing(3),
-        overflowX: "auto",
-    },
-    table: {
-        minWidth: 650,
-    },
-}));
 
-function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
-const useStyles = makeStyles((theme) => ({
-    button_fluid: {
-        width: "90%",
-        padding: 10,
-    },
-    formControl: {
-        minWidth: 120,
-    },
-    selectSpacing: {
-        paddingTop: 5,
-    },
-    selectEmpty: {
-        marginTop: theme.spacing(2),
-    },
-}));
 
-export default function MOMS() {
-    function createData(date_time, feature, reporter, description) {
-        return { date_time, feature, reporter, description };
-    }
-    const dt_classes = tableStyle();
+function MomsInstances () {
+    const cmd = "update-delete";
+    const [cookies, setCookie] = useCookies(['credentials']);
+    const dt_classes = tableStyles();
     const classes = useStyles();
+      
+    const [open, setOpen] = React.useState(false);
+    const [openDelete, setOpenDelete] = React.useState(false);
+    const [notifStatus, setNotifStatus] = useState('success');
+	const [openNotif, setOpenNotif] = useState(false);
+    const [notifText, setNotifText] = useState('');
 
-    const [openRaise, setOpenRaise] = useState(false);
-    const [momsContainer, setMomsContainer] = useState([]);
+    const [selectedData, setSelectedData] = useState({});
+    const [command, setCommand] = useState("add");
 
-    const [selectedMomsFeatures, setSelectedMomsFeatures] = useState(0);
-    const [selectedFeatureName, setSelectedFeatureName] = useState(0);
-    const [selectedTS, setSelectedTS] = useState(
-        moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
-    );
-    const [selectedRemarks, setSelectedRemarks] = useState("");
-    const [selectedReporter, setSelectedReporter] = useState("");
-    const [selectedLocation, setSelectedLocation] = useState("");
-    const [selectedAlertLevel, setSelectedAlertLevel] = useState(0);
-    const [selectedMomsID, setSelectedMomsID] = useState(0);
-    const [modificationDisabled, setModificationDisabled] = useState(false);
-    const [autoCompleteFeaturename, setAutoCompleteFeaturename] = useState("");
-
-    const [notifStatus, setNotifStatus] = useState("success");
-    const [openNotif, setOpenNotif] = useState(false);
-    const [notifText, setNotifText] = useState("");
-    const [cookies, setCookie] = useCookies(["credentials"]);
-
-    const [featureNameList, setFeatureNameList] = useState({
-        options: [{ title: "None selected", instance_id: 0 }],
-        getOptionLabel: (options) => options.title,
+    const formData = useRef();
+    const [tableData, setTableData] = useState([]);
+    const [defaultStringValues, setDefaultStrValues] = useState({
+        "Feature Type": "",
+        "Description": ""
     });
+    const [defaultTSValues, setDefaultTSValues] = useState({});
+    const [defaultIntValues, setDefaultIntValues] = useState({});
 
-    const [featureDetails, setFeatureDetails] = useState([]);
-
-    const [datatable, setDatatable] = useState([]);
-
-    useEffect(() => {
-        initMoms(cookies.credentials.site_id);
-    }, []);
-
-    const initMoms = async (site_id = 29) => {
-        const response = await MarGroundData.GetMOMSData(site_id);
-        console.log("response", response);
-        if (response.status === true) {
-            response.data.forEach((element) => {
-                element.observance_ts = moment(element.observance_ts).format("YYYY-MM-DD HH:mm:ss")
-            });
-            setMomsContainer(response.data);
-            setDatatable(response.data);
-        } else {
-            console.error(response.message);
-        }
+    // TEST
+    const options = {
+        filterType: "checkbox",
     };
+    const columns = [
+        { name: "feature_type", label: "Feature Type" },
+        { name: "description", label: "Description" },
+    ];
+    
+    useEffect(()=> {
+        initTable();
+    },[]);
 
-    const handleMomsModification = (data) => {
-        let temp = {
-            instance_id: data.instance_id,
-            feature_name: data.feature_name,
-        };
-        setOpenForm(true);
-        setModificationDisabled(true);
-        setSelectedMomsFeatures(data.feature_id);
-        setSelectedFeatureName(temp);
-        setSelectedMomsID(data.moms_id);
-        setAutoCompleteFeaturename(data.feature_name);
-        setSelectedTS(data.observance_ts);
-        setSelectedRemarks(data.remarks);
-        setSelectedReporter(data.reporter);
-        setSelectedLocation(data.location);
-        setSelectedAlertLevel(data.op_trigger);
-    };
+    const initTable = async () => {
+        const response = await MarGroundData.FetchMomsFeatures();
+        response.status ? setTableData(response.data) : console.error("problem retrieving MOMS."); 
+    }
 
-    const handleCloseRaise = () => {
-        setOpenRaise(false);
-    };
-
-    const [openForm, setOpenForm] = React.useState(false);
-
-    const handleClickOpenForm = () => {
-        setOpenForm(true);
-        setModificationDisabled(false);
-    };
-
-    const handleCloseForm = () => {
-        setOpenForm(false);
-    };
-
-    const handleChangeFeatureType = async (feature_id) => {
-        setSelectedMomsFeatures(feature_id);
-        const response = await MarGroundData.FetchMOMSFeatures(feature_id, cookies.credentials.site_id);
-        if (response.status === true) {
-            let f_list = [];
-            let f_container = [];
-
-            response.data.forEach((element) => {
-                f_container.push(element);
-                f_list.push({
-                    title: element.feature_name,
-                    instance_id: element.instance_id,
-                });
-            });
-            setFeatureNameList({
-                options: f_list,
-                getOptionLabel: (options) => {
-                    if (typeof options === "string") {
-                        return options;
-                    }
-                    if (options.inputValue) {
-                        return options.inputValue;
-                    }
-                    return options.title;
-                },
-            });
-            setFeatureDetails(f_container);
-        } else {
-            console.error(response.message);
-        }
-    };
-
-    const handleFeatureNameChange = (feature_name) => {
-        setAutoCompleteFeaturename(feature_name);
-        let feature_details = {};
-        feature_details = featureDetails.find(
-            (o) => o.feature_name === feature_name,
-        );
-        if (feature_details == null) {
-            feature_details = {
-                instance_id: 0,
-                feature_name: feature_name,
-            };
-        }
-        setSelectedFeatureName(feature_details);
-    };
-
-    const submitNewMoms = async () => {
-        let api_func = "";
-        let json = "";
-        let response;
-        if (modificationDisabled === true) {
-            api_func = "update";
-            json = {
-                ts: selectedTS,
-                feature_id: selectedMomsFeatures,
-                feature_type: selectedMomsFeatures,
-                feature_name: autoCompleteFeaturename,
-                reporter: selectedReporter,
-                location: selectedLocation,
-                remarks: selectedRemarks,
-                site_id: cookies.credentials.site_id,
-                user_id: cookies.credentials.user_id,
-                alert_level: selectedAlertLevel,
-                moms_id: selectedMomsID,
-            };
-            response = await MarGroundData.UpdateMOMSData(json);
-        } else {
-            api_func = "add";
-            json = {
-                ts: selectedTS,
-                feature_id: selectedMomsFeatures,
-                feature_type: selectedMomsFeatures,
-                feature_name: selectedFeatureName.feature_name,
-                reporter: selectedReporter,
-                location: selectedLocation,
-                remarks: selectedRemarks,
-                site_id: cookies.credentials.site_id,
-                user_id: cookies.credentials.user_id,
-                alert_level: selectedAlertLevel,
-            };
-            response = await MarGroundData.InsertMOMSData(json);
-        }
-
-        if (response.status === true) {
-            initMoms();
-            handleCloseForm();
-            setOpenNotif(true);
-            setNotifStatus("success");
-            if (api_func == "add") {
-                setNotifText(
-                    "Successfully added new manifestation of movements.",
-                );
-            } else {
-                setNotifText(
-                    "Successfully updated manifestation of movements.",
-                );
-            }
-        } else {
-            setOpenNotif(true);
-            setNotifStatus("error");
-            if (api_func == "add") {
-                setNotifText("Failed to add manifestation of movements.");
-            } else {
-                setNotifText("Failed to update manifestation of movements.");
-            }
-        }
-    };
-
-    const deleteMoms = async () => {
-        const response = await MarGroundData.DeleteMOMSData({
-            moms_id: selectedMomsID,
+    const resetState = () => {
+        setSelectedData({});    
+        setDefaultStrValues({
+            "Feature Type": "",
+            "Description": ""
         });
-        if (response.status === true) {
-            initMoms();
-            handleCloseForm();
-            setOpenNotif(true);
-            setNotifStatus("success");
-            setNotifText("Successfully deleted manifestation of movements.");
-        } else {
-            setOpenNotif(true);
-            setNotifStatus("error");
-            setNotifText("Failed to delete manifestation of movements.");
-        }
+    }
+  
+    const handleAdd = () => {
+        resetState();
+        setOpen(true);
     };
+
+    const handleEdit = (data) => {
+        setSelectedData(data);
+        console.log(data);
+        setDefaultStrValues({
+            "Feature Type": data["feature_type"],
+            "Remarks": data["remarks"],
+        });
+        setOpen(true);
+        setCommand("edit");
+    };
+
+    const handleClose = () => {
+      setOpen(false);
+      resetState();
+    };
+
+    const handleDelete = (data) => {
+        setSelectedData(data);
+        handleOpenDelete();
+    };
+
+    const handleOpenDelete = () => {
+        setOpen(false);
+        setOpenDelete(true);
+    };
+
+    const handleCloseDelete = () => {
+        setOpen(true);
+        setOpenDelete(false);
+        resetState();
+    }
+
+    const deleteMoms = () => {
+        setOpen(false);
+        setOpenDelete(true);
+    }
+
+    const confirmDelete = async () => {
+        const input = {
+            "moms_id": selectedData.moms_id
+        };
+        const response = await MarGroundData.DeleteMOMSData(input);
+        if (response.status === true) {
+            initTable();
+            setOpen(false);
+            setOpenDelete(false);
+            resetState();
+            setNotifStatus("success");
+        } else {
+            setNotifStatus("error");
+        }
+        setNotifText(response.message);
+        setOpenNotif(true);
+    }
+
+    const submit = async () => {
+        console.log("formData.curren", formData.current);
+        let json = formData.current;
+        json.user_id = cookies.credentials.user_id;
+        let hasModifiedRow = false;
+        let response;
+        if (!Object.keys(selectedData).length) {
+            // ADD
+            const { observance_ts, } = defaultTSValues;
+            const temp_ts = {
+                observance_ts: moment( ).format("YYYY-MM-DD HH:mm:ss"),
+            }
+            json = Object.assign(defaultStringValues, defaultIntValues, temp_ts, json);
+            
+            Object.keys(json).forEach(key => {
+                let temp;
+                console.log("key", key);
+                switch(key) {
+                    case 'StatDesc':
+                        json["stat_desc"] = json[key]
+                        break;
+                    case 'InCharge':
+                        json["in_charge"] = json[key]
+                        break;
+                    case 'Resource':
+                        json["resource"] = json[key]
+                        break;
+                    default:
+                        json[key.replace(" ","_").toLocaleLowerCase()] = json[key]
+                        break;
+                }
+            });
+            response = await MarGroundData.InsertMomsFeatureType(json);
+        } else {
+            // EDIT
+            hasModifiedRow = true;
+            json.id = selectedData.id;
+            json.user_id = cookies.credentials.user_id;
+            let temp_array = []
+            Object.keys(json).forEach(key => {
+                let temp = {};
+                console.log("key", key);
+                switch(key) {
+                    case 'StatDesc':
+                        temp["stat_desc"] = json[key]
+                        break;
+                    case 'InCharge':
+                        temp["in_charge"] = json[key]
+                        break;
+                    case 'Date':
+                        temp["date"] = json[key]
+                        break;
+                    default:
+                        temp[key.replace(" ","_").toLocaleLowerCase()] = json[key]
+                        break;
+                }
+                temp_array.push(temp);
+            });
+            response = await MarGroundData.UpdateMOMSData(temp_array);
+        }
+
+        if (response.status === true) {
+            initTable();
+            handleClose();
+            setNotifStatus("success");
+        } else {
+            handleClose();
+            setNotifStatus("error");
+        }
+        setNotifText(response.message);
+        setOpenNotif(true);
+    }
 
     return (
         <Fragment>
-            {
-                // Modal for raising
-            }
-            <Dialog
-                open={openRaise}
-                onClose={handleCloseRaise}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"Raise Manifestation of movement?"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Are you sure you want to raise this alert?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseRaise} color="primary">
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={handleCloseRaise}
-                        color="primary"
-                        autoFocus
-                    >
-                        Confirm
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            {
-                // Modal for CRUD Moms
-                console.log("selectedFeatureName", selectedFeatureName)
-            }
-            <Dialog
-                open={openForm}
-                onClose={handleCloseForm}
-                fullWidth="sm"
-                maxWidth="sm"
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    Manifestation of Movements
-                </DialogTitle>
-                <DialogContent>
-                    <Grid container spacing={2}>
-                        <Grid item xs={6}>
-                            <MuiPickersUtilsProvider utils={MomentUtils}>
-                                <DateTimePicker
-                                    autoOk
-                                    ampm={false}
-                                    disableFuture
-                                    disabled={modificationDisabled}
-                                    style={{ paddingTop: 5 }}
-                                    format="YYYY-MM-DD HH:mm:ss"
-                                    value={selectedTS}
-                                    onChange={(date) => {
-                                        setSelectedTS(
-                                            moment(date).format(
-                                                "YYYY-MM-DD HH:mm:ss",
-                                            ),
-                                        );
-                                    }}
-                                    label="Date time"
-                                    fullWidth
-                                />
-                            </MuiPickersUtilsProvider>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                value={selectedReporter}
-                                id="reporter"
-                                label="Reporter"
-                                type="text"
-                                onChange={(e) => {
-                                    setSelectedReporter(e.target.value);
-                                }}
-                                fullWidth
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <FormControl
-                                className={classes.formControl}
-                                fullWidth
-                            >
-                                <InputLabel
-                                    shrink
-                                    id="demo-simple-select-placeholder-label-label"
-                                >
-                                    Feature type
-                                </InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-placeholder-label-label"
-                                    id="demo-simple-select-placeholder-label"
-                                    disabled={modificationDisabled}
-                                    value={selectedMomsFeatures}
-                                    onChange={(e) =>
-                                        handleChangeFeatureType(e.target.value)
-                                    }
-                                    displayEmpty
-                                    className={classes.selectEmpty}
-                                >
-                                    <MenuItem value={0}>
-                                        <em>None selected</em>
-                                    </MenuItem>
-                                    <MenuItem value={1}>Crack</MenuItem>
-                                    <MenuItem value={2}>Scarp</MenuItem>
-                                    <MenuItem value={3}>Seepage</MenuItem>
-                                    <MenuItem value={4}>Ponding</MenuItem>
-                                    <MenuItem value={5}>
-                                        Tilted/Split trees
-                                    </MenuItem>
-                                    <MenuItem value={6}>
-                                        Damaged structures
-                                    </MenuItem>
-                                    <MenuItem value={7}>Slope failure</MenuItem>
-                                    <MenuItem value={8}>
-                                        Bulgin/Depression
-                                    </MenuItem>
-                                    <MenuItem value={9}>
-                                        <em>
-                                            No landslide manifestation observed
-                                        </em>
-                                    </MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <FormControl
-                                className={classes.formControl}
-                                fullWidth
-                            >
-                                <InputLabel shrink id="feature-name-label">
-                                    Feature name
-                                </InputLabel>
-                                <Autocomplete
-                                    {...featureNameList}
-                                    id="feature-name"
-                                    clearOnEscape
-                                    freeSolo
-                                    inputValue={autoCompleteFeaturename}
-                                    disabled={modificationDisabled}
-                                    onInputChange={(e, v) => {
-                                        handleFeatureNameChange(v);
-                                    }}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            margin="normal"
-                                        />
-                                    )}
-                                    
-                                />
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                id="location"
-                                label="Location"
-                                type="text"
-                                value={selectedLocation}
-                                onChange={(e) => {
-                                    setSelectedLocation(e.target.value);
-                                }}
-                                fullWidth
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <FormControl
-                                className={[
-                                    classes.formControl,
-                                    classes.selectSpacing,
-                                ]}
-                                fullWidth
-                            >
-                                <InputLabel
-                                    shrink
-                                    id="demo-simple-select-placeholder-label-label"
-                                >
-                                    Alert level
-                                </InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-placeholder-label-label"
-                                    disabled={modificationDisabled}
-                                    id="demo-simple-select-placeholder-label"
-                                    value={selectedAlertLevel}
-                                    onChange={(e) =>
-                                        setSelectedAlertLevel(e.target.value)
-                                    }
-                                    displayEmpty
-                                    className={classes.selectEmpty}
-                                >
-                                    <MenuItem value={0}>
-                                        <em>No significant movement</em>
-                                    </MenuItem>
-                                    <MenuItem value={2}>
-                                        Significant movement observed
-                                    </MenuItem>
-                                    <MenuItem value={3}>
-                                        Critical movement observed
-                                    </MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                id="desciption"
-                                label="Description"
-                                type="text"
-                                value={selectedRemarks}
-                                onChange={(e) => {
-                                    setSelectedRemarks(e.target.value);
-                                }}
-                                fullWidth
-                            />
-                        </Grid>
-                        <Grid item xs={12} align="center">
-                            <Fab variant="extended">
-                                <CloudUploadIcon style={{ padding: 10 }} />
-                                Upload photo(s) of Manifestation of Movements
-                            </Fab>
-                        </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseForm} color="primary">
-                        Cancel
-                    </Button>
-                    {modificationDisabled ? (
-                        <Button
-                            onClick={() => {
-                                deleteMoms();
-                            }}
-                            color="primary"
-                        >
-                            Delete
-                        </Button>
-                    ) : (
-                        <div></div>
-                    )}
-                    <Button
-                        onClick={() => {
-                            submitNewMoms();
+        <Container fixed>
+            <Grid container align="center" spacing={2}>
+                <Grid item xs={12} >
+                    <FabMuiTable
+                        classes={{}}
+                        addLabel=""
+                        data={{
+                            columns: columns,
+                            rows: tableData,
                         }}
-                        color="primary"
-                        autoFocus
-                    >
-                        Confirm
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Container fixed>
-                <Grid container align="center" spacing={2}>
-                    <Grid item xs={12}>
-                        <Paper className={dt_classes.root}>
-                            <Table className={dt_classes.table}>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Date and time</TableCell>
-                                        <TableCell>Feature type</TableCell>
-                                        <TableCell>Feature name</TableCell>
-                                        <TableCell>Location</TableCell>
-                                        <TableCell>Reporter</TableCell>
-                                        <TableCell>Remarks</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {datatable.length === 0 ? (
-                                        <TableRow>
-                                            <Typography
-                                                variant="h4"
-                                                align="center"
-                                            >
-                                                No data available
-                                            </Typography>
-                                        </TableRow>
-                                    ) : (
-                                        datatable.map((row) => (
-                                            <TableRow
-                                                key={row.observance_ts}
-                                                onClick={() => {
-                                                    handleMomsModification(row);
-                                                }}
-                                            >
-                                                <TableCell
-                                                    component="th"
-                                                    scope="row"
-                                                >
-                                                    {row.observance_ts}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {row.feature_type}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {row.feature_name}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {row.location}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {row.reporter}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {row.remarks}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Typography variant="subtitle2">
-                            * click row to Raise/Modify/Remove Manifestation of
-                            Movements data.
-                        </Typography>
-                    </Grid>
-                    <Grid container align="center" style={{ paddingTop: 20 }}>
-                        <Grid item xs={3} />
-                        <Grid item xs={2}>
-                            <Fab
-                                variant="extended"
-                                color="primary"
-                                aria-label="add"
-                                className={classes.button_fluid}
-                                onClick={handleClickOpenForm}
-                            >
-                                Add MoMs
-                            </Fab>
-                        </Grid>
-                        <Grid item xs={2}>
-                            <Fab
-                                variant="extended"
-                                color="primary"
-                                aria-label="add"
-                                className={classes.button_fluid}
-                                onClick={() => {}}
-                            >
-                                Download
-                            </Fab>
-                        </Grid>
-                        <Grid item xs={2}>
-                            <Fab
-                                variant="extended"
-                                color="primary"
-                                aria-label="add"
-                                className={classes.button_fluid}
-                                onClick={() => {}}
-                            >
-                                Print
-                            </Fab>
-                        </Grid>
-                        <Grid item xs={3} />
-                    </Grid>
+                        handlers={{
+                            handleAdd,
+                            handleEdit,
+                            handleDelete,
+                        }}
+                        options={options}
+                        cmd={cmd}
+                    />
                 </Grid>
-            </Container>
-            <Snackbar
-                open={openNotif}
-                autoHideDuration={3000}
-                onClose={() => {
-                    setOpenNotif(false);
-                }}
-                anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                key={"top,right"}
-            >
-                <Alert
-                    onClose={() => {
-                        setOpenNotif(false);
+                <Grid item xs={12}>
+                    <Typography variant="subtitle2">
+                        * click row to Raise/Modify/Remove MOMS data.
+                    </Typography>
+                </Grid>
+                <Grid container align="center">
+                    <Grid item xs={4} />
+                    <Grid item xs={4}>
+                        <Fab variant="extended"
+                            color="primary"
+                            aria-label="add" className={classes.button_fluid}
+                            onClick={() => setOpen(true)}>
+                            Add Entry
+                        </Fab>
+                    </Grid>
+                    <Grid item xs={4} />
+                </Grid>
+            </Grid>
+        </Container>
+        <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">MOMS</DialogTitle>
+            <DialogContent>
+                <Forms data={{
+                        string: defaultStringValues,
+                        int: defaultIntValues,
+                        ts: defaultTSValues
                     }}
-                    severity={notifStatus}
-                >
-                    {notifText}
-                </Alert>
-            </Snackbar>
-        </Fragment>
-    );
+                    formData={formData}
+                    closeForm={() => handleClose()}
+                    submitForm={() => submit()}
+                    deleteForm={() => deleteMoms()} 
+                />
+            </DialogContent>
+        </Dialog>
+
+        <Dialog
+            open={openDelete}
+            onClose={handleCloseDelete}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogTitle id="alert-dialog-title">{"Are you sure you want to remove this entry?"}</DialogTitle>
+            <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+                Removing this MOMS data cannot be undone. Are you sure you want to remove this entry?
+            </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleCloseDelete} color="primary">
+                    Cancel
+                </Button>
+                <Button onClick={confirmDelete} color="primary" autoFocus>
+                    Confirmed
+                </Button>
+            </DialogActions>
+        </Dialog>
+
+        <Snackbar open={openNotif} 
+            autoHideDuration={3000} 
+            onClose={() => {setOpenNotif(false)}}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            key={'top,right'}>
+            <Alert onClose={() => {setOpenNotif(false)}} severity={notifStatus}>
+                {notifText}
+            </Alert>
+        </Snackbar>
+    </Fragment>
+    )
+}
+
+
+///////////////////////////////////////////////////
+// FUUUUUUUUUUUUUUUUUUUUUUUUUUUUCK
+///////////////////////////////////////////////////
+
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+export default function MOMS() {
+    const cmd = "update-delete";
+    let feature_type_container = [];
+    const [cookies, setCookie] = useCookies(['credentials']);
+    const dt_classes = tableStyles();
+    const classes = useStyles();
+      
+    const [open, setOpen] = React.useState(false);
+    const [openDelete, setOpenDelete] = React.useState(false);
+    const [notifStatus, setNotifStatus] = useState('success');
+	const [openNotif, setOpenNotif] = useState(false);
+    const [notifText, setNotifText] = useState('');
+
+    const [selectedData, setSelectedData] = useState({});
+    const [command, setCommand] = useState("add");
+
+    const formData = useRef({
+        "form_data": {}, 
+        "custom_values": { 
+            "Feature Name": [], 
+            "Feature Type": []
+        }
+    });
+    const [tableData, setTableData] = useState([]);
+    const [defaultStringValues, setDefaultStrValues] = useState({
+        "Remarks": "",
+        "Feature Type": [],
+        "Feature Name": []
+    });
+    const [defaultTSValues, setDefaultTSValues] = useState({
+        "Observance TS": moment(),
+    });
+    const [defaultIntValues, setDefaultIntValues] = useState({
+        "Alert Level": 0,
+    });
+
+    // TEST
+    const options = {
+        filterType: "checkbox",
+    };
+    const columns = [
+        { name: "observance_ts", label: "Observance TS" },
+        { name: "remarks", label: "Remarks" },
+        { name: "feature_type", label: "Feature Type" },
+        { name: "feature_name", label: "Feature Name" },
+        { name: "moms_reporter", label: "Moms Reporter" },
+        { name: "op_trigger", label: "Alert Level" },
+    ];
+    
+    useEffect(()=> {
+        initTable();
+    },[]);
+
+    const initTable = async () => {
+        const response = await MarGroundData.GetMOMSData();
+        response.status ? setTableData(response.data) : console.error("problem retrieving MOMS."); 
+
+        if (response.status) {
+            const feature_types = await MarGroundData.FetchMomsFeatures();
+            console.log("feature_types", feature_types)
+            if (feature_types.status) {
+                const temp = feature_types.data.map((element, index) => {
+                    return ({
+                        "type": element.feature_type,
+                        "default_val": false
+                    })
+                });
+                setDefaultStrValues({
+                    ...defaultStringValues, 
+                    "Feature Type": temp
+                });
+                console.log("defaultStringValues", defaultStringValues);
+            } else {
+                console.error(feature_types.messsage)
+            }
+        }
+    }
+
+    const handleFeatureTypeChange = async (feature_type, fData) => {
+        console.log("CHANGING feature_type", feature_type);
+        const site_id = cookies.credentials.site_id;
+        const response = await MarGroundData.FetchOneMomsFeatures(feature_type, site_id);
+        console.log("response", response);
+        if (response.status) {
+            if (response.data.length > 0) {
+                const { feature_id } = response.data[0];
+                const new_response = await MarGroundData.FetchMomsInstances(feature_id, site_id);
+                console.log("new_response", new_response);
+                if (new_response.status) {
+                    const temp = new_response.data.map((element, index) => {
+                        return ({
+                            "type": element.feature_name,
+                            "default_val": false
+                        })
+                    });
+                    formData.current.custom_values["Feature Name"] = temp;
+                    console.log("defaultStringValues", defaultStringValues);
+                    console.log("formData.current", formData.current);
+                } else {
+                    console.error("Problem retrieving f names")
+                }
+            } 
+        } else {
+            console.error("Problem retrieving f types")
+        }
+    };
+
+    const handleFeatureNameChange = async (feature_name, fData) => {
+        console.log("feature_name", feature_name);
+    };
+
+    const resetState = () => {
+        setSelectedData({});    
+        setDefaultStrValues({
+            "Remarks": "",
+            "Feature Type": [],
+            "Feature Name": []
+        });
+        setDefaultTSValues({
+            "Observance TS": moment(),
+        });
+        setDefaultIntValues({
+            "Alert Level": 0
+        });
+    }
+  
+    const handleAdd = () => {
+        resetState();
+        setOpen(true);
+    };
+
+    const handleEdit = (data) => {
+        setSelectedData(data);
+        console.log("data", data);
+        console.log("formData", formData);
+        console.log("defaultStringValues", defaultStringValues);
+        // GET moms_features and moms_instances
+        const temp_type_values = defaultStringValues["Feature Type"];
+        console.log("temp_type_values", temp_type_values);
+        const type_index = temp_type_values.findIndex(element => element.type === data.feature_type);
+        if (type_index !== -1) temp_type_values[type_index]["default_val"] = true;
+
+        formData.current.custom_values["Feature Type"] = temp_type_values;
+
+        setDefaultStrValues({
+            ...defaultStringValues,
+            "Remarks": data["remarks"],
+            // "Feature Type": temp_type_values,
+        });
+        setDefaultIntValues({
+            "Alert Level": data["op_trigger"],
+        });
+        setDefaultTSValues({
+            "Observance TS": data["observance_ts"],
+        });
+        setOpen(true);
+        setCommand("edit");
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        resetState();
+    };
+
+    const handleDelete = (data) => {
+        setSelectedData(data);
+        handleOpenDelete();
+    };
+
+    const handleOpenDelete = () => {
+        setOpen(false);
+        setOpenDelete(true);
+    };
+
+    const handleCloseDelete = () => {
+        setOpen(true);
+        setOpenDelete(false);
+        resetState();
+    }
+
+    const deleteMoms = () => {
+        setOpen(false);
+        setOpenDelete(true);
+    }
+
+    const confirmDelete = async () => {
+        const input = {
+            "moms_id": selectedData.moms_id
+        };
+        const response = await MarGroundData.DeleteMOMSData(input);
+        if (response.status === true) {
+            initTable();
+            setOpen(false);
+            setOpenDelete(false);
+            resetState();
+            setNotifStatus("success");
+        } else {
+            setNotifStatus("error");
+            setNotifText("Failed to delete moms data. Please contact the developers or file a bug report");
+        }
+        setNotifText(response.message);
+        setOpenNotif(true);
+    }
+
+    const submit = async () => {
+        console.log("formData.current", formData.current);
+        let json = formData.current;
+        json.user_id = cookies.credentials.user_id;
+        let hasModifiedRow = false;
+        let response;
+        if (!Object.keys(selectedData).length) {
+            // ADD
+            const { observance_ts, } = defaultTSValues;
+            const temp_ts = {
+                observance_ts: moment( ).format("YYYY-MM-DD HH:mm:ss"),
+            }
+            json = Object.assign(defaultStringValues, defaultIntValues, temp_ts, json);
+            
+            Object.keys(json).forEach(key => {
+                let temp;
+                console.log("key", key);
+                switch(key) {
+                    case 'StatDesc':
+                        json["stat_desc"] = json[key]
+                        break;
+                    case 'InCharge':
+                        json["in_charge"] = json[key]
+                        break;
+                    case 'Resource':
+                        json["resource"] = json[key]
+                        break;
+                    default:
+                        json[key.replace(" ","_").toLocaleLowerCase()] = json[key]
+                        break;
+                }
+            });
+            response = await MarGroundData.InsertMOMSData(json);
+        } else {
+            // EDIT
+            hasModifiedRow = true;
+            json.id = selectedData.id;
+            json.user_id = cookies.credentials.user_id;
+            let temp_array = []
+            Object.keys(json).forEach(key => {
+                let temp = {};
+                console.log("key", key);
+                switch(key) {
+                    case 'StatDesc':
+                        temp["stat_desc"] = json[key]
+                        break;
+                    case 'InCharge':
+                        temp["in_charge"] = json[key]
+                        break;
+                    case 'Date':
+                        temp["date"] = json[key]
+                        break;
+                    default:
+                        temp[key.replace(" ","_").toLocaleLowerCase()] = json[key]
+                        break;
+                }
+                temp_array.push(temp);
+            });
+            response = await MarGroundData.UpdateMOMSData(temp_array);
+        }
+
+        if (response.status === true) {
+            initTable();
+            handleClose();
+            setNotifStatus("success");
+        } else {
+            handleClose();
+            setNotifStatus("error");
+        }
+        setNotifText(response.message);
+        setOpenNotif(true);
+    }
+
+    return (
+        <Fragment>
+        <Container fixed>
+            <Grid container align="center" spacing={2}>
+                <Grid item xs={12} >
+                    <FabMuiTable
+                        classes={{}}
+                        addLabel=""
+                        data={{
+                            columns: columns,
+                            rows: tableData,
+                        }}
+                        handlers={{
+                            handleAdd,
+                            handleEdit,
+                            handleDelete,
+                        }}
+                        options={options}
+                        cmd={cmd}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography variant="subtitle2">
+                        * click row to Raise/Modify/Remove MOMS data.
+                    </Typography>
+                </Grid>
+                <Grid container align="center">
+                    <Grid item xs={4} />
+                    <Grid item xs={4}>
+                        <Fab variant="extended"
+                            color="primary"
+                            aria-label="add" className={classes.button_fluid}
+                            onClick={() => setOpen(true)}>
+                            Add Entry
+                        </Fab>
+                    </Grid>
+                    <Grid item xs={4} />
+                </Grid>
+            </Grid>
+        </Container>
+        <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">MOMS</DialogTitle>
+            <DialogContent>
+                <Forms data={{
+                        string: defaultStringValues,
+                        int: defaultIntValues,
+                        ts: defaultTSValues
+                    }}
+                    formData={formData}
+                    closeForm={() => handleClose()}
+                    submitForm={() => submit()}
+                    deleteForm={() => deleteMoms()} 
+                    customHandlers={{
+                        type: "moms",
+                        "Feature Type": handleFeatureTypeChange,
+                        "Feature Name": handleFeatureNameChange
+                    }}
+                />
+            </DialogContent>
+        </Dialog>
+
+        <Dialog
+            open={openDelete}
+            onClose={handleCloseDelete}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogTitle id="alert-dialog-title">{"Are you sure you want to remove this entry?"}</DialogTitle>
+            <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+                Removing this MOMS data cannot be undone. Are you sure you want to remove this entry?
+            </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleCloseDelete} color="primary">
+                    Cancel
+                </Button>
+                <Button onClick={confirmDelete} color="primary" autoFocus>
+                    Confirmed
+                </Button>
+            </DialogActions>
+        </Dialog>
+
+        <Snackbar open={openNotif} 
+            autoHideDuration={3000} 
+            onClose={() => {setOpenNotif(false)}}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            key={'top,right'}>
+            <Alert onClose={() => {setOpenNotif(false)}} severity={notifStatus}>
+                {notifText}
+            </Alert>
+        </Snackbar>
+    </Fragment>
+    )
 }

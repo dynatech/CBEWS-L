@@ -54,10 +54,18 @@ import {
 } from "./src/MAR/GroundData/SurficialMarkers";
 import {
     FetchMoMSFeatures,
+    FetchOneMomsFeatures,
+    FetchMomsInstances,
     GetMOMSData,
     UpdateMOMSData,
     InsertMOMSData,
     DeleteMOMSData,
+    InsertMomsFeatureType,
+    InsertMomsInstance,
+    UpdateMomsFeatureType,
+    UpdateMomsInstance,
+    DeleteMomsFeatureType,
+    DeleteMomsInstance,
 } from "./src/MAR/GroundData/MOMS";
 import {
     GetOnDemandData,
@@ -186,6 +194,8 @@ const MarGroundData = {
     InsertSurficialMarkersData,
     DeleteSurficialMarkersData,
     FetchMoMSFeatures,
+    FetchOneMomsFeatures,
+    FetchMomsInstances,
     GetMOMSData,
     UpdateMOMSData,
     InsertMOMSData,
@@ -193,6 +203,12 @@ const MarGroundData = {
     GetOnDemandData,
     RaiseOnDemandAlert,
     InsertOnDemandData,
+    InsertMomsFeatureType,
+    InsertMomsInstance,
+    UpdateMomsFeatureType,
+    UpdateMomsInstance,
+    DeleteMomsFeatureType,
+    DeleteMomsInstance,
 };
 
 const MarCommunityRiskAssessment = {
