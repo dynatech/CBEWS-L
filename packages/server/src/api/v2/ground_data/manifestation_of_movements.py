@@ -166,16 +166,23 @@ def fetch_moms_instances(site_id, feature_id=None):
     try:
         name_container = []
         if feature_id:
-            moms_instances = GroundData.fetch_moms_instance_by_feature_id(feature_id, None, site_id)
+            result = GroundData.fetch_moms_instance_by_feature_id(feature_id, None, site_id)
         else:
-            moms_instances = GroundData.fetch_all_moms_instance(site_id=site_id)
+            moms_features = GroundData.fetch_moms_features()
+
+            result = {}
+            for row in moms_features:
+                moms_instances_per_type = GroundData.fetch_moms_instances_by_feature_id_joined(row["feature_id"], site_id)
+                
+                result.update({int(row["feature_id"]): moms_instances_per_type})
+
         moms = {"status": True, "data": moms_instances}
     except Exception as err:
         moms = {
             "status": False,
             "message": f"Failed to fetch moms instances data. Error: {err}"
         }
-    return jsonify(moms)
+    return jsonify(result)
 
 
 @MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/update/ground_data/moms/instance", methods=["POST"])
@@ -247,9 +254,9 @@ def insert_moms_feature():
 def fetch_moms_feature_types(f_type=None):
     try:
         if f_type:
-            feature_types = GroundData.fetch_feature_types_by_type(f_type)
+            feature_types = GroundData.fetch_moms_features_by_type(f_type)
         else:
-            feature_types = GroundData.fetch_feature_types()
+            feature_types = GroundData.fetch_moms_features()
         response = {
             "status": True,
             "data": feature_types,
