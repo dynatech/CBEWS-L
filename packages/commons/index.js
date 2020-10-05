@@ -60,6 +60,12 @@ import {
     UpdateMOMSData,
     InsertMOMSData,
     DeleteMOMSData,
+    InsertMomsFeatureType,
+    InsertMomsInstance,
+    UpdateMomsFeatureType,
+    UpdateMomsInstance,
+    DeleteMomsFeatureType,
+    DeleteMomsInstance,
 } from "./src/MAR/GroundData/MOMS";
 import {
     GetOnDemandData,
@@ -197,6 +203,12 @@ const MarGroundData = {
     GetOnDemandData,
     RaiseOnDemandAlert,
     InsertOnDemandData,
+    InsertMomsFeatureType,
+    InsertMomsInstance,
+    UpdateMomsFeatureType,
+    UpdateMomsInstance,
+    DeleteMomsFeatureType,
+    DeleteMomsInstance,
 };
 
 const MarCommunityRiskAssessment = {

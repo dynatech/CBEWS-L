@@ -143,7 +143,7 @@ const UpdateMomsFeatureType = (data) => {
     });
 };
 
-const DeleteMomsFeature = (data) => {
+const DeleteMomsFeatureType = (data) => {
   return fetch(`${AppConfig.HOSTNAME}/v2/delete/ground_data/moms/feature`, {
     method: "DELETE",
     headers: {
@@ -234,6 +234,6 @@ const DeleteMomsInstance = (data) => {
 
 export { 
   InsertMOMSData, GetMOMSData, UpdateMOMSData, DeleteMOMSData,
-  InsertMomsFeatureType, FetchMomsInstances, UpdateMomsFeatureType, DeleteMomsFeature,
+  InsertMomsFeatureType, FetchMomsInstances, UpdateMomsFeatureType, DeleteMomsFeatureType,
   InsertMomsInstance, FetchMomsFeatures, FetchOneMomsFeatures, UpdateMomsInstance, DeleteMomsInstance,
 };
