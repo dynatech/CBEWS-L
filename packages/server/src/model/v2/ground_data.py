@@ -224,7 +224,7 @@ class GroundData():
             return result
 
 
-    def fetch_feature_types():
+    def fetch_moms_features():
         try:
             query = 'SELECT feature_id, feature_type FROM moms_features'
             result = DB.db_read(query, 'senslopedb')
@@ -235,7 +235,7 @@ class GroundData():
             return result
 
 
-    def fetch_feature_types_by_type(f_type):
+    def fetch_moms_features_by_type(f_type):
         try:
             query = f'SELECT feature_id, feature_type, description FROM moms_features WHERE feature_type = "{f_type}"'
             result = DB.db_read(query, 'senslopedb')
@@ -325,7 +325,7 @@ class GroundData():
             return result
 
 
-    def fetch_all_moms_instance(site_id=None):
+    def fetch_moms_instances_by_feature_id_joined(feature_id=None, site_id=None):
         try:
             query = """
                 SELECT 
@@ -338,8 +338,13 @@ class GroundData():
                     moms_features AS mf USING (feature_id)
             """
 
-            if site_id:
+            if feature_id:
+                query += f" WHERE feature_id = {feature_id}"
+                if site_id:
+                    query += f" AND site_id = {site_id}"
+            else:
                 query += f" WHERE site_id = {site_id}"
+
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
