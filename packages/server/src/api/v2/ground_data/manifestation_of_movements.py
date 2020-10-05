@@ -161,15 +161,19 @@ def insert_moms_instance():
 
 
 @MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/moms/instance/<feature_id>/<site_id>", methods=["GET"])
-def fetch_moms_instances(feature_id, site_id):
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/moms/instance/<site_id>", methods=["GET"])
+def fetch_moms_instances(site_id, feature_id=None):
     try:
         name_container = []
-        moms_instances = GroundData.fetch_feature_name(feature_id, None, site_id)
+        if feature_id:
+            moms_instances = GroundData.fetch_moms_instance_by_feature_id(feature_id, None, site_id)
+        else:
+            moms_instances = GroundData.fetch_all_moms_instance(site_id=site_id)
         moms = {"status": True, "data": moms_instances}
     except Exception as err:
         moms = {
             "status": False,
-            "message": f"Failed to fetch moms data. Error: {err}"
+            "message": f"Failed to fetch moms instances data. Error: {err}"
         }
     return jsonify(moms)
 

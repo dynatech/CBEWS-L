@@ -238,6 +238,8 @@ def get_mobiles(table=None,host=None,reset_variables=False,resource=None):
         nums = dbio.read(query=query, identifier='get_mobile_sim_nums', 
             host=host, resource=resource)
 
+        print("nums", nums)
+
         user_mobile_sim_nums = {sim_num: mobile_id for (mobile_id, sim_num, 
             gsm_id) in nums}
         mc.set("user_mobile_sim_nums",user_mobile_sim_nums)
@@ -348,8 +350,8 @@ def set_variables_old(reset_variables):
 
     print ("Set mobile numbers to memory",)
 #    mobiles_host = sc["resource"]["mobile_nums_db"]
-    get_mobiles(table="loggers", reset_variables=reset_variables, resource="sms_data")
-    get_mobiles(table="users", reset_variables=reset_variables, resource="sms_data")
+    # get_mobiles(table="loggers", reset_variables=reset_variables, resource="sms_data")
+    # get_mobiles(table="users", reset_variables=reset_variables, resource="sms_data")
     print ("done")
 
     try:

@@ -11,6 +11,10 @@ import {
     Typography,
     Button,
     TextField,
+
+    FormControl,
+    InputLabel,
+    Select,
 } from "@material-ui/core";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import MomentUtils from "@date-io/moment";
@@ -35,50 +39,40 @@ function ReusableInput(props) {
     label = label.replace("_", " ");
     const key = propKey.replace(/\s/g, "");
 
-    let component;    
+    let component;
+    console.log(label);
+    console.log("value", value);
     if (Array.isArray(value)) {
-        console.log("value", value);
-        if ("customHandlers" in originalProps) {
-            const { customHandlers } = originalProps;
-            let auto_handler = console.log("This is the autohandler");
-            let option = [];
-            switch (customHandlers.type) {
-                case "moms":
-                    auto_handler = customHandlers[label];
-                    option = props.fData.current.custom_values[label];
-                    break;
-                default:
-                    console.log("does not exist!");
-            }
+        console.log("ARRAY!");
+        
+        const rows = value[1].map((element, index) => {
+            // console.log("element", element);
+            if (index === 0) return (<option aria-label="None" value="" />);
+            else return (<option value={element.value}>{element.label}</option>);
+        });
+        const select_value = value[0];
+        console.log("select_value", select_value);
+        const auto_handler = props.origProps.customHandlers[label]
 
-            if (Object.prototype.toString.call(value) !== "[object Object]") {
-                return (
-                    <Grid item xs={6}>
-                        <Autocomplete
-                            freeSolo
-                            id="freeSoloCombo"
-                            disableClearable
-                            options={option.map((option) => option.type)}
-                            onChange={(event) => auto_handler(event.target.innerText, props.fData)}
-                            renderInput={(params) => {
-                                return (
-                                    <TextField
-                                        {...params}
-                                        label={label}
-                                        margin="normal"
-                                        variant="outlined"
-                                        InputProps={{ ...params.InputProps, type: 'search' }}
-                                        onChange={(event) => { console.log("selected", event.target.value) }}
-                                    />
-                                )
-                            }}
-                        />
-                    </Grid>
-                );
-            } else {
-                console.log("OBject");
-            }
-        }
+        return (
+            <Grid item xs={6}>
+                <FormControl>
+                    <InputLabel htmlFor="age-native-simple">{label}</InputLabel>
+                    <Select
+                        native
+                        value={select_value}
+                        onChange={auto_handler}
+                        inputProps={{
+                            name: 'select',
+                            id: 'select-native-simple',
+                        }}
+                        fullWidth
+                    >
+                        {rows}
+                    </Select>
+                </FormControl>
+            </Grid>
+        );
     } else if (propKey in reference.string) {
         component = (
             <Grid item xs={12}>
@@ -165,8 +159,7 @@ export default function Forms(props) {
                                         reference={reference}
                                         handleBlur={handleBlur}
                                         handleChange={handleChange}
-                                        originalProps={props}
-                                        fData={formData}
+                                        origProps={props}
                                     />
                                 );
                             })}
