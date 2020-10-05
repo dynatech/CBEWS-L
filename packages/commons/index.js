@@ -54,8 +54,9 @@ import {
 } from "./src/MAR/GroundData/SurficialMarkers";
 import {
     FetchMoMSFeatures,
-    FetchOneMomsFeatures,
-    FetchMomsInstances,
+    FetchOneMoMSFeatures,
+    GetMomsInstancesPerType,
+    GetMomsInstancesPerSite,
     GetMOMSData,
     UpdateMOMSData,
     InsertMOMSData,
@@ -194,8 +195,9 @@ const MarGroundData = {
     InsertSurficialMarkersData,
     DeleteSurficialMarkersData,
     FetchMoMSFeatures,
-    FetchOneMomsFeatures,
-    FetchMomsInstances,
+    FetchOneMoMSFeatures,
+    GetMomsInstancesPerType,
+    GetMomsInstancesPerSite,
     GetMOMSData,
     UpdateMOMSData,
     InsertMOMSData,

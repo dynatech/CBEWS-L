@@ -224,22 +224,6 @@ class GroundData():
             return result
 
 
-    def fetch_feature_name(feature_id, feature, site_id):
-        try:
-            if isinstance(feature, str) and feature != '':
-                query = f'SELECT instance_id, feature_name, location, reporter FROM moms_instances WHERE feature_name = "{feature}" AND ' \
-                    f'site_id = {site_id} AND feature_id = {feature_id}'
-            else:
-                query = f'SELECT instance_id, feature_name, location, reporter FROM moms_instances WHERE ' \
-                    f'site_id = {site_id} AND feature_id = {feature_id}'
-            result = DB.db_read(query, 'senslopedb')
-        except Exception as err:
-            result = {"status": False,
-                "message": f"Failed to retrieve MoMs data. => {err}"}
-        finally:
-            return result
-
-
     def fetch_feature_types():
         try:
             query = 'SELECT feature_id, feature_type FROM moms_features'
@@ -314,9 +298,48 @@ class GroundData():
             return result
 
 
-    def fetch_moms_instance(instance_id):
+    def fetch_moms_instance_by_instance_id(instance_id):
         try:
             query = f'SELECT * FROM moms_instances WHERE instance_id = {instance_id}'
+            result = DB.db_read(query, 'senslopedb')
+        except Exception as err:
+            result = {"status": False,
+                "message": f"Failed to fetch moms instance. => {err}"}
+        finally:
+            return result
+
+
+    def fetch_moms_instance_by_feature_id(feature_id, feature, site_id):
+        try:
+            if isinstance(feature, str) and feature != '':
+                query = f'SELECT instance_id, feature_name, location, reporter FROM moms_instances WHERE feature_name = "{feature}" AND ' \
+                    f'site_id = {site_id} AND feature_id = {feature_id}'
+            else:
+                query = f'SELECT instance_id, feature_name, location, reporter FROM moms_instances WHERE ' \
+                    f'site_id = {site_id} AND feature_id = {feature_id}'
+            result = DB.db_read(query, 'senslopedb')
+        except Exception as err:
+            result = {"status": False,
+                "message": f"Failed to retrieve MoMs data. => {err}"}
+        finally:
+            return result
+
+
+    def fetch_all_moms_instance(site_id=None):
+        try:
+            query = """
+                SELECT 
+                    mi.*,
+                    mf.feature_type,
+                    CONCAT(mf.feature_type, ' ', mi.feature_name) name
+                FROM
+                    moms_instances AS mi
+                        INNER JOIN
+                    moms_features AS mf USING (feature_id)
+            """
+
+            if site_id:
+                query += f" WHERE site_id = {site_id}"
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,

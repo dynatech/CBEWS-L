@@ -107,7 +107,7 @@ const FetchMoMSFeatures = (data) => {
     });
 }
 
-const FetchOneMomsFeatures = (feature_type, site_id) => {
+const FetchOneMoMSFeatures = (feature_type, site_id) => {
   // return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types/${site_id}`, {
   return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types/${feature_type}`, {
     method: "GET",
@@ -179,8 +179,25 @@ const InsertMomsInstance = (data) => {
     });
 };
 
-const FetchMomsInstances = (feature_id, site_id) => {
+const GetMomsInstancesPerType = (feature_id, site_id) => {
   return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/instance/${feature_id}/${site_id}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      return responseJson;
+    })
+    .catch((error) => {
+      console.error("Error on fetching all moms features. Err: ", error);
+    });
+};
+
+const GetMomsInstancesPerSite = (site_id) => {
+  return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/instance/${site_id}`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -234,6 +251,6 @@ const DeleteMomsInstance = (data) => {
 
 export { 
   InsertMOMSData, GetMOMSData, UpdateMOMSData, DeleteMOMSData,
-  InsertMomsFeatureType, FetchMomsInstances, UpdateMomsFeatureType, DeleteMomsFeatureType,
-  InsertMomsInstance, FetchMoMSFeatures, FetchOneMomsFeatures, UpdateMomsInstance, DeleteMomsInstance,
+  InsertMomsFeatureType, GetMomsInstancesPerType, GetMomsInstancesPerSite, UpdateMomsFeatureType, DeleteMomsFeatureType,
+  InsertMomsInstance, FetchMoMSFeatures, FetchOneMoMSFeatures, UpdateMomsInstance, DeleteMomsInstance,
 };

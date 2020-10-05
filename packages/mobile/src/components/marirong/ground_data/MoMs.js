@@ -142,9 +142,10 @@ function MoMs() {
     const fetchLatestData = async () => {
         try {
             let features = await MarGroundData.FetchMoMSFeatures();
-            let names = await MarGroundData.FetchMomsInstances();
+            let names = await MarGroundData.GetMomsInstancesPerSite('29'); // leave this for now
             let response = await MarGroundData.GetMOMSData();
 
+            alert(JSON.stringify(names));
             if (response.status == true) {
                 // setDefaultStrValues({
                 //     "Observance timestamp": "",
@@ -164,7 +165,7 @@ function MoMs() {
                 feature_types.current = features.data;
                 init(response.data);
                 setFeatureData(features.data);
-                setFeatureNameData(null);
+                // setFeatureNameData(null);
             } else {
                 ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
             }

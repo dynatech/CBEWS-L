@@ -315,6 +315,7 @@ export default function RainfallPlot(props) {
     }, [])
 
     const initRainfall = async () => {
+        // setRainfallData([]);
         const response = await UmiDataAnalysis.GetRainfallPlotData();
         if (response.status === true) {
             let rainfall_data = response.data[0];
