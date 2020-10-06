@@ -205,23 +205,26 @@ class GroundData():
             validator_id (int) - in CBEWSL, one reporter and
                                 validator is enough - user_id
         """
+
+        # TODO: THIS LOGIC SHOULD NOT BE HERE. MOVE TO API.
         try:
             if isinstance(observance_ts, str):
                 observance_ts = Helpers.str_to_dt(observance_ts)
             if not validator_id:
                 validator = reporter_id
             last_ts = Helpers.dt_to_str(dt.today())
-            query = "INSERT INTO monitoring_moms "
-            query += "(instance_id, observance_ts, reporter_id, remarks, validator, op_trigger, last_ts)"
-            query += f"VALUES ({instance_id}, '{observance_ts}', {reporter_id}, '{remarks}', {validator}, {alert_level}, '{last_ts}')"
-
-            status = DB.db_modify(query, 'senslopedb', True)
-            result = {"status": True, "data": status}
         except Exception as err:
-            result = {"status": False,
-                "message": f"Failed to add MoMs Record data. Error: {err}"}
-        finally:
-            return result
+            print(err)
+            raise
+
+        query = f"""
+            INSERT INTO monitoring_moms 
+            (instance_id, observance_ts, reporter_id, remarks, validator, op_trigger, last_ts)
+            VALUES ({instance_id}, '{observance_ts}', {reporter_id}, '{remarks}', {validator}, {alert_level}, '{last_ts}')
+        """
+        moms_id = DB.db_modify(query, 'senslopedb', True)
+        
+        return moms_id
 
 
     def fetch_moms_features():
