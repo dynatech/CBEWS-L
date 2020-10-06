@@ -261,7 +261,7 @@ def insert_moms_feature():
         H.var_checker("result", result)
         return_value = {
             "status": True,
-            "instance_id": result,
+            "feature_id": result,
             "message": "MOMS feature successfully updated!"
         }
     except Exception as err:
