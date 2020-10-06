@@ -29,10 +29,19 @@ def add():
         alert_level = data["alert_level"]
         site_id = data["site_id"]
 
-        moms_id = GroundData.insert_moms_record(
+        insert_result = GroundData.insert_moms_record(
             instance_id=instance_id, observance_ts=observance_ts, remarks=remarks,
             reporter_id=reporter_id, alert_level=alert_level
         )
+        # TEST ERROR HANDLING
+        if "status" in insert_result:
+            return jsonify({
+                "status": False,
+                "code": 500,
+                "message": f"Failed to insert moms record. Error: {insert_result['Message']}"
+            })
+        else:
+            moms_id = insert_result
 
         trigger_sym_id = AlertGen.get_operational_trigger_symbol(
                                     trigger_source='moms',
@@ -47,11 +56,20 @@ def add():
 
         # If nothing exists in database:
         if not op_trig_data_dict:
-            trigger_id = AlertGen.insert_operational_trigger(
+            insert_op_resp = AlertGen.insert_operational_trigger(
                 site_id=site_id,
                 trig_sym_id=trigger_sym_id,
                 ts_updated=observance_ts
             )
+            if "status" in insert_op_resp:
+                return jsonify({
+                    "status": False,
+                    "code": 500,
+                    "message": f"Failed to insert operational trigger during moms insert. Error: {insert_op_resp['Message']}"
+                })
+            else:
+                trigger_id = insert_op_resp
+
         # Else update especially ts in database:
         else:
             trigger_id = op_trig_data_dict["trigger_id"]
@@ -63,15 +81,16 @@ def add():
 
         moms = {
             "status": True,
+            "code": 200,
             "message": "Successfully added new Manifestation of Movements data.",
             "moms_id": moms_id,
             "trigger_id": trigger_id
         }
     except Exception as err:
-        raise(err)
         moms = {
             "status": False,
-            "message": f"Failed to fetch moms data. Error: {err}"
+            "code": 500,
+            "message": f"API Failure in process of adding moms data. Error: {err}"
         }
     return jsonify(moms)
 
@@ -100,12 +119,16 @@ def update_monitoring_moms():
         data_list = request.get_json()
         
         moms_monitoring_update = GroundData.update_monitoring_moms(data_list)
+        if "status" in moms_monitoring_update:
+            return jsonify({
+                "status": False,
+                "message": f"Failure in updating moms obs. Error: {moms_monitoring_update['Message']}"
+            })
         moms = {
             "status": True,
             "message": "Successfully updated Manifestation of Movements."
         }
     except Exception as err:
-        raise(err)
         moms = {
             "status": False,
             "message": "Failed to update monitoring_moms table (remarks) data."
