@@ -1,7 +1,7 @@
 import AppConfig from "../../utils/AppConfig";
 
 const InsertMOMSData = (data) => {
-  return fetch(`${AppConfig.HOSTNAME}/v2/add/ground_data/mar/moms`, {
+  return fetch(`${AppConfig.HOSTNAME}/v2/add/ground_data/moms`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -89,7 +89,7 @@ const InsertMomsFeatureType = (data) => {
     });
 };
 
-const FetchMomsFeatures = (data) => {
+const FetchMoMSFeatures = (data) => {
   // return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types/${site_id}`, {
   return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types`, {
     method: "GET",
@@ -107,7 +107,7 @@ const FetchMomsFeatures = (data) => {
     });
 }
 
-const FetchOneMomsFeatures = (feature_type, site_id) => {
+const FetchOneMoMSFeatures = (feature_type, site_id) => {
   // return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types/${site_id}`, {
   return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types/${feature_type}`, {
     method: "GET",
@@ -252,5 +252,5 @@ const DeleteMomsInstance = (data) => {
 export { 
   InsertMOMSData, GetMOMSData, UpdateMOMSData, DeleteMOMSData,
   InsertMomsFeatureType, GetMomsInstancesPerType, GetMomsInstancesPerSite, UpdateMomsFeatureType, DeleteMomsFeatureType,
-  InsertMomsInstance, FetchMomsFeatures, FetchOneMomsFeatures, UpdateMomsInstance, DeleteMomsInstance,
+  InsertMomsInstance, FetchMoMSFeatures, FetchOneMoMSFeatures, UpdateMomsInstance, DeleteMomsInstance,
 };
