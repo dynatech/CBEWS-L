@@ -25,47 +25,42 @@ function SurficialMarkers() {
         setTimeout( async ()=> {
             const isConnected = await NetworkUtils.isNetworkAvailable()
             if (isConnected != true) {
-              Alert.alert(
-                'CBEWS-L is not connected to the internet',
-                'CBEWS-L Local data will be used.',
-                [
-                  { text: 'Ok', onPress: () => {
-                    MobileCaching.getItem('MarSurficialData').then(response => {
-                        init(response);
+                MobileCaching.getItem('MarSurficialData').then(data => {
+                    MobileCaching.getItem('MarSurficialDataMarkers').then(markers => {
+                        init(data, markers);
                     });
-                  }, style: 'cancel' },
-                ]
-              )
+                });
             } else {
                 fetchLatestData();
             }
           },100);
     }, [])
 
-    const init = async (response) => {
+    const init = async (data, markers) => {
         let temp = [];
         let temp_headers = [];
-        if (response.markers.length != 0) {
+        if (markers.length != 0) {
             let temp_default_fields = {
                 'Observance timestamp': '',
                 'Weather': '',
                 'Observer / Nagsukat': ''
             }
-            response.markers.forEach(element => {
+            markers.forEach(element => {
                 temp_default_fields[element.marker_name] = "";
                 temp_headers.push(<DataTable.Title key={element.marker_name} style={{width: 75}}>{element.marker_name}</DataTable.Title>)
             });
 
-            if (response.data.length != 0) {
-                response.data.forEach(element => {
+            if (data.length != 0) {
+                data.forEach(element => {
                     let temp_data = element[Object.keys(element)[0]];
                     let temp_marker_value_container = [];
-
+                    
                     for (const [key, value] of Object.entries(temp_data)) {
-                        if (key != 'observer' && key != 'ts' && key != 'weather') {
-                            temp_marker_value_container.push(<DataTable.Cell key={value} style={{width: 75}}>{value}</DataTable.Cell>);
+                        if (key != 'observer' && key != 'ts' && key != 'weather' && key != 'alterations') {
+                            temp_marker_value_container.push(<DataTable.Cell key={`${key}_${value}`} style={{width: 75}}>{value}</DataTable.Cell>);
                         }
                     }
+                    
                     temp.push(
                         <DataTable.Row key={Object.keys(element)[0]} onPress={() => { modifySummary(element) }}>
                             <DataTable.Cell style={{width: 150}}>{temp_data.ts}</DataTable.Cell>
@@ -84,10 +79,9 @@ function SurficialMarkers() {
             }
             setDataTableHeaders(temp_headers)
             setDataTableContent(temp)
-            setSurficialData(response.data);
-            setMarkers(response.markers)
+            setSurficialData(data);
+            setMarkers(markers)
             setDefaultStrValues(temp_default_fields);
-
         } else {
             // Display error
         }
@@ -142,7 +136,6 @@ function SurficialMarkers() {
     const modifySummary = (data) => {
         let key = Object.keys(data)[0];
         let inputs = {
-            'Observance timestamp': data[key]['ts'],
             'Weather': data[key]['weather'],
             'Observer / Nagsukat': data[key]['observer'],
         };
@@ -166,12 +159,40 @@ function SurficialMarkers() {
                 setTimeout(async () => {
                     const isConnected = await NetworkUtils.isNetworkAvailable();
                     let response = null;
+                    let marker_value = {};
+
+                    for (const [key, value] of Object.entries(data)) {
+                        if (key != 'Observer/Nagsukat' && key != 'Observancetimestamp' 
+                            && key != 'Weather' && key != 'attachment') {
+                            marker_value[key] = value;
+                        }
+                    }
+
+                    let temp = {
+                        "observer": data['Observer/Nagsukat'],
+                        "ts": data['Observancetimestamp'],
+                        "weather": data['Weather'],
+                        "site_id": 29,
+                        marker_value
+                    }
+
                     if (isConnected != true) {
-                        let temp = await MobileCaching.getItem("MarSurficialData").then(cached_data => {
-                            // cached_data.push(
-                            // });
+                        let cached = await MobileCaching.getItem("MarSurficialData").then(cached_data => {
+                            let surficial_obj = {};
+
+                            surficial_obj[temp['ts']] = {
+                                ...temp['marker_value'],
+                                'observer': temp['observer'],
+                                'weather': temp['weather'],
+                                'ts': temp['ts'],
+                                'alterations': 'add'
+                            }
+
+                            cached_data.push(surficial_obj);
+
                             try {
                                 MobileCaching.setItem("MarSurficialData", cached_data);
+                                // OPEN MESSAGING APP TO SEND MANUALLY
                                 response = {
                                     "status": true,
                                     "message": "Surficial Data is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
@@ -182,27 +203,12 @@ function SurficialMarkers() {
                                     "message": "Surficial Data failed to save data to memory."
                                 }
                             }
-                            init(cached_data);
+                            MobileCaching.getItem('MarSurficialDataMarkers').then(markers => {
+                                init(cached_data, markers);
+                            });
                             return response;
                         });
                     } else {
-                        let marker_value = {};
-
-                        for (const [key, value] of Object.entries(data)) {
-                            if (key != 'Observer/Nagsukat' && key != 'Observancetimestamp' 
-                                && key != 'Weather' && key != 'attachment') {
-                                marker_value[key] = value;
-                            }
-                        }
-
-                        let temp = {
-                            "observer": data['Observer/Nagsukat'],
-                            "ts": data['Observancetimestamp'],
-                            "weather": data['Weather'],
-                            "site_id": 29,
-                            marker_value
-                        }
-
                         response = await MarGroundData.InsertSurficialMarkersData(temp)
                         fetchLatestData();
                     }
@@ -224,7 +230,6 @@ function SurficialMarkers() {
                         const isConnected = await NetworkUtils.isNetworkAvailable();
                         let response = {};
                         let temp = {};
-
                         Object.keys(data).forEach(key => {
                             switch(key) {
                                 case 'Observer/Nagsukat':
@@ -245,20 +250,39 @@ function SurficialMarkers() {
                             }
                         });
 
-                        temp['site_id'] = credentials['site_id'];
-                        temp['ref_ts'] = selectedData['ts'];
-
                         if (isConnected != true) {
-                            let temp = await MobileCaching.getItem("MarSurficialData").then(cached_data => {
-                                let response = null;
-                                let state_contaner = selectedData;
-                                temp_array.forEach(element => {
-                                    let key = Object.keys(element)[0];
-                                    state_contaner[key] = element[key];
-                                });
-                                state_contaner['alterations'] = "update";
-                                let index = cached_data.findIndex(x => x.id == selectedData['id']);
-                                cached_data[index] = state_contaner;
+                            let temp_data = await MobileCaching.getItem("MarSurficialData").then(cached_data => {
+
+                                let temp_state = selectedData;
+
+                                if (temp['marker_values'] == undefined) {
+                                    temp_state = {
+                                        ...temp_state,
+                                        ...temp,
+                                    }
+                                } else {
+                                    let mv = {...temp['marker_values']}
+                                    temp_state = {
+                                        ...temp_state,
+                                        ...mv
+                                    }
+
+                                    temp['marker_values'] = undefined;
+                                    
+                                    temp_state = {
+                                        ...temp_state,
+                                        ...temp,
+                                    }
+                                }
+
+                                let temp_proc = {}
+
+                                let index = cached_data.findIndex(x=> x[temp_state['ts']].ts == temp_state['ts']);
+                                temp_proc[temp_state['ts']] = temp_state;
+                                cached_data[index] = temp_proc
+
+                                alert(JSON.stringify(cached_data));
+
                                 try {
                                     MobileCaching.setItem("MarSurficialData", cached_data);
                                     response = {
@@ -271,9 +295,15 @@ function SurficialMarkers() {
                                         "message": "Capacity and Vulnerability failed to save data to memory."
                                     }
                                 }
-                                init(cached_data);
+                                // OPEN MESSAGING APP TO UPDATE
+                                MobileCaching.getItem('MarSurficialDataMarkers').then(markers => {
+                                    init(cached_data, markers);
+                                });
+                                return response
                             });
                         } else {
+                            temp['site_id'] = credentials['site_id'];
+                            temp['ref_ts'] = selectedData['ts'];
                             response = await MarGroundData.UpdateSurficialMarkerData(temp);
                             if (response.status == true) {
                                 fetchLatestData();
@@ -292,8 +322,9 @@ function SurficialMarkers() {
     const fetchLatestData = async () => {
         let response = await MarGroundData.GetSurficialMarkersData();
         if (response.status == true) {
-            init(response);
+            init(response.data, response.markers);
             MobileCaching.setItem('MarSurficialData', response.data);
+            MobileCaching.setItem('MarSurficialDataMarkers', response.markers);
         } else {
             ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
         }

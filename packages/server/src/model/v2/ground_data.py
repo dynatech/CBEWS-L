@@ -229,7 +229,7 @@ class GroundData():
 
     def fetch_moms_features():
         try:
-            query = 'SELECT feature_id, feature_type, description FROM moms_features'
+            query = 'SELECT feature_id, feature_type FROM moms_features'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -430,15 +430,11 @@ class GroundData():
                 if 'moms_id' == key:
                     query = f"{query}, last_ts = '{Helpers.dt_to_str(dt.today())}' WHERE moms_id = '{x[key]}'"
         
-            print(query)
-            Helpers.var_checker("query", query)
             ret_val = DB.db_modify(query, 'senslopedb', True)
-            print(ret_val)
         except Exception as err:
             raise(err)
 
         return ret_val
-
 
     def delete_moms_observation(moms_id):
         try:

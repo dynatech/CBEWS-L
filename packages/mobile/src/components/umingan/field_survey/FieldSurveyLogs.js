@@ -83,7 +83,7 @@ function FieldSurveyLogs () {
     }
 
     const uploadFile = async (attachment) => {
-        const url = 'http://192.168.0.10:5000/v2/upload/field_survey/umi/field_survey_logs'
+        const url = 'http://192.168.150.221:5000/v2/upload/field_survey/umi/field_survey_logs'
         const file = [{
           name: 'file',
           filename: attachment.filename,
