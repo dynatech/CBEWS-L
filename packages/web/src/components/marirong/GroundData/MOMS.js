@@ -3,7 +3,9 @@ import {
     Grid, Paper, Container,
     Fab, Table,
     TableBody, TableCell, TableHead,
-    TableRow, Button, Typography
+    TableRow, Button, Typography,
+    FormControl, MenuItem, InputLabel,
+    Select
 } from "@material-ui/core";
 
 import Dialog from '@material-ui/core/Dialog';
@@ -42,21 +44,13 @@ export default function MOMS() {
     const [notifText, setNotifText] = useState('');
 
     const [selectedData, setSelectedData] = useState({});
-    const [feature_id, setFeatureId] = useState();
     const [command, setCommand] = useState("add");
 
-    const formData = useRef({
-        "form_data": {}, 
-        "custom_values": { 
-            "Feature Name": [], 
-            "Feature Type": []
-        }
-    });
+    const formData = useRef();
     const [tableData, setTableData] = useState([]);
     const [defaultStringValues, setDefaultStrValues] = useState({
-        "Remarks": "",
-        "Feature Type": [],
-        "Feature Name": []
+        "Description": "",
+        "Feature Selection": {},
     });
     const [defaultTSValues, setDefaultTSValues] = useState({
         "Observance TS": moment(),
@@ -65,14 +59,18 @@ export default function MOMS() {
         "Alert Level": 0,
     });
 
+    const [feature_id, setFeatureId] = useState();
+    const [instance_id, setInstanceId] = useState();
+    const [instance_options, setInstanceOptions] = useState([]);
+    const [fNameItems, setFNameItems] = useState([]);
+
     // TEST
     const options = {
         filterType: "checkbox",
     };
     const columns = [
         { name: "observance_ts", label: "Observance TS" },
-        { name: "remarks", label: "Remarks" },
-        { name: "feature_type", label: "Feature Type" },
+        { name: "remarks", label: "Description" },
         { name: "feature_name", label: "Feature Name" },
         { name: "moms_reporter", label: "Moms Reporter" },
         { name: "op_trigger", label: "Alert Level" },
@@ -84,54 +82,94 @@ export default function MOMS() {
 
     const initTable = async () => {
         const response = await MarGroundData.GetMOMSData();
-        response.status ? setTableData(response.data) : console.error("problem retrieving MOMS."); 
+        if (response.status === true) {
+            setTableData(response.data);
+            const features_response = await MarGroundData.FetchMomsFeatures();
 
-        if (response.status) {
-            const feature_types = await MarGroundData.FetchMomsFeatures();
-            console.log("feature_types", feature_types)
-            if (feature_types.status) {
-                const temp = feature_types.data.map((element, index) => {
-                    return ({
-                        "label": element.feature_type,
-                        "value": parseInt(element.feature_id)
+            if (features_response.status === true) {
+                const instance_response = await MarGroundData.GetMomsInstancesPerSite(cookies.credentials.site_id);
+
+                console.log("ITLOOOG", instance_response);
+                if (instance_response.status === true) {
+                    console.log("ITLOOOG");
+                    setFNameItems(instance_response.data);
+                    console.log("instance_response.data", instance_response.data);
+                    console.log("fNameItems", fNameItems);
+                    const f_types_items = features_response.data.map(feat => {     
+                        return ({
+                            "label": feat.feature_type,
+                            "value": parseInt(feat.feature_id)
+                        })
+                    });
+
+                    console.log("f_types_items", f_types_items);
+
+                    const type_rows = f_types_items.map(e2 => <MenuItem value={e2.value}>{e2.label}</MenuItem>);
+
+                    const feat_selection = (
+                        <Grid item container>
+                            <Grid item xs={6}>
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="age-native-simple">Feature Type</InputLabel>
+                                    <Select
+                                        value={feature_id}
+                                        onChange={handleFeatureTypeChange(instance_response.data)}
+                                        inputProps={{
+                                            name: 'select',
+                                            id: 'select-native-simple',
+                                        }}
+                                    >
+                                        {type_rows}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <FormControl fullWidth >
+                                    <InputLabel htmlFor="age-native-simple">Feature Name</InputLabel>
+                                    <Select
+                                        value={instance_id}
+                                        onChange={handleFeatureNameChange}
+                                        inputProps={{
+                                            name: 'select',
+                                            id: 'select-native-simple',
+                                        }}
+                                    >
+                                        {instance_options}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        </Grid>
+                    );
+                    setDefaultStrValues({
+                        ...defaultStringValues,
+                        "Feature Selection": feat_selection
                     })
-                });
-                setDefaultStrValues({
-                    ...defaultStringValues, 
-                    "Feature Type": [null, temp]
-                });
-                console.log("defaultStringValues", defaultStringValues);
+                }
             } else {
-                console.error(feature_types.messsage)
+                console.error(response);
+                alert("Trouble loading features");
             }
-        }
+        } else console.error("problem retrieving MOMS.");
     }
 
-    const handleFeatureTypeChange = async (feature_id) => {
-        console.log("FEATURE ID")
-        const site_id = cookies.credentials.site_id;
-        const new_response = await MarGroundData.FetchMomsInstances(feature_id, site_id);
-        console.log("new_response", new_response);
-        if (new_response.status) {
-            setDefaultStrValues({
-                ...defaultStringValues,
-                "Feature Names": [null, new_response.data]
-            });
-        } else {
-            console.error("Problem retrieving f names")
-        }
+    const handleFeatureTypeChange = (data) => (event) => {
+        console.log("handler data", data);
+        setFeatureId(event.target.value);
+        console.log("fNameItems[event.target.value]", data[event.target.value]);
+        const temp = data[event.target.value].map((e3, i3) => <MenuItem value={e3.instance_id}>{e3.feature_name}</MenuItem>)
+        console.log("temp", temp);
+        setInstanceOptions(temp);
     };
 
-    const handleFeatureNameChange = async (feature_name, fData) => {
-        console.log("feature_name", feature_name);
+    const handleFeatureNameChange = (instance_id) => {
+        console.log("instance_id", instance_id);
     };
 
     const resetState = () => {
         setSelectedData({});    
         setDefaultStrValues({
-            "Remarks": "",
-            "Feature Type": [],
-            "Feature Name": []
+            "Description": "",
+            "Feature Selection": {},
         });
         setDefaultTSValues({
             "Observance TS": moment(),
@@ -151,15 +189,18 @@ export default function MOMS() {
         console.log("data", data);
         console.log("formData", formData);
         console.log("defaultStringValues", defaultStringValues);
+
         
         // GET moms_features and moms_instances
-        const temp = defaultStringValues["Feature Type"];
-        temp[0] = parseInt(data["feature_id"]);
+        // const temp = defaultStringValues["Feature Name"];
+        // temp[0] = parseInt(data["instance_id"]);
+        setInstanceId(data["instance_id"]);
+        setFeatureId(data["feature_id"]);
 
         setDefaultStrValues({
             ...defaultStringValues,
-            "Remarks": data["remarks"],
-            "Feature Type": temp,
+            "Description": data["remarks"],
+            // "Feature Name": temp,
         });
         setDefaultIntValues({
             "Alert Level": data["op_trigger"],
@@ -234,15 +275,14 @@ export default function MOMS() {
                 let temp;
                 console.log("key", key);
                 switch(key) {
-                    case 'StatDesc':
-                        json["stat_desc"] = json[key]
+                    case 'Description':
+                        json["remarks"] = json[key]
                         break;
-                    case 'InCharge':
-                        json["in_charge"] = json[key]
+                    case 'ObservanceTS':
+                        temp["observance_ts"] = json[key]
                         break;
-                    case 'Resource':
-                        json["resource"] = json[key]
-                        break;
+                    case 'AlertLevel':
+                        temp["op_trigger"] = json[key]
                     default:
                         json[key.replace(" ","_").toLocaleLowerCase()] = json[key]
                         break;
@@ -259,15 +299,14 @@ export default function MOMS() {
                 let temp = {};
                 console.log("key", key);
                 switch(key) {
-                    case 'StatDesc':
-                        temp["stat_desc"] = json[key]
+                    case 'Description':
+                        temp["remarks"] = json[key]
                         break;
-                    case 'InCharge':
-                        temp["in_charge"] = json[key]
+                    case 'ObservanceTS':
+                        temp["observance_ts"] = json[key]
                         break;
-                    case 'Date':
-                        temp["date"] = json[key]
-                        break;
+                    case 'AlertLevel':
+                        temp["op_trigger"] = json[key]
                     default:
                         temp[key.replace(" ","_").toLocaleLowerCase()] = json[key]
                         break;
@@ -329,6 +368,7 @@ export default function MOMS() {
                 </Grid>
             </Grid>
         </Container>
+
         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">MOMS</DialogTitle>
             <DialogContent>
@@ -340,11 +380,7 @@ export default function MOMS() {
                     formData={formData}
                     closeForm={() => handleClose()}
                     submitForm={() => submit()}
-                    deleteForm={() => deleteMoms()} 
-                    customHandlers={{
-                        "Feature Type": handleFeatureTypeChange,
-                        "Feature Name": handleFeatureNameChange
-                    }}
+                    deleteForm={() => deleteMoms()}
                 />
             </DialogContent>
         </Dialog>
