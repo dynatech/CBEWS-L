@@ -113,7 +113,7 @@ def fetch_moms(site_code):
     return jsonify(moms)
 
 
-@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/update/ground_data/moms", methods=["POST"])
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/update/ground_data/moms", methods=["PATCH"])
 def update_monitoring_moms():
     try:
         data_list = request.get_json()

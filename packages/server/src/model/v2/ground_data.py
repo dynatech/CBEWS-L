@@ -430,15 +430,11 @@ class GroundData():
                 if 'moms_id' == key:
                     query = f"{query}, last_ts = '{Helpers.dt_to_str(dt.today())}' WHERE moms_id = '{x[key]}'"
         
-            print(query)
-            Helpers.var_checker("query", query)
             ret_val = DB.db_modify(query, 'senslopedb', True)
-            print(ret_val)
         except Exception as err:
             raise(err)
 
         return ret_val
-
 
     def delete_moms_observation(moms_id):
         try:

@@ -1,7 +1,7 @@
 import AppConfig from "../../utils/AppConfig";
 
 const InsertMOMSData = (data) => {
-  return fetch(`${AppConfig.HOSTNAME}/v2/add/ground_data/mar/moms`, {
+  return fetch(`${AppConfig.HOSTNAME}/v2/add/ground_data/moms`, {
     method: "POST",
     headers: {
       Accept: "application/json",
