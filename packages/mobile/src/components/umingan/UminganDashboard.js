@@ -92,7 +92,7 @@ function UminganDashboard(props) {
                             <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Sensor{'\n'}Maintenance</Text>
                         </View>
                         <View style={[ContainerStyle.menu_container]}>
-                            <TouchableOpacity onPress={() => { }}>
+                            <TouchableOpacity onPress={() => { navigator.navigate('SurficialDataStack')}}>
                                 <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/umingan/menu/surficial.png')}></Image>
                             </TouchableOpacity>
                             <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Surficial Data</Text>

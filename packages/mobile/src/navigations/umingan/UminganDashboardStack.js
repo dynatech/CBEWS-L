@@ -6,6 +6,7 @@ import RATabStack from '../umingan/RATabStack';
 import FieldSurveyStack from '../umingan/FieldSurveyStack';
 import SituationReportStack from '../umingan/SituationReportStack';
 import ReportSummary from '../../components/umingan/reports/ReportSummary';
+import SurficialDataStack from '../umingan/SurficialDataStack';
 
 const Stack = createStackNavigator();
 
@@ -43,6 +44,13 @@ function UminganDashboardStack() {
                     textAlign: 'center',
                   },
             }} component={ReportSummary} />
+            <Stack.Screen name="SurficialDataStack" options={{
+                title: 'Surficial Data',
+                headerLeft: null,
+                headerTitleStyle: {
+                    textAlign: 'center',
+                  },
+            }} component={SurficialDataStack} />
         </Stack.Navigator>
     );
 }
