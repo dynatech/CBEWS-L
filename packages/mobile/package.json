@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@dynaslope/commons": "file:../commons",
+    "@highcharts/highcharts-react-native": "^3.1.2",
     "@material-ui/core": "^4.9.14",
     "@react-native-community/async-storage": "^1.11.0",
     "@react-native-community/cli-platform-android": "^4.10.1",
@@ -30,10 +31,10 @@
     "formik": "^2.1.4",
     "materialui-daterange-picker": "^1.1.91",
     "moment-timezone": "^0.5.31",
-    "react": "16.11.0",
+    "react": "16.13.1",
     "react-dom": "^16.13.1",
     "react-hot-loader": "^4.12.21",
-    "react-native": "0.61.0",
+    "react-native": "0.63.3",
     "react-native-calendar": "^0.13.1",
     "react-native-calendars": "^1.296.0",
     "react-native-data-table": "^0.2.1",
@@ -52,6 +53,7 @@
     "react-native-safe-area-context": "^1.0.0",
     "react-native-screens": "^2.7.0",
     "react-native-tab-view": "^2.14.2",
+    "react-native-unimodules": "^0.11.0",
     "react-native-vector-icons": "^6.6.0",
     "rn-fetch-blob": "^0.12.0"
   },
