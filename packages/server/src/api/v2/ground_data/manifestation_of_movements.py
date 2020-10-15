@@ -199,13 +199,16 @@ def fetch_moms_instances(site_id, feature_id=None):
                 
                 result.update({int(row["feature_id"]): moms_instances_per_type})
 
-        moms = {"status": True, "data": moms_instances}
+        moms = {
+            "status": True, 
+            "data": result, 
+            "message": "Successfully retrieved moms instances."}
     except Exception as err:
         moms = {
             "status": False,
-            "message": f"Failed to fetch moms instances data. Error: {err}"
+            "message": f"Failed to fetch moms instances data. Error 500: {err}"
         }
-    return jsonify(result)
+    return jsonify(moms)
 
 
 @MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/update/ground_data/moms/instance", methods=["POST"])

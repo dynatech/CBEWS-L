@@ -1,22 +1,28 @@
 import React, {Fragment, useState, useEffect, useRef} from 'react';
 import {
     Grid, Paper, Container,
-    Fab, Table,
-    TableBody, TableCell, TableHead,
-    TableRow, Button, Typography
+    Fab, 
+    InputLabel, Button, Typography,
+    FormControl, MenuItem, TextField,
+    Select, Link
 } from "@material-ui/core";
+import { MuiPickersUtilsProvider, KeyboardDateTimePicker } from "@material-ui/pickers";
+import DateFnsUtils from '@date-io/date-fns';
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContentText from '@material-ui/core/DialogContentText';
+
 import { useStyles, tableStyles } from '../../../styles/general_styles';
+import { ButtonStyle } from "../../../styles/button_style";
 
 import Forms from '../../utils/Forms';
 import FabMuiTable from "../../utils/MuiTable";
 
 import moment from 'moment';
+import { Formik, Form, Field } from "formik";
 
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -24,15 +30,134 @@ import { useCookies } from 'react-cookie';
 
 import { MarGroundData } from '@dynaslope/commons';
 
+
+function MomsFeaturesDialog (props) {
+    const { classes, open, setOpen, data, setData, options, setFeatureOptions, } = props;
+    const btn_classes = ButtonStyle();
+    const command = "add";
+
+    const addFeature = async () => {
+        const response = await MarGroundData.InsertMomsFeatureType(data);
+        if (response.status === true) console.log("yey");
+    }
+
+    const deleteMomsFeatures = () => {
+        console.log("test");
+    };
+    
+    return (
+        <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">MOMS Features</DialogTitle>
+            <DialogContent>
+                <Formik
+                    initialValues={data}
+                    onSubmit={(values) => {
+                        console.log("submit values", values);
+                    }}
+                >
+                    {({ handleChange, handleBlur, handleSubmit, values }) => {
+                        console.log("values", values);
+                        return (
+                            <form className={classes.form} >
+                                <Grid container spacing={1}>
+                                    <Grid item xs={6}>
+                                        {/* Feature Type */}
+                                        <FormControl fullWidth>
+                                            <InputLabel htmlFor="type-native-simple">Feature Type</InputLabel>
+                                            <Select
+                                                value={data.feature_id}
+                                                onChange={(event) => {
+                                                    const { value } = event.target;
+                                                    console.log("options.find((e) => e.feature_id === value)", options.find((e) => e.feature_id === value));
+                                                    setData(options.find((e) => e.feature_id === value));
+                                                }}
+                                                inputProps={{
+                                                    name: 'select',
+                                                    id: 'select-native-simple',
+                                                }}
+                                            >
+                                                {options.map(type => <MenuItem value={type.feature_id}>{type.feature_type}</MenuItem>)}
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        {/* feature type */}
+                                        <TextField
+                                            key="feature_type_txt"
+                                            name="feature_type_txt"
+                                            label={"Feature Type"}
+                                            onChange={handleChange("feature_type")}
+                                            onBlur={handleBlur("feature_type")}
+                                            defaultValue={data.feature_type}
+                                            variant="outlined"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        {/* type description */}
+                                        <TextField
+                                            key="type_description_txt"
+                                            name="type_description_txt"
+                                            label={"Type Description"}
+                                            onChange={handleChange("description")}
+                                            onBlur={handleBlur("description")}
+                                            defaultValue={data.description}
+                                            variant="outlined"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Typography>* All fields are required</Typography>
+                                        <Typography>
+                                            * Please review your details before submitting
+                                        </Typography>
+                                    </Grid>
+                                    {command != "add" ? (
+                                        <Fragment>
+                                            <Grid item xs={6}>
+                                                <Button
+                                                    className={btn_classes.small2}
+                                                    onClick={handleSubmit}
+                                                    type="submit"
+                                                >
+                                                    Submit
+                                                </Button>
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                <Button 
+                                                    className={btn_classes.small2}
+                                                    onClick={deleteMomsFeatures}>Delete</Button>
+                                            </Grid>
+                                        </Fragment>
+                                    ) : (
+                                        <Grid item xs={12}>
+                                            <Button
+                                                className={btn_classes.small}
+                                                onClick={handleSubmit}
+                                                type="submit"
+                                            >
+                                                Submit
+                                            </Button>
+                                        </Grid>
+                                    )}
+                                </Grid>
+                            </form>
+                        )
+                    }}
+                </Formik>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 export default function MOMS() {
     const cmd = "update-delete";
-    let feature_type_container = [];
     const [cookies, setCookie] = useCookies(['credentials']);
-    const dt_classes = tableStyles();
+    const btn_classes = ButtonStyle();
     const classes = useStyles();
       
     const [open, setOpen] = React.useState(false);
@@ -42,27 +167,40 @@ export default function MOMS() {
     const [notifText, setNotifText] = useState('');
 
     const [selectedData, setSelectedData] = useState({});
-    const [feature_id, setFeatureId] = useState();
     const [command, setCommand] = useState("add");
 
-    const formData = useRef({
-        "form_data": {}, 
-        "custom_values": { 
-            "Feature Name": [], 
-            "Feature Type": []
-        }
-    });
     const [tableData, setTableData] = useState([]);
-    const [defaultStringValues, setDefaultStrValues] = useState({
-        "Remarks": "",
-        "Feature Type": [],
-        "Feature Name": []
+
+    // CONTAINERS
+    const [feature_options, setFeatureOptions] = useState([]);
+    const [instance_options, setInstanceOptions] = useState([]);
+    const [observanceTs, setObservanceTS] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+
+    //// FEATURE PARTS
+    // FEATURE TYPE
+    const [momsFeatureFormData, setMomsFeatureFormData] = useState({
+        "feature_id": "",
+        "description": "",
+        "feature_type": ""
     });
-    const [defaultTSValues, setDefaultTSValues] = useState({
-        "Observance TS": moment(),
+    const [isFeatureDialogOpen, setIsFeatureDialogOpen] = useState(false);
+    const [momsInstancesFormData, setMomsInstancesFormData] = useState({
+        "instance_id": "",
+        "feature_name": "",
+        "location": "",
+        "reporter": ""
     });
-    const [defaultIntValues, setDefaultIntValues] = useState({
-        "Alert Level": 0,
+    const [isInstanceDialogOpen, setIsInstanceDialogOpen] = useState(false);
+
+    const feature_names_ref = useRef([]);
+    
+    const [defaultStrValues, setDefaultStrValues] = useState({
+        "observance_ts": moment(observanceTs).format("YYYY-MM-DD HH:mm:ss"),
+        "feature_id": "",
+        "instance_id": "",
+        "reporter": "",
+        "description": "",
+        "alert_level": ""
     });
 
     // TEST
@@ -71,73 +209,58 @@ export default function MOMS() {
     };
     const columns = [
         { name: "observance_ts", label: "Observance TS" },
-        { name: "remarks", label: "Remarks" },
-        { name: "feature_type", label: "Feature Type" },
+        { name: "remarks", label: "Description" },
         { name: "feature_name", label: "Feature Name" },
         { name: "moms_reporter", label: "Moms Reporter" },
         { name: "op_trigger", label: "Alert Level" },
     ];
     
     useEffect(()=> {
-        initTable();
+        fetchLatestData();
     },[]);
 
-    const initTable = async () => {
+    const fetchLatestData = async () => {
         const response = await MarGroundData.GetMOMSData();
-        response.status ? setTableData(response.data) : console.error("problem retrieving MOMS."); 
+        const features_response = await MarGroundData.FetchMoMSFeatures();
+        console.log("features_response", features_response);
+        const instance_response = await MarGroundData.GetMomsInstancesPerSite(cookies.credentials.site_id);
 
-        if (response.status) {
-            const feature_types = await MarGroundData.FetchMomsFeatures();
-            console.log("feature_types", feature_types)
-            if (feature_types.status) {
-                const temp = feature_types.data.map((element, index) => {
-                    return ({
-                        "label": element.feature_type,
-                        "value": parseInt(element.feature_id)
-                    })
-                });
-                setDefaultStrValues({
-                    ...defaultStringValues, 
-                    "Feature Type": [null, temp]
-                });
-                console.log("defaultStringValues", defaultStringValues);
-            } else {
-                console.error(feature_types.messsage)
+        if (response.status === true) {
+            setTableData(response.data);
+        } else console.error("problem retrieving MOMS.");
+
+        if (features_response.status === true) {
+            setFeatureOptions(features_response.data);
+            if (instance_response.status === true) {
+                setInstanceOptions(instance_response.data);
+                feature_names_ref.current = instance_response.data;
+
+                const type_rows = features_response.data.map(feat => <MenuItem value={parseInt(feat.feature_id)}>{feat.feature_type}</MenuItem>);
             }
+        } else {
+            console.error(response);
+            alert("Trouble loading features");
         }
     }
 
-    const handleFeatureTypeChange = async (feature_id) => {
-        console.log("FEATURE ID")
-        const site_id = cookies.credentials.site_id;
-        const new_response = await MarGroundData.FetchMomsInstances(feature_id, site_id);
-        console.log("new_response", new_response);
-        if (new_response.status) {
-            setDefaultStrValues({
-                ...defaultStringValues,
-                "Feature Names": [null, new_response.data]
-            });
-        } else {
-            console.error("Problem retrieving f names")
-        }
+    const handleFeatureTypeChange = ({ target: { value }}) => {
+        setDefaultStrValues({ ...defaultStrValues, "feature_id": value });
+        setInstanceOptions(feature_names_ref.current[value]);
     };
 
-    const handleFeatureNameChange = async (feature_name, fData) => {
-        console.log("feature_name", feature_name);
+    const handleFeatureNameChange = ({ target: { value }}) => {
+        setDefaultStrValues({ ...defaultStrValues, "instance_id": value });
     };
 
     const resetState = () => {
         setSelectedData({});    
         setDefaultStrValues({
-            "Remarks": "",
-            "Feature Type": [],
-            "Feature Name": []
-        });
-        setDefaultTSValues({
-            "Observance TS": moment(),
-        });
-        setDefaultIntValues({
-            "Alert Level": 0
+            "observance_ts": moment(observanceTs).format("YYYY-MM-DD HH:mm:ss"),
+            "feature_id": "",
+            "instance_id": "",
+            "reporter": "",
+            "description": "",
+            "alert_level": ""
         });
     }
   
@@ -147,25 +270,18 @@ export default function MOMS() {
     };
 
     const handleEdit = (data) => {
+        setCommand("update");
         setSelectedData(data);
-        console.log("data", data);
-        console.log("formData", formData);
-        console.log("defaultStringValues", defaultStringValues);
-        
-        // GET moms_features and moms_instances
-        const temp = defaultStringValues["Feature Type"];
-        temp[0] = parseInt(data["feature_id"]);
+        setInstanceOptions(feature_names_ref.current[data["feature_id"]]);
 
         setDefaultStrValues({
-            ...defaultStringValues,
-            "Remarks": data["remarks"],
-            "Feature Type": temp,
-        });
-        setDefaultIntValues({
-            "Alert Level": data["op_trigger"],
-        });
-        setDefaultTSValues({
-            "Observance TS": data["observance_ts"],
+            ...defaultStrValues,
+            "observance_ts": moment(data.observance_ts).format("YYYY-MM-DD HH:mm:ss"),
+            "feature_id": data.feature_id,
+            "instance_id": data.instance_id,
+            "reporter": data.reporter,
+            "description": data.remarks,
+            "alert_level": data.op_trigger
         });
         setOpen(true);
         setCommand("edit");
@@ -203,7 +319,7 @@ export default function MOMS() {
         };
         const response = await MarGroundData.DeleteMOMSData(input);
         if (response.status === true) {
-            initTable();
+            fetchLatestData();
             setOpen(false);
             setOpenDelete(false);
             resetState();
@@ -216,69 +332,35 @@ export default function MOMS() {
         setOpenNotif(true);
     }
 
-    const submit = async () => {
-        console.log("formData.current", formData.current);
-        let json = formData.current;
-        json.user_id = cookies.credentials.user_id;
+    const submitForm = async (values) => {
+        console.log("form values on submit", values);
+        let json = values;
+        json.reporter_id = cookies.credentials.user_id;
         let hasModifiedRow = false;
         let response;
+        json.remarks = json.description;
+        json.op_trigger = json.alert_level;
         if (!Object.keys(selectedData).length) {
             // ADD
-            const { observance_ts, } = defaultTSValues;
-            const temp_ts = {
-                observance_ts: moment( ).format("YYYY-MM-DD HH:mm:ss"),
-            }
-            json = Object.assign(defaultStringValues, defaultIntValues, temp_ts, json);
-            
-            Object.keys(json).forEach(key => {
-                let temp;
-                console.log("key", key);
-                switch(key) {
-                    case 'StatDesc':
-                        json["stat_desc"] = json[key]
-                        break;
-                    case 'InCharge':
-                        json["in_charge"] = json[key]
-                        break;
-                    case 'Resource':
-                        json["resource"] = json[key]
-                        break;
-                    default:
-                        json[key.replace(" ","_").toLocaleLowerCase()] = json[key]
-                        break;
-                }
-            });
             response = await MarGroundData.InsertMOMSData(json);
         } else {
             // EDIT
             hasModifiedRow = true;
-            json.id = selectedData.id;
-            json.user_id = cookies.credentials.user_id;
+            json.moms_id = selectedData.moms_id;
             let temp_array = []
+            console.log("JSON", json);
             Object.keys(json).forEach(key => {
-                let temp = {};
                 console.log("key", key);
-                switch(key) {
-                    case 'StatDesc':
-                        temp["stat_desc"] = json[key]
-                        break;
-                    case 'InCharge':
-                        temp["in_charge"] = json[key]
-                        break;
-                    case 'Date':
-                        temp["date"] = json[key]
-                        break;
-                    default:
-                        temp[key.replace(" ","_").toLocaleLowerCase()] = json[key]
-                        break;
+                if (!["feature_id", "reporter", "description", "alert_level"].includes(key)) {
+                    let temp = {[key]: json[key]};
+                    temp_array.push(temp);
                 }
-                temp_array.push(temp);
             });
             response = await MarGroundData.UpdateMOMSData(temp_array);
         }
 
         if (response.status === true) {
-            initTable();
+            fetchLatestData();
             handleClose();
             setNotifStatus("success");
         } else {
@@ -329,23 +411,157 @@ export default function MOMS() {
                 </Grid>
             </Grid>
         </Container>
+
         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">MOMS</DialogTitle>
             <DialogContent>
-                <Forms data={{
-                        string: defaultStringValues,
-                        int: defaultIntValues,
-                        ts: defaultTSValues
+                <Formik
+                    initialValues={defaultStrValues}
+                    onSubmit={(values) => {
+                        submitForm(values);
                     }}
-                    formData={formData}
-                    closeForm={() => handleClose()}
-                    submitForm={() => submit()}
-                    deleteForm={() => deleteMoms()} 
-                    customHandlers={{
-                        "Feature Type": handleFeatureTypeChange,
-                        "Feature Name": handleFeatureNameChange
+                >
+                    {({ handleChange, handleBlur, handleSubmit, values }) => {
+                        return (
+                            <form className={classes.form} >
+                                <Grid container spacing={1}>
+                                    <Grid item xs={12}>
+                                        {/* Observance TS */}
+                                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                            <KeyboardDateTimePicker
+                                                value={observanceTs}
+                                                onChange={(value) => {
+                                                    console.log("value",value);
+                                                    setObservanceTS(value);
+                                                }}
+                                                label="Obs Trial"
+                                                onError={console.log}
+                                                // minDate={moment("2018-01-01 00:00:00").format("YYYY-MM-DD HH:mm:ss")}
+                                                format="yyyy-MM-dd HH:mm:ss"
+                                                fullWidth
+                                            />
+                                        </MuiPickersUtilsProvider>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        {/* Feature Type */}
+                                        <FormControl fullWidth>
+                                            <InputLabel htmlFor="type-native-simple">Feature Type</InputLabel>
+                                            <Select
+                                                value={defaultStrValues.feature_id}
+                                                onChange={handleFeatureTypeChange}
+                                                inputProps={{
+                                                    name: 'select',
+                                                    id: 'select-native-simple',
+                                                }}
+                                            >
+                                                {feature_options.map(type => <MenuItem value={type.feature_id}>{type.feature_type}</MenuItem>)}
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        {/* Feature Type */}
+                                        <Link
+                                            href="#"
+                                            onClick={() => {
+                                                console.log("Clicked feature link");
+                                                setIsFeatureDialogOpen(true);
+                                            }}
+                                        >
+                                            Add New Type
+                                        </Link>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        {/* Feature Name */}
+                                        <FormControl fullWidth>
+                                            <InputLabel htmlFor="name-native-simple">Feature Name</InputLabel>
+                                            <Select
+                                                value={defaultStrValues.instance_id}
+                                                onChange={handleFeatureNameChange}
+                                                inputProps={{
+                                                    name: 'select',
+                                                    id: 'select-native-simple',
+                                                }}
+                                            >
+                                                {instance_options.map(name => <MenuItem value={name.instance_id}>{name.feature_name}</MenuItem>)}
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        {/* Feature Name */}
+                                        <Link
+                                            href="#"
+                                            onClick={() => {
+                                                console.log("Clicked instance link");
+                                            }}
+                                        >
+                                            Add New Name
+                                        </Link>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        {/* Remarks */}
+                                        <TextField
+                                            key="description_txt"
+                                            name="description_txt"
+                                            label={"Description"}
+                                            onChange={handleChange("description")}
+                                            onBlur={handleBlur("description")}
+                                            defaultValue={values.description}
+                                            variant="outlined"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        {/* Alert Level */}
+                                        <TextField
+                                            key="alert_level_txt"
+                                            name="alert_level_txt"
+                                            label={"Alert Level"}
+                                            onChange={handleChange("alert_level")}
+                                            onBlur={handleBlur("alert_level")}
+                                            defaultValue={values.alert_level}
+                                            variant="outlined"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Typography>* All fields are required</Typography>
+                                        <Typography>
+                                            * Please review your details before submitting
+                                        </Typography>
+                                    </Grid>
+                                    {command != "add" ? (
+                                        <Fragment>
+                                            <Grid item xs={6}>
+                                                <Button
+                                                    className={btn_classes.small2}
+                                                    onClick={handleSubmit}
+                                                    type="submit"
+                                                >
+                                                    Submit
+                                                </Button>
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                <Button 
+                                                    className={btn_classes.small2}
+                                                    onClick={deleteMoms}>Delete</Button>
+                                            </Grid>
+                                        </Fragment>
+                                    ) : (
+                                        <Grid item xs={12}>
+                                            <Button
+                                                className={btn_classes.small}
+                                                onClick={handleSubmit}
+                                                type="submit"
+                                            >
+                                                Submit
+                                            </Button>
+                                        </Grid>
+                                    )}
+                                </Grid>
+                            </form>
+                        )
                     }}
-                />
+                </Formik>
             </DialogContent>
         </Dialog>
 
@@ -369,6 +585,121 @@ export default function MOMS() {
                     Confirmed
                 </Button>
             </DialogActions>
+        </Dialog>
+
+        {/* <MomsFeaturesDialog
+            classes={classes}
+            open={isFeatureDialogOpen}
+            setOpen={setIsFeatureDialogOpen}
+            data={momsFeatureFormData}
+            setData={setMomsFeatureFormData}
+            options={feature_options}
+            setFeatureOptions={setFeatureOptions}
+        /> */}
+
+        <Dialog open={isFeatureDialogOpen} onClose={() => setIsFeatureDialogOpen(false)} aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">MOMS Features</DialogTitle>
+            <DialogContent>
+                <Formik
+                    initialValues={momsFeatureFormData}
+                    onSubmit={(values) => {
+                        console.log("submit values", values);
+                    }}
+                >
+                    {({ handleChange, handleBlur, handleSubmit, values }) => {
+                        console.log("values", values);
+                        return (
+                            <form className={classes.form} >
+                                <Grid container spacing={1}>
+                                    <Grid item xs={6}>
+                                        {/* Feature Type */}
+                                        <FormControl fullWidth>
+                                            <InputLabel htmlFor="type-native-simple">Feature Type</InputLabel>
+                                            <Select
+                                                value={momsFeatureFormData.feature_id}
+                                                onChange={(event) => {
+                                                    const { value } = event.target;
+                                                    console.log("feature_options.find((e) => e.feature_id === value)", feature_options.find((e) => e.feature_id === value));
+                                                    const temp = feature_options.find((e) => e.feature_id === value);
+                                                    setMomsFeatureFormData({
+                                                        ...momsFeatureFormData,
+                                                        ...temp
+                                                    });
+                                                }}
+                                                inputProps={{
+                                                    name: 'select',
+                                                    id: 'select-native-simple',
+                                                }}
+                                            >
+                                                {feature_options.map(type => <MenuItem value={type.feature_id}>{type.feature_type}</MenuItem>)}
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        {/* feature type */}
+                                        <TextField
+                                            key="feature_type_txt"
+                                            name="feature_type_txt"
+                                            label={"Feature Type"}
+                                            onChange={handleChange("feature_type")}
+                                            onBlur={handleBlur("feature_type")}
+                                            defaultValue={momsFeatureFormData.feature_type}
+                                            variant="outlined"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    {/* <Grid item xs={12}>
+                                        <TextField
+                                            key="type_description_txt"
+                                            name="type_description_txt"
+                                            label={"Type Description"}
+                                            onChange={handleChange("description")}
+                                            onBlur={handleBlur("description")}
+                                            defaultValue={momsFeatureFormData.description}
+                                            variant="outlined"
+                                            fullWidth
+                                        />
+                                    </Grid> */}
+                                    <Grid item xs={12}>
+                                        <Typography>* All fields are required</Typography>
+                                        <Typography>
+                                            * Please review your details before submitting
+                                        </Typography>
+                                    </Grid>
+                                    {command != "add" ? (
+                                        <Fragment>
+                                            <Grid item xs={6}>
+                                                <Button
+                                                    className={btn_classes.small2}
+                                                    onClick={handleSubmit}
+                                                    type="submit"
+                                                >
+                                                    Submit
+                                                </Button>
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                <Button 
+                                                    className={btn_classes.small2}
+                                                    onClick={() => "deleteMomsFeatures"}>Delete</Button>
+                                            </Grid>
+                                        </Fragment>
+                                    ) : (
+                                        <Grid item xs={12}>
+                                            <Button
+                                                className={btn_classes.small}
+                                                onClick={handleSubmit}
+                                                type="submit"
+                                            >
+                                                Submit
+                                            </Button>
+                                        </Grid>
+                                    )}
+                                </Grid>
+                            </form>
+                        )
+                    }}
+                </Formik>
+            </DialogContent>
         </Dialog>
 
         <Snackbar open={openNotif} 

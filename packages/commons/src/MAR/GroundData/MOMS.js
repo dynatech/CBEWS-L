@@ -89,7 +89,7 @@ const InsertMomsFeatureType = (data) => {
     });
 };
 
-const FetchMoMSFeatures = (data) => {
+const FetchMoMSFeatures = () => {
   // return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types/${site_id}`, {
   return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types`, {
     method: "GET",

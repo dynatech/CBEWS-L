@@ -15,6 +15,7 @@ import {
     FormControl,
     InputLabel,
     Select,
+    MenuItem,
 } from "@material-ui/core";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import MomentUtils from "@date-io/moment";
@@ -40,37 +41,11 @@ function ReusableInput(props) {
     const key = propKey.replace(/\s/g, "");
 
     let component;
-    console.log(label);
-    console.log("value", value);
-    if (Array.isArray(value)) {
-        console.log("ARRAY!");
-        
-        const rows = value[1].map((element, index) => {
-            // console.log("element", element);
-            if (index === 0) return (<option aria-label="None" value="" />);
-            else return (<option value={element.value}>{element.label}</option>);
-        });
-        const select_value = value[0];
-        console.log("select_value", select_value);
-        const auto_handler = props.origProps.customHandlers[label]
-
+    if (typeof(value) === "object") {
+        console.log("OBJECT!", value);
         return (
-            <Grid item xs={6}>
-                <FormControl>
-                    <InputLabel htmlFor="age-native-simple">{label}</InputLabel>
-                    <Select
-                        native
-                        value={select_value}
-                        onChange={auto_handler}
-                        inputProps={{
-                            name: 'select',
-                            id: 'select-native-simple',
-                        }}
-                        fullWidth
-                    >
-                        {rows}
-                    </Select>
-                </FormControl>
+            <Grid item xs={12}>
+                {value}
             </Grid>
         );
     } else if (propKey in reference.string) {
@@ -131,8 +106,6 @@ export default function Forms(props) {
     const [defaultValues, setDefaultValues] = useState(Object.assign({}, string, int, ts));
     const [cmd, setCmd] = useState("");
 
-    console.log("formData", formData);
-
     useEffect(() => {
         setCmd(command);
     }, []);
@@ -159,7 +132,6 @@ export default function Forms(props) {
                                         reference={reference}
                                         handleBlur={handleBlur}
                                         handleChange={handleChange}
-                                        origProps={props}
                                     />
                                 );
                             })}
