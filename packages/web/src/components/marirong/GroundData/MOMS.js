@@ -4,7 +4,7 @@ import {
     Fab, 
     InputLabel, Button, Typography,
     FormControl, MenuItem, TextField,
-    Select
+    Select, Link
 } from "@material-ui/core";
 import { MuiPickersUtilsProvider, KeyboardDateTimePicker } from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
@@ -30,6 +30,126 @@ import { useCookies } from 'react-cookie';
 
 import { MarGroundData } from '@dynaslope/commons';
 
+
+function MomsFeaturesDialog (props) {
+    const { classes, open, setOpen, data, setData, options, setFeatureOptions, } = props;
+    const btn_classes = ButtonStyle();
+    const command = "add";
+
+    const addFeature = async () => {
+        const response = await MarGroundData.InsertMomsFeatureType(data);
+        if (response.status === true) console.log("yey");
+    }
+
+    const deleteMomsFeatures = () => {
+        console.log("test");
+    };
+    
+    return (
+        <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">MOMS Features</DialogTitle>
+            <DialogContent>
+                <Formik
+                    initialValues={data}
+                    onSubmit={(values) => {
+                        console.log("submit values", values);
+                    }}
+                >
+                    {({ handleChange, handleBlur, handleSubmit, values }) => {
+                        console.log("values", values);
+                        return (
+                            <form className={classes.form} >
+                                <Grid container spacing={1}>
+                                    <Grid item xs={6}>
+                                        {/* Feature Type */}
+                                        <FormControl fullWidth>
+                                            <InputLabel htmlFor="type-native-simple">Feature Type</InputLabel>
+                                            <Select
+                                                value={data.feature_id}
+                                                onChange={(event) => {
+                                                    const { value } = event.target;
+                                                    console.log("options.find((e) => e.feature_id === value)", options.find((e) => e.feature_id === value));
+                                                    setData(options.find((e) => e.feature_id === value));
+                                                }}
+                                                inputProps={{
+                                                    name: 'select',
+                                                    id: 'select-native-simple',
+                                                }}
+                                            >
+                                                {options.map(type => <MenuItem value={type.feature_id}>{type.feature_type}</MenuItem>)}
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        {/* feature type */}
+                                        <TextField
+                                            key="feature_type_txt"
+                                            name="feature_type_txt"
+                                            label={"Feature Type"}
+                                            onChange={handleChange("feature_type")}
+                                            onBlur={handleBlur("feature_type")}
+                                            defaultValue={data.feature_type}
+                                            variant="outlined"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        {/* type description */}
+                                        <TextField
+                                            key="type_description_txt"
+                                            name="type_description_txt"
+                                            label={"Type Description"}
+                                            onChange={handleChange("description")}
+                                            onBlur={handleBlur("description")}
+                                            defaultValue={data.description}
+                                            variant="outlined"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Typography>* All fields are required</Typography>
+                                        <Typography>
+                                            * Please review your details before submitting
+                                        </Typography>
+                                    </Grid>
+                                    {command != "add" ? (
+                                        <Fragment>
+                                            <Grid item xs={6}>
+                                                <Button
+                                                    className={btn_classes.small2}
+                                                    onClick={handleSubmit}
+                                                    type="submit"
+                                                >
+                                                    Submit
+                                                </Button>
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                <Button 
+                                                    className={btn_classes.small2}
+                                                    onClick={deleteMomsFeatures}>Delete</Button>
+                                            </Grid>
+                                        </Fragment>
+                                    ) : (
+                                        <Grid item xs={12}>
+                                            <Button
+                                                className={btn_classes.small}
+                                                onClick={handleSubmit}
+                                                type="submit"
+                                            >
+                                                Submit
+                                            </Button>
+                                        </Grid>
+                                    )}
+                                </Grid>
+                            </form>
+                        )
+                    }}
+                </Formik>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -49,16 +169,28 @@ export default function MOMS() {
     const [selectedData, setSelectedData] = useState({});
     const [command, setCommand] = useState("add");
 
-    const formData = useRef();
     const [tableData, setTableData] = useState([]);
 
     // CONTAINERS
-    const [feature_id, setFeatureId] = useState();
-    const [instance_id, setInstanceId] = useState();
     const [feature_options, setFeatureOptions] = useState([]);
     const [instance_options, setInstanceOptions] = useState([]);
-    const [fNameItems, setFNameItems] = useState([]);
     const [observanceTs, setObservanceTS] = useState(moment().format("YYYY-MM-DD HH:mm:ss"));
+
+    //// FEATURE PARTS
+    // FEATURE TYPE
+    const [momsFeatureFormData, setMomsFeatureFormData] = useState({
+        "feature_id": "",
+        "description": "",
+        "feature_type": ""
+    });
+    const [isFeatureDialogOpen, setIsFeatureDialogOpen] = useState(false);
+    const [momsInstancesFormData, setMomsInstancesFormData] = useState({
+        "instance_id": "",
+        "feature_name": "",
+        "location": "",
+        "reporter": ""
+    });
+    const [isInstanceDialogOpen, setIsInstanceDialogOpen] = useState(false);
 
     const feature_names_ref = useRef([]);
     
@@ -90,6 +222,7 @@ export default function MOMS() {
     const fetchLatestData = async () => {
         const response = await MarGroundData.GetMOMSData();
         const features_response = await MarGroundData.FetchMoMSFeatures();
+        console.log("features_response", features_response);
         const instance_response = await MarGroundData.GetMomsInstancesPerSite(cookies.credentials.site_id);
 
         if (response.status === true) {
@@ -100,7 +233,6 @@ export default function MOMS() {
             setFeatureOptions(features_response.data);
             if (instance_response.status === true) {
                 setInstanceOptions(instance_response.data);
-                setFNameItems(instance_response.data);
                 feature_names_ref.current = instance_response.data;
 
                 const type_rows = features_response.data.map(feat => <MenuItem value={parseInt(feat.feature_id)}>{feat.feature_type}</MenuItem>);
@@ -112,22 +244,18 @@ export default function MOMS() {
     }
 
     const handleFeatureTypeChange = ({ target: { value }}) => {
-        console.log("value", value)
         setDefaultStrValues({ ...defaultStrValues, "feature_id": value });
-        console.log("defaultStrValues", defaultStrValues);
         setInstanceOptions(feature_names_ref.current[value]);
     };
 
     const handleFeatureNameChange = ({ target: { value }}) => {
-        console.log("value", value)
         setDefaultStrValues({ ...defaultStrValues, "instance_id": value });
-        setInstanceId(value);
     };
 
     const resetState = () => {
         setSelectedData({});    
         setDefaultStrValues({
-            "ts": moment(observanceTs).format("YYYY-MM-DD HH:mm:ss"),
+            "observance_ts": moment(observanceTs).format("YYYY-MM-DD HH:mm:ss"),
             "feature_id": "",
             "instance_id": "",
             "reporter": "",
@@ -144,12 +272,8 @@ export default function MOMS() {
     const handleEdit = (data) => {
         setCommand("update");
         setSelectedData(data);
-        // GET moms_features and moms_instances
-        setInstanceId(data["instance_id"]);
-        setFeatureId(data["feature_id"]);
         setInstanceOptions(feature_names_ref.current[data["feature_id"]]);
 
-        console.log("edit data", data);
         setDefaultStrValues({
             ...defaultStrValues,
             "observance_ts": moment(data.observance_ts).format("YYYY-MM-DD HH:mm:ss"),
@@ -159,7 +283,6 @@ export default function MOMS() {
             "description": data.remarks,
             "alert_level": data.op_trigger
         });
-
         setOpen(true);
         setCommand("edit");
     };
@@ -247,8 +370,6 @@ export default function MOMS() {
         setNotifText(response.message);
         setOpenNotif(true);
     }
-
-    console.log("observanceTs", observanceTs)
 
     return (
         <Fragment>
@@ -338,6 +459,18 @@ export default function MOMS() {
                                         </FormControl>
                                     </Grid>
                                     <Grid item xs={6}>
+                                        {/* Feature Type */}
+                                        <Link
+                                            href="#"
+                                            onClick={() => {
+                                                console.log("Clicked feature link");
+                                                setIsFeatureDialogOpen(true);
+                                            }}
+                                        >
+                                            Add New Type
+                                        </Link>
+                                    </Grid>
+                                    <Grid item xs={6}>
                                         {/* Feature Name */}
                                         <FormControl fullWidth>
                                             <InputLabel htmlFor="name-native-simple">Feature Name</InputLabel>
@@ -352,6 +485,17 @@ export default function MOMS() {
                                                 {instance_options.map(name => <MenuItem value={name.instance_id}>{name.feature_name}</MenuItem>)}
                                             </Select>
                                         </FormControl>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        {/* Feature Name */}
+                                        <Link
+                                            href="#"
+                                            onClick={() => {
+                                                console.log("Clicked instance link");
+                                            }}
+                                        >
+                                            Add New Name
+                                        </Link>
                                     </Grid>
                                     <Grid item xs={12}>
                                         {/* Remarks */}
@@ -441,6 +585,121 @@ export default function MOMS() {
                     Confirmed
                 </Button>
             </DialogActions>
+        </Dialog>
+
+        {/* <MomsFeaturesDialog
+            classes={classes}
+            open={isFeatureDialogOpen}
+            setOpen={setIsFeatureDialogOpen}
+            data={momsFeatureFormData}
+            setData={setMomsFeatureFormData}
+            options={feature_options}
+            setFeatureOptions={setFeatureOptions}
+        /> */}
+
+        <Dialog open={isFeatureDialogOpen} onClose={() => setIsFeatureDialogOpen(false)} aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">MOMS Features</DialogTitle>
+            <DialogContent>
+                <Formik
+                    initialValues={momsFeatureFormData}
+                    onSubmit={(values) => {
+                        console.log("submit values", values);
+                    }}
+                >
+                    {({ handleChange, handleBlur, handleSubmit, values }) => {
+                        console.log("values", values);
+                        return (
+                            <form className={classes.form} >
+                                <Grid container spacing={1}>
+                                    <Grid item xs={6}>
+                                        {/* Feature Type */}
+                                        <FormControl fullWidth>
+                                            <InputLabel htmlFor="type-native-simple">Feature Type</InputLabel>
+                                            <Select
+                                                value={momsFeatureFormData.feature_id}
+                                                onChange={(event) => {
+                                                    const { value } = event.target;
+                                                    console.log("feature_options.find((e) => e.feature_id === value)", feature_options.find((e) => e.feature_id === value));
+                                                    const temp = feature_options.find((e) => e.feature_id === value);
+                                                    setMomsFeatureFormData({
+                                                        ...momsFeatureFormData,
+                                                        ...temp
+                                                    });
+                                                }}
+                                                inputProps={{
+                                                    name: 'select',
+                                                    id: 'select-native-simple',
+                                                }}
+                                            >
+                                                {feature_options.map(type => <MenuItem value={type.feature_id}>{type.feature_type}</MenuItem>)}
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        {/* feature type */}
+                                        <TextField
+                                            key="feature_type_txt"
+                                            name="feature_type_txt"
+                                            label={"Feature Type"}
+                                            onChange={handleChange("feature_type")}
+                                            onBlur={handleBlur("feature_type")}
+                                            defaultValue={momsFeatureFormData.feature_type}
+                                            variant="outlined"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    {/* <Grid item xs={12}>
+                                        <TextField
+                                            key="type_description_txt"
+                                            name="type_description_txt"
+                                            label={"Type Description"}
+                                            onChange={handleChange("description")}
+                                            onBlur={handleBlur("description")}
+                                            defaultValue={momsFeatureFormData.description}
+                                            variant="outlined"
+                                            fullWidth
+                                        />
+                                    </Grid> */}
+                                    <Grid item xs={12}>
+                                        <Typography>* All fields are required</Typography>
+                                        <Typography>
+                                            * Please review your details before submitting
+                                        </Typography>
+                                    </Grid>
+                                    {command != "add" ? (
+                                        <Fragment>
+                                            <Grid item xs={6}>
+                                                <Button
+                                                    className={btn_classes.small2}
+                                                    onClick={handleSubmit}
+                                                    type="submit"
+                                                >
+                                                    Submit
+                                                </Button>
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                <Button 
+                                                    className={btn_classes.small2}
+                                                    onClick={() => "deleteMomsFeatures"}>Delete</Button>
+                                            </Grid>
+                                        </Fragment>
+                                    ) : (
+                                        <Grid item xs={12}>
+                                            <Button
+                                                className={btn_classes.small}
+                                                onClick={handleSubmit}
+                                                type="submit"
+                                            >
+                                                Submit
+                                            </Button>
+                                        </Grid>
+                                    )}
+                                </Grid>
+                            </form>
+                        )
+                    }}
+                </Formik>
+            </DialogContent>
         </Dialog>
 
         <Snackbar open={openNotif} 
