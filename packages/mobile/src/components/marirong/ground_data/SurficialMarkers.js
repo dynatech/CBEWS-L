@@ -85,7 +85,6 @@ function SurficialMarkers() {
         } else {
             // Display error
         }
-
     }
 
     const showForm = () => {
