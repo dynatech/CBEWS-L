@@ -7,6 +7,7 @@ import FieldSurveyStack from '../umingan/FieldSurveyStack';
 import SituationReportStack from '../umingan/SituationReportStack';
 import ReportSummary from '../../components/umingan/reports/ReportSummary';
 import SurficialDataStack from '../umingan/SurficialDataStack';
+import SensorMaintenanceStack from '../umingan/SensorMaintenanceStack';
 
 const Stack = createStackNavigator();
 
@@ -51,6 +52,13 @@ function UminganDashboardStack() {
                     textAlign: 'center',
                   },
             }} component={SurficialDataStack} />
+            <Stack.Screen name="SensorMaintenanceStack" options={{
+                title: 'Sensor Maintenance Logs',
+                headerLeft: null,
+                headerTitleStyle: {
+                    textAlign: 'center',
+                  },
+            }} component={SensorMaintenanceStack} />
         </Stack.Navigator>
     );
 }
