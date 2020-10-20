@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Modal, ScrollView, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
-import { MarGroundData } from '@dynaslope/commons';
 import { DataTable } from 'react-native-paper';
 import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
 import { ButtonStyle } from '../../../styles/button_style';
+import { UmiGroundData } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import NetworkUtils from '../../../utils/NetworkUtils';
 import MobileCaching from '../../../utils/MobileCaching';
 
-function SurficialMarkers() {
+function SurficialData() {
 
     let formData = useRef();
     const [openModal, setOpenModal] = useState(false);
@@ -20,6 +20,9 @@ function SurficialMarkers() {
     const [selectedData, setSelectedData] = useState({});
     const [cmd, setCmd] = useState('add');
     const [defaultStrValues, setDefaultStrValues] = useState({});
+
+    const [page, setPage] = useState(0);
+    const [pages, setPages] = useState(0);
 
     useEffect(() => {
         setTimeout( async ()=> {
@@ -36,9 +39,12 @@ function SurficialMarkers() {
           },100);
     }, [])
 
+
     const init = async (data, markers) => {
         let temp = [];
         let temp_headers = [];
+        let temp_pages = parseInt(data.length / 10)
+
         if (markers.length != 0) {
             let temp_default_fields = {
                 'Observance timestamp': '',
@@ -50,41 +56,55 @@ function SurficialMarkers() {
                 temp_headers.push(<DataTable.Title key={element.marker_name} style={{width: 75}}>{element.marker_name}</DataTable.Title>)
             });
 
-            if (data.length != 0) {
-                data.forEach(element => {
-                    let temp_data = element[Object.keys(element)[0]];
-                    let temp_marker_value_container = [];
-                    
-                    for (const [key, value] of Object.entries(temp_data)) {
-                        if (key != 'observer' && key != 'ts' && key != 'weather' && key != 'alterations') {
-                            temp_marker_value_container.push(<DataTable.Cell key={`${key}_${value}`} style={{width: 75}}>{value}</DataTable.Cell>);
-                        }
-                    }
-                    
-                    temp.push(
-                        <DataTable.Row key={Object.keys(element)[0]} onPress={() => { modifySummary(element) }}>
-                            <DataTable.Cell style={{width: 150}}>{temp_data.ts}</DataTable.Cell>
-                                { temp_marker_value_container }
-                            <DataTable.Cell style={{width: 150}}>{temp_data.weather}</DataTable.Cell>
-                            <DataTable.Cell style={{width: 150}}>{temp_data.observer}</DataTable.Cell>
-                        </DataTable.Row>
-                    )
-                });
-            } else {
-                temp.push(
-                    <View key={0} style={{padding: 10}}>
-                        <Text>No available data.</Text>
-                    </View>
-                )
+            if ((data.length % 10) != 0) {
+                temp_pages = temp_pages+1;
             }
+
             setDataTableHeaders(temp_headers)
-            setDataTableContent(temp)
             setSurficialData(data);
             setMarkers(markers)
             setDefaultStrValues(temp_default_fields);
+            setPages(temp_pages);
+            constructDtBody(data, 0)
         } else {
             // Display error
         }
+    }
+
+
+    const fetchLatestData = async () => {
+        let response = await UmiGroundData.GetSurficialMarkersData();
+        if (response.status == true) {
+            init(response.data, response.markers);
+            MobileCaching.setItem('UmiSurficialData', response.data);
+            MobileCaching.setItem('UmiSurficialDataMarkers', response.markers);
+        } else {
+            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+        }
+    }
+
+    const onPageChange = (raw_page) => {
+        setPage(raw_page);
+        constructDtBody(surficialData, raw_page * 10);
+    }
+
+    const modifySummary = (data) => {
+        let key = Object.keys(data)[0];
+        let inputs = {
+            'Weather': data[key]['weather'],
+            'Observer / Nagsukat': data[key]['observer'],
+        };
+
+        Object.keys(data[key]).forEach(element => {
+            if (element != 'ts' && element != 'weather' && element != 'observer') {
+                inputs[element] = data[key][element];
+            }
+        });
+
+        setSelectedData(data[key]);
+        setDefaultStrValues(inputs);
+        setCmd('update')
+        showForm();
     }
 
     const showForm = () => {
@@ -110,9 +130,9 @@ function SurficialMarkers() {
                     if (isConnected != true) {
                         ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.LONG, ToastAndroid.CENTER)
                     } else {
-                        let response = await MarGroundData.DeleteSurficialMarkersData({
+                        let response = await UmiGroundData.DeleteSurficialMarkersData({
                             "observer": selectedData['observer'],
-                            "site_id": "29",
+                            "site_id": "50",
                             "ts": selectedData['ts'],
                             "weather": selectedData['weather']
                          })
@@ -130,25 +150,6 @@ function SurficialMarkers() {
             ],
             { cancelable: false }
         );
-    }
-
-    const modifySummary = (data) => {
-        let key = Object.keys(data)[0];
-        let inputs = {
-            'Weather': data[key]['weather'],
-            'Observer / Nagsukat': data[key]['observer'],
-        };
-
-        Object.keys(data[key]).forEach(element => {
-            if (element != 'ts' && element != 'weather' && element != 'observer') {
-                inputs[element] = data[key][element];
-            }
-        });
-
-        setSelectedData(data[key]);
-        setDefaultStrValues(inputs);
-        setCmd('update')
-        showForm();
     }
 
     const submitForm = async () => {
@@ -171,12 +172,12 @@ function SurficialMarkers() {
                         "observer": data['Observer/Nagsukat'],
                         "ts": data['Observancetimestamp'],
                         "weather": data['Weather'],
-                        "site_id": 29,
+                        "site_id": 50,
                         marker_value
                     }
 
                     if (isConnected != true) {
-                        let cached = await MobileCaching.getItem("MarSurficialData").then(cached_data => {
+                        let cached = await MobileCaching.getItem("UmiSurficialData").then(cached_data => {
                             let surficial_obj = {};
 
                             surficial_obj[temp['ts']] = {
@@ -208,7 +209,7 @@ function SurficialMarkers() {
                             return response;
                         });
                     } else {
-                        response = await MarGroundData.InsertSurficialMarkersData(temp)
+                        response = await UmiGroundData.InsertSurficialMarkersData(temp)
                         fetchLatestData();
                     }
                     if (response.status == true) {
@@ -280,10 +281,8 @@ function SurficialMarkers() {
                                 temp_proc[temp_state['ts']] = temp_state;
                                 cached_data[index] = temp_proc
 
-                                alert(JSON.stringify(cached_data));
-
                                 try {
-                                    MobileCaching.setItem("MarSurficialData", cached_data);
+                                    MobileCaching.setItem("UmiSurficialData", cached_data);
                                     response = {
                                         "status": true,
                                         "message": "Capacity and Vulnerability is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
@@ -295,7 +294,7 @@ function SurficialMarkers() {
                                     }
                                 }
                                 // OPEN MESSAGING APP TO UPDATE
-                                MobileCaching.getItem('MarSurficialDataMarkers').then(markers => {
+                                MobileCaching.getItem('UmiSurficialDataMarkers').then(markers => {
                                     init(cached_data, markers);
                                 });
                                 return response
@@ -303,7 +302,8 @@ function SurficialMarkers() {
                         } else {
                             temp['site_id'] = credentials['site_id'];
                             temp['ref_ts'] = selectedData['ts'];
-                            response = await MarGroundData.UpdateSurficialMarkerData(temp);
+                            temp['new_ts'] = selectedData['ts']; // leave this for now
+                            response = await UmiGroundData.UpdateSurficialMarkerData(temp);
                             if (response.status == true) {
                                 fetchLatestData();
                             }
@@ -318,25 +318,40 @@ function SurficialMarkers() {
         }
     }
 
-    const fetchLatestData = async () => {
-        let response = await MarGroundData.GetSurficialMarkersData();
-        if (response.status == true) {
-            init(response.data, response.markers);
-            MobileCaching.setItem('MarSurficialData', response.data);
-            MobileCaching.setItem('MarSurficialDataMarkers', response.markers);
-        } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-        }
-    }
-
+    const constructDtBody = (data, dt_row) => {
+        let surficial_row = data.slice(dt_row, dt_row+10);
+        let temp = [];
+        surficial_row.forEach(row => {
+            let obj_data = Object.values(row)
+            let actual_data = Object.values(obj_data[0])
+            let temp_marker_value_container = [];
+            for (const [key, value] of Object.entries(obj_data[0])) {
+                if (key != 'observer' && key != 'ts' && key != 'weather' && key != 'alterations') {
+                    temp_marker_value_container.push(<DataTable.Cell key={`${key}_${value}`} style={{width: 75}}>{value}</DataTable.Cell>);
+                }
+            }
+            
+            temp.push(
+                <DataTable.Row key={Object.keys(obj_data)[0]} onPress={() => { modifySummary(obj_data) }}>
+                    <DataTable.Cell style={{width: 150}}>{obj_data[0].ts}</DataTable.Cell>
+                        { temp_marker_value_container }
+                    <DataTable.Cell style={{width: 150}}>{obj_data[0].weather}</DataTable.Cell>
+                    <DataTable.Cell style={{width: 150}}>{obj_data[0].observer}</DataTable.Cell>
+                </DataTable.Row>
+            )
+        });
+        setDataTableContent(temp)
+      }
+    
     return(
         <ScrollView>
             <View style={ContainerStyle.content}>
                 <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Surficial Data</Text>
-                <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Add / Modify / Surficial data</Text>
+                <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Add / Edit / Delete Surficial Data</Text>
                 <View style={ContainerStyle.datatable_content}>
-                    <ScrollView horizontal={true}>
-                        <DataTable style={{ flex: 1, padding: 10}}>
+                <ScrollView horizontal={true}>
+                    <DataTable style={{ flex: 1, padding: 10}}>
+                        
                             <DataTable.Header>
                                 <DataTable.Title style={{width: 150}}>Observance timestamp</DataTable.Title>
                                 { dataTableHeaders }
@@ -344,14 +359,14 @@ function SurficialMarkers() {
                                 <DataTable.Title style={{width: 150}}>Nagsukat / Reporter</DataTable.Title>
                             </DataTable.Header>
                             { dataTableContent }
-                        </DataTable>
-                    </ScrollView>
-                    <DataTable.Pagination
-                        page={1}
-                        numberOfPages={3}
-                        onPageChange={(page) => { console.log(page); }}
-                        label="1-2 of 6"
-                    />
+                    </DataTable>
+                </ScrollView>
+                <DataTable.Pagination
+                    page={page}
+                    numberOfPages={pages}
+                    onPageChange={(page) => { onPageChange(page); }}
+                    label={`Page ${page} of ${pages-1}`}
+                />
                 </View>
                 <View>
                     <Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click row to modify.</Text>
@@ -383,4 +398,4 @@ function SurficialMarkers() {
     )
 }
 
-export default SurficialMarkers
+export default SurficialData
