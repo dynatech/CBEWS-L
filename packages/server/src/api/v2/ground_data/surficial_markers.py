@@ -140,13 +140,13 @@ def add():
     finally:
         return jsonify(surficial)
 
-@SURFICIAL_MARKERS_BLUEPRINT.route("/remove/ground_data/surficial_markers", methods=["POST"])
+@SURFICIAL_MARKERS_BLUEPRINT.route("/remove/ground_data/surficial_markers", methods=["DELETE"])
 def remove():
     try:
         data = request.get_json()
         mo_id = GroundData.delete_marker_observation(data)
-        if mo_id[status]:
-            del_status = GroundData.delete_marker_values(mo_id)
+        if mo_id['status']:
+            del_status = GroundData.delete_marker_values(mo_id['mo_id'])
             surficial = del_status
         else:
             surficial = {
