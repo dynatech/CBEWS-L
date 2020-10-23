@@ -85,10 +85,11 @@ export default function EarthquakeData() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Date and time</TableCell>
-                                    <TableCell>Reporter</TableCell>
-                                    <TableCell>Reason for Monitoring</TableCell>
-                                    <TableCell>Alert Level</TableCell>
-                                    {/* <TableCell>Attachments</TableCell> */}
+                                    <TableCell>Distance from Site</TableCell>
+                                    <TableCell>Magnitude</TableCell>
+                                    <TableCell>Depth</TableCell>
+                                    <TableCell>Latitude</TableCell>
+                                    <TableCell>Longitude</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -97,10 +98,11 @@ export default function EarthquakeData() {
                                         <TableCell component="th" scope="row">
                                             {row.ts}
                                         </TableCell>
-                                        <TableCell>{row.reporter}</TableCell>
-                                        <TableCell>{row.reason}</TableCell>
-                                        <TableCell>{row.alert_level}</TableCell>
-                                        {/* <TableCell>{row.attachments}</TableCell> */}
+                                        <TableCell>{row.distance}</TableCell>
+                                        <TableCell>{row.magnitude}</TableCell>
+                                        <TableCell>{row.depth}</TableCell>
+                                        <TableCell>{row.latitude}</TableCell>
+                                        <TableCell>{row.longitude}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

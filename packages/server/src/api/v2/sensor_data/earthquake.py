@@ -14,7 +14,7 @@ def fetch_latest_eq_events(site_code):
         response = {
             "status": True,
             "data": eq_data,
-            "message": f"A problem has occured in fetching of eq events: {err}"
+            "message": "Successfully retrieved earthquake data."
         }
         
     except Exception as err:
