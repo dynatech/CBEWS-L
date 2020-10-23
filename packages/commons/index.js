@@ -82,6 +82,9 @@ import {
 import {
   GetSubsurfacePlotData
 } from "./src/MAR/DataAnalysis/SubsurfaceAnalysis";
+import {
+  GetEarthquakeData,
+} from "./src/MAR/SensorData";
 
 // UMI
 import {
@@ -247,6 +250,10 @@ const MarMaintenanceLogs = {
   SendPDFReportViaEmail,
 };
 
+const MarSensorData = {
+  GetEarthquakeData,
+}
+
 const UmiRiskManagement = {
   GetAllSummary,
   InsertSummary,
@@ -336,6 +343,7 @@ export {
     MarEventsTemplate,
     MarGroundData,
     MarDataAnalysis,
+    MarSensorData,
     UmiRiskManagement,
     UmiFieldSurvey,
     UmiSituationReport,

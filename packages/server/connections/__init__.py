@@ -141,4 +141,7 @@ def create_app():
 	from src.api.v2.umi.sensor_maintenance import SENSOR_MAINTENANCE_BLUEPRINT
 	app.register_blueprint(SENSOR_MAINTENANCE_BLUEPRINT, url_prefix="/v2")
 
+	from src.api.v2.sensor_data.earthquake import EARTHQUAKE_BLUEPRINT
+	app.register_blueprint(EARTHQUAKE_BLUEPRINT, url_prefix="/v2")
+
 	return app
