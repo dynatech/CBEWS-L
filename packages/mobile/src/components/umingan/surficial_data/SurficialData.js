@@ -349,9 +349,8 @@ function SurficialData() {
                 <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Surficial Data</Text>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Add / Edit / Delete Surficial Data</Text>
                 <View style={ContainerStyle.datatable_content}>
-                <ScrollView horizontal={true}>
-                    <DataTable style={{ flex: 1, padding: 10}}>
-                        
+                    <ScrollView horizontal={true}>
+                        <DataTable style={{ flex: 1, padding: 10}}>
                             <DataTable.Header>
                                 <DataTable.Title style={{width: 150}}>Observance timestamp</DataTable.Title>
                                 { dataTableHeaders }
@@ -359,14 +358,14 @@ function SurficialData() {
                                 <DataTable.Title style={{width: 150}}>Nagsukat / Reporter</DataTable.Title>
                             </DataTable.Header>
                             { dataTableContent }
-                    </DataTable>
-                </ScrollView>
-                <DataTable.Pagination
-                    page={page}
-                    numberOfPages={pages}
-                    onPageChange={(page) => { onPageChange(page); }}
-                    label={`Page ${page} of ${pages-1}`}
-                />
+                        </DataTable>
+                    </ScrollView>
+                    <DataTable.Pagination
+                        page={page}
+                        numberOfPages={pages}
+                        onPageChange={(page) => { onPageChange(page); }}
+                        label={`Page ${page} of ${pages-1}`}
+                    />
                 </View>
                 <View>
                     <Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click row to modify.</Text>

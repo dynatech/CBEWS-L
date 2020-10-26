@@ -31,21 +31,9 @@ class SensorMaintenanceModel():
 		return result
 
 	def update_sensor_maintenance_log(data):
-		query = "UPDATE sensor_maintenance SET"
-		counter = 0
-		for x in data:
-			key = list(x)[0]
-			if 'id' != key:
-				if counter == 0:
-					query += f" {key} = '{x[key]}'"
-				else:
-					query += f", {key} = '{x[key]}'"
-				counter += 1
-		
-		for x in data:
-			key = list(x)[0]
-			if 'id' == key:
-				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = '{x[key]}'"
+		query = f"UPDATE sensor_maintenance SET remarks='{data['remarks']}', working_nodes='{data['working_nodes']}'" \
+				f",anomalous_nodes='{data['anomalous_nodes']}',rain_gauge_status ='{data['rain_gauge_status']}', timestamp='{data['timestamp']}'," \
+				f" last_ts='{data['last_ts']}' where id='{data['id']}';"
 		ret_val = DB.db_modify(query, 'cbewsl_umi_collections', True)
 		return ret_val
 
