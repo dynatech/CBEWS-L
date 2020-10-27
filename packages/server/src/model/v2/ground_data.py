@@ -60,6 +60,75 @@ class GroundData():
         return result
 
 
+    def fetch_latest_surficial_data(site_id):
+        query = f"""
+            SELECT 
+                *
+            FROM
+                marker_observations
+            WHERE
+                site_id = {site_id}
+            ORDER BY ts DESC
+            LIMIT 1;
+        """
+        mo_result = DB.db_read(query, 'senslopedb')
+        if mo_result:
+            mo_id = mo_result[0]["mo_id"]
+            query = f"""
+                SELECT 
+                    marker_name, measurement
+                FROM
+                    marker_data
+                        JOIN
+                    site_markers USING (marker_id)
+                WHERE
+                    mo_id = {mo_id}; 
+            """
+            result = DB.db_read(query, 'senslopedb')
+            if result:
+                temp = []
+                for item in result:
+                    stuff = (item["marker_name"], item["measurement"])
+                    temp.append(stuff)
+                
+                result = [{
+                    "data_list": temp,
+                    "ts": mo_result[0]["ts"],
+                    "observer_name": mo_result[0]["observer_name"],
+                    "weather": mo_result[0]["weather"],
+                    "data_source": mo_result[0]["data_source"]
+                }]
+            else:
+                raise("Database inconsistent. MO has no corresponding marker data.")
+
+
+        return result
+
+
+    def fetch_surficial_operational_trigger(site_id, latest_ts):
+        query = f"""
+            SELECT 
+                ot.site_id,
+                ot.ts_updated as ts,
+                ots.alert_symbol,
+                ots.alert_description
+            FROM
+                operational_triggers AS ot
+                    JOIN
+                operational_trigger_symbols as ots USING (trigger_sym_id)
+                    JOIN
+                trigger_hierarchies as th USING (source_id)
+            WHERE
+                ot.site_id = {site_id}
+            AND
+                ot.ts_updated = "{latest_ts}"
+            AND
+                th.trigger_source = "surficial"
+        """
+        result = DB.db_read(query, 'senslopedb')
+        return result
+
+
     def fetch_surficial_plot_data(marker_id, site_code, start, end):
         query = f'SELECT mo_id, data_id, marker_id, ts as x, measurement as y FROM senslopedb.marker_data INNER ' \
                 f'JOIN marker_observations USING (mo_id) WHERE (ts BETWEEN "{start}" AND "{end}") and marker_id = {marker_id} ' \

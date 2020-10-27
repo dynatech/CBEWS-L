@@ -1,8 +1,8 @@
 import React, { useState, Fragment } from 'react';
 import { Container, Grid, Fab } from '@material-ui/core';
-import RainfallPlot from './DataAnalysis/RainfallPlot';
-import SurficialPlot from './DataAnalysis/SurficialPlot';
-import SubsurfacePlot from './DataAnalysis/SubsurfacePlot';
+import RainfallPlot from '../charts/RainfallPlot';
+import SurficialPlot from '../charts/SurficialPlot';
+import SubsurfacePlots from '../charts/SubsurfacePlots';
 import { useStyles } from '../../styles/general_styles';
 
 export default function DataAnalysis() {
@@ -32,7 +32,7 @@ export default function DataAnalysis() {
                 sfpActive("");
                 rpActive("");
                 sbpActive("primary");
-                return_feat = [<SubsurfacePlot feature={"data_analysis"} />];
+                return_feat = [<SubsurfacePlots feature={"velocity_alerts"} />];
                 break;
             default:
                 rpActive("primary")
@@ -47,7 +47,7 @@ export default function DataAnalysis() {
     return (
         <Fragment>
             <Container maxWidth="xl" className={classes.root} spacing={24}>
-                <Grid container alignItems="center" justify="center">
+                <Grid container alignItems="flex-start" justify="center">
                     <Grid item xs={3}>
                         <Grid container direction="column" className={classes.menuContainer}>
                             <Grid item={true} xs={3} style={{ marginTop: '15%' }} />

@@ -15,7 +15,8 @@ def fetch(site_code):
     sensor_plots = []
     site_sensors = {
         'mar': ['marta', 'martb'],
-        'umi': ['umita']
+        'umi': ['umita'],
+        'blc': ['blcsb'],
     }
     for sensors in site_sensors[site_code]:
         plot = subsurface_analysis.vcdgen(sensors, current_ts)

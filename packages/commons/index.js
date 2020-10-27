@@ -74,7 +74,8 @@ import {
     InsertOnDemandData,
 } from "./src/MAR/GroundData/OnDemand";
 import {
-  GetRainfallPlotData
+  GetRainfallPlotData,
+  GetRainfallAnalysis,
 } from "./src/MAR/DataAnalysis/RainfallAnalysis";
 import {
   GetSurficialPlotData
@@ -188,6 +189,7 @@ const AlertGeneration = {
 
 const MarDataAnalysis = {
   GetRainfallPlotData,
+  GetRainfallAnalysis,
   GetSurficialPlotData,
   GetSubsurfacePlotData,
 };
