@@ -33,7 +33,6 @@ const ColPos = (props) => {
                 values: temp_values
             })
         });
-        console.log(temp);
         return temp
     }
 
@@ -54,42 +53,42 @@ const ColPos = (props) => {
 const Displacement = (props) => {
 
     const {
-        surficial_plot,
-        site_code,
-        ts_end,
-        ts_start
+        annotations,
+        data,
+        orientation
     } = props.props;
 
-    const constructDataSet = (surficial_plot) => {
+    const constructDataSet = (data) => {
         let temp = [];
-        surficial_plot.forEach(element => {
+        data.forEach((element, index) => {
             let temp_values = [];
             let color_code = Math.floor(Math.random()*16777215).toString(16);
-            element.data.forEach(set => {
-                temp_values.push({
-                    y: set.y,
-                    x: moment.unix(set.x).valueOf()
+            if (index != 0) {
+                element.data.forEach((value, index) => {
+                    temp_values.push({
+                        y: value.y,
+                        x: moment.unix(value.x).valueOf()
+                    })
+                });
+                temp.push({
+                    label: `${element.name}`,
+                    config: {
+                        color: processColor(`#${color_code}`),
+                        drawValues: true,
+                        valueTextSize: 10,
+                        valueTextColor: processColor(`#${color_code}`)
+                    },
+                    values: temp_values
                 })
-            });
-            temp.push({
-                label: `${element.marker_name}`,
-                config: {
-                    color: processColor(`#${color_code}`),
-                    drawValues: true,
-                    valueTextSize: 10,
-                    valueTextColor: processColor(`#${color_code}`)
-                },
-                values: temp_values
-            })
+            }
         });
-        console.log(temp);
         return temp
     }
 
     return(
-        <LineChart style={{height: 250, width: 750}}
+        <LineChart style={{height: 250, width: 2000}}
             data={{
-                dataSets: constructDataSet(surficial_plot)
+                dataSets: constructDataSet(data)
             }}
             xAxis={{
                 valueFormatter: 'date',
