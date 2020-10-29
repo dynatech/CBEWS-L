@@ -86,7 +86,7 @@ function UminganDashboard(props) {
                     </View>
                     <View style={ContainerStyle.menu_row}>
                         <View style={[ContainerStyle.menu_container]}>
-                            <TouchableOpacity onPress={() => { }}>
+                            <TouchableOpacity onPress={() => {navigator.navigate('SensorMaintenanceStack') }}>
                                 <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/umingan/menu/sensor_maintenance.png')}></Image>
                             </TouchableOpacity>
                             <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Sensor{'\n'}Maintenance</Text>
