@@ -33,6 +33,7 @@ const ColPos = (props) => {
                 values: temp_values
             })
         });
+        console.log("Subsurface:", temp);
         return temp
     }
 
@@ -75,6 +76,7 @@ const Displacement = (props) => {
                     config: {
                         color: processColor(`#${color_code}`),
                         drawValues: true,
+                        drawCircles: false,
                         valueTextSize: 10,
                         valueTextColor: processColor(`#${color_code}`)
                     },
@@ -86,7 +88,7 @@ const Displacement = (props) => {
     }
 
     return(
-        <LineChart style={{height: 250, width: 2000}}
+        <LineChart style={{height: 250, width: '100%'}}
             data={{
                 dataSets: constructDataSet(data)
             }}
