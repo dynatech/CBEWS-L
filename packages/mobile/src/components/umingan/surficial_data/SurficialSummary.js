@@ -189,7 +189,6 @@ function SurficialSummary() {
         "ts_start": "2020-03-26 14:30:26"
     }
     
-
     return(
         <ScrollView>
             <View style={ContainerStyle.content}>

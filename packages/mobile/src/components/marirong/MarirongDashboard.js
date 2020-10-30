@@ -142,7 +142,7 @@ function MarirongDashboard(props) {
             </View>
             <View style={ContainerStyle.menu_row}>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { StackNavigator.navigate("DataAnalysis") }}>
+                <TouchableOpacity onPress={() => { StackNavigator.navigate("DataAnalysisStack") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/data_analysis.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Data{"\n"}Analysis</Text>
