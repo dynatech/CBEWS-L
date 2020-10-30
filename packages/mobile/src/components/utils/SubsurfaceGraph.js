@@ -38,7 +38,7 @@ const ColPos = (props) => {
     }
 
     return(
-        <LineChart style={{height: 250, width: '100%'}}
+        <LineChart style={{height: 500, width: '100%'}}
             data={{
                 dataSets: constructDataSet(data)
             }}
@@ -46,6 +46,13 @@ const ColPos = (props) => {
                 valueFormatter: 'date',
                 valueFormatterPattern: 'HH:mm',
                 position: 'BOTTOM',
+            }}
+            legend={{
+                enabled: true,
+                textSize: 14,
+                xEntrySpace: '50%',
+                form: 'SQUARE',
+                wordWrapEnabled: true,
             }}
         />
     )
@@ -88,7 +95,7 @@ const Displacement = (props) => {
     }
 
     return(
-        <LineChart style={{height: 250, width: '100%'}}
+        <LineChart style={{height: 500, width: '100%'}}
             data={{
                 dataSets: constructDataSet(data)
             }}
@@ -97,6 +104,7 @@ const Displacement = (props) => {
                 valueFormatterPattern: 'HH:mm',
                 position: 'BOTTOM',
             }}
+            legend={{wordWrapEnabled: true}}
         />
     )
 }

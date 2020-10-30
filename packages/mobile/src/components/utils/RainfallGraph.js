@@ -18,6 +18,7 @@ const RainfallGraph = (props) => {
 
     useEffect(()=> {
         let temp = constructDataSet(data)
+        // Add costum legend
         if (temp.length !=0 ) {
             setDisplay([
                 <Fragment>
@@ -31,11 +32,12 @@ const RainfallGraph = (props) => {
                             valueFormatterPattern: 'HH:mm',
                             position: 'BOTTOM',
                         }}
+                        legend={{wordWrapEnabled: true}}
                     />
                 </Fragment>
             ])
         }
-    });
+    },[]);
 
     const constructDataSet = (data) => {
         let ret = [];
@@ -85,14 +87,14 @@ const RainfallGraph = (props) => {
             ret.push({
                 label: `1-day threshold`,
                 config: {
-                    color: processColor(`blue`),
+                    color: processColor(`#5c5cfa`),
                     drawValues: true,
                     drawCircles: false,
                     valueTextSize: 10,
                     dashedLine: {
                         lineLength: 1,
                         spaceLength: 20},
-                    valueTextColor: processColor(`blue`)
+                    valueTextColor: processColor(`#5c5cfa`)
                 },
                 values: threshold_1_day  
             })
@@ -113,14 +115,14 @@ const RainfallGraph = (props) => {
             ret.push({
                 label: `3-day threshold`,
                 config: {
-                    color: processColor(`red`),
+                    color: processColor(`#ff4040`),
                     drawValues: true,
                     drawCircles: false,
                     valueTextSize: 10,
                     dashedLine: {
                         lineLength: 1,
                         spaceLength: 100},
-                    valueTextColor: processColor(`red`)
+                    valueTextColor: processColor(`#ff4040`)
                 },
                 values: threshold_3_day  
             })
