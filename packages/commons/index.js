@@ -67,6 +67,7 @@ import {
     UpdateMomsInstance,
     DeleteMomsFeatureType,
     DeleteMomsInstance,
+    FetchMOMSAnalysis,
 } from "./src/MAR/GroundData/MOMS";
 import {
     GetOnDemandData,
@@ -78,7 +79,8 @@ import {
   GetRainfallAnalysis,
 } from "./src/MAR/DataAnalysis/RainfallAnalysis";
 import {
-  GetSurficialPlotData
+  GetSurficialPlotData,
+  GetSurficialPlotAnalysis
 } from "./src/MAR/DataAnalysis/SurficialAnalysis";
 import {
   GetSubsurfacePlotData
@@ -191,6 +193,7 @@ const MarDataAnalysis = {
   GetRainfallPlotData,
   GetRainfallAnalysis,
   GetSurficialPlotData,
+  GetSurficialPlotAnalysis,
   GetSubsurfacePlotData,
 };
 
@@ -216,6 +219,7 @@ const MarGroundData = {
     UpdateMomsInstance,
     DeleteMomsFeatureType,
     DeleteMomsInstance,
+    FetchMOMSAnalysis,
 };
 
 const MarCommunityRiskAssessment = {

@@ -11,6 +11,7 @@ import {
 // import { sample_rain_data } from "./sample_rain_data._not_final";
 import { useCookies } from 'react-cookie';
 import { MarDataAnalysis } from "@dynaslope/commons";
+import { UmiDataAnalysis } from "@dynaslope/commons";
 
 require("highcharts/modules/exporting")(Highcharts);
 
@@ -308,6 +309,10 @@ export default function RainfallPlot(props) {
     }, [])
 
     const initRainfall = async () => {
+        let func
+        if (cookies.credentials.site_code === "mar") {
+            func = MarDataAnalysis
+        }
         const response = await MarDataAnalysis.GetRainfallPlotData();
         if (response.status === true) {
             let rainfall_data = response.data[0];

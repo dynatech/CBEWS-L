@@ -211,6 +211,38 @@ def fetch_moms_instances(site_id, feature_id=None):
     return jsonify(moms)
 
 
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/<site_id>/moms/latest", methods=["GET"])
+def fetch_latest_moms(site_id):
+    try:
+        name_container = []
+        data = {}
+        latest_moms = GroundData.fetch_latest_moms(site_id)
+
+        if latest_moms:
+            release_time = H.round_to_nearest_release_time(dt.now(), interval=4)
+            internal = release_time - timedelta(hours=4)
+
+            is_data_available = H.str_to_dt(latest_moms[0]["observance_ts"]) > internal
+
+            data = latest_moms[0]
+            data["analysis"] = f"Received MoMs data recently at {data['observance_ts']}" if is_data_available else "No MoMs data received recently."
+
+        else:
+            data = None
+
+
+        moms = {
+            "status": True, 
+            "data": data, 
+            "message": "Successfully retrieved latest moms."}
+    except Exception as err:
+        moms = {
+            "status": False,
+            "message": f"Failed to fetch latest moms data. Error 500: {err}"
+        }
+    return jsonify(moms)
+
+
 @MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/update/ground_data/moms/instance", methods=["POST"])
 def update_moms_instance():
     try:

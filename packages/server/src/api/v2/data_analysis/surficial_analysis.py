@@ -61,7 +61,7 @@ def fetch_status_analysis(site_code):
     message = ""
     site_id = Sites.get_site_details(
         filter_value=site_code, site_filter="site_code", return_col="site_id")
-    print(site_id)
+    print("site_id",site_id)
     latest_data = GroundData.fetch_latest_surficial_data(site_id)
     print(latest_data)
     try:
@@ -69,12 +69,19 @@ def fetch_status_analysis(site_code):
             ts = latest_data[0]["ts"]
             op_trigger = GroundData.fetch_surficial_operational_trigger(
                 site_id, ts)
+            print(op_trigger)
             if op_trigger:
                 alert_symbol = op_trigger[0]["alert_symbol"]
                 alert_description = op_trigger[0]["alert_description"]
+                latest_data_str = ""
+                for item in latest_data[0]["data_list"]:
+                    latest_data_str += f"{item[0]}->{item[1]}cm "
+                
+                ts_str = h.dt_to_str(ts)
                 data = {
-                    "analysis": alert_description,
-                    "ts": h.dt_to_str(ts)
+                    "analysis": f"As of {ts_str}, {alert_description}.",
+                    "latest_data": f"{ts_str} | {latest_data_str}",
+                    "ts": ts_str
                 }
             message = "Successful"    
         else:

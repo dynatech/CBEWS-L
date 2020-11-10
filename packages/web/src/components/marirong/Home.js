@@ -41,22 +41,46 @@ function LatestRainfall () {
 
 
 function LatestGroundMeas () {
+    const [data, setData] = React.useState(null);
     
     React.useEffect(() => {
         init();
     }, []);
 
-    const init = () => {
-        console.log("test")
+    const init = async () => {
+        const response = await MarDataAnalysis.GetSurficialPlotAnalysis();
+        console.log("response", response);
+        if (response.status === true) {
+            console.log(response.message);
+            setData(response.data);
+        } else {
+            console.error(response.message);
+        }
     }
+
+    console.log("data", data)
+
     return (
-        <div>test</div>
+        <Fragment>
+            {
+                data !== null ? (
+                    <Fragment>
+                        <Typography variant="body">{data.latest_data}</Typography>
+                        <br /><br />
+                        <Typography variant="body">{data.analysis}</Typography>
+                    </Fragment>
+
+                ) : (
+                    <Typography variant="h5" align="center" color="secondary">No data available</Typography>
+                )
+            }
+        </Fragment>
     );
 }
 
 function LatestMoms () {
     return (
-        <div>Moms</div>
+        <Typography variant="h5" align="center" color="secondary">No Moms Data Available</Typography>
     );
 }
 
@@ -71,24 +95,25 @@ export default function Home () {
                 </Paper>
             </Grid>
             <Grid item xs={12} md={6}>
-                <Paper style={{ height: "180px", padding: "5%"}}>
+                <Paper style={{ height: "150px", padding: "5%"}}>
                     <Typography variant="h6" align="center">Latest Rainfall data</Typography>
                     <LatestRainfall />
                 </Paper>
             </Grid>
             <Grid item xs={12} md={6}>
-                <Paper style={{ height: "180px", padding: "5%"}}>
+                <Paper style={{ height: "150px", padding: "5%"}}>
                     <Typography variant="h6" align="center">Latest Ground Measurement data</Typography>
                     <LatestGroundMeas />
                 </Paper>
             </Grid>
             <Grid item xs={12} md={6}>
-                <Paper style={{ height: "180px", padding: "5%"}}>
+                <Paper style={{ height: "150px", padding: "5%"}}>
                     <Typography variant="h6" align="center">Latest Subsurface data</Typography>
+                    <Typography variant="h5" align="center" color="secondary">No subsurface data available</Typography>
                 </Paper>
             </Grid>
             <Grid item xs={12} md={6}>
-                <Paper style={{ height: "180px", padding: "5%"}}>
+                <Paper style={{ height: "150px", padding: "5%"}}>
                     <Typography variant="h6" align="center">Latest Manifestations of Movement data</Typography>
                     <LatestMoms />
                 </Paper>
