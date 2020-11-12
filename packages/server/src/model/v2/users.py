@@ -100,8 +100,8 @@ class Users():
 		return count
 
 	def fetch_account(username):
-		query = "SELECT * FROM user_accounts INNER JOIN user_profiles USING(profile_id) " \
-				"INNER JOIN user_mobiles USING(mobile_id) INNER JOIN user_roles USING(role_id) " \
+		query = "SELECT * FROM user_accounts INNER JOIN user_profiles ON (user_profiles.id = user_accounts.profile_id) " \
+				"INNER JOIN user_mobiles ON (user_mobiles.id = user_accounts.mobile_id) INNER JOIN user_roles ON (user_roles.id = user_accounts.role_id) " \
 				f"WHERE username = '{username}'"
 		account = DB.db_read(query, 'cbewsl_commons_db')
 		return account
@@ -109,7 +109,7 @@ class Users():
 	def fetch_user(profile_id):
 		query = "SELECT firstname, lastname FROM cbewsl_commons_db.user_profiles as cdb_up " \
 				"INNER JOIN cbewsl_commons_db.user_accounts as cdb_ua " \
-				"USING (profile_id)" \
-				f"WHERE cdb_up.profile_id = {profile_id}"
+				"ON (cdb_ua.profile_id = cdb_up.id)" \
+				f"WHERE cdb_up.id = {profile_id}"
 		user = DB.db_read(query, 'cbewsl_commons_db')
 		return user

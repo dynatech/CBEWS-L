@@ -170,7 +170,7 @@ class GroundData():
             if 'mo_id' in surficial_data:
                 mo_id = surficial_data['mo_id']
                 site_id = surficial_data['site_id']
-                query = f'DELETE FROM marker_observations WHERE mo_id="{mo_id}" AND site_id="{site_id}'
+                query = f'DELETE FROM marker_observations WHERE id="{mo_id}" AND site_id="{site_id}'
             else:
                 ts = surficial_data['ts']
                 weather = surficial_data['weather']
@@ -178,7 +178,7 @@ class GroundData():
                 site_id = surficial_data['site_id']
                 query = f'DELETE FROM marker_observations WHERE ts="{ts}" ' \
                         f'AND weather="{weather}" AND observer_name="{observer}" AND site_id = "{site_id}" ' \
-                        'AND IFNULL(mo_id, 0) = LAST_INSERT_ID(mo_id);'
+                        'AND IFNULL(id, 0) = LAST_INSERT_ID(id);'
             mo_status = DB.db_modify(query, 'senslopedb', True)
             if mo_status is None:
                 result = {"status": True, "mo_id": mo_id}
@@ -299,7 +299,7 @@ class GroundData():
 
     def fetch_moms_features():
         try:
-            query = 'SELECT feature_id, feature_type FROM moms_features'
+            query = 'SELECT id, feature_type FROM moms_features'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -310,7 +310,7 @@ class GroundData():
 
     def fetch_moms_features_by_type(f_type):
         try:
-            query = f'SELECT feature_id, feature_type, description FROM moms_features WHERE feature_type = "{f_type}"'
+            query = f'SELECT id, feature_type, description FROM moms_features WHERE feature_type = "{f_type}"'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -324,7 +324,7 @@ class GroundData():
             Returns {"feature_id": <feature_id value>} of searched feature type
         """
         try:
-            query = f"SELECT feature_id FROM moms_features WHERE feature_type = '{feature_type}'"
+            query = f"SELECT id FROM moms_features WHERE feature_type = '{feature_type}'"
             feature_id = DB.db_read(query, 'senslopedb')
         except Exception as err:
             raise(err)
@@ -340,13 +340,13 @@ class GroundData():
                 FROM
                     moms_instances
                         INNER JOIN
-                    monitoring_moms USING (instance_id)
+                    monitoring_moms ON (monitoring_moms.instance_id = moms_instances.id)
                         INNER JOIN
-                    moms_features USING (feature_id)
+                    moms_features ON (moms_features.id = monitoring_moms.feature_id)
                         INNER JOIN
-                    cbewsl_commons_db.user_accounts AS users ON users.user_id = monitoring_moms.reporter_id 
+                    cbewsl_commons_db.user_accounts AS users ON users.id = monitoring_moms.reporter_id 
                         INNER JOIN
-                    cbewsl_commons_db.user_profiles AS user_prof ON user_prof.profile_id = users.profile_id
+                    cbewsl_commons_db.user_profiles AS user_prof ON user_prof.id = users.profile_id
                 WHERE
                     moms_instances.site_id = {site_id}
                 ORDER BY observance_ts DESC;
@@ -362,7 +362,7 @@ class GroundData():
 
     def fetch_moms_by_moms_id(moms_id):
         try:
-            query = f'SELECT * FROM monitoring_moms WHERE moms_id = {moms_id}'
+            query = f'SELECT * FROM monitoring_moms WHERE id = {moms_id}'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -373,7 +373,7 @@ class GroundData():
 
     def fetch_moms_instance_by_instance_id(instance_id):
         try:
-            query = f'SELECT * FROM moms_instances WHERE instance_id = {instance_id}'
+            query = f'SELECT * FROM moms_instances WHERE id = {instance_id}'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -439,11 +439,11 @@ class GroundData():
             FROM
                 monitoring_moms
                     JOIN
-                moms_instances USING (instance_id)
+                moms_instances ON (moms_instances.id = monitoring_moms.instance_id)
                     JOIN
-                moms_features USING (feature_id)
+                moms_features ON (moms_features.id = moms_instances.feature_id)
                     JOIN
-                cbewsl_commons_db.sites USING (site_id)
+                cbewsl_commons_db.sites ON (cbewsl_commons_db.sites.id = moms_instances.site_id)
             WHERE
                 site_id = {site_id}
             ORDER BY observance_ts DESC
@@ -537,7 +537,7 @@ class GroundData():
 
     def delete_moms_observation(moms_id):
         try:
-            query = f'DELETE FROM monitoring_moms WHERE moms_id = {moms_id}'
+            query = f'DELETE FROM monitoring_moms WHERE id = {moms_id}'
             update_status = DB.db_modify(query, 'senslopedb', True)
             result = {"status": True,
                 "data": update_status, "message": "Success"}
@@ -550,7 +550,7 @@ class GroundData():
 
     def delete_moms_feature(feature_id):
         try:
-            query = f'DELETE FROM moms_features WHERE feature_id = {feature_id}'
+            query = f'DELETE FROM moms_features WHERE id = {feature_id}'
             update_status = DB.db_modify(query, 'senslopedb', True)
             result = {"status": True, "data": update_status, "message": "Success"}
         except Exception as err:
@@ -562,7 +562,7 @@ class GroundData():
 
     def delete_moms_instance(instance_id):
         try:
-            query = f'DELETE FROM moms_instances WHERE instance_id = {instance_id}'
+            query = f'DELETE FROM moms_instances WHERE id = {instance_id}'
             update_status = DB.db_modify(query, 'senslopedb', True)
             result = {"status": True, "data": update_status, "message": "Success"}
         except Exception as err:
@@ -584,20 +584,6 @@ class GroundData():
 
         od_data = DB.db_read(query, 'senslopedb')
 
-        # return_list = []
-        # if od_data:
-        #     return_list = []
-        #     for row in od_data:
-        #         return_list.append({
-        #             "id": row[0],
-        #             "ts": Helpers.dt_to_str(row[1]),
-        #             "site_id": row[2],
-        #             "reason": row[3],
-        #             "reporter": row[4],
-        #             "alert_level": row[5]
-        #         })
-
-        # return return_list
         return od_data
 
 

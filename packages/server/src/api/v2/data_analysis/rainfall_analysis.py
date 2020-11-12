@@ -13,8 +13,11 @@ RAINFALL_ANALYSIS_BLUEPRINT = Blueprint("rainfall_analysis_blueprint", __name__)
 @RAINFALL_ANALYSIS_BLUEPRINT.route("/get/data_analysis/<site_code>/rainfall/plot_data", methods=["GET"])
 def fetch(site_code, internal=False):
     try:
-        data_ts_end = dt.today().strftime("%Y-%m-%d %H:%M:%S")
-        data_ts_start = dt.today() - td(days=7)
+        # data_ts_end = dt.today().strftime("%Y-%m-%d %H:%M:%S")
+        # data_ts_start = dt.today() - td(days=7)
+        data_ts_end = dt(year=2019, month=1, day=12, hour=12, minute=00, second=00).strftime("%Y-%m-%d %H:%M:%S")
+        data_ts_start = dt(year=2019, month=1, day=12, hour=12, minute=00, second=00) - td(days=7)
+        print(data_ts_end, data_ts_start)
 
         plot_data = rainfall_analysis.main(site_code = site_code, end=data_ts_end, days=7)
         rain_data = json.loads(plot_data)
@@ -28,6 +31,7 @@ def fetch(site_code, internal=False):
             "message": "Success generating rain data"
         }
     except Exception as err:
+        raise(err)
         response = {
             "data": [],
             "status": False,
@@ -43,7 +47,7 @@ def fetch(site_code, internal=False):
 @RAINFALL_ANALYSIS_BLUEPRINT.route("/get/data_analysis/<site_code>/rainfall/plot_analysis", methods=["GET"])
 def fetch_status_analysis(site_code):
     response = fetch(site_code, internal=True)
-    analysis_data = None
+    analysis_data = {}
     if response["status"]:
 
         if response["data"]:
@@ -101,7 +105,8 @@ def fetch_status_analysis(site_code):
                         "1_day_threshold": one_day_threshold,
                         "3_day_threshold": three_day_threshold
                     }
-
+        else:
+            analysis_data = None
         response = {
             "data": analysis_data,
             "status": True,
