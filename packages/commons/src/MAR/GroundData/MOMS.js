@@ -249,8 +249,26 @@ const DeleteMomsInstance = (data) => {
     });
 };
 
+const FetchMOMSAnalysis = () => {
+  return fetch(`${AppConfig.HOSTNAME}/v2/delete/ground_data/moms/instance`, {
+    method: "DELETE",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      return responseJson;
+    })
+    .catch((error) => {
+      console.error("Error on deleting moms instance data. Err: ", error);
+    });  
+} 
+
 export { 
   InsertMOMSData, GetMOMSData, UpdateMOMSData, DeleteMOMSData,
   InsertMomsFeatureType, GetMomsInstancesPerType, GetMomsInstancesPerSite, UpdateMomsFeatureType, DeleteMomsFeatureType,
-  InsertMomsInstance, FetchMoMSFeatures, FetchOneMoMSFeatures, UpdateMomsInstance, DeleteMomsInstance,
+  InsertMomsInstance, FetchMoMSFeatures, FetchOneMoMSFeatures, UpdateMomsInstance, DeleteMomsInstance, FetchMOMSAnalysis,
 };

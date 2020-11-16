@@ -4,9 +4,7 @@ import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { Fab, Container, Grid, Paper, makeStyles, Typography } from "@material-ui/core";
 import moment from "moment";
-// import { getSubsurfacePlotData } from "./sample_subsurface_data_not_final";
-import TransitionalModal from '../../reducers/loading';
-import AppConfig from '../../reducers/AppConfig';
+import TransitionalModal from '../reducers/loading';
 import { useCookies } from 'react-cookie';
 import { MarDataAnalysis } from "@dynaslope/commons";
 
@@ -353,7 +351,7 @@ function prepareVelocityAlertsOption(set_data, form) {
     };
 }
 
-function SubsurfacePlot(props) {
+export default function SubsurfaceColumnPositionPlot(props) {
     const {feature} = props;
     const tsm_sensor = 'MARTA'
     const [timestamps, setTimestamps] = useState({ start: "2019-06-24 01:00:00", end: "2019-06-17 01:00:00" });
@@ -482,5 +480,3 @@ function SubsurfacePlot(props) {
         </Fragment>
     );
 }
-
-export default SubsurfacePlot;

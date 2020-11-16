@@ -158,7 +158,7 @@ class AlertGeneration():
 
         query = f"SELECT {select_option} FROM public_alert_event"
         if include_site:
-            query = f"{query} INNER JOIN {sites_db}.sites USING (site_id)"
+            query = f"{query} INNER JOIN {sites_db}.sites ON (sites.id = public_alert_event.site_id)"
         query = f"{query} WHERE status in ('on-going', 'extended')"
 
         # schema = DB.db_switcher(site_id)
@@ -176,8 +176,8 @@ class AlertGeneration():
             query = f"{query}, {sites_db}.sites.*"
         query = f"{query} FROM public_alert_event"
         if include_site:
-            query = f"{query} INNER JOIN {sites_db}.sites USING (site_id)"
-        query = f"{query} WHERE public_alert_event.event_id = {event_id}"
+            query = f"{query} INNER JOIN {sites_db}.sites sites.id = public_alert_event.site_id"
+        query = f"{query} WHERE public_alert_event.id = {event_id}"
 
         # schema = DB.db_switcher("senslopedb")
         schema = "senslopedb"
@@ -190,7 +190,7 @@ class AlertGeneration():
         Returns event row. There is an option to include site details
         """
         query = f"SELECT validity FROM public_alert_event \
-            WHERE public_alert_event.event_id = {event_id}"
+            WHERE public_alert_event.id = {event_id}"
 
         # schema = DB.db_switcher(site_id)
         schema = "senslopedb"
@@ -221,21 +221,10 @@ class AlertGeneration():
         schema = "senslopedb"
         result = DB.db_read(query, schema)
 
-        return_data = None
-        if result:
-            result = result[0]
-            if complete:
-                return_data = result
-            else:
-                return_data = {
-                    "release_id": result["release_id"], 
-                    "data_timestamp": result["data_timestamp"], 
-                    "internal_alert_level": result["internal_alert_level"], 
-                    "release_time": result["release_time"], 
-                    "reporter_id_mt": result["reporter_id_mt"]
-                }
+        if not complete:
+            result = [result[0]]
 
-        return return_data
+        return result
 
 
     def get_event_triggers(event_id, sort_order="desc", return_count=None, complete=False):
@@ -256,23 +245,10 @@ class AlertGeneration():
         schema = "senslopedb"
         result = DB.db_read(query, schema)
 
-        temp_list = []
-        if result:
-            for trig in result:
-                temp_dict = None
-                if complete:
-                    temp_dict = trig
-                else:
-                    temp_dict = {
-                        "trigger_id": trig["trigger_id"],
-                        "release_id": trig["release_id"],
-                        "trigger_type": trig["trigger_type"],
-                        "timestamp": trig["timestamp"],
-                        "info": trig["info"]
-                    }
-                temp_list.append(temp_dict)
-
-        return temp_list
+        if not complete:
+            result = [result[0]]
+    
+        return result
 
 
     def get_release_triggers(release_id, sort_order="desc", return_count=None, complete=False):
@@ -322,14 +298,6 @@ class AlertGeneration():
             return_data = result[0][return_col]
         else:
             return_data = result[0]
-            # temp = result[0]
-            # return_data = {
-            #     "pub_sym_id": temp[0],
-            #     "alert_symbol": temp[1],
-            #     "alert_level": temp[2],
-            #     "alert_type": temp[3],
-            #     "recommended_response": temp[4]
-            # }
 
         return return_data
 
@@ -347,26 +315,13 @@ class AlertGeneration():
         query = f"SELECT {select_option} FROM " + \
                 "senslopedb.internal_alert_symbols ias " + \
             "INNER JOIN " + \
-                "operational_trigger_symbols ots USING (trigger_sym_id) " + \
+                "operational_trigger_symbols ots ON (ots.id = ias.trigger_sym_id" + \
             "INNER JOIN " + \
-                "trigger_hierarchies th USING (source_id)"
+                "trigger_hierarchies th ON (th.id = ots.source_id)"
 
         schema = "senslopedb"
         result = DB.db_read(query, schema)
 
-        # result_list = []
-        # for row in result:
-        #     result_list.append({
-        #         "trigger_sym_id": row[0],
-        #         "internal_sym_id": row[1],
-        #         "ias_symbol": row[2],
-        #         "ots_symbol": row[3],
-        #         "alert_description": row[4],
-        #         "alert_level": row[5],
-        #         "trigger_source": row[6]
-        #     })
-
-        # return result_list
         return result
 
 
@@ -374,7 +329,7 @@ class AlertGeneration():
         """
         Util miniquery
         """
-        select_option = f"internal_sym_id, \
+        select_option = f"id, \
                     ias.trigger_sym_id, \
                     ias.alert_symbol as ias_symbol, \
                     ots.alert_symbol as ots_symbol, \
@@ -386,9 +341,9 @@ class AlertGeneration():
         query = f"SELECT {select_option} FROM " + \
                 "senslopedb.internal_alert_symbols ias " + \
             "INNER JOIN " + \
-                "operational_trigger_symbols ots USING (trigger_sym_id) " + \
+                "operational_trigger_symbols ots ON (ots.id = ias.trigger_sym_id) " + \
             "INNER JOIN " + \
-                "trigger_hierarchies th USING (source_id)"
+                "trigger_hierarchies th ON (th.id = ots.source_id)"
 
         query = f"{query} WHERE trigger_source = '{trigger_source}' "
         query = f"{query} AND alert_level = {alert_level}"
@@ -407,7 +362,7 @@ class AlertGeneration():
         """
         Util miniquery
         """
-        select_option = f"internal_sym_id, \
+        select_option = f"id, \
                     ias.trigger_sym_id, \
                     ias.alert_symbol as ias_symbol, \
                     ots.alert_symbol as ots_symbol, \
@@ -424,9 +379,9 @@ class AlertGeneration():
         query = f"SELECT {select_option} FROM " + \
                 "senslopedb.internal_alert_symbols ias " + \
             "INNER JOIN " + \
-                "operational_trigger_symbols ots USING (trigger_sym_id) " + \
+                "operational_trigger_symbols ots ON (ots.id = ias.trigger_sym_id) " + \
             "INNER JOIN " + \
-                "trigger_hierarchies th USING (source_id)"
+                "trigger_hierarchies th ON (th.id = ots.source_id)"
 
         if trigger_type:
             query = f"{query} WHERE BINARY ias.alert_symbol = '{trigger_type}'"
@@ -460,7 +415,7 @@ class AlertGeneration():
         if return_col:
             select_option = return_col
         query = f"SELECT {select_option} FROM operational_trigger_symbols as ots "
-        query += "INNER JOIN trigger_hierarchies as th USING (source_id) "
+        query += "INNER JOIN trigger_hierarchies as th ON (th.id = ots.source_id) "
         query += f"WHERE th.trigger_source = '{trigger_source}' "
         query += f"AND ots.alert_level = {alert_level}"
 

@@ -1,12 +1,11 @@
 import React, { useState, useEffect,Fragment } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import TransitionalModal from '../../reducers/loading';
+import TransitionalModal from '../reducers/loading';
 import moment from "moment";
 import {
     Grid, Paper, Container, Fab, makeStyles, Typography
 } from "@material-ui/core";
-import AppConfig from "../../reducers/AppConfig";
 import { useCookies } from 'react-cookie';
 import { MarDataAnalysis } from "@dynaslope/commons";
 

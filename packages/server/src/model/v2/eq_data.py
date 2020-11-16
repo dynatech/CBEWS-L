@@ -47,9 +47,9 @@ class Earthquake():
 			FROM
 				earthquake_events
 					INNER JOIN
-				earthquake_alerts USING (eq_id)
+				earthquake_alerts ON (earthquake_alerts.eq_id = earthquake_events.id)
 					INNER JOIN
-				cbewsl_commons_db.sites USING (site_id)
+				cbewsl_commons_db.sites ON (cbewsl_commons_db.sites.id = earthquake_alerts.site_id)
 			WHERE
 				site_id = {site_id}
 			ORDER BY ts

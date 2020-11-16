@@ -17,7 +17,7 @@ def main():
     mo = db.df_read(query)
     query = "SELECT * FROM marker_data"
     md = db.df_read(query)
-    query = "SELECT ma_id, ts, marker_id FROM marker_alerts"
+    query = "SELECT id as ma_id, ts, marker_id FROM marker_alerts"
     ma = db.df_read(query)
     
     marker_alerts = pd.merge(ma, markers, on='marker_id', validate='m:1')
@@ -31,7 +31,7 @@ def main():
     # delete marker_alerts not in marker_observations and duplicated marker_alerts
     ma_id = set(ma['ma_id']) - set(marker_alerts['ma_id'])
     if len(ma_id) != 0:
-        query = 'DELETE FROM marker_alerts WHERE ma_id in %s' %str(tuple(ma_id))
+        query = 'DELETE FROM marker_alerts WHERE id in %s' %str(tuple(ma_id))
         qdb.execute_query(query)
     
     try:

@@ -13,8 +13,25 @@ const GetRainfallPlotData = () => {
         return responseJson;
     })
     .catch((error) => {
-        console.error("Error on fetching all surficial markers data. Err: ", error);
+        console.error("Error on fetching rainfall plot data. Err: ", error);
     });
 };
 
-export { GetRainfallPlotData }
+const GetRainfallAnalysis = () => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/get/data_analysis/mar/rainfall/plot_analysis`, {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        console.error("Error on fetching rainfall analysis. Err: ", error);
+    });
+}
+
+export { GetRainfallPlotData, GetRainfallAnalysis }

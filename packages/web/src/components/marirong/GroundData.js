@@ -48,7 +48,7 @@ export default function GroundData(props) {
     return (
         <Fragment>
             <Container maxWidth="xl" className={classes.root} spacing={24}>
-                <Grid container alignItems="center" justify="center">
+                <Grid container alignItems="flex-start" justify="center">
                     <Grid item xs={3}>
                         <Grid container direction="column" className={classes.menuContainer}>
                             <Grid item={true} xs={3} style={{ marginTop: '15%' }} />

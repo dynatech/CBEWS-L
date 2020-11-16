@@ -1,6 +1,7 @@
 import React, { useState, Fragment } from 'react';
 import { Container, Grid, Fab } from '@material-ui/core';
-import SurficialMarkers from './GroundData/SurficialMarkers';
+import RainfallPlot from '../charts/RainfallPlot';
+import SubsurfacePlots from '../charts/SubsurfacePlots';
 import MoMs from './GroundData/MOMS';
 import EarthquakeData from './SensorData/EarthquakeData';
 import { useStyles } from '../../styles/general_styles';
@@ -9,7 +10,7 @@ export default function SensorData(props) {
     // const { classes } = props;
     const classes = useStyles();
 
-    const [feature, setFeature] = useState([<SurficialMarkers />]);
+    const [feature, setFeature] = useState([<RainfallPlot feature="instantanous" />]);
     const [rp, rpActive] = useState("primary");
     const [sfp, sfpActive] = useState("");
     const [sbp, sbpActive] = useState("");
@@ -17,19 +18,19 @@ export default function SensorData(props) {
     function handleFeatureNav(feature) {
         let return_feat = []
         switch (feature) {
-            case "surficial_marker":
+            case "rainfall":
                 rpActive("primary");
                 sfpActive("");
                 sbpActive("");
-                return_feat = [<SurficialMarkers />];
+                return_feat = [<RainfallPlot feature="instantanous" />];
                 break;
-            case "moms":
+            case "subsurface":
                 sfpActive("primary");
                 rpActive("");
                 sbpActive("");
-                return_feat = [<MoMs />];
+                return_feat = [<SubsurfacePlots feature="data_analysis" />];
                 break;
-            case "od_monitoring":
+            case "eq_data":
                 sfpActive("");
                 rpActive("");
                 sbpActive("primary");
@@ -39,7 +40,7 @@ export default function SensorData(props) {
                 rpActive("primary")
                 sfpActive("");
                 sbpActive("");
-                return_feat = [<SurficialMarkers />];
+                return_feat = [<RainfallPlot feature="instantanous" />];
                 break;
         }
         setFeature(return_feat);
@@ -48,7 +49,7 @@ export default function SensorData(props) {
     return (
         <Fragment>
             <Container maxWidth="xl" className={classes.root} spacing={24}>
-                <Grid container alignItems="center" justify="center">
+                <Grid container alignItems="flex-start" justify="center">
                     <Grid item xs={3}>
                         <Grid container direction="column" className={classes.menuContainer}>
                             <Grid item={true} xs={3} style={{ marginTop: '15%' }} />
@@ -57,7 +58,7 @@ export default function SensorData(props) {
                                     color={rp}
                                     aria-label="add"
                                     className={classes.menu}
-                                    onClick={()=>{handleFeatureNav("surficial_marker")}}>
+                                    onClick={()=>{handleFeatureNav("rainfall")}}>
                                     RAINFALL DATA PRESENCE
                                 </Fab>
                             </Grid>
@@ -66,7 +67,7 @@ export default function SensorData(props) {
                                     color={sfp}
                                     aria-label="add"
                                     className={classes.menu}
-                                    onClick={()=>{handleFeatureNav("moms")}}>
+                                    onClick={()=>{handleFeatureNav("subsurface")}}>
                                     SUBSURFACE NODES DATA
                                 </Fab>
                             </Grid>
@@ -75,7 +76,7 @@ export default function SensorData(props) {
                                     color={sbp}
                                     aria-label="add"
                                     className={classes.menu}
-                                    onClick={()=>{handleFeatureNav("od_monitoring")}}>
+                                    onClick={()=>{handleFeatureNav("eq_data")}}>
                                     EARTHQUAKE DATA
                                 </Fab>
                             </Grid>

@@ -38,31 +38,101 @@ class GroundData():
 
 
     def fetch_surficial_mo_id(ts, site_id):
-        query = f'SELECT mo_id FROM senslopedb.marker_observations WHERE ts = "{ts}" and site_id = "{site_id}" limit 1;'
+        query = f'SELECT id FROM senslopedb.marker_observations WHERE ts = "{ts}" and site_id = "{site_id}" limit 1;'
         result = DB.db_read(query, 'senslopedb')
         return result
 
 
     def fetch_marker_ids_v_moid(mo_id):
         query = f'SELECT marker_id, marker_name FROM senslopedb.marker_data ' \
-            f'INNER JOIN senslopedb.marker_names ON marker_id = name_id where mo_id = "{mo_id}";'
+            f'INNER JOIN senslopedb.marker_names ON (marker_id = id) where mo_id = "{mo_id}";'
         result = DB.db_read(query, 'senslopedb')
         return result
 
 
     def fetch_surficial_data(site_id):
         query = f'SELECT ts, measurement, marker_name, observer_name, weather ' \
-                f'FROM senslopedb.site_markers INNER JOIN ' \
-                f'cbewsl_commons_db.sites USING (site_id) INNER JOIN ' \
-                f'senslopedb.marker_data USING (marker_id) INNER JOIN senslopedb.marker_observations USING (mo_id) ' \
+                f'FROM senslopedb.site_markers sm INNER JOIN ' \
+                f'cbewsl_commons_db.sites s ON (s.id = sm.site_id) INNER JOIN ' \
+                f'senslopedb.marker_data md ON (md.marker_id = site_markers,marker_id) INNER JOIN senslopedb.marker_observations mo ON (mo.id = md.mo_id) ' \
                 f'WHERE sites.site_id = "{site_id}" ORDER BY ts desc limit 100;'
         result = DB.db_read(query, 'senslopedb')
         return result
 
 
+    def fetch_latest_surficial_data(site_id):
+        query = f"""
+            SELECT 
+                *
+            FROM
+                marker_observations
+            WHERE
+                site_id = {site_id}
+            ORDER BY ts DESC
+            LIMIT 1;
+        """
+        result = []
+        mo_result = DB.db_read(query, 'senslopedb')
+        if mo_result:
+            mo_id = mo_result[0]["mo_id"]
+            query = f"""
+                SELECT 
+                    marker_name, measurement
+                FROM
+                    marker_data md
+                        JOIN
+                    site_markers sm ON (sm.marker_id = md.marker_id)
+                WHERE
+                    mo_id = {mo_id}; 
+            """
+            result = DB.db_read(query, 'senslopedb')
+
+            if result:
+                temp = []
+                for item in result:
+                    stuff = (item["marker_name"], item["measurement"])
+                    temp.append(stuff)
+                
+                result = [{
+                    "data_list": temp,
+                    "ts": mo_result[0]["ts"],
+                    "observer_name": mo_result[0]["observer_name"],
+                    "weather": mo_result[0]["weather"],
+                    "data_source": mo_result[0]["data_source"]
+                }]
+            else:
+                raise ValueError("Database inconsistent. MO has no corresponding marker data.")
+
+        return result
+
+
+    def fetch_surficial_operational_trigger(site_id, latest_ts):
+        query = f"""
+            SELECT 
+                ot.site_id,
+                ot.ts_updated as ts,
+                ots.alert_symbol,
+                ots.alert_description
+            FROM
+                operational_triggers ot
+                    JOIN
+                operational_trigger_symbols ots ON (ots.id = ot.trigger_sym_id)
+                    JOIN
+                trigger_hierarchies th ON (th.id = ots.source_id)
+            WHERE
+                ot.site_id = {site_id}
+            AND
+                ot.ts_updated = "{latest_ts}"
+            AND
+                th.trigger_source = "surficial"
+        """
+        result = DB.db_read(query, 'senslopedb')
+        return result
+
+
     def fetch_surficial_plot_data(marker_id, site_code, start, end):
-        query = f'SELECT mo_id, data_id, marker_id, ts as x, measurement as y FROM senslopedb.marker_data INNER ' \
-                f'JOIN marker_observations USING (mo_id) WHERE (ts BETWEEN "{start}" AND "{end}") and marker_id = {marker_id} ' \
+        query = f'SELECT mo_id, id, marker_id, ts as x, measurement as y FROM senslopedb.marker_data md INNER ' \
+                f'JOIN marker_observations  mo ON (mo.id = md.mo_id) WHERE (ts BETWEEN "{start}" AND "{end}") and marker_id = {marker_id} ' \
                 'order by ts asc;'
         result = DB.db_read(query, 'senslopedb')
         return result
@@ -70,8 +140,8 @@ class GroundData():
 
     def fetch_surficial_markers(site_id):
         query = f'SELECT marker_id, marker_name ' \
-            f'FROM senslopedb.site_markers INNER JOIN cbewsl_commons_db.sites USING (site_id) ' \
-            f'WHERE sites.site_id = "{site_id}" ORDER BY marker_name;'
+            f'FROM senslopedb.site_markers sm INNER JOIN cbewsl_commons_db.sites s ON (s.id = sm.site_id) ' \
+            f'WHERE sites.id = "{site_id}" ORDER BY marker_name;'
         result = DB.db_read(query, 'senslopedb')
         return result
 
@@ -100,7 +170,7 @@ class GroundData():
             if 'mo_id' in surficial_data:
                 mo_id = surficial_data['mo_id']
                 site_id = surficial_data['site_id']
-                query = f'DELETE FROM marker_observations WHERE mo_id="{mo_id}" AND site_id="{site_id}'
+                query = f'DELETE FROM marker_observations WHERE id="{mo_id}" AND site_id="{site_id}'
             else:
                 ts = surficial_data['ts']
                 weather = surficial_data['weather']
@@ -108,7 +178,7 @@ class GroundData():
                 site_id = surficial_data['site_id']
                 query = f'DELETE FROM marker_observations WHERE ts="{ts}" ' \
                         f'AND weather="{weather}" AND observer_name="{observer}" AND site_id = "{site_id}" ' \
-                        'AND IFNULL(mo_id, 0) = LAST_INSERT_ID(mo_id);'
+                        'AND IFNULL(id, 0) = LAST_INSERT_ID(id);'
             mo_status = DB.db_modify(query, 'senslopedb', True)
             if mo_status is None:
                 result = {"status": True, "mo_id": mo_id}
@@ -229,7 +299,7 @@ class GroundData():
 
     def fetch_moms_features():
         try:
-            query = 'SELECT feature_id, feature_type FROM moms_features'
+            query = 'SELECT id, feature_type FROM moms_features'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -240,7 +310,7 @@ class GroundData():
 
     def fetch_moms_features_by_type(f_type):
         try:
-            query = f'SELECT feature_id, feature_type, description FROM moms_features WHERE feature_type = "{f_type}"'
+            query = f'SELECT id, feature_type, description FROM moms_features WHERE feature_type = "{f_type}"'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -254,7 +324,7 @@ class GroundData():
             Returns {"feature_id": <feature_id value>} of searched feature type
         """
         try:
-            query = f"SELECT feature_id FROM moms_features WHERE feature_type = '{feature_type}'"
+            query = f"SELECT id FROM moms_features WHERE feature_type = '{feature_type}'"
             feature_id = DB.db_read(query, 'senslopedb')
         except Exception as err:
             raise(err)
@@ -270,13 +340,13 @@ class GroundData():
                 FROM
                     moms_instances
                         INNER JOIN
-                    monitoring_moms USING (instance_id)
+                    monitoring_moms ON (monitoring_moms.instance_id = moms_instances.id)
                         INNER JOIN
-                    moms_features USING (feature_id)
+                    moms_features ON (moms_features.id = monitoring_moms.feature_id)
                         INNER JOIN
-                    cbewsl_commons_db.user_accounts AS users ON users.user_id = monitoring_moms.reporter_id 
+                    cbewsl_commons_db.user_accounts AS users ON users.id = monitoring_moms.reporter_id 
                         INNER JOIN
-                    cbewsl_commons_db.user_profiles AS user_prof ON user_prof.profile_id = users.profile_id
+                    cbewsl_commons_db.user_profiles AS user_prof ON user_prof.id = users.profile_id
                 WHERE
                     moms_instances.site_id = {site_id}
                 ORDER BY observance_ts DESC;
@@ -292,7 +362,7 @@ class GroundData():
 
     def fetch_moms_by_moms_id(moms_id):
         try:
-            query = f'SELECT * FROM monitoring_moms WHERE moms_id = {moms_id}'
+            query = f'SELECT * FROM monitoring_moms WHERE id = {moms_id}'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -303,7 +373,7 @@ class GroundData():
 
     def fetch_moms_instance_by_instance_id(instance_id):
         try:
-            query = f'SELECT * FROM moms_instances WHERE instance_id = {instance_id}'
+            query = f'SELECT * FROM moms_instances WHERE id = {instance_id}'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -354,6 +424,35 @@ class GroundData():
                 "message": f"Failed to fetch moms instance. => {err}"}
         finally:
             return result
+    
+
+    def fetch_latest_moms(site_id):
+        query = f"""
+            SELECT 
+                site_code,
+                observance_ts,
+                feature_type,
+                feature_name,
+                remarks,
+                reporter,
+                location
+            FROM
+                monitoring_moms
+                    JOIN
+                moms_instances ON (moms_instances.id = monitoring_moms.instance_id)
+                    JOIN
+                moms_features ON (moms_features.id = moms_instances.feature_id)
+                    JOIN
+                cbewsl_commons_db.sites ON (cbewsl_commons_db.sites.id = moms_instances.site_id)
+            WHERE
+                site_id = {site_id}
+            ORDER BY observance_ts DESC
+            LIMIT 1;
+        """
+
+        result = DB.db_read(query, 'senslopedb')
+
+        return result
 
 
     def update_moms_instance(data):
@@ -438,7 +537,7 @@ class GroundData():
 
     def delete_moms_observation(moms_id):
         try:
-            query = f'DELETE FROM monitoring_moms WHERE moms_id = {moms_id}'
+            query = f'DELETE FROM monitoring_moms WHERE id = {moms_id}'
             update_status = DB.db_modify(query, 'senslopedb', True)
             result = {"status": True,
                 "data": update_status, "message": "Success"}
@@ -451,7 +550,7 @@ class GroundData():
 
     def delete_moms_feature(feature_id):
         try:
-            query = f'DELETE FROM moms_features WHERE feature_id = {feature_id}'
+            query = f'DELETE FROM moms_features WHERE id = {feature_id}'
             update_status = DB.db_modify(query, 'senslopedb', True)
             result = {"status": True, "data": update_status, "message": "Success"}
         except Exception as err:
@@ -463,7 +562,7 @@ class GroundData():
 
     def delete_moms_instance(instance_id):
         try:
-            query = f'DELETE FROM moms_instances WHERE instance_id = {instance_id}'
+            query = f'DELETE FROM moms_instances WHERE id = {instance_id}'
             update_status = DB.db_modify(query, 'senslopedb', True)
             result = {"status": True, "data": update_status, "message": "Success"}
         except Exception as err:
@@ -485,20 +584,6 @@ class GroundData():
 
         od_data = DB.db_read(query, 'senslopedb')
 
-        # return_list = []
-        # if od_data:
-        #     return_list = []
-        #     for row in od_data:
-        #         return_list.append({
-        #             "id": row[0],
-        #             "ts": Helpers.dt_to_str(row[1]),
-        #             "site_id": row[2],
-        #             "reason": row[3],
-        #             "reporter": row[4],
-        #             "alert_level": row[5]
-        #         })
-
-        # return return_list
         return od_data
 
 

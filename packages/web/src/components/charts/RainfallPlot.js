@@ -9,15 +9,9 @@ import {
     TableRow, Typography
 } from "@material-ui/core";
 // import { sample_rain_data } from "./sample_rain_data._not_final";
-import TransitionalModal from '../../reducers/loading';
-import {
-    MuiPickersUtilsProvider,
-    KeyboardDatePicker,
-} from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
-import AppConfig from "../../reducers/AppConfig";
 import { useCookies } from 'react-cookie';
 import { MarDataAnalysis } from "@dynaslope/commons";
+import { UmiDataAnalysis } from "@dynaslope/commons";
 
 require("highcharts/modules/exporting")(Highcharts);
 
@@ -315,6 +309,10 @@ export default function RainfallPlot(props) {
     }, [])
 
     const initRainfall = async () => {
+        let func
+        if (cookies.credentials.site_code === "mar") {
+            func = MarDataAnalysis
+        }
         const response = await MarDataAnalysis.GetRainfallPlotData();
         if (response.status === true) {
             let rainfall_data = response.data[0];

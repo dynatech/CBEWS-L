@@ -114,10 +114,10 @@ def get_site_moms_alerts(site_id, start, end):
 
     query = "SELECT * FROM senslopedb.monitoring_moms as moms"
     query = f"{query} JOIN senslopedb.moms_instances as mi"
-    query = f"{query} ON moms.instance_id = mi.instance_id"
+    query = f"{query} ON moms.instance_id = mi.id"
     query = f"{query} JOIN cbewsl_commons_db.sites as site"
-    query = f"{query} ON mi.site_id = site.site_id"
-    query = f"{query} WHERE site.site_id = {site_id}"
+    query = f"{query} ON mi.site_id = site.id"
+    query = f"{query} WHERE site.id = {site_id}"
     query = f"{query} AND moms.observance_ts >= '{start}'"
     query = f"{query} AND moms.observance_ts <= '{end}'"
     query = f"{query} ORDER BY moms.observance_ts DESC"
@@ -138,7 +138,7 @@ def get_public_symbols():
     """Dataframe containing public alert level and its corresponding symbol.
     """
 
-    query = "SELECT * FROM public_alert_symbols"
+    query = "SELECT *, id as pub_sym_id FROM public_alert_symbols"
 
     public_symbols = qdb.get_db_dataframe(query)
     public_symbols = public_symbols.sort_values(['alert_type', 'alert_level'],
@@ -150,21 +150,27 @@ def get_internal_symbols():
     """Dataframe containing trigger alert level, source and, 
     hierarchy in writing its symbol in internal alert
     """
-
-    query =  "SELECT trigger_sym_id, trig.source_id, trigger_source, "
-    query += "alert_level, alert_symbol, hierarchy_id FROM ( "
-    query += "  SELECT op.trigger_sym_id, source_id, alert_level, "
-    query += "  inte.alert_symbol FROM "
-    query += "    internal_alert_symbols AS inte "
-    query += "  INNER JOIN "
-    query += "	 operational_trigger_symbols AS op "
-    query += "  ON op.trigger_sym_id = inte.trigger_sym_id "
-    query += "  ) AS sub "
-    query += "INNER JOIN "
-    query += "  trigger_hierarchies AS trig "
-    query += "ON trig.source_id = sub.source_id "
-    query += "ORDER BY hierarchy_id"
-    
+    query =  """
+        SELECT 
+            trigger_sym_id,
+            source_id,
+            trigger_source,
+            alert_level,
+            alert_symbol,
+            hierarchy_id
+        FROM
+            (SELECT 
+                op.id AS trigger_sym_id,
+                    source_id,
+                    alert_level,
+                    inte.alert_symbol
+            FROM
+                internal_alert_symbols AS inte
+            INNER JOIN operational_trigger_symbols AS op ON op.id = inte.trigger_sym_id) AS sub
+                INNER JOIN
+            trigger_hierarchies AS trig ON trig.id = sub.source_id
+        ORDER BY hierarchy_id
+    """
     internal_symbols = qdb.get_db_dataframe(query)
     
     return internal_symbols
@@ -174,12 +180,12 @@ def get_trigger_symbols():
     its corresponding id/symbol.
     """
 
-    query =  "SELECT trigger_sym_id, alert_level, alert_symbol, "
+    query =  "SELECT op.id as trigger_sym_id, alert_level, alert_symbol, "
     query += "op.source_id, trigger_source FROM "
     query += "  operational_trigger_symbols AS op "
     query += "INNER JOIN "
     query += "  trigger_hierarchies AS trig "
-    query += "ON op.source_id = trig.source_id"
+    query += "ON op.source_id = trig.id"
     
     trig_symbols = qdb.get_db_dataframe(query)
     
@@ -219,7 +225,7 @@ def event_start(site_id, end):
     query += "INNER JOIN "
     query += "  (SELECT * FROM public_alert_symbols "
     query += "  WHERE alert_type = 'event') AS sym "
-    query += "ON pub.pub_sym_id = sym.pub_sym_id "
+    query += "ON pub.pub_sym_id = sym.id "
     query += "ORDER BY ts DESC LIMIT 3"
     
     # previous positive alert
@@ -279,7 +285,7 @@ def get_monitoring_type(site_id, end):
     query += "  ) AS pub "
     query += "INNER JOIN "
     query += "  public_alert_symbols AS sym "
-    query += "ON pub.pub_sym_id = sym.pub_sym_id"
+    query += "ON pub.pub_sym_id = sym.id"
             
     monitoring_type = qdb.get_db_dataframe(query)['alert_type'].values[0]
     
@@ -300,7 +306,7 @@ def get_operational_trigger(site_id, start_monitor, end):
                    start of monitoring
     """
 
-    query =  "SELECT op.trigger_id, op.trigger_sym_id, ts, site_id, source_id, alert_level, "
+    query =  "SELECT op.id as trigger_id, op.trigger_sym_id, ts, site_id, source_id, alert_level, "
     query += "alert_symbol, ts_updated FROM"
     query += "  (SELECT * FROM operational_triggers "
     query += "  WHERE site_id = %s" %site_id
@@ -308,7 +314,7 @@ def get_operational_trigger(site_id, start_monitor, end):
     query += "  ) AS op "
     query += "INNER JOIN "
     query += "  operational_trigger_symbols AS sym "
-    query += "ON op.trigger_sym_id = sym.trigger_sym_id "
+    query += "ON op.trigger_sym_id = sym.id "
     query += "ORDER BY ts DESC"
 
     op_trigger = qdb.get_db_dataframe(query)
@@ -417,7 +423,7 @@ def get_tsm_alert(site_id, end):
     query += "    ORDER BY ts DESC "
     query += "    ) AS alert "
     query += "  INNER JOIN "
-    query += "    (SELECT tsm_id, tsm_name FROM tsm_sensors "
+    query += "    (SELECT id as tsm_id, tsm_name FROM tsm_sensors "
     query += "    WHERE site_id = %s " %site_id
     query += "    ) AS tsm "
     query += "  ON tsm.tsm_id = alert.tsm_id) "
@@ -428,7 +434,7 @@ def get_tsm_alert(site_id, end):
     query += "    operational_trigger_symbols "
     query += "    ) AS sym "
     query += "  INNER JOIN "
-    query += "    (SELECT source_id FROM trigger_hierarchies "
+    query += "    (SELECT id as source_id FROM trigger_hierarchies "
     query += "    WHERE trigger_source = 'subsurface' "
     query += "    ) AS hier "
     query += "  ON hier.source_id = sym.source_id "
@@ -488,7 +494,7 @@ def replace_rainfall_alert_if_rx(internal_df, internal_symbols, site_id,
 def query_current_events(end):
     query = "SELECT PA.ts, PA.ts_updated, PA.site_id, PAS.alert_symbol FROM public_alerts as PA "
     query += "  JOIN public_alert_symbols as PAS "
-    query += "    ON PA.pub_sym_id = PAS.pub_sym_id "
+    query += "    ON PA.pub_sym_id = PAS.id "
     query += "    WHERE PAS.alert_level > 0 "
     query += "    AND ts_updated >= '%s' " %end
     query += "    ORDER BY ts DESC "
@@ -498,8 +504,11 @@ def query_current_events(end):
     return current_events
 
 def get_alert_history(current_events):
+    print("PASOK")
     site_id = current_events['site_id'].values[0]
+    print("PASOK2")
     start_ts = current_events['ts'].values[0]
+    print("PASOK3")
     public_alert_symbols = current_events['alert_symbol'].values[0]
     
     query = "SELECT CONCAT(cdb.firstname, ' ', cdb.lastname) as iomp, " 
@@ -507,23 +516,25 @@ def get_alert_history(current_events):
     query += "ALS.remarks, TH.trigger_source, ALS.alert_status, PAS.alert_symbol as public_alert_symbol, ALS.trigger_id as trigger_id "
     query += "FROM alert_status as ALS "
     query += "  JOIN operational_triggers as OT "
-    query += "    ON ALS.trigger_id = OT.trigger_id "
+    query += "    ON ALS.trigger_id = OT.id "
     query += "      JOIN cbewsl_commons_db.sites "
-    query += "      ON sites.site_id = OT.site_id " 
+    query += "      ON sites.id = OT.site_id " 
     query += "      JOIN operational_trigger_symbols as OTS "
-    query += "      ON OT.trigger_sym_id = OTS.trigger_sym_id " 
+    query += "      ON OT.trigger_sym_id = OTS.id " 
     query += "      JOIN trigger_hierarchies as TH "
-    query += "      ON OTS.source_id = TH.source_id "
+    query += "      ON OTS.source_id = TH.id "
     query += "      JOIN cbewsl_commons_db.user_profiles as cdb "
-    query += "      ON ALS.user_id = cdb.profile_id "
+    query += "      ON ALS.user_id = cdb.id "
     query += "      JOIN public_alerts as PA"
     query += "      ON PA.site_id = OT.site_id"
     query += "      JOIN public_alert_symbols as PAS "
-    query += "      ON PA.pub_sym_id = PAS.pub_sym_id "
+    query += "      ON PA.pub_sym_id = PAS.id "
     query += "WHERE OT.site_id = '%s' " %site_id
     query += "AND OT.ts >= '%s' " %start_ts
     query += "AND PAS.alert_symbol = '%s' " %public_alert_symbols
     query += "ORDER BY OT.ts DESC"
+
+    print(query)
     
     current_events_history = qdb.get_db_dataframe(query)
     
@@ -531,8 +542,7 @@ def get_alert_history(current_events):
 
 def get_site_dynamic_variables(site_id):
     query = "SELECT * FROM cbewsl_commons_db.dynamic_variables WHERE "
-    query = f"{query} fk_site_id={site_id}" 
-
+    query = f"{query} fk_site_id={site_id}"
     dynamic_variables = qdb.get_db_dataframe(query)
 
     return dynamic_variables
@@ -703,9 +713,13 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
             ground_alert = 0
 
         if public_alert == 0 or ground_alert == -1:
+            shet = internal_symbols[(internal_symbols.alert_level == \
+                             ground_alert) & (internal_symbols.source_id == \
+                             internal_id)]
             pub_internal = internal_symbols[(internal_symbols.alert_level == \
                              ground_alert) & (internal_symbols.source_id == \
                              internal_id)]['alert_symbol'].values[0]
+            
             if public_alert == 0:
                 internal_alert = ''
                 hyphen = ''
@@ -885,7 +899,7 @@ def main(end=datetime.now()):
     
     # LOUIE
     # site id and code
-    query = "SELECT site_id, site_code FROM cbewsl_commons_db.sites WHERE active = 1"
+    query = "SELECT id as site_id, site_code FROM cbewsl_commons_db.sites WHERE active = 1"
     props = qdb.get_db_dataframe(query)
     site_props = props.groupby('site_id', as_index=False)
     alerts = site_props.apply(site_public_alert, end=end,
@@ -906,7 +920,6 @@ def main(end=datetime.now()):
     # map invalid alerts
     current_events = query_current_events(end)
     current_alerts = current_events.apply(get_alert_history)
-
     columns = ['iomp', 'site_code', 'alert_symbol', 'ts_last_retrigger', 'alert_level', 'remarks', 'trigger_source', 'alert_status', 'public_alert_symbol', 'trigger_id']
     invalid_alerts = pd.DataFrame(columns=columns)
     try:
