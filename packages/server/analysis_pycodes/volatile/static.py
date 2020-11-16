@@ -205,13 +205,13 @@ def get_mobiles(table=None,host=None,reset_variables=False,resource=None):
 
         print ("Force reset logger mobiles in memory")
 
-        query = ("SELECT t1.mobile_id, t1.sim_num, t1.gsm_id "
+        query = ("SELECT t1.id, t1.sim_num, t1.gsm_id "
             "FROM logger_mobile AS t1 "
             "LEFT OUTER JOIN logger_mobile AS t2 "
             "ON t1.sim_num = t2.sim_num "
             "AND (t1.date_activated < t2.date_activated "
             "OR (t1.date_activated = t2.date_activated "
-            "AND t1.mobile_id < t2.mobile_id)) "
+            "AND t1.id < t2.id)) "
             "WHERE t2.sim_num IS NULL and t1.sim_num is not null")
 
         nums = dbio.read(query=query, identifier='get_mobile_sim_nums', 
@@ -233,7 +233,7 @@ def get_mobiles(table=None,host=None,reset_variables=False,resource=None):
 
         print ("Force reset user mobiles in memory")
         
-        query = "select mobile_id, sim_num, gsm_id from user_mobile"
+        query = "select id, sim_num, gsm_id from user_mobile"
 
         nums = dbio.read(query=query, identifier='get_mobile_sim_nums', 
             host=host, resource=resource)
@@ -280,14 +280,14 @@ def get_surficial_markers(host = None, from_memory = True):
         host = sc["resource"]["datadb"]
 
     query = ("select m2.marker_id, m3.marker_name, m4.site_id from "
-        "(select max(history_id) as history_id, "
+        "(select max(id) as history_id, "
         "marker_id from marker_history as m1 "
         "group by m1.marker_id "
         ") as m2 "
         "inner join marker_names as m3 "
         "on m2.history_id = m3.history_id "
         "inner join markers as m4 "
-        "on m2.marker_id = m4.marker_id ")
+        "on m2.marker_id = m4.id ")
 
     engine = dbio.connect(resource="sensor_data",conn_type=0)
     surficial_markers = psql.read_sql_query(query, engine)
@@ -313,7 +313,7 @@ def get_surficial_parser_reply_messages():
     query = "select * from surficial_parser_reply_messages"
     
     df = get_db_dataframe(query)
-    df = df.set_index("msg_id")
+    df = df.set_index("id")
 
     return df
 

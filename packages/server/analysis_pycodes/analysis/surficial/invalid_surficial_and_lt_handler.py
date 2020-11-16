@@ -61,18 +61,18 @@ def get_valid_cotriggers(site_id, public_ts_start):
 
 def get_surficial_trigger(start_ts, end_ts):
     query =  "SELECT "
-    query += "  ot.trigger_id, ot.ts, ot.site_id, als.alert_status, "
+    query += "  ot.id as trigger_id, ot.ts, ot.site_id, als.alert_status, "
     query += "  ot.ts_updated, ot.trigger_sym_id, ots.alert_symbol, "
-    query += "  ots.alert_level, pas.pub_sym_id, sites.site_code "
+    query += "  ots.alert_level, pas.id as pub_sym_id, sites.site_code "
     query += "FROM operational_triggers AS ot "
     query += "JOIN operational_trigger_symbols AS ots"
     query += "  ON ot.trigger_sym_id = ots.trigger_sym_id "
     query += "JOIN public_alert_symbols AS pas"
     query += "  ON ots.alert_level = pas.alert_level "
     query += "JOIN alert_status AS als"
-    query += "  ON ot.trigger_id = als.trigger_id "
+    query += "  ON ot.id = als.trigger_id "
     query += "JOIN sites "
-    query += "  ON ot.site_id = sites.site_id "
+    query += "  ON ot.site_id = sites.id "
     query += "WHERE "
     query += "  (ts >= '%s' AND ts_updated <= '%s') " %(start_ts, end_ts) 
     query += "  AND source_id = 2 "

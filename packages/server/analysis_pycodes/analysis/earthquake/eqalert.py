@@ -87,24 +87,24 @@ def get_sites():
     return df
     
 def get_alert_symbol():
-    query =  "SELECT trigger_sym_id FROM "
+    query =  "SELECT id as trigger_sym_id FROM "
     query += "  operational_trigger_symbols AS op "
     query += "INNER JOIN "
-    query += "  (SELECT source_id FROM trigger_hierarchies "
+    query += "  (SELECT id FROM trigger_hierarchies "
     query += "  WHERE trigger_source = 'earthquake' "
     query += "  ) AS trig "
-    query += "ON op.source_id = trig.source_id"
+    query += "ON op.source_id = trig.id"
     sym = dynadb.df_read(query=query, resource="sensor_data")
     return sym.trigger_sym_id[0]
 
 def create_table():
     query = ''
     query += 'CREATE TABLE `senslopedb`.`earthquake_alerts` ('
-    query += '`ea_id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,'
+    query += '`id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,'
     query += '`eq_id` INT(10) UNSIGNED NOT NULL,'
     query += '`site_id` TINYINT(3) UNSIGNED NOT NULL,'
     query += '`distance` DECIMAL(5,3) NULL,'
-    query += 'PRIMARY KEY (`ea_id`),'
+    query += 'PRIMARY KEY (`id`),'
     query += 'UNIQUE INDEX `uq_earthquake_alerts` (`eq_id` ASC,`site_id` ASC),'
     query += 'INDEX `fk_earthquake_alerts_sites_idx` (`site_id` ASC),'
     query += 'INDEX `fk_earthquake_alerts_earthquake_events_idx` (`eq_id` ASC),'
@@ -208,13 +208,13 @@ def main():
         critdist = get_crit_dist(mag)
     
         if False in np.isfinite([mag,eq_lat,eq_lon]): #has NaN value in mag, lat, or lon 
-            query = "update %s set processed = -1 where eq_id = %s " % (EVENTS_TABLE, i)
+            query = "update %s set processed = -1 where id = %s " % (EVENTS_TABLE, i)
             dynadb.write(query=query, resource="sensor_data")
             continue
          
         if mag < 4:
             print ("> Magnitude too small: %d" % (mag))
-            query = "update %s set processed = 1 where eq_id = %s " % (EVENTS_TABLE,i)
+            query = "update %s set processed = 1 where id = %s " % (EVENTS_TABLE,i)
             dynadb.write(query=query, resource="sensor_data")
             continue
         else:
@@ -231,7 +231,7 @@ def main():
             
         if len(crits.site_id.values) < 1: 
             print ("> No affected sites. ")
-            query = "update %s set processed = 1, critical_distance = %s where eq_id = %s" % (EVENTS_TABLE,critdist,i)
+            query = "update %s set processed = 1, critical_distance = %s where id = %s" % (EVENTS_TABLE,critdist,i)
             dynadb.write(query=query, resource="sensor_data")
             continue
         else:
@@ -252,7 +252,7 @@ def main():
 #        dynadb.df_write(DataTable("operational_triggers", op_trig), resource="sensor_data")
 #        dynadb.df_write(DataTable("earthquake_alerts", eq_a), resource="sensor_data")
         
-        query = "update %s set processed = 1, critical_distance = %s where eq_id = %s " % (EVENTS_TABLE,critdist,i)
+        query = "update %s set processed = 1, critical_distance = %s where id = %s " % (EVENTS_TABLE,critdist,i)
 #        dynadb.write(query=query, resource="sensor_data")
 
         print (">> Alert iniated.\n")
