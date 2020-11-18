@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 import Signin from '../components/authentications/Signin';
 import SignUp from '../components/authentications/SignUp';
+import DownloadPage from '../components/misc/DownloadPage';
 import ForgotPassword from '../components/authentications/ForgotPassword';
 import PageNotFound from '../components/authentications/PageNotFound';
 
@@ -34,7 +35,8 @@ function RouterApp() {
         }
         <Route path='/forgot-password' component={ForgotPassword} /> 
         <Route path='/signup' component={SignUp} />
-        <Route exact path='/' component={Signin} />
+        <Route path='/signin' component={Signin} />
+        <Route exact path='/' component={DownloadPage} />
         <Route component={PageNotFound} />
       </Switch>
     </BrowserRouter>
