@@ -36,7 +36,7 @@ function RouterApp() {
         <Route path='/forgot-password' component={ForgotPassword} /> 
         <Route path='/signup' component={SignUp} />
         <Route path='/signin' component={Signin} />
-        <Route exact path='/' component={DownloadPage} />
+        <Route path='/' component={DownloadPage} />
         <Route component={PageNotFound} />
       </Switch>
     </BrowserRouter>
