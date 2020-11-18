@@ -657,7 +657,7 @@ def main(to_update_pub_alerts=False, internal_gen_data=None):
             # TODO: please identify ung path pag sa windows. 
             os.system(f"python {APP_CONFIG['app_directory']}\\CBEWS-L\\packages\\server\\analysis_pycodes\\analysis\\publicalerts.py")
         else:
-            os.system("python ~/CODES/CBEWSL/packages/server/analysis_pycodes/analysis/publicalerts.py")
+            os.system("python ~/CBEWS-L/packages/server/analysis_pycodes/analysis/publicalerts.py")
 
     if internal_gen_data:
         generated_alerts_dict = internal_gen_data

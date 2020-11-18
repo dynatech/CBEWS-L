@@ -344,6 +344,7 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
                 extended_release_time = int(site_dynamic_vars["extended_release_time"])
 
                 latest_release = AG.get_event_releases(event_id=event_id, return_count=1)
+                latest_release = latest_release[0]
                 ( release_id, data_timestamp,
                     internal_alert_level, release_time, reporter_id_mt ) = latest_release.values()
                 user_result = Users.fetch_user(profile_id=reporter_id_mt)
@@ -395,18 +396,20 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
                     alert_level=public_alert_level,
                     return_col="recommended_response"
                 )
-
                 ###########################
                 # LATEST RELEASE TRIGGERS #
                 ###########################
                 latest_release_triggers = AG.get_release_triggers(
                     release_id=release_id
                 )
+                print("latest", latest_release_triggers)
                 # event_data["release_triggers"] = format_release_triggers(payload=latest_release_trigger, process_one=True)
                 temp = format_release_triggers(payload=latest_release_triggers, process_one=False)
                 event_data.update({
                     "release_triggers": temp
                 })
+                print(temp)
+                print(event_data)
 
                 #########################
                 # LATEST EVENT TRIGGERS #

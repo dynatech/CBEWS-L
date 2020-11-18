@@ -16,8 +16,8 @@ class DatabaseConnection():
         try:
             #Static for now
             db = MySQLdb.connect('localhost',
-                                    'root',
-                                    'senslope', schema)
+                                    'cbewsl',
+                                    'cb3wsls3rv3r', schema)
             cur = db.cursor()
             return db, cur
         except TypeError as err:

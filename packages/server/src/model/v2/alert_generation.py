@@ -154,7 +154,7 @@ class AlertGeneration():
         if complete:
             select_option = "public_alert_event.*"
 
-        select_option = f"{select_option}, sites.site_code " if include_site else select_option
+        select_option = f"{select_option}, sites.site_code, public_alert_event.id as event_id " if include_site else select_option
 
         query = f"SELECT {select_option} FROM public_alert_event"
         if include_site:
@@ -205,7 +205,7 @@ class AlertGeneration():
         """
         Returns public_alert_releases row/s
         """
-        select_option = "release_id, data_timestamp, internal_alert_level, release_time, reporter_id_mt"
+        select_option = "id as release_id, data_timestamp, internal_alert_level, release_time, reporter_id_mt"
         if complete:
             select_option = "*"
 
@@ -213,14 +213,14 @@ class AlertGeneration():
                 WHERE event_id = {event_id} "
 
         order = "ASC" if sort_order in ["asc", "ASC"] else "DESC"
-        query = f"{query} ORDER BY release_id {order}"
+        query = f"{query} ORDER BY id {order}"
 
         query = f"{query} LIMIT {return_count}" if return_count else query
 
         # schema = DB.db_switcher(site_id)
         schema = "senslopedb"
         result = DB.db_read(query, schema)
-
+        print(result)
         if not complete:
             result = [result[0]]
 
@@ -231,7 +231,7 @@ class AlertGeneration():
         """
         Returns public_alert_trigger row/s
         """
-        select_option = "trigger_id, release_id, trigger_type, timestamp, info"
+        select_option = "id as trigger_id, release_id, trigger_type, timestamp, info"
         if complete:
             select_option = "*"
 
@@ -255,7 +255,7 @@ class AlertGeneration():
         """
         Returns public_alert_trigger row/s
         """
-        select_option = "trigger_id, release_id, trigger_type, timestamp, info"
+        select_option = "id as trigger_id, release_id, trigger_type, timestamp, info"
         if complete:
             select_option = "*"
 
@@ -434,7 +434,7 @@ class AlertGeneration():
             select_option = return_col
 
         query = f"SELECT {select_option} FROM trigger_hierarchies"
-        query = f"{query} WHERE source_id = {source_id}"
+        query = f"{query} WHERE id = {source_id}"
         schema = "senslopedb"
         result = DB.db_read(query, schema)
 

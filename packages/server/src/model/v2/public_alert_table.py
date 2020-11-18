@@ -63,13 +63,17 @@ class PublicAlertTable():
                 sql = "AND "
                 if index == 0:
                     sql = "WHERE "
-                query += f"{sql}{item[0]} = {item[1]} "
+
+                filter = item[0]
+                if item[0] == "event_id":
+                    filter = "id"
+                query += f"{sql}{filter} = {item[1]} "
 
             schema = "senslopedb"
             result = DB.db_modify(query, schema, True)
 
-            if result:
-                result = result[0]
+            #if result:
+             #   result = result[0]
         except Exception as err:
             raise(err)
 
@@ -119,7 +123,7 @@ class PublicAlertTable():
         """
         """
         query = "SELECT bulletin_number FROM bulletin_tracker "
-        query += f"WHERE site_id = {site_id}"
+        query += f"WHERE id = {site_id}"
         schema = "senslopedb"
         bulletin_number = DB.db_read(query, schema)
         if bulletin_number:
