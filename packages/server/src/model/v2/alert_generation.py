@@ -281,7 +281,11 @@ class AlertGeneration():
         """
         select_option = "*"
         if return_col:
-            select_option = return_col
+            if return_col == "pas_id":
+                select_option = "id as pas_id"
+            else:
+                select_option = return_col
+
         query = f"SELECT {select_option} FROM public_alert_symbols WHERE "
 
         # Either you give level or symbol. Pretty obvious one.
@@ -305,7 +309,7 @@ class AlertGeneration():
         """
         Util miniquery
         """
-        select_option = f"internal_sym_id, \
+        select_option = f"ias.id as internal_sym_id, \
                     ias.trigger_sym_id, \
                     ias.alert_symbol as ias_symbol, \
                     ots.alert_symbol as ots_symbol, \
@@ -329,7 +333,7 @@ class AlertGeneration():
         """
         Util miniquery
         """
-        select_option = f"id, \
+        select_option = f"ias.id as internal_sym_id, \
                     ias.trigger_sym_id, \
                     ias.alert_symbol as ias_symbol, \
                     ots.alert_symbol as ots_symbol, \
@@ -362,7 +366,7 @@ class AlertGeneration():
         """
         Util miniquery
         """
-        select_option = f"id, \
+        select_option = f"ias.id as internal_sym_id, \
                     ias.trigger_sym_id, \
                     ias.alert_symbol as ias_symbol, \
                     ots.alert_symbol as ots_symbol, \
@@ -411,9 +415,12 @@ class AlertGeneration():
             trigger_source (str) - 
             alert_level (int) - 
         """
-        select_option = "ots.*"
+        select_option = "ots.*, ots.id as trigger_sym_id"
         if return_col:
-            select_option = return_col
+            if return_col == "trigger_sym_id":
+                select_option = "ots.id as trigger_sym_id"
+            else:
+                select_option = return_col
         query = f"SELECT {select_option} FROM operational_trigger_symbols as ots "
         query += "INNER JOIN trigger_hierarchies as th ON (th.id = ots.source_id) "
         query += f"WHERE th.trigger_source = '{trigger_source}' "
@@ -429,7 +436,7 @@ class AlertGeneration():
         return return_data
 
     def get_trigger_hierarchy(source_id, return_col=None):
-        select_option = "*"
+        select_option = "*, id as source_id"
         if return_col:
             select_option = return_col
 
