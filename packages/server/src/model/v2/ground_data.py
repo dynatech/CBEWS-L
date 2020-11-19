@@ -54,8 +54,8 @@ class GroundData():
         query = f'SELECT ts, measurement, marker_name, observer_name, weather ' \
                 f'FROM senslopedb.site_markers sm INNER JOIN ' \
                 f'cbewsl_commons_db.sites s ON (s.id = sm.site_id) INNER JOIN ' \
-                f'senslopedb.marker_data md ON (md.marker_id = site_markers,marker_id) INNER JOIN senslopedb.marker_observations mo ON (mo.id = md.mo_id) ' \
-                f'WHERE sites.id = "{site_id}" ORDER BY ts desc limit 100;'
+                f'senslopedb.marker_data md ON (md.marker_id = sm.marker_id) INNER JOIN senslopedb.marker_observations mo ON (mo.id = md.mo_id) ' \
+                f'WHERE s.id = "{site_id}" ORDER BY ts desc limit 100;'
         result = DB.db_read(query, 'senslopedb')
         return result
 
@@ -141,7 +141,7 @@ class GroundData():
     def fetch_surficial_markers(site_id):
         query = f'SELECT marker_id, marker_name ' \
             f'FROM senslopedb.site_markers sm INNER JOIN cbewsl_commons_db.sites s ON (s.id = sm.site_id) ' \
-            f'WHERE sites.id = "{site_id}" ORDER BY marker_name;'
+            f'WHERE s.id = "{site_id}" ORDER BY marker_name;'
         result = DB.db_read(query, 'senslopedb')
         return result
 
@@ -299,7 +299,7 @@ class GroundData():
 
     def fetch_moms_features():
         try:
-            query = 'SELECT id, feature_type FROM moms_features'
+            query = 'SELECT id as feature_id, feature_type FROM moms_features'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -336,22 +336,21 @@ class GroundData():
         try:
             query = f"""
                 SELECT 
-                    monitoring_moms.*, monitoring_moms.id as moms_id, moms_features.feature_type, moms_instances.*, moms_instances.id as instance_id, CONCAT(user_prof.firstname, " ", user_prof.lastname) as moms_reporter
+                    mm.*, mm.id as moms_id, mf.feature_type, mi.*, mi.id as instance_id, CONCAT(user_prof.firstname, " ", user_prof.lastname) as moms_reporter
                 FROM
-                    moms_instances
+                    moms_instances AS mi
                         INNER JOIN
-                    monitoring_moms ON (monitoring_moms.instance_id = moms_instances.id)
+                    monitoring_moms AS mm ON (mm.instance_id = mi.id)
                         INNER JOIN
-                    moms_features ON (moms_features.id = monitoring_moms.feature_id)
+                    moms_features AS mf ON (mf.id = mi.feature_id)
                         INNER JOIN
-                    cbewsl_commons_db.user_accounts AS users ON users.id = monitoring_moms.reporter_id 
+                    cbewsl_commons_db.user_accounts AS users ON users.id = mm.reporter_id 
                         INNER JOIN
                     cbewsl_commons_db.user_profiles AS user_prof ON user_prof.id = users.profile_id
                 WHERE
-                    moms_instances.site_id = {site_id}
+                    mi.site_id = {site_id}
                 ORDER BY observance_ts DESC;
             """
-            Helpers.var_checker("query", query)
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -404,7 +403,7 @@ class GroundData():
                 SELECT 
                     mi.*,
                     mf.feature_type,
-                    mf.id as feature_id
+                    mf.id as feature_id,
                     CONCAT(mf.feature_type, ' ', mi.feature_name) name
                 FROM
                     moms_instances AS mi
@@ -444,9 +443,9 @@ class GroundData():
                     JOIN
                 moms_features ON (moms_features.id = moms_instances.feature_id)
                     JOIN
-                cbewsl_commons_db.sites ON (cbewsl_commons_db.sites.id = moms_instances.site_id)
+                cbewsl_commons_db.sites as sites ON (sites.id = moms_instances.site_id)
             WHERE
-                site_id = {site_id}
+                sites.id = {site_id}
             ORDER BY observance_ts DESC
             LIMIT 1;
         """
