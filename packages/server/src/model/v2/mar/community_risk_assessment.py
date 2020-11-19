@@ -26,20 +26,17 @@ class CommunityRiskAssessment():
 	def update_cav(data):
 		query = "UPDATE capacity_and_vulnerability SET"
 		counter = 0
-		h.var_checker("data", data)
 		for x in data:
-			h.var_checker("list(x)[0]", list(x)[0])
-			key = list(x)[0]
-			if 'id' != key:
-				if counter == 0:
-					query += f" {key} = '{x[key]}'"
+			key = list(x)
+			if key:
+				if 'id' != key[0]:
+					if counter == 0:
+						query += f" {key[0]} = '{x[key[0]]}'"
+					else:
+						query += f", {key[0]} = '{x[key[0]]}'"
 				else:
-					query += f", {key} = '{x[key]}'"
-			else:
-				query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = {x[key]}"
-			counter += 1
-			
-		h.var_checker("query", query)
+					query = f"{query}, last_ts = '{str(dt.today())}' WHERE id = {x[key[0]]}"
+				counter += 1
 		ret_val = DB.db_modify(query, schema, True)
 		return ret_val
 

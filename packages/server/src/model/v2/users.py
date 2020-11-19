@@ -100,7 +100,24 @@ class Users():
 		return count
 
 	def fetch_account(username):
-		query = "SELECT * FROM user_accounts INNER JOIN user_profiles ON (user_profiles.id = user_accounts.profile_id) " \
+		query = "SELECT user_accounts.id as user_id, " \
+				"profile_id," \
+				"site_id," \
+				"role_id," \
+				"mobile_id," \
+				"username," \
+				"password," \
+				"salt," \
+				"firstname," \
+				"lastname," \
+				"middlename," \
+				"age," \
+				"gender," \
+				"email," \
+				"gsm_id," \
+				"mobile_number," \
+				"role_title," \
+				"role_restrictions FROM user_accounts INNER JOIN user_profiles ON (user_profiles.id = user_accounts.profile_id) " \
 				"INNER JOIN user_mobiles ON (user_mobiles.id = user_accounts.mobile_id) INNER JOIN user_roles ON (user_roles.id = user_accounts.role_id) " \
 				f"WHERE username = '{username}'"
 		account = DB.db_read(query, 'cbewsl_commons_db')
