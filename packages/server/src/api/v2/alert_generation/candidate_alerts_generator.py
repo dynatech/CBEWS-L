@@ -88,7 +88,8 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         # FIND ONGOING DB ALERTS
         ongoing_db_alerts = list(filter(lambda x: x["event_status"] == "on-going", merged_db_alerts))
         site_db_alert = next(filter(lambda x: x["site_code"] == site_code, ongoing_db_alerts), None)
-        
+        print("site_db_alert", site_db_alert)
+
         # If site_code is already in active events:
         site_db_validity = None
         if site_db_alert:
