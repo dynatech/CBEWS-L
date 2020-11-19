@@ -57,7 +57,6 @@ def delete_mar_community_risk_assessment():
         filename = json['filename']
         
         while os.path.exists(Path(directory) / filename):
-            h.var_checker("Path(directory) / filename", Path(directory) / filename)
             # os.remove(f"'{directory}{filename}'")
             os.remove(Path(directory) / filename)
         return_data = {
@@ -80,7 +79,6 @@ def send_email(recipients_list, subject, message, file_location):
 
         if file_location:
             path, filename = ntpath.split(file_location)
-            h.var_checker("Sending email to", send_to_email)
 
         msg = MIMEMultipart()
         msg['From'] = email

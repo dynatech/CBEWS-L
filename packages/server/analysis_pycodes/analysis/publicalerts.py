@@ -122,6 +122,8 @@ def get_site_moms_alerts(site_id, start, end):
     query = f"{query} AND moms.observance_ts <= '{end}'"
     query = f"{query} ORDER BY moms.observance_ts DESC"
 
+    print("query", query)
+
     site_moms_alerts_df = qdb.get_db_dataframe(query)
     sorted_df = site_moms_alerts_df.sort_values(['op_trigger'], ascending=[False])
 

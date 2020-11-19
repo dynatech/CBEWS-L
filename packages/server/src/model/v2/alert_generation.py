@@ -71,7 +71,7 @@ class AlertGeneration():
         """
         stat_row = None
         retun_dict = None
-        query = "SELECT * FROM alert_status "
+        query = "SELECT *, id as stat_id FROM alert_status "
         query += f"WHERE trigger_id = {trigger_id}"
 
         schema = "senslopedb"

@@ -38,7 +38,6 @@ def get_summary(id):
 def add_summary():
     try:
         data = request.get_json()
-        h.var_checker("data", data)
         request_data = {
             'location': data['Location'],
             'impact': data['Impact'],
@@ -370,14 +369,10 @@ def fetch_hazard_map():
         latest_file = latest_file.split("\\", 1)
         map_list = [*latest_file]
 
-        h.var_checker("map_list", map_list)
-        h.var_checker("latest", latest_file)
-
         entries = ((os.stat(path), path) for path in map_list)
         # leave only regular files, insert creation date
         entries = ((stat[ST_CTIME], path)
         for stat, path in entries if S_ISREG(stat[ST_MODE]))
-        h.var_checker("entries", entries)
 
         maps = []
         for map in map_list:

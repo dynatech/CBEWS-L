@@ -533,7 +533,6 @@ def fix_internal_alert_invalids(entry, invalid_triggers_list, merged_list):
             sorted_v_trigs = sorted(valid_triggers, key=lambda x: x["ts"], reverse=True)
             if sorted_v_trigs:
                 latest_ts = h.str_to_dt(sorted_v_trigs[0]["ts"])
-                # HOTFIX 1
                 latest_ts = h.round_to_nearest_release_time(latest_ts)
                 mod_validity = latest_ts + timedelta(1)
 
