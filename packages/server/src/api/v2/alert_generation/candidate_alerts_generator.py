@@ -531,8 +531,6 @@ def fix_internal_alert_invalids(entry, invalid_triggers_list, merged_list):
             # if there are any invalid triggers, GENERATE new validity
             valid_triggers = list(filter(lambda x: x["trigger_id"] not in invalid_trigger_ids_list, entry["triggers"]))
             sorted_v_trigs = sorted(valid_triggers, key=lambda x: x["ts"], reverse=True)
-            h.var_checker("entry", entry)
-            h.var_checker("site_db_alert", site_db_alert)
             if sorted_v_trigs:
                 latest_ts = h.str_to_dt(sorted_v_trigs[0]["ts"])
                 mod_validity = latest_ts + timedelta(1)

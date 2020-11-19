@@ -303,25 +303,21 @@ def get_od_tech_info(site_id, latest_trigger_ts):
 
 def get_eq_tech_info(site_id, latest_trigger_ts):
     try:
-        var_checker("latest_trigger_ts", latest_trigger_ts)
         alert_detail = query_eq_alerts(site_id, latest_trigger_ts)
-
-        var_checker("alert_detail", alert_detail)
 
         magnitude = alert_detail["magnitude"]
         depth = alert_detail["depth"]
         distance = alert_detail["distance"]
         issuer = alert_detail["issuer"]
-        od_tech_info = f"Magnitude {magnitude} earthquake recorded {distance} km from site."
+        eq_tech_info = f"Magnitude {magnitude} earthquake recorded {distance} km from site."
 
-        return od_tech_info
+        return eq_tech_info
     
     except Exception as err:
         print("get eq tech info: " + err)
 
         
 def main(trigger_df):
-    # print trigger_df
     trigger_group = trigger_df.groupby('trigger_source', as_index=False)
     site_id = trigger_df.iloc[0]['site_id']
     

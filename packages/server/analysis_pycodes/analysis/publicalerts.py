@@ -196,7 +196,7 @@ def get_moms_feature_types():
     """Dataframe containing moms feature types for use in tech info
     """
 
-    query = "SELECT feature_id, feature_type FROM moms_features"
+    query = "SELECT id as feature_id, feature_type FROM moms_features"
 
     moms_types = qdb.get_db_dataframe(query)
 

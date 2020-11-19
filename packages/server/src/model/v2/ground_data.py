@@ -38,14 +38,14 @@ class GroundData():
 
 
     def fetch_surficial_mo_id(ts, site_id):
-        query = f'SELECT id FROM senslopedb.marker_observations WHERE ts = "{ts}" and site_id = "{site_id}" limit 1;'
+        query = f'SELECT id as mo_id FROM senslopedb.marker_observations WHERE ts = "{ts}" and site_id = "{site_id}" limit 1;'
         result = DB.db_read(query, 'senslopedb')
         return result
 
 
     def fetch_marker_ids_v_moid(mo_id):
-        query = f'SELECT marker_id, marker_name FROM senslopedb.marker_data ' \
-            f'INNER JOIN senslopedb.marker_names ON (marker_id = id) where mo_id = "{mo_id}";'
+        query = f'SELECT marker_id, marker_name FROM senslopedb.marker_data md ' \
+            f'INNER JOIN senslopedb.marker_names mn ON (md.marker_id = mn.id) where mo_id = "{mo_id}";'
         result = DB.db_read(query, 'senslopedb')
         return result
 
@@ -55,7 +55,7 @@ class GroundData():
                 f'FROM senslopedb.site_markers sm INNER JOIN ' \
                 f'cbewsl_commons_db.sites s ON (s.id = sm.site_id) INNER JOIN ' \
                 f'senslopedb.marker_data md ON (md.marker_id = site_markers,marker_id) INNER JOIN senslopedb.marker_observations mo ON (mo.id = md.mo_id) ' \
-                f'WHERE sites.site_id = "{site_id}" ORDER BY ts desc limit 100;'
+                f'WHERE sites.id = "{site_id}" ORDER BY ts desc limit 100;'
         result = DB.db_read(query, 'senslopedb')
         return result
 
@@ -63,7 +63,7 @@ class GroundData():
     def fetch_latest_surficial_data(site_id):
         query = f"""
             SELECT 
-                *
+                *, marker_observations.id as mo_id
             FROM
                 marker_observations
             WHERE
@@ -154,9 +154,9 @@ class GroundData():
 
     def update_surficial_marker_observation(mo_id, ts, weather, observer, site_id):
         try:
-            query = f'UPDATE marker_observations SET ts="{ts}", ' \
-                f'observer_name="{observer}", weather="{weather}" ' \
-                f'WHERE site_id = "{site_id}" AND mo_id = "{mo_id}";'
+            query = f'UPDATE marker_observations SET ts = "{ts}", ' \
+                f'observer_name = "{observer}", weather = "{weather}" ' \
+                f'WHERE site_id = "{site_id}" AND id = "{mo_id}";'
             update_status = DB.db_modify(query, 'senslopedb', True)
             result = {"status": True, "data": update_status}
         except Exception as err:
@@ -303,18 +303,18 @@ class GroundData():
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
-                "message": f"Failed to retrieve MoMs data. => {err}"}
+                "message": f"Failed to retrieve MoMs features. => {err}"}
         finally:
             return result
 
 
     def fetch_moms_features_by_type(f_type):
         try:
-            query = f'SELECT id, feature_type, description FROM moms_features WHERE feature_type = "{f_type}"'
+            query = f'SELECT id as feature_id, feature_type, description FROM moms_features WHERE feature_type = "{f_type}"'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
-                "message": f"Failed to retrieve MoMs data. => {err}"}
+                "message": f"Failed to retrieve MoMs features by type. => {err}"}
         finally:
             return result
 
@@ -324,7 +324,7 @@ class GroundData():
             Returns {"feature_id": <feature_id value>} of searched feature type
         """
         try:
-            query = f"SELECT id FROM moms_features WHERE feature_type = '{feature_type}'"
+            query = f"SELECT id as feature_id FROM moms_features WHERE feature_type = '{feature_type}'"
             feature_id = DB.db_read(query, 'senslopedb')
         except Exception as err:
             raise(err)
@@ -336,7 +336,7 @@ class GroundData():
         try:
             query = f"""
                 SELECT 
-                    monitoring_moms.*, moms_features.feature_type, moms_instances.*, CONCAT(user_prof.firstname, " ", user_prof.lastname) as moms_reporter
+                    monitoring_moms.*, monitoring_moms.id as moms_id, moms_features.feature_type, moms_instances.*, moms_instances.id as instance_id, CONCAT(user_prof.firstname, " ", user_prof.lastname) as moms_reporter
                 FROM
                     moms_instances
                         INNER JOIN
@@ -362,7 +362,7 @@ class GroundData():
 
     def fetch_moms_by_moms_id(moms_id):
         try:
-            query = f'SELECT * FROM monitoring_moms WHERE id = {moms_id}'
+            query = f'SELECT *, id as moms_id FROM monitoring_moms WHERE id = {moms_id}'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -373,7 +373,7 @@ class GroundData():
 
     def fetch_moms_instance_by_instance_id(instance_id):
         try:
-            query = f'SELECT * FROM moms_instances WHERE id = {instance_id}'
+            query = f'SELECT *, id as instance_id FROM moms_instances WHERE id = {instance_id}'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -385,10 +385,10 @@ class GroundData():
     def fetch_moms_instance_by_feature_id(feature_id, feature, site_id):
         try:
             if isinstance(feature, str) and feature != '':
-                query = f'SELECT instance_id, feature_name, location, reporter FROM moms_instances WHERE feature_name = "{feature}" AND ' \
+                query = f'SELECT id as instance_id, feature_name, location, reporter FROM moms_instances WHERE feature_name = "{feature}" AND ' \
                     f'site_id = {site_id} AND feature_id = {feature_id}'
             else:
-                query = f'SELECT instance_id, feature_name, location, reporter FROM moms_instances WHERE ' \
+                query = f'SELECT id as instance_id, feature_name, location, reporter FROM moms_instances WHERE ' \
                     f'site_id = {site_id} AND feature_id = {feature_id}'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
@@ -404,11 +404,12 @@ class GroundData():
                 SELECT 
                     mi.*,
                     mf.feature_type,
+                    mf.id as feature_id
                     CONCAT(mf.feature_type, ' ', mi.feature_name) name
                 FROM
                     moms_instances AS mi
                         INNER JOIN
-                    moms_features AS mf USING (feature_id)
+                    moms_features AS mf ON (mf.id = mi.feature_id)
             """
 
             if feature_id:
@@ -473,7 +474,7 @@ class GroundData():
             for x in data:
                 key = list(x)[0]
                 if 'instance_id' == key:
-                    query = f"{query}, last_ts = '{Helpers.dt_to_str(dt.today())}' WHERE instance_id = '{x[key]}'"
+                    query = f"{query}, last_ts = '{Helpers.dt_to_str(dt.today())}' WHERE id = '{x[key]}'"
 
             print(query)
             DB.db_modify(query, 'senslopedb', True)
@@ -499,7 +500,7 @@ class GroundData():
             for x in data:
                 key = list(x)[0]
                 if 'feature_id' == key:
-                    query = f"{query}, last_ts = '{Helpers.dt_to_str(dt.today())}' WHERE feature_id = '{x[key]}'"
+                    query = f"{query}, last_ts = '{Helpers.dt_to_str(dt.today())}' WHERE id = '{x[key]}'"
 
             print(query)
             ret_val = DB.db_modify(query, 'senslopedb', True)
@@ -527,7 +528,7 @@ class GroundData():
             for x in data:
                 key = list(x)[0]
                 if 'moms_id' == key:
-                    query = f"{query}, last_ts = '{Helpers.dt_to_str(dt.today())}' WHERE moms_id = '{x[key]}'"
+                    query = f"{query}, last_ts = '{Helpers.dt_to_str(dt.today())}' WHERE id = '{x[key]}'"
         
             ret_val = DB.db_modify(query, 'senslopedb', True)
         except Exception as err:
@@ -577,7 +578,7 @@ class GroundData():
     ###############
 
     def get_latest_od_events(site_id):
-        query = "SELECT id, ts, site_id, reason, reporter, alert_level FROM public_alert_on_demand "
+        query = "SELECT id as od_id, ts, site_id, reason, reporter, alert_level FROM public_alert_on_demand "
         query += f"WHERE site_id = {site_id} "
         query += "ORDER BY ts DESC"
         print(query)
