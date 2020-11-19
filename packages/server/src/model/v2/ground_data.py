@@ -299,7 +299,7 @@ class GroundData():
 
     def fetch_moms_features():
         try:
-            query = 'SELECT id, feature_type FROM moms_features'
+            query = 'SELECT id as feature_id, feature_type FROM moms_features'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -444,9 +444,9 @@ class GroundData():
                     JOIN
                 moms_features ON (moms_features.id = moms_instances.feature_id)
                     JOIN
-                cbewsl_commons_db.sites ON (cbewsl_commons_db.sites.id = moms_instances.site_id)
+                cbewsl_commons_db.sites as sites ON (sites.id = moms_instances.site_id)
             WHERE
-                site_id = {site_id}
+                sites.id = {site_id}
             ORDER BY observance_ts DESC
             LIMIT 1;
         """
