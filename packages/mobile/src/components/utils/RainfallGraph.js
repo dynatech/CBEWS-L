@@ -130,12 +130,13 @@ const RainfallGraph = (props) => {
 
         return ret;
     }
-    
-    const constructConfig = () => {
-
-    }
 
     return display
 }
 
-export { RainfallGraph }
+
+const RainfallInstantaneousGraph = (props) => {
+
+}
+
+export { RainfallGraph, RainfallInstantaneousGraph }
