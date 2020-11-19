@@ -351,7 +351,6 @@ class GroundData():
                     mi.site_id = {site_id}
                 ORDER BY observance_ts DESC;
             """
-            Helpers.var_checker("query", query)
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -390,7 +389,6 @@ class GroundData():
             else:
                 query = f'SELECT id as instance_id, feature_name, location, reporter FROM moms_instances WHERE ' \
                     f'site_id = {site_id} AND feature_id = {feature_id}'
-            H.var_checker("query", query)
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,

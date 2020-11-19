@@ -168,7 +168,6 @@ def insert_moms_instance():
     try:
         data = request.get_json()
         result = GroundData.insert_moms_instance(data)
-        H.var_checker("result", result)
         return_value = {
             "status": True,
             "instance_id": result,
@@ -212,10 +211,8 @@ def fetch_moms_instances(site_id, feature_id=None):
 @MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/<site_id>/moms/latest", methods=["GET"])
 def fetch_latest_moms(site_id):
     try:
-        name_container = []
         data = {}
         latest_moms = GroundData.fetch_latest_moms(site_id)
-        H.var_checker("latest_moms", latest_moms)
 
         if latest_moms:
             release_time = H.round_to_nearest_release_time(dt.now(), interval=4)
@@ -292,7 +289,6 @@ def insert_moms_feature():
     try:
         data = request.get_json()
         result = GroundData.insert_moms_feature(data)
-        H.var_checker("result", result)
         return_value = {
             "status": True,
             "feature_id": result,

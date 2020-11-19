@@ -102,14 +102,12 @@ def modify():
 def add():
     try:
         data = request.get_json()
-        h.var_checker("data", data)
         mo_status = GroundData.insert_marker_observation(data)
         missing_marker = []
         if mo_status['status'] == True:
             if mo_status['mo_id'] is not None:
                 marker_ids = GroundData.fetch_surficial_markers(data['site_id'])
                 for id in marker_ids:
-                    h.var_checker("id", id)
                     marker_status = GroundData.insert_marker_values(id["marker_id"], 
                             data['marker_value'][id["marker_name"]], mo_status['mo_id'])
                     if (marker_status['data'] == False):
