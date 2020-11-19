@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, request
 from connections import SOCKETIO
-import sys
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 from src.model.v2.ground_data import GroundData
 from src.model.v2.alert_generation import AlertGeneration as AlertGen
 from src.api.helpers import Helpers as H
@@ -187,7 +186,6 @@ def insert_moms_instance():
 @MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/get/ground_data/moms/instance/<site_id>", methods=["GET"])
 def fetch_moms_instances(site_id, feature_id=None):
     try:
-        name_container = []
         if feature_id:
             result = GroundData.fetch_moms_instance_by_feature_id(feature_id, None, site_id)
         else:
@@ -217,6 +215,7 @@ def fetch_latest_moms(site_id):
         name_container = []
         data = {}
         latest_moms = GroundData.fetch_latest_moms(site_id)
+        H.var_checker("latest_moms", latest_moms)
 
         if latest_moms:
             release_time = H.round_to_nearest_release_time(dt.now(), interval=4)
