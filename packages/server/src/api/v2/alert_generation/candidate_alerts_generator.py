@@ -88,7 +88,8 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         # FIND ONGOING DB ALERTS
         ongoing_db_alerts = list(filter(lambda x: x["event_status"] == "on-going", merged_db_alerts))
         site_db_alert = next(filter(lambda x: x["site_code"] == site_code, ongoing_db_alerts), None)
-        
+        print("site_db_alert", site_db_alert)
+
         # If site_code is already in active events:
         site_db_validity = None
         if site_db_alert:
@@ -530,8 +531,6 @@ def fix_internal_alert_invalids(entry, invalid_triggers_list, merged_list):
             # if there are any invalid triggers, GENERATE new validity
             valid_triggers = list(filter(lambda x: x["trigger_id"] not in invalid_trigger_ids_list, entry["triggers"]))
             sorted_v_trigs = sorted(valid_triggers, key=lambda x: x["ts"], reverse=True)
-            h.var_checker("entry", entry)
-            h.var_checker("site_db_alert", site_db_alert)
             if sorted_v_trigs:
                 latest_ts = h.str_to_dt(sorted_v_trigs[0]["ts"])
                 mod_validity = latest_ts + timedelta(1)
@@ -657,7 +656,7 @@ def main(to_update_pub_alerts=False, internal_gen_data=None):
             # TODO: please identify ung path pag sa windows. 
             os.system(f"python {APP_CONFIG['app_directory']}\\CBEWS-L\\packages\\server\\analysis_pycodes\\analysis\\publicalerts.py")
         else:
-            os.system("python ~/CODES/CBEWSL/packages/server/analysis_pycodes/analysis/publicalerts.py")
+            os.system("python ~/CBEWS-L/packages/server/analysis_pycodes/analysis/publicalerts.py")
 
     if internal_gen_data:
         generated_alerts_dict = internal_gen_data

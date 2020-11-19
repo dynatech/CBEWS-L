@@ -37,7 +37,7 @@ def query_tsm_alerts(site_id, start_ts, latest_trigger_ts):
         query += "JOIN tsm_sensors AS t_s"
         query += "  ON node_alerts.tsm_id = t_s.tsm_id "
         query += "JOIN "
-        query += "  (SELECT site_code, site_id FROM cbewsl_commons_db.sites WHERE site_id = '%s') AS sc " %(site_id)
+        query += "  (SELECT site_code, sites.id as site_id FROM cbewsl_commons_db.sites as sites WHERE id = '%s') AS sc " %(site_id)
         query += "  ON t_s.site_id = sc.site_id "
         query += "WHERE ts >= '%s' " %(start_ts)
         query += "AND ts <= '%s' " %(latest_trigger_ts) 
@@ -48,7 +48,7 @@ def query_tsm_alerts(site_id, start_ts, latest_trigger_ts):
         return result
 
 def query_rainfall_alerts(site_id, latest_trigger_ts):
-        query = "SELECT ra.*, rp.* "
+        query = "SELECT ra.*, rp.*, ra.id as ra_id "
         query += "FROM rainfall_alerts AS ra "
         query += "JOIN rain_props AS rp "
         query += "ON ra.rain_id = rp.rain_id "
@@ -59,9 +59,9 @@ def query_rainfall_alerts(site_id, latest_trigger_ts):
         return result
     
 def query_surficial_alerts(site_id, latest_trigger_ts):
-        query = "SELECT * FROM marker_alerts as ma "
+        query = "SELECT *, ma.id as ma_id FROM marker_alerts as ma "
         query += "JOIN site_markers as sm "
-        query += "ON ma.marker_id = sm.marker_id "
+        query += "ON ma.id = sm.marker_id "
         query += "WHERE sm.site_id = '%s' and ts = '%s'" %(site_id, latest_trigger_ts)
         query += "AND alert_level > 0"
         result = qdb.get_db_dataframe(query)
@@ -69,12 +69,12 @@ def query_surficial_alerts(site_id, latest_trigger_ts):
         return result
     
 def query_moms_alerts(site_id, latest_trigger_ts):
-        query = "SELECT * FROM senslopedb.monitoring_moms as moms " + \
+        query = "SELECT *, moms.id as moms_id FROM senslopedb.monitoring_moms as moms " + \
             "JOIN senslopedb.moms_instances as mi " + \
-            "ON moms.instance_id = mi.instance_id " + \
+            "ON moms.instance_id = mi.id " + \
             "JOIN cbewsl_commons_db.sites as site " + \
-            "ON mi.site_id = site.site_id " + \
-            f"WHERE site.site_id = '{site_id}'" + \
+            "ON mi.site_id = site.id " + \
+            f"WHERE site.id = '{site_id}'" + \
             f"AND moms.observance_ts = '{latest_trigger_ts}'" + \
             f"AND moms.op_trigger > 0"
 
@@ -83,7 +83,7 @@ def query_moms_alerts(site_id, latest_trigger_ts):
         return result
     
 def query_od_alerts(site_id, latest_trigger_ts):
-        query = "SELECT * FROM senslopedb.public_alert_on_demand as paod " + \
+        query = "SELECT *, paod.id as od_id FROM senslopedb.public_alert_on_demand as paod " + \
             f"WHERE site_id = {site_id} and ts = '{latest_trigger_ts}'"
 
         result = qdb.get_db_dataframe(query)
@@ -94,8 +94,8 @@ def query_od_alerts(site_id, latest_trigger_ts):
         return result
     
 def query_eq_alerts(site_id, latest_trigger_ts):
-        query = "SELECT * FROM senslopedb.earthquake_events"
-        query = f"{query} INNER JOIN senslopedb.earthquake_alerts  as ea USING (eq_id)"
+        query = "SELECT *, ee.id as eq_id FROM senslopedb.earthquake_events as ee"
+        query = f"{query} INNER JOIN senslopedb.earthquake_alerts as ea ON (ea.eq_id = ee.id)"
         query = f"{query} WHERE ea.site_id = {site_id} and ts = '{latest_trigger_ts}'"
         result = qdb.get_db_dataframe(query)
 
@@ -303,25 +303,21 @@ def get_od_tech_info(site_id, latest_trigger_ts):
 
 def get_eq_tech_info(site_id, latest_trigger_ts):
     try:
-        var_checker("latest_trigger_ts", latest_trigger_ts)
         alert_detail = query_eq_alerts(site_id, latest_trigger_ts)
-
-        var_checker("alert_detail", alert_detail)
 
         magnitude = alert_detail["magnitude"]
         depth = alert_detail["depth"]
         distance = alert_detail["distance"]
         issuer = alert_detail["issuer"]
-        od_tech_info = f"Magnitude {magnitude} earthquake recorded {distance} km from site."
+        eq_tech_info = f"Magnitude {magnitude} earthquake recorded {distance} km from site."
 
-        return od_tech_info
+        return eq_tech_info
     
     except Exception as err:
         print("get eq tech info: " + err)
 
         
 def main(trigger_df):
-    # print trigger_df
     trigger_group = trigger_df.groupby('trigger_source', as_index=False)
     site_id = trigger_df.iloc[0]['site_id']
     

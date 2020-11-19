@@ -196,7 +196,7 @@ def get_moms_feature_types():
     """Dataframe containing moms feature types for use in tech info
     """
 
-    query = "SELECT feature_id, feature_type FROM moms_features"
+    query = "SELECT id as feature_id, feature_type FROM moms_features"
 
     moms_types = qdb.get_db_dataframe(query)
 
@@ -504,11 +504,8 @@ def query_current_events(end):
     return current_events
 
 def get_alert_history(current_events):
-    print("PASOK")
     site_id = current_events['site_id'].values[0]
-    print("PASOK2")
     start_ts = current_events['ts'].values[0]
-    print("PASOK3")
     public_alert_symbols = current_events['alert_symbol'].values[0]
     
     query = "SELECT CONCAT(cdb.firstname, ' ', cdb.lastname) as iomp, " 
@@ -533,8 +530,6 @@ def get_alert_history(current_events):
     query += "AND OT.ts >= '%s' " %start_ts
     query += "AND PAS.alert_symbol = '%s' " %public_alert_symbols
     query += "ORDER BY OT.ts DESC"
-
-    print(query)
     
     current_events_history = qdb.get_db_dataframe(query)
     
