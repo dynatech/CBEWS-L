@@ -55,7 +55,7 @@ class GroundData():
                 f'FROM senslopedb.site_markers sm INNER JOIN ' \
                 f'cbewsl_commons_db.sites s ON (s.id = sm.site_id) INNER JOIN ' \
                 f'senslopedb.marker_data md ON (md.marker_id = site_markers,marker_id) INNER JOIN senslopedb.marker_observations mo ON (mo.id = md.mo_id) ' \
-                f'WHERE sites.id = "{site_id}" ORDER BY ts desc limit 100;'
+                f'WHERE s.id = "{site_id}" ORDER BY ts desc limit 100;'
         result = DB.db_read(query, 'senslopedb')
         return result
 
@@ -141,7 +141,7 @@ class GroundData():
     def fetch_surficial_markers(site_id):
         query = f'SELECT marker_id, marker_name ' \
             f'FROM senslopedb.site_markers sm INNER JOIN cbewsl_commons_db.sites s ON (s.id = sm.site_id) ' \
-            f'WHERE sites.id = "{site_id}" ORDER BY marker_name;'
+            f'WHERE s.id = "{site_id}" ORDER BY marker_name;'
         result = DB.db_read(query, 'senslopedb')
         return result
 
@@ -299,7 +299,7 @@ class GroundData():
 
     def fetch_moms_features():
         try:
-            query = 'SELECT id, feature_type FROM moms_features'
+            query = 'SELECT id as feature_id, feature_type FROM moms_features'
             result = DB.db_read(query, 'senslopedb')
         except Exception as err:
             result = {"status": False,
@@ -444,9 +444,9 @@ class GroundData():
                     JOIN
                 moms_features ON (moms_features.id = moms_instances.feature_id)
                     JOIN
-                cbewsl_commons_db.sites ON (cbewsl_commons_db.sites.id = moms_instances.site_id)
+                cbewsl_commons_db.sites as sites ON (sites.id = moms_instances.site_id)
             WHERE
-                site_id = {site_id}
+                sites.id = {site_id}
             ORDER BY observance_ts DESC
             LIMIT 1;
         """
