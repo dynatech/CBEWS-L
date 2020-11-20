@@ -987,7 +987,7 @@ def alert_to_db(df, table_name):
     
     # previous alert
     query += "  SELECT * FROM %s " %table_name
-    query += "  WHERE %s = %s " %(where_id, df[where_id].values[0])
+    query += "  WHERE id = %s " %df[where_id].values[0]
     query += "  AND ((ts <= '%s' " %df['ts_updated'].values[0]
     query += "    AND ts_updated >= '%s') " %df['ts_updated'].values[0]
     query += "  OR (ts_updated <= '%s' " %df['ts_updated'].values[0]
