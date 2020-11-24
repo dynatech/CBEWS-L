@@ -1,7 +1,7 @@
 import AppConfig from '../../utils/AppConfig';
 
 const GetSubsurfacePlotData = () => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/get/data_analysis/mar/subsurface/plot/data`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/get/data_analysis/mar/subsurface/plot_data`, {
         method: 'GET',
         headers: {
             Accept: 'application/json',
