@@ -72,6 +72,7 @@ class GroundData():
             LIMIT 1;
         """
         result = []
+        print(query)
         mo_result = DB.db_read(query, 'senslopedb')
         if mo_result:
             mo_id = mo_result[0]["mo_id"]
@@ -131,8 +132,8 @@ class GroundData():
 
 
     def fetch_surficial_plot_data(marker_id, site_code, start, end):
-        query = f'SELECT mo_id, id, marker_id, ts as x, measurement as y FROM senslopedb.marker_data md INNER ' \
-                f'JOIN marker_observations  mo ON (mo.id = md.mo_id) WHERE (ts BETWEEN "{start}" AND "{end}") and marker_id = {marker_id} ' \
+        query = f'SELECT mo.id AS mo_id, md.id AS data_id, marker_id, ts AS x, measurement AS y FROM senslopedb.marker_data md INNER ' \
+                f'JOIN marker_observations mo ON (mo.id = md.mo_id) WHERE (ts BETWEEN "{start}" AND "{end}") and marker_id = {marker_id} ' \
                 'order by ts asc;'
         result = DB.db_read(query, 'senslopedb')
         return result

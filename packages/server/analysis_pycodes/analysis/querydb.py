@@ -268,7 +268,7 @@ def get_raw_accel_data(tsm_id='',tsm_name = "", from_time = "", to_time = "",
     #get tsm_id if input is tsm_name and not tsm_id
     else:
         #if tsm_name has more than 1 tsm_id, it will return tsm_name 
-        #where the date_deactivation is NULL or greater than or equal to_time 
+        #where the date_deactivation is NULL or greater than or equal to_time
         if tsm_details.tsm_id[tsm_details.tsm_name==tsm_name].count()>1:
             
             tsm_id = (tsm_details.tsm_id[(tsm_details.tsm_name==tsm_name) & 
@@ -281,9 +281,9 @@ def get_raw_accel_data(tsm_id='',tsm_name = "", from_time = "", to_time = "",
     #query
     print_out('Querying database ...')
 
-    query = ("SELECT ts,'%s' as 'tsm_name',times.node_id,xval,yval,zval,batt,"
-             " times.accel_number,accel_id, in_use from (select *, if(type_num"
-             " in (32,11,41) or type_num is NULL, 1,if(type_num in (33,12,42),2,0)) "
+    query = ("SELECT ts, '%s' as 'tsm_name', times.node_id, xval, yval, zval, batt,"
+             " times.accel_number, accel_id, in_use from (select *, if(type_num"
+             " in (32,11,41) or type_num is NULL, 1, if(type_num in (33,12,42),2,0)) "
              " as 'accel_number' from tilt_%s" %(tsm_name,tsm_name))
 
     query += " WHERE ts >= '%s'" %from_time
@@ -299,7 +299,7 @@ def get_raw_accel_data(tsm_id='',tsm_name = "", from_time = "", to_time = "",
         
     query += " ) times"
     
-    node_id_query = " inner join (SELECT * FROM senslopedb.accelerometers"
+    node_id_query = " inner join (SELECT *, id AS accel_id FROM senslopedb.accelerometers"
 
     node_id_query += " where tsm_id=%d" %tsm_id
     
@@ -420,7 +420,7 @@ def get_surficial_data(site_id, start_ts, end_ts, num_pts):
     """
 
     query =  "SELECT * FROM "
-    query += "  (SELECT * FROM marker_data "
+    query += "  (SELECT *, marker_data.id AS data_id FROM marker_data "
     query += "  WHERE marker_id IN ( "
     query += "    SELECT id as marker_id "
     query += "    FROM markers "
@@ -717,6 +717,7 @@ def get_tsm_list(tsm_name='', end=datetime.now()):
         try:
             query = "SELECT site_id, logger_id, id as tsm_id, tsm_name, number_of_segments, segment_length, date_activated"
             query += " FROM senslopedb.tsm_sensors WHERE (date_deactivated > '%s' OR date_deactivated IS NULL)" %end
+
             df = db.df_read(query)
             df = df.sort_values(['logger_id', 'date_activated'], ascending=[True, False])
             df = df.drop_duplicates('logger_id')
@@ -732,6 +733,7 @@ def get_tsm_list(tsm_name='', end=datetime.now()):
             query = "SELECT site_id, logger_id, id as tsm_id, tsm_name, number_of_segments, segment_length, date_activated"
             query += " FROM senslopedb.tsm_sensors WHERE (date_deactivated > '%s' OR date_deactivated IS NULL)" %end
             query += " AND tsm_name = '%s'" %tsm_name
+
             df = db.df_read(query)
             df = df.sort_values(['logger_id', 'date_activated'], ascending=[True, False])
             df = df.drop_duplicates('logger_id')

@@ -11,9 +11,16 @@ class Sites():
             site_filter (Str): site_id or site_code
             filter_value (Str or Int): int or str
 		"""
-		option = "*"
+		option = "*, sites.id AS site_id"
 		if return_col:
-			option = return_col
+			if return_col == "site_id":
+				option = "sites.id as site_id"
+			else:
+				option = return_col
+		
+		if site_filter == "site_id":
+			site_filter = "id"
+
 		query = f"SELECT {option} FROM sites WHERE {site_filter} = '{filter_value}'"
 		result = DB.db_read(query, 'senslopedb')
 

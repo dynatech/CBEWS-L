@@ -9,7 +9,7 @@ import analysis_pycodes.analysis.subsurface.vcdgen as subsurface_analysis
 
 SUBSURFACE_ANALYSIS_BLUEPRINT = Blueprint("subsurface_analysis_blueprint", __name__)
 
-@SUBSURFACE_ANALYSIS_BLUEPRINT.route("/get/data_analysis/<site_code>/subsurface/plot/data", methods=["GET"])
+@SUBSURFACE_ANALYSIS_BLUEPRINT.route("/get/data_analysis/<site_code>/subsurface/plot_data", methods=["GET"])
 def fetch(site_code):
     current_ts = dt.today().strftime("%Y-%m-%d %H:%M")
     sensor_plots = []
