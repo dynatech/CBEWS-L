@@ -72,7 +72,6 @@ def fetch_one_capacity_and_vulnerability(id):
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/update/community_risk_assessment/mar/capacity_and_vulnerability", methods=["POST"])
 def modify_capacity_and_vulnerability():
     data = request.get_json()
-    h.var_checker("data", data)
     result = CommunityRiskAssessment.update_cav(data)
     if result:
         return_value = {
