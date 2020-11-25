@@ -153,10 +153,6 @@ def delete_moms():
             }
     except Exception as err:
         raise(err)
-        moms = {
-            "status": False,
-            "message": f"Failed to fetch moms data. Error: {err}"
-        }
     return jsonify(moms)
 
 
@@ -240,7 +236,7 @@ def fetch_latest_moms(site_id):
     return jsonify(moms)
 
 
-@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/update/ground_data/moms/instance", methods=["POST"])
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/update/ground_data/moms/instance", methods=["PATCH"])
 def update_moms_instance():
     try:
         data_list = request.get_json()
@@ -267,7 +263,7 @@ def delete_moms_instance():
             "status": True,
             "message": "Successfully deleted instance data."
         }
-        if moms_delete["status"]:
+        if not moms_delete["status"]:
             moms = {
                 "status": False,
                 "message": f"Failed to fetch moms instance data. Error: {moms_delete['message']}"
@@ -324,7 +320,7 @@ def fetch_moms_feature_types(f_type=None):
     return jsonify(response)
 
 
-@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/update/ground_data/moms/feature/types", methods=["POST"])
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/update/ground_data/moms/feature/types", methods=["PATCH"])
 def update_moms_feature():
     try:
         data_list = request.get_json()
@@ -351,7 +347,7 @@ def delete_moms_feature():
             "status": True,
             "message": "Successfully deleted moms feature data."
         }
-        if moms_delete["status"]:
+        if not moms_delete["status"]:
             moms = {
                 "status": False,
                 "message": f"Failed to fetch moms feature data. Error: {moms_delete['message']}"

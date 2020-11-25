@@ -228,9 +228,9 @@ class GroundData():
             else:
                 temp_desc = f"NULL"
 
-            query = f"INSERT INTO moms_features (feature_id, feature_type, description, last_ts) "
-            query += f"VALUES (0, '{feature_type}', {temp_desc}, '{last_ts}')"
-            print(query)
+            query = f"INSERT INTO moms_features (feature_type, description, last_ts) "
+            query += f"VALUES ('{feature_type}', {temp_desc}, '{last_ts}')"
+
             feature_id = DB.db_modify(query, 'senslopedb', True)
         except Exception as err:
             raise(err)
@@ -247,16 +247,14 @@ class GroundData():
             reporter = data["reporter"]
             last_ts = Helpers.dt_to_str(dt.today())
 
-            query = f"INSERT INTO moms_instances (instance_id, site_id, feature_id, "
-            query += f"feature_name, location, reporter, last_ts) VALUES (0, {site_id}, "
+            query = f"INSERT INTO moms_instances (site_id, feature_id, "
+            query += f"feature_name, location, reporter, last_ts) VALUES ({site_id}, "
             query += f"{feature_id}, '{feature_name}', '{location}', '{reporter}', '{last_ts}')"
 
-            print(query)
             status = DB.db_modify(query, 'senslopedb', True)
             result = status
-            print(status)
         except Exception as err:
-            Helpers.var_checker("Error", err)
+            raise(err)
         finally:
             return result
 
