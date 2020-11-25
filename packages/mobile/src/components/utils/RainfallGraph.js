@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
-import { Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { processColor } from 'react-native';
-import {LineChart} from 'react-native-charts-wrapper';
+import { BarChart} from 'react-native-charts-wrapper';
 import { LabelStyle } from '../../styles/label_style';
 import moment from 'moment';
 
@@ -136,7 +136,77 @@ const RainfallGraph = (props) => {
 
 
 const RainfallInstantaneousGraph = (props) => {
+    const [display, setDisplay] = useState([]);
+    const [noData, setNoData] = useState(false);
+    const {
+        data,
+        data_source,
+        distance,
+        gauge_name,
+        threshold_value
+    } = props.props;
 
+    useEffect(()=> {
+        let {dataset , formatter} = constructDataSet(data)
+        if (dataset.length !=0 ) {
+            setDisplay([
+                <Fragment>
+                     {console.log(noData)}
+                    <Text style={[LabelStyle.medium_label, LabelStyle.brand]}>{`${gauge_name.toUpperCase()} (${distance}km away)`}</Text>
+                        <BarChart style={{height: 250, width: '100%'}}
+                            data={{
+                                dataSets: dataset
+                            }}
+                            xAxis={{
+                                valueFormatter: formatter,
+                                granularityEnabled: true,
+                                granularity : 1,
+                            }}
+                           
+                            gridBackgroundColor={noData ? processColor('#c7e5f2') : processColor('#fff')}
+                            legend={{wordWrapEnabled: true}}
+                        />
+                </Fragment>
+            ])
+        }
+    },[]);
+
+    const constructDataSet = (data) => {
+        let dataset = [];
+        let formatter = [];
+        let reconstruct_dataset = [];
+        setNoData(false);
+        data.forEach(element => {
+            formatter.push(moment(element.ts).format("HH:mm"))
+            if (element.rain != null) {
+                reconstruct_dataset.push(
+                    {y: element.rain}
+                );
+            } else {
+                reconstruct_dataset.push(
+                    {y: 0}
+                );
+                setNoData(true);
+            }
+        });
+
+        dataset.push({
+            label: `data`,
+            config: {
+                color: processColor('black'),
+                barShadowColor: processColor('lightgrey'),
+                highlightAlpha: 90,
+                highlightColor: processColor('red'),
+            },
+            xAxis: {
+                drawLabels: false,
+            },
+            values: reconstruct_dataset  
+        })
+        return {dataset, formatter};
+    }
+
+    return display;
 }
 
 export { RainfallGraph, RainfallInstantaneousGraph }

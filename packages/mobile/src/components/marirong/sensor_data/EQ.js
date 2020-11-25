@@ -3,7 +3,7 @@ import { View, Text, ScrollView } from 'react-native';
 import { LabelStyle } from '../../../styles/label_style';
 import { ContainerStyle } from '../../../styles/container_style';
 
-function EQ() {
+function EarthquakeData() {
 
     useEffect(()=> {
     }, []);
@@ -31,4 +31,4 @@ function EQ() {
     )
 }
 
-export default EQ;
+export default EarthquakeData;

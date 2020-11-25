@@ -11,7 +11,7 @@ function SubsurfaceDisplacement() {
     return (
         <ScrollView>
             <View style={ContainerStyle.content}>
-                <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Earthquake data</Text>
+                <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Subsurface displacement data</Text>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Latest data as of YYYY-MM-DD HH:mm:ss</Text>
                 {/* {
                     temp_rain.data.map((element)=> {

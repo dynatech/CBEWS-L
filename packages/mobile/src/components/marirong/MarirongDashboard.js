@@ -154,7 +154,7 @@ function MarirongDashboard(props) {
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Ground Data</Text>
               </View>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { StackNavigator.navigate("SensorData") }}>
+                <TouchableOpacity onPress={() => { StackNavigator.navigate("SensorDataStack") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/sensor_data.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Sensor Data</Text>
