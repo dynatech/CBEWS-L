@@ -316,7 +316,6 @@ def get_operational_trigger(site_id, start_monitor, end):
     query += "  operational_trigger_symbols AS sym "
     query += "ON op.trigger_sym_id = sym.id "
     query += "ORDER BY ts DESC"
-
     op_trigger = qdb.get_db_dataframe(query)
     
     return op_trigger

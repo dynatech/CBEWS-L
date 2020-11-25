@@ -87,6 +87,7 @@ def add():
             "trigger_id": trigger_id
         }
     except Exception as err:
+        raise
         moms = {
             "status": False,
             "code": 500,

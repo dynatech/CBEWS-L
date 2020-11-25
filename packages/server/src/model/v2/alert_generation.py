@@ -130,7 +130,7 @@ class AlertGeneration():
             site_id (int) - trigger_id identified the row to be updated
             trig_sym_id (int) - trigger_sym_id - the kind of trigger
         """
-        query = "SELECT * FROM operational_triggers "
+        query = "SELECT *, id as trigger_id FROM operational_triggers "
         query += f"WHERE site_id = {site_id} "
         if trig_sym_id:
             query += f"AND trigger_sym_id = {trig_sym_id} "
