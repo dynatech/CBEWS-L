@@ -14,6 +14,7 @@ from flask_jwt_extended import JWTManager
 from pprint import pprint
 from config import APP_CONFIG
 from flask_talisman import Talisman
+from flask_sslify import SSLify
 
 BCRYPT = Bcrypt()
 JWT = JWTManager()
@@ -33,6 +34,7 @@ def create_app():
 	CORS(app)
 	SOCKETIO.init_app(app)
 	Talisman(app)
+	SSLify(app)
 
 	# from src.api.users.user_account import USER_ACCOUNT_BLUEPRINT
 	# app.register_blueprint(USER_ACCOUNT_BLUEPRINT, url_prefix="/api")
