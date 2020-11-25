@@ -88,7 +88,6 @@ def get_all_field_survey_logs():
 def add_field_survey_logs():
     try:
         data = request.get_json()
-        h.var_checker("data", data)
         summary = FieldSurveyModel.create_field_survey_log(data)
         ret_val = {
             'status': True,

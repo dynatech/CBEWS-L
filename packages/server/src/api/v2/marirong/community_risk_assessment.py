@@ -89,7 +89,6 @@ def modify_capacity_and_vulnerability():
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/delete/community_risk_assessment/mar/capacity_and_vulnerability", methods=["DELETE"])
 def remove_capacity_and_vulnerability():
     data = request.get_json()
-    h.var_checker("data", data)
     status = CommunityRiskAssessment.delete_cav(data["id"])
     if status:
         return_value = {
@@ -170,7 +169,6 @@ def fetch_hazard_map():
         # leave only regular files, insert creation date
         entries = ((stat[ST_CTIME], path)
         for stat, path in entries if S_ISREG(stat[ST_MODE]))
-        h.var_checker("entries", entries)
 
         maps = []
         for map in map_list:

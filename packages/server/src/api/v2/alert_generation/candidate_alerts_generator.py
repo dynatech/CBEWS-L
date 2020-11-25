@@ -533,6 +533,7 @@ def fix_internal_alert_invalids(entry, invalid_triggers_list, merged_list):
             sorted_v_trigs = sorted(valid_triggers, key=lambda x: x["ts"], reverse=True)
             if sorted_v_trigs:
                 latest_ts = h.str_to_dt(sorted_v_trigs[0]["ts"])
+                latest_ts = h.round_to_nearest_release_time(latest_ts)
                 mod_validity = latest_ts + timedelta(1)
 
                 if candidate_alert_level == 3:
@@ -653,7 +654,6 @@ def main(to_update_pub_alerts=False, internal_gen_data=None):
 
     if to_update_pub_alerts:
         if platform.system() == "Windows":
-            # TODO: please identify ung path pag sa windows. 
             os.system(f"python {APP_CONFIG['app_directory']}\\CBEWS-L\\packages\\server\\analysis_pycodes\\analysis\\publicalerts.py")
         else:
             os.system("python ~/CBEWS-L/packages/server/analysis_pycodes/analysis/publicalerts.py")

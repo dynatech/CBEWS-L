@@ -268,7 +268,7 @@ def get_raw_accel_data(tsm_id='',tsm_name = "", from_time = "", to_time = "",
     #get tsm_id if input is tsm_name and not tsm_id
     else:
         #if tsm_name has more than 1 tsm_id, it will return tsm_name 
-        #where the date_deactivation is NULL or greater than or equal to_time 
+        #where the date_deactivation is NULL or greater than or equal to_time
         if tsm_details.tsm_id[tsm_details.tsm_name==tsm_name].count()>1:
             
             tsm_id = (tsm_details.tsm_id[(tsm_details.tsm_name==tsm_name) & 
@@ -281,9 +281,9 @@ def get_raw_accel_data(tsm_id='',tsm_name = "", from_time = "", to_time = "",
     #query
     print_out('Querying database ...')
 
-    query = ("SELECT ts,'%s' as 'tsm_name',times.node_id,xval,yval,zval,batt,"
-             " times.accel_number,accel_id, in_use from (select *, if(type_num"
-             " in (32,11,41) or type_num is NULL, 1,if(type_num in (33,12,42),2,0)) "
+    query = ("SELECT ts, '%s' as 'tsm_name', times.node_id, xval, yval, zval, batt,"
+             " times.accel_number, accel_id, in_use from (select *, if(type_num"
+             " in (32,11,41) or type_num is NULL, 1, if(type_num in (33,12,42),2,0)) "
              " as 'accel_number' from tilt_%s" %(tsm_name,tsm_name))
 
     query += " WHERE ts >= '%s'" %from_time
@@ -299,7 +299,7 @@ def get_raw_accel_data(tsm_id='',tsm_name = "", from_time = "", to_time = "",
         
     query += " ) times"
     
-    node_id_query = " inner join (SELECT * FROM senslopedb.accelerometers"
+    node_id_query = " inner join (SELECT *, id AS accel_id FROM senslopedb.accelerometers"
 
     node_id_query += " where tsm_id=%d" %tsm_id
     
@@ -420,7 +420,7 @@ def get_surficial_data(site_id, start_ts, end_ts, num_pts):
     """
 
     query =  "SELECT * FROM "
-    query += "  (SELECT * FROM marker_data "
+    query += "  (SELECT *, marker_data.id AS data_id FROM marker_data "
     query += "  WHERE marker_id IN ( "
     query += "    SELECT id as marker_id "
     query += "    FROM markers "
@@ -717,6 +717,7 @@ def get_tsm_list(tsm_name='', end=datetime.now()):
         try:
             query = "SELECT site_id, logger_id, id as tsm_id, tsm_name, number_of_segments, segment_length, date_activated"
             query += " FROM senslopedb.tsm_sensors WHERE (date_deactivated > '%s' OR date_deactivated IS NULL)" %end
+
             df = db.df_read(query)
             df = df.sort_values(['logger_id', 'date_activated'], ascending=[True, False])
             df = df.drop_duplicates('logger_id')
@@ -732,6 +733,7 @@ def get_tsm_list(tsm_name='', end=datetime.now()):
             query = "SELECT site_id, logger_id, id as tsm_id, tsm_name, number_of_segments, segment_length, date_activated"
             query += " FROM senslopedb.tsm_sensors WHERE (date_deactivated > '%s' OR date_deactivated IS NULL)" %end
             query += " AND tsm_name = '%s'" %tsm_name
+
             df = db.df_read(query)
             df = df.sort_values(['logger_id', 'date_activated'], ascending=[True, False])
             df = df.drop_duplicates('logger_id')
@@ -912,7 +914,7 @@ def alert_to_db(df, table_name):
     
     if table_name == 'operational_triggers':
         # checks trigger source
-        query =  "SELECT * FROM "
+        query =  "SELECT *, op.id as trigger_sym_id FROM "
         query += "  operational_trigger_symbols AS op "
         query += "INNER JOIN "
         query += "  trigger_hierarchies AS trig "
@@ -931,17 +933,17 @@ def alert_to_db(df, table_name):
         elif trigger_source == 'surficial':
 
             query =  "SELECT trigger_id, trig.trigger_sym_id FROM "
-            query += "  (SELECT id as trigger_sym_id, alert_level, alert_symbol, "
+            query += "  (SELECT op.id as trigger_sym_id, alert_level, alert_symbol, "
             query += "  op.source_id, trigger_source FROM "
             query += "    operational_trigger_symbols AS op "
             query += "  INNER JOIN "
-            query += "    (SELECT * FROM trigger_hierarchies "
+            query += "    (SELECT *, trigger_hierarchies.id as source_id FROM trigger_hierarchies "
             query += "    WHERE trigger_source = '%s' " %trigger_source
             query += "    ) AS trig "
             query += "  ON op.source_id = trig.id "
             query += "  ) AS sym "
             query += "INNER JOIN "
-            query += "  (SELECT * FROM operational_triggers "
+            query += "  (SELECT *, operational_triggers.id as trigger_id FROM operational_triggers "
             query += "  WHERE site_id = %s " %df['site_id'].values[0]
             query += "  AND ts = '%s' " %df['ts'].values[0]
             query += "  ) AS trig "
@@ -957,20 +959,20 @@ def alert_to_db(df, table_name):
                 if trigger_sym_id != surficial['trigger_sym_id'].values[0]:
                     query =  "UPDATE %s " %table_name
                     query += "SET trigger_sym_id = '%s' " %trigger_sym_id
-                    query += "WHERE trigger_id = %s" %trigger_id
+                    query += "WHERE id = %s" %trigger_id
                     db.write(query)
             
             return
                 
         query =  "SELECT * FROM "
-        query += "  (SELECT trigger_sym_id, alert_level, alert_symbol, "
+        query += "  (SELECT op.id as trigger_sym_id, alert_level, alert_symbol, "
         query += "    op.source_id, trigger_source FROM "
         query += "      operational_trigger_symbols AS op "
         query += "    INNER JOIN "
-        query += "      (SELECT * FROM trigger_hierarchies "
+        query += "      (SELECT *, trigger_hierarchies.id as source_id FROM trigger_hierarchies "
         query += "      WHERE trigger_source = '%s' " %trigger_source
         query += "      ) AS trig "
-        query += "    ON op.source_id = trig.source_id "
+        query += "    ON op.source_id = trig.id "
         query += "    ) AS sym "
         query += "INNER JOIN "
         query += "  ( "
@@ -984,10 +986,18 @@ def alert_to_db(df, table_name):
         where_id = 'site_id'
         
     ts_updated = pd.to_datetime(df['ts_updated'].values[0])-timedelta(hours=0.5)
-    
+
+    temp = ""
+    if table_name == 'operational_triggers':
+        temp = f", {table_name}.id as trigger_id"
+    elif table_name == 'public_alerts':
+        temp = f", {table_name}.id as public_id"
+    elif table_name == 'tsm_alerts':
+        temp = f", {table_name}.id as ta_id"
+
     # previous alert
-    query += "  SELECT * FROM %s " %table_name
-    query += "  WHERE %s = %s " %(where_id, df[where_id].values[0])
+    query += "  SELECT *%s FROM %s " %(temp, table_name)
+    query += "  WHERE id = %s " %df[where_id].values[0]
     query += "  AND ((ts <= '%s' " %df['ts_updated'].values[0]
     query += "    AND ts_updated >= '%s') " %df['ts_updated'].values[0]
     query += "  OR (ts_updated <= '%s' " %df['ts_updated'].values[0]

@@ -122,6 +122,8 @@ def get_site_moms_alerts(site_id, start, end):
     query = f"{query} AND moms.observance_ts <= '{end}'"
     query = f"{query} ORDER BY moms.observance_ts DESC"
 
+    print("query", query)
+
     site_moms_alerts_df = qdb.get_db_dataframe(query)
     sorted_df = site_moms_alerts_df.sort_values(['op_trigger'], ascending=[False])
 
@@ -316,7 +318,6 @@ def get_operational_trigger(site_id, start_monitor, end):
     query += "  operational_trigger_symbols AS sym "
     query += "ON op.trigger_sym_id = sym.id "
     query += "ORDER BY ts DESC"
-
     op_trigger = qdb.get_db_dataframe(query)
     
     return op_trigger

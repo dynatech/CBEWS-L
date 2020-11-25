@@ -72,6 +72,7 @@ class GroundData():
             LIMIT 1;
         """
         result = []
+        print(query)
         mo_result = DB.db_read(query, 'senslopedb')
         if mo_result:
             mo_id = mo_result[0]["mo_id"]
@@ -131,8 +132,8 @@ class GroundData():
 
 
     def fetch_surficial_plot_data(marker_id, site_code, start, end):
-        query = f'SELECT mo_id, id, marker_id, ts as x, measurement as y FROM senslopedb.marker_data md INNER ' \
-                f'JOIN marker_observations  mo ON (mo.id = md.mo_id) WHERE (ts BETWEEN "{start}" AND "{end}") and marker_id = {marker_id} ' \
+        query = f'SELECT mo.id AS mo_id, md.id AS data_id, marker_id, ts AS x, measurement AS y FROM senslopedb.marker_data md INNER ' \
+                f'JOIN marker_observations mo ON (mo.id = md.mo_id) WHERE (ts BETWEEN "{start}" AND "{end}") and marker_id = {marker_id} ' \
                 'order by ts asc;'
         result = DB.db_read(query, 'senslopedb')
         return result
@@ -227,9 +228,9 @@ class GroundData():
             else:
                 temp_desc = f"NULL"
 
-            query = f"INSERT INTO moms_features (feature_id, feature_type, description, last_ts) "
-            query += f"VALUES (0, '{feature_type}', {temp_desc}, '{last_ts}')"
-            print(query)
+            query = f"INSERT INTO moms_features (feature_type, description, last_ts) "
+            query += f"VALUES ('{feature_type}', {temp_desc}, '{last_ts}')"
+
             feature_id = DB.db_modify(query, 'senslopedb', True)
         except Exception as err:
             raise(err)
@@ -246,16 +247,14 @@ class GroundData():
             reporter = data["reporter"]
             last_ts = Helpers.dt_to_str(dt.today())
 
-            query = f"INSERT INTO moms_instances (instance_id, site_id, feature_id, "
-            query += f"feature_name, location, reporter, last_ts) VALUES (0, {site_id}, "
+            query = f"INSERT INTO moms_instances (site_id, feature_id, "
+            query += f"feature_name, location, reporter, last_ts) VALUES ({site_id}, "
             query += f"{feature_id}, '{feature_name}', '{location}', '{reporter}', '{last_ts}')"
 
-            print(query)
             status = DB.db_modify(query, 'senslopedb', True)
             result = status
-            print(status)
         except Exception as err:
-            Helpers.var_checker("Error", err)
+            raise(err)
         finally:
             return result
 

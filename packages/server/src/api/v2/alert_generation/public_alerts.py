@@ -177,7 +177,6 @@ def get_umi_alert_validation_data():
 def validate_trigger():
     """
     """
-    print("FAK")
     try:
         AG = AlertGeneration
         json_input = request.get_json()

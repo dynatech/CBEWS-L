@@ -61,15 +61,12 @@ def fetch_status_analysis(site_code):
     message = ""
     site_id = Sites.get_site_details(
         filter_value=site_code, site_filter="site_code", return_col="site_id")
-    print("site_id",site_id)
     latest_data = GroundData.fetch_latest_surficial_data(site_id)
-    print(latest_data)
     try:
         if latest_data:
             ts = latest_data[0]["ts"]
             op_trigger = GroundData.fetch_surficial_operational_trigger(
                 site_id, ts)
-            print(op_trigger)
             if op_trigger:
                 alert_symbol = op_trigger[0]["alert_symbol"]
                 alert_description = op_trigger[0]["alert_description"]

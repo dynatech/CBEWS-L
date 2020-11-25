@@ -282,7 +282,7 @@ def get_moms_tech_info(site_id, latest_trigger_ts):
 
                 moms_tech_info["m" + str(index+2)] = f"{prefix} {tech_info} found on site."
         return moms_tech_info
-    
+
     except Exception as err:
         print("get moms tech info: " + err)
 
