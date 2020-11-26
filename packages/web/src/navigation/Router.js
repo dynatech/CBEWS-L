@@ -10,6 +10,9 @@ import PageNotFound from '../components/authentications/PageNotFound';
 
 import MarDashboard from '../components/marirong/MarirongDashboard';
 import UmiDashboard from '../components/umingan/UminganDashboard';
+import SigninIloilo from '../components/iloilo_pdrrmo/authentication/Signin';
+import IloiloDashboard from '../components/iloilo_pdrrmo/IloIloDashboard';
+
 import { useCookies } from "react-cookie";
 
 function RouterApp() {
@@ -37,6 +40,10 @@ function RouterApp() {
         <Route path='/signup' component={SignUp} />
         <Route path='/signin' component={Signin} />
         <Route exact path='/' component={DownloadPage} />
+        {/* PDRRMO SECTION */}
+        <Route path='/iloilo/signin' component={SigninIloilo} />
+        <Route path='/iloilo/dashboard' component={IloiloDashboard} />
+        {/* PDRRMO SECTION */}
         <Route component={PageNotFound} />
       </Switch>
     </BrowserRouter>
