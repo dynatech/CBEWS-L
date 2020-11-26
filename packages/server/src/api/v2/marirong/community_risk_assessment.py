@@ -69,7 +69,7 @@ def fetch_one_capacity_and_vulnerability(id):
         return jsonify(data)
 
 
-@COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/update/community_risk_assessment/mar/capacity_and_vulnerability", methods=["POST"])
+@COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/update/community_risk_assessment/mar/capacity_and_vulnerability", methods=["PATCH"])
 def modify_capacity_and_vulnerability():
     data = request.get_json()
     result = CommunityRiskAssessment.update_cav(data)
