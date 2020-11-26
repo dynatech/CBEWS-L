@@ -6,7 +6,7 @@ import {
     TableRow
 } from "@material-ui/core";
 
-import TransitionalModal from '../../reducers/pdrmmo_iloilo/loading';
+import TransitionalModal from '../../reducers/pdrrmo_iloilo/loading';
 
 
 const tableStyle = makeStyles(theme => ({

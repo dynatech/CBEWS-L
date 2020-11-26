@@ -16,7 +16,7 @@ function RainfallInstantaneous() {
             <View style={ContainerStyle.content}>
                 <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Instantaneous Rainfall Plots</Text>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Latest data as of YYYY-MM-DD HH:mm:ss</Text>
-                {/* {
+                {
                     temp_rain.data.map((element)=> {
                         let ret_val = [];
                         element.plot.forEach(row => {
@@ -28,7 +28,7 @@ function RainfallInstantaneous() {
                         }); 
                         return ret_val;
                     })
-                } */}
+                }
             </View>
         </ScrollView>
     )

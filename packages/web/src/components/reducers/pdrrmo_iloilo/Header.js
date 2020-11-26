@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogoAppBar } from '../reducers/logos'
+import { LogoAppBar } from '../pdrrmo_iloilo/Logos'
 import { AppBar, Toolbar, IconButton, 
     Drawer, List, Divider, 
     ListItem, ListItemText, makeStyles, Typography, Container, Grid } from '@material-ui/core';
