@@ -25,8 +25,7 @@ class ProductionConfig(Config):
 
     DEBUG = False
 
-APP_DIR = "C:/Users/John Louie/codes"
-# APP_DIR = "/home/louie-cbews/CODES"
+APP_DIR = "/home/dynaslope/CODES"
 
 APP_CONFIG = {
     "development": DevelopmentConfig,
