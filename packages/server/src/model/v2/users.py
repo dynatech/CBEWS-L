@@ -90,7 +90,7 @@ class Users():
 		return count
 
 	def fetch_account(username):
-		uery = f"""
+		query = f"""
 			SELECT
 				user_accounts.id as user_id, 
 				profile_id, site_id, role_id,

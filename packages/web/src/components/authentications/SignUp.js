@@ -100,7 +100,7 @@ export default function SignUp(props) {
                             let response = await UserManagement.AuthRegistration(values);
                             console.log("response", response);
                             if (response.status === true) {
-                                handleChangeRoute('');
+                                handleChangeRoute('signin');
                             } else {
                                 console.error("problem submitting");
                             }
@@ -294,7 +294,7 @@ export default function SignUp(props) {
                                     <Link
                                         href="#"
                                         variant="body2"
-                                        onClick={() => handleChangeRoute("")}
+                                        onClick={() => handleChangeRoute("signin")}
                                     >
                                         Already have an account? Sign in
                                     </Link>
