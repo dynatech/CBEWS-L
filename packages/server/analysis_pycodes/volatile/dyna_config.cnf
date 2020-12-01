@@ -23,9 +23,9 @@ resources4 = sb_remote,sb_rack_remote_1,sb_local
 
 
 [Db]
-password = senslope
+password = cb3wsls3rv3r
 name = senslopedb
-user = root
+user = cbewsl
 
 [Serial]
 baudrate = 57600
