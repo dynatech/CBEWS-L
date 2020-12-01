@@ -7,7 +7,7 @@ import GridListTileBar from '@material-ui/core/GridListTileBar';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
-import AppConfig from "../reducers/AppConfig";
+import { AppConfig } from '@dynaslope/commons';
 
 const useStyles = makeStyles((theme) => ({
     root: {

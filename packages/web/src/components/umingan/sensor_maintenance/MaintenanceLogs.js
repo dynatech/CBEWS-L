@@ -23,11 +23,10 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContentText from "@material-ui/core/DialogContentText";
 
 import PDFViewer from "../../reducers/PDFViewer";
-import AppConfig from "../../reducers/AppConfig";
 
 import { UmiSensorMaintenance } from "@dynaslope/commons";
 
-import { useStyles, tableStyles } from "../../../styles/general_styles";
+import { useStyles } from "../../../styles/general_styles";
 
 import Forms from "../../utils/Forms";
 import FabMuiTable from "../../utils/MuiTable";
@@ -35,8 +34,6 @@ import FabMuiTable from "../../utils/MuiTable";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import { useCookies } from "react-cookie";
-
-import { renderToString } from "react-dom/server";
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;

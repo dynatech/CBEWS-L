@@ -1,26 +1,11 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import { useCookies } from 'react-cookie';
 import {
     Grid, Paper, Container,
     Fab, makeStyles, Table,
     TableBody, TableCell, TableHead,
-    TableRow, Box, TextField, Button,
-    FormControl, InputLabel, Select, MenuItem
+    TableRow
 } from "@material-ui/core";
 
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-
-import {
-    MuiPickersUtilsProvider,
-    KeyboardDatePicker,
-} from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
-import moment from "moment";
-import AppConfig from '../../reducers/AppConfig';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 

@@ -25,7 +25,6 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 
 import AttachmentsGridList from "../../reducers/AttachmentList";
 import PDFPreviewer from "../../reducers/PDFViewer";
-import AppConfig from "../../reducers/AppConfig";
 
 import { MarMaintenanceLogs } from "@dynaslope/commons";
 

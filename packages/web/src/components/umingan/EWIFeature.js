@@ -8,8 +8,7 @@ import {
 } from '@material-ui/core';
 import moment from "moment";
 import { useStyles, tableStyle } from '../../styles/general_styles';
-import AppConfig from "../reducers/AppConfig";
-import { AlertGeneration } from '@dynaslope/commons';
+import { AlertGeneration, AppConfig } from '@dynaslope/commons';
 
 // import RainfallPlot from './rainfall_plot';
 // import SurficialPlot from './surficial_plot';

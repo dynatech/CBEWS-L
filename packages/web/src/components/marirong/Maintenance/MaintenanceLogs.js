@@ -23,7 +23,6 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContentText from "@material-ui/core/DialogContentText";
 
 import PDFViewer from "../../reducers/PDFViewer";
-import AppConfig from "../../reducers/AppConfig";
 
 import { MarMaintenanceLogs } from "@dynaslope/commons";
 

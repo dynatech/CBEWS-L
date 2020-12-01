@@ -25,9 +25,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 
-import { MarCommunityRiskAssessment } from "@dynaslope/commons";
-
-import AppConfig from "../../reducers/AppConfig";
+import { MarCommunityRiskAssessment, AppConfig } from "@dynaslope/commons";
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;

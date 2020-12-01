@@ -2,7 +2,6 @@ import React from 'react';
 import {
     Grid, Fab, makeStyles, Box, Typography
 } from "@material-ui/core";
-import AppConfig from "../reducers/AppConfig";
 
 import { MarCommunityRiskAssessment } from '@dynaslope/commons';
 
