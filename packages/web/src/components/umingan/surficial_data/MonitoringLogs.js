@@ -25,9 +25,8 @@ import MomentUtils from '@date-io/moment';
 import moment from 'moment';
 
 import { useCookies } from 'react-cookie';
-import AppConfig from '../../reducers/AppConfig';
 
-import { MarGroundData } from '@dynaslope/commons'
+import { MarGroundData, AppConfig } from '@dynaslope/commons'
 
 const tableStyle = makeStyles(theme => ({
     root: {

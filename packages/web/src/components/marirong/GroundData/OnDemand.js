@@ -20,11 +20,10 @@ import {
 } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import moment from "moment";
-import AppConfig from '../../reducers/AppConfig';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 
-import { MarGroundData } from '@dynaslope/commons';
+import { MarGroundData, AppConfig } from '@dynaslope/commons';
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;

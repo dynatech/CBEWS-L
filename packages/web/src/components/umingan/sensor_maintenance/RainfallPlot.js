@@ -8,14 +8,7 @@ import {
     TableBody, TableCell, TableHead,
     TableRow, Typography
 } from "@material-ui/core";
-// import { sample_rain_data } from "./sample_rain_data._not_final";
-import TransitionalModal from '../../reducers/loading';
-import {
-    MuiPickersUtilsProvider,
-    KeyboardDatePicker,
-} from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
-import AppConfig from "../../reducers/AppConfig";
+
 import { useCookies } from 'react-cookie';
 import { UmiDataAnalysis } from "@dynaslope/commons";
 

@@ -1,3 +1,5 @@
+import AppConfig from './src/utils/AppConfig';
+
 import {
   AuthRegistration,
   UserAuthentication,
@@ -342,6 +344,7 @@ const UmiSensorMaintenance = {
 }
 
 export {
+    AppConfig,
     AlertGeneration,
     UserManagement,
     MarCommunityRiskAssessment,
