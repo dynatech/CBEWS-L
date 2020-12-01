@@ -5,16 +5,6 @@ import hashlib
 
 class Users():
 
-	def create_user(username):
-		query = ('INSERT INTO users VALUES (0, "%s", "","", 1)') % username
-		user_id = DB.db_modify(query,'cbewsl_commons_db', True)
-		return user_id
-
-	def create_user_complete_details(firstname, lastname, nickname):
-		query = (f"INSERT INTO users VALUES (0, '{firstname}', '{lastname}', '{nickname}', 1)")
-		user_id = DB.db_modify(query,'cbewsl_commons_db', True)
-		return user_id
-
 	def create_user_account(data):
 		try:
 			firstname, lastname, middlename, \
@@ -100,26 +90,24 @@ class Users():
 		return count
 
 	def fetch_account(username):
-		query = "SELECT user_accounts.id as user_id, " \
-				"profile_id," \
-				"site_id," \
-				"role_id," \
-				"mobile_id," \
-				"username," \
-				"password," \
-				"salt," \
-				"firstname," \
-				"lastname," \
-				"middlename," \
-				"age," \
-				"gender," \
-				"email," \
-				"gsm_id," \
-				"mobile_number," \
-				"role_title," \
-				"role_restrictions FROM user_accounts INNER JOIN user_profiles ON (user_profiles.id = user_accounts.profile_id) " \
-				"INNER JOIN user_mobiles ON (user_mobiles.id = user_accounts.mobile_id) INNER JOIN user_roles ON (user_roles.id = user_accounts.role_id) " \
-				f"WHERE username = '{username}'"
+		uery = f"""
+			SELECT
+				user_accounts.id as user_id, 
+				profile_id, site_id, role_id,
+				mobile_id, username, password,
+				salt, firstname, lastname,
+				middlename, age, gender,
+				email, gsm_id, mobile_number,
+				role_title, role_restrictions
+			FROM
+				user_accounts 
+			INNER JOIN
+				user_profiles
+				ON (user_profiles.id = user_accounts.profile_id) 
+			INNER JOIN
+				user_mobiles
+				ON (user_mobiles.id = user_accounts.mobile_id) INNER JOIN user_roles ON (user_roles.id = user_accounts.role_id) 
+			WHERE username = '{username}'"""
 		account = DB.db_read(query, 'cbewsl_commons_db')
 		return account
 
