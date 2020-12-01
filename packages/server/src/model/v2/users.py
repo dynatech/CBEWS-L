@@ -69,7 +69,7 @@ class Users():
 		return gsm_id, f"639{remaining_number}"
 
 	def get_role_privilige(org):
-		query = f"SELECT role_id FROM user_roles WHERE role_title = '{org}'"
+		query = f"SELECT id AS role_id FROM user_roles WHERE role_title = '{org}'"
 		ret_val = DB.db_read(query, 'cbewsl_commons_db')[0]["role_id"]
 		return ret_val
 
@@ -90,7 +90,7 @@ class Users():
 		return count
 
 	def fetch_account(username):
-		uery = f"""
+		query = f"""
 			SELECT
 				user_accounts.id as user_id, 
 				profile_id, site_id, role_id,
@@ -106,7 +106,9 @@ class Users():
 				ON (user_profiles.id = user_accounts.profile_id) 
 			INNER JOIN
 				user_mobiles
-				ON (user_mobiles.id = user_accounts.mobile_id) INNER JOIN user_roles ON (user_roles.id = user_accounts.role_id) 
+				ON (user_mobiles.id = user_accounts.mobile_id)
+			INNER JOIN user_roles
+				ON (user_roles.id = user_accounts.role_id) 
 			WHERE username = '{username}'"""
 		account = DB.db_read(query, 'cbewsl_commons_db')
 		return account
