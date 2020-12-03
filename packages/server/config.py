@@ -25,7 +25,7 @@ class ProductionConfig(Config):
 
     DEBUG = False
 
-APP_DIR = "/home/dynaslope/CODES"
+APP_DIR = "/home/dynaslope"
 
 APP_CONFIG = {
     "development": DevelopmentConfig,
