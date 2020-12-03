@@ -712,38 +712,21 @@ def logger_array_list(TSMdf):
 
 #get_tsm_list():
 #    returns a list of loggerArray objects from the database tables
-def get_tsm_list(tsm_name='', end=datetime.now()):
-    if tsm_name == '':
-        try:
-            query = "SELECT site_id, logger_id, id as tsm_id, tsm_name, number_of_segments, segment_length, date_activated"
-            query += " FROM senslopedb.tsm_sensors WHERE (date_deactivated > '%s' OR date_deactivated IS NULL)" %end
-
-            df = db.df_read(query)
-            df = df.sort_values(['logger_id', 'date_activated'], ascending=[True, False])
-            df = df.drop_duplicates('logger_id')
-            
-            # make a sensor list of loggerArray class functions
-            TSMdf = df.groupby('logger_id', as_index=False)
-            sensors = TSMdf.apply(logger_array_list)
-            return sensors
-        except:
-            raise ValueError('Could not get sensor list from database')
-    else:
-        try:
-            query = "SELECT site_id, logger_id, id as tsm_id, tsm_name, number_of_segments, segment_length, date_activated"
-            query += " FROM senslopedb.tsm_sensors WHERE (date_deactivated > '%s' OR date_deactivated IS NULL)" %end
+def get_tsm_list(tsm_name='', end='2010-01-01'):
+    try:
+        query = "SELECT site_id, logger_id, id as tsm_id, tsm_name, number_of_segments, segment_length, date_activated"
+        query += " FROM tsm_sensors WHERE (date_deactivated > '%s' OR date_deactivated IS NULL)" %end
+        if tsm_name != '':
             query += " AND tsm_name = '%s'" %tsm_name
-
-            df = db.df_read(query)
-            df = df.sort_values(['logger_id', 'date_activated'], ascending=[True, False])
-            df = df.drop_duplicates('logger_id')
-            
-            # make a sensor list of loggerArray class functions
-            TSMdf = df.groupby('logger_id', as_index=False)
-            sensors = TSMdf.apply(logger_array_list)
-            return sensors
-        except:
-            raise ValueError('Could not get sensor list from database')
+        df = db.df_read(query)
+        df = df.sort_values(['logger_id', 'date_activated'], ascending=[True, False])
+        df = df.drop_duplicates('logger_id')
+        # make a sensor list of loggerArray class functions
+        TSMdf = df.groupby('logger_id', as_index=False)
+        sensors = TSMdf.apply(logger_array_list)
+        return sensors
+    except:
+        raise ValueError('Could not get sensor list from database')
 
 #returns list of non-working nodes from the node status table
 #function will only return the latest entry per site per node with

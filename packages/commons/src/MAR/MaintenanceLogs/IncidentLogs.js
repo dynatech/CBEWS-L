@@ -43,7 +43,6 @@ const GetDayIncidentLogs = (timestamp) => {
 }
 
 const GetMonthIncidentLogs = (start, end) => {
-    console.log("di naman nareject");
     return fetch(`${AppConfig.HOSTNAME}/v2/fetch/month/maintenance/mar/incident_logs/${start}/${end}`, {
         method: 'GET',
         headers: {
