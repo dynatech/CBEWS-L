@@ -1,4 +1,5 @@
 import React, { useState, Fragment } from 'react';
+import moment from 'moment';
 import { Container, Paper, Grid, CardMedia, Box, makeStyles, Fab } from '@material-ui/core';
 import { AlertGeneration } from '@dynaslope/commons';
 
@@ -69,7 +70,7 @@ function AlertStatus(props) {
                                                     Start of event:
                                                 </Box>
                                                 <Box fontSize={15} fontWeight={"bold"} style={{marginLeft: 5}}>
-                                                    {moment(body.umi.event_start).format("MMMM D, YYYY HH:mm:SS")}
+                                                    {moment(body.umi.event_start, "MMMM D, YYYY HH:mm:SS")}
                                                 </Box>
                                             </Box>
                                             <Box style={{display: 'inline-flex'}}>
@@ -77,7 +78,7 @@ function AlertStatus(props) {
                                                     Latest trigger:
                                                 </Box>
                                                 <Box fontSize={15} fontWeight={"bold"} style={{marginLeft: 5}}>
-                                                    {moment(body.umi.latest_event_triggers[0].timestamp).format("MMMM D, YYYY HH:mm:SS")}
+                                                    {moment(body.umi.latest_event_triggers[0].timestamp, "MMMM D, YYYY HH:mm:SS")}
                                                 </Box>
                                             </Box>
                                             <Box style={{display: 'inline-flex'}}>
@@ -157,7 +158,7 @@ function AlertStatus(props) {
                                                         Start of event:
                                                     </Box>
                                                     <Box fontSize={15} fontWeight={"bold"} style={{marginLeft: 5}}>
-                                                        {moment(body.umi.event_start).format("MMMM D, YYYY HH:mm:SS")}
+                                                        {moment(body.umi.event_start, "MMMM D, YYYY HH:mm:SS")}
                                                     </Box>
                                                 </Box>
                                                 <Box style={{display: 'inline-flex'}}>
@@ -165,7 +166,7 @@ function AlertStatus(props) {
                                                         Latest trigger:
                                                     </Box>
                                                     <Box fontSize={15} fontWeight={"bold"} style={{marginLeft: 5}}>
-                                                        {moment(body.umi.latest_event_triggers[0].timestamp).format("MMMM D, YYYY HH:mm:SS")}
+                                                        {moment(body.umi.latest_event_triggers[0].timestamp, "MMMM D, YYYY HH:mm:SS")}
                                                     </Box>
                                                 </Box>
                                                 <Box style={{display: 'inline-flex'}}>
