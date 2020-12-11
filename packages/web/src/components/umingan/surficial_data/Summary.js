@@ -4,9 +4,8 @@ import HighchartsReact from "highcharts-react-official";
 import TransitionalModal from '../../reducers/loading';
 import moment from "moment";
 import {
-    Grid, Paper, Container, Fab, makeStyles, Typography
+    Grid, Paper, Container, makeStyles, Typography
 } from "@material-ui/core";
-import AppConfig from "../../reducers/AppConfig";
 import { useCookies } from 'react-cookie';
 import { UmiDataAnalysis } from "@dynaslope/commons";
 

@@ -4,7 +4,6 @@ import {
     Fab, Typography, TextField, MenuItem
 } from "@material-ui/core";
 import { useStyles, tableStyles } from '../../styles/general_styles';
-import AppConfig from '../reducers/AppConfig';
 import moment from 'moment';
 
 import Button from '@material-ui/core/Button';
