@@ -2,7 +2,7 @@ import React, { Fragment, useEffect } from 'react';
 import { Grid, Paper, Typography, } from '@material-ui/core';
 import moment from 'moment';
 
-import { MarDataAnalysis } from '@dynaslope/commons';
+import { MarDataAnalysis, MarGroundData } from '@dynaslope/commons';
 
 
 function LatestRainfall () {
@@ -13,7 +13,7 @@ function LatestRainfall () {
     }, []);
 
     const init = async () => {
-        const response = MarDataAnalysis.GetRainfallAnalysis();
+        const response = await MarDataAnalysis.GetRainfallAnalysis();
         if (response.status === true) {
             console.log("success");
             setData(response.data);
@@ -25,10 +25,12 @@ function LatestRainfall () {
             {
                 data !== null ? (
                     <Fragment>
-                        <Typography variant="h6">{`${data.rain_gauge.toUpperCase()} as of ${moment(data.data_ts).format("D MMM YYYY HH:mm")}`}</Typography>
-                        <Typography variant="h6">{`1-day cumulative rainfall: ${data["1_day_cumulative"]} (${data["1_day_percent"]} of threshold)`}</Typography>
-                        <Typography variant="h6">{`3-day cumulative rainfall: ${data["3_day_cumulative"]} (${data["3_day_percent"]} of threshold)`}</Typography>
-                        <Typography variant="h6">{data.analysis}</Typography>
+                        <Grid item align="center">
+                            <Typography variant="h6">{`${data.rain_gauge.toUpperCase()} as of ${moment(data.data_ts).format("D MMM YYYY HH:mm")}`}</Typography>
+                            <Typography variant="h6" color="primary">{`1-day cumulative rainfall: ${data["1_day_cumulative"]} (${data["1_day_percent"]}% of threshold)`}</Typography>
+                            <Typography variant="h6" color="secondary">{`3-day cumulative rainfall: ${data["3_day_cumulative"]} (${Math.round((parseInt(data["3_day_cumulative"]) + Number.EPSILON) * 100) / 100}% of threshold)`}</Typography>
+                            <Typography variant="body1">DATA ANALYSIS: {data.analysis}</Typography>
+                        </Grid>
                     </Fragment>
 
                 ) : (
@@ -64,11 +66,11 @@ function LatestGroundMeas () {
         <Fragment>
             {
                 data !== null ? (
-                    <Fragment>
+                    <Grid item align="center">
                         <Typography variant="body">{data.latest_data}</Typography>
                         <br /><br />
                         <Typography variant="body">{data.analysis}</Typography>
-                    </Fragment>
+                    </Grid>
 
                 ) : (
                     <Typography variant="h5" align="center" color="secondary">No data available</Typography>
@@ -79,8 +81,56 @@ function LatestGroundMeas () {
 }
 
 function LatestMoms () {
+    const [data, setData] = React.useState(null);
+    
+    React.useEffect(() => {
+        init();
+    }, []);
+
+    const init = async () => {
+        const response = await MarGroundData.GetMOMSData();
+        if (response.status === true) {
+            setData(response.data);
+        } else {
+            console.error(response.message);
+        }
+    }
+
+    console.log("data", data)
+
     return (
-        <Typography variant="h5" align="center" color="secondary">No Moms Data Available</Typography>
+        <Fragment>
+            {
+                data !== null ? (
+                    <Fragment>
+                        <Grid container>
+                            <Grid item xs={6} align="center">
+                                <Typography variant="button" color="primary">Observance Timestamp</Typography>
+                                <br />
+                                <Typography variant="body1">{data[0].observance_ts}</Typography>
+                            </Grid>
+                            <Grid item xs={6} align="center">
+                                <Typography variant="button" color="primary">Remarks</Typography>
+                                <br />
+                                <Typography variant="body1">{data[0].remarks}</Typography>
+                            </Grid>
+                            <Grid item xs={6} align="center">
+                                <Typography variant="button" color="primary">Feature Type</Typography>
+                                <br />
+                                <Typography variant="body1">{data[0].feature_type}</Typography>
+                            </Grid>
+                            <Grid item xs={6} align="center">
+                                <Typography variant="button" color="primary">Feature Name</Typography>
+                                <br />
+                                <Typography variant="body1">{data[0].feature_name}</Typography>
+                            </Grid>
+                        </Grid>
+                    </Fragment>
+                ) : (
+                    <Typography variant="h5" align="center" color="secondary">No data available</Typography>
+                )
+            }
+        </Fragment>
     );
 }
 
@@ -104,12 +154,6 @@ export default function Home () {
                 <Paper style={{ height: "150px", padding: "5%"}}>
                     <Typography variant="h6" align="center">Latest Ground Measurement data</Typography>
                     <LatestGroundMeas />
-                </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-                <Paper style={{ height: "150px", padding: "5%"}}>
-                    <Typography variant="h6" align="center">Latest Subsurface data</Typography>
-                    <Typography variant="h5" align="center" color="secondary">No subsurface data available</Typography>
                 </Paper>
             </Grid>
             <Grid item xs={12} md={6}>
