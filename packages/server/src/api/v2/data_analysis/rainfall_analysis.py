@@ -13,10 +13,10 @@ RAINFALL_ANALYSIS_BLUEPRINT = Blueprint("rainfall_analysis_blueprint", __name__)
 @RAINFALL_ANALYSIS_BLUEPRINT.route("/get/data_analysis/<site_code>/rainfall/plot_data", methods=["GET"])
 def fetch(site_code, internal=False):
     try:
-        # data_ts_end = dt.today().strftime("%Y-%m-%d %H:%M:%S")
-        # data_ts_start = dt.today() - td(days=7)
-        data_ts_end = dt(year=2019, month=1, day=12, hour=12, minute=00, second=00).strftime("%Y-%m-%d %H:%M:%S")
-        data_ts_start = dt(year=2019, month=1, day=12, hour=12, minute=00, second=00) - td(days=7)
+        data_ts_end = dt.today().strftime("%Y-%m-%d %H:%M:%S")
+        data_ts_start = dt.today() - td(days=7)
+        # data_ts_end = dt(year=2019, month=1, day=12, hour=12, minute=00, second=00).strftime("%Y-%m-%d %H:%M:%S")
+        # data_ts_start = dt(year=2019, month=1, day=12, hour=12, minute=00, second=00) - td(days=7)
         print(data_ts_end, data_ts_start)
 
         plot_data = rainfall_analysis.main(site_code = site_code, end=data_ts_end, days=7)
