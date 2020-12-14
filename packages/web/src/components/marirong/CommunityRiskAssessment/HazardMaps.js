@@ -56,11 +56,10 @@ export default function HazardMaps() {
 
     const initHazardMaps = async () => {
         const response = await MarCommunityRiskAssessment.GetHazardMaps();
-        console.log("response")
         if (response.status) {
             if (response.data.length > 0) {
                 console.log(response.message);
-                setMapPreview(`${AppConfig.HOST_DIR}:8080/MARIRONG/MAPS/${response.data[0].filename}`);
+                setMapPreview(`${AppConfig.HOST_DIR}:5001/MARIRONG/MAPS/${response.data[0].filename}`);
             } else {
                 console.error(response.message);
             }

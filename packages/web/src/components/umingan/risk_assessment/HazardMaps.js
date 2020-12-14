@@ -56,7 +56,7 @@ export default function HazardMaps() {
         const response = await UmiRiskManagement.GetHazardMaps();
         if (response.status) {
             if (response.data.length > 0) {
-                setMapPreview(`${AppConfig.HOST_DIR}:8080/UMINGAN/MAPS/${response.data[0].filename}`);
+                setMapPreview(`${AppConfig.HOST_DIR}:5001/UMINGAN/MAPS/${response.data[0].filename}`);
             }
         }
     };
