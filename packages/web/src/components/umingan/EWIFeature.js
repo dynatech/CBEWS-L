@@ -462,7 +462,7 @@ function CurrentAlert() {
     }, []);
 
     const initLatestCurrentAlert = async () => {
-        const response = await AlertGeneration.GetOngoingAndExtendedMonitoring();
+        const response = await AlertGeneration.UmiGetOngoingAndExtendedMonitoring();
         const { data, status } = response;
         if (status) {
             let key = "";

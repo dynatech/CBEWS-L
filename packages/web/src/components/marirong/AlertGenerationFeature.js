@@ -474,7 +474,7 @@ function LatestCurrentAlert() {
     }, [leo]);
 
     const initLatestCurrentAlert = async () => {
-        const response = await AlertGeneration.GetOngoingAndExtendedMonitoring();
+        const response = await AlertGeneration.MarGetOngoingAndExtendedMonitoring();
         console.log("response", response);
         const { data, status } = response;
         if (status) {
