@@ -145,7 +145,7 @@ class AlertGeneration():
         return result
 
 
-    def get_ongoing_extended_overdue_events(site_id=None, complete=False, include_site=False):
+    def get_ongoing_extended_overdue_events(site_id=None, complete=False, include_site=False, site_code=None):
         """
         Returns ongoing, extended, and routine events
         """
@@ -160,6 +160,9 @@ class AlertGeneration():
         if include_site:
             query = f"{query} INNER JOIN {sites_db}.sites ON (sites.id = public_alert_event.site_id)"
         query = f"{query} WHERE status in ('on-going', 'extended')"
+
+        if site_code:
+            query = f"{query} AND site_code = '{site_code}'"
 
         # schema = DB.db_switcher(site_id)
         schema = "senslopedb"

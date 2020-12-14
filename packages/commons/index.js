@@ -179,7 +179,7 @@ import {
   DeleteSensorMaintenanceLogs,
 } from "./src/UMI/SensorMaintenance/SensorMaintenance";
 
-import { GetOngoingAndExtendedMonitoring } from "./src/AlertGeneration/PublicAlerts";
+import { UmiGetOngoingAndExtendedMonitoring, MarGetOngoingAndExtendedMonitoring } from "./src/AlertGeneration/PublicAlerts";
 import { RenderPDF, DownloadPDF } from "./src/MAR/FileManager/PDFManager";
 
 const UserManagement = {
@@ -188,7 +188,8 @@ const UserManagement = {
 };
 
 const AlertGeneration = {
-  GetOngoingAndExtendedMonitoring,
+  UmiGetOngoingAndExtendedMonitoring,
+  MarGetOngoingAndExtendedMonitoring
 };
 
 const MarDataAnalysis = {
