@@ -299,8 +299,8 @@ def get_unique_trigger_per_type(trigger_list):
 
 
 @PUBLIC_ALERTS_BLUEPRINT.route("/alert_gen/public_alerts/get_ongoing_and_extended_monitoring", methods=["GET"])
-@PUBLIC_ALERTS_BLUEPRINT.route("/alert_gen/public_alerts/get_ongoing_and_extended_monitoring/<run_ts>", methods=["GET"])
-def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
+@PUBLIC_ALERTS_BLUEPRINT.route("/alert_gen/public_alerts/get_ongoing_and_extended_monitoring/<site_code>", methods=["GET"])
+def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch", site_code=None):
     """
     returns dictionary of lists
 
@@ -316,7 +316,10 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
 
     try:
         AG = AlertGeneration
-        events = AG.get_ongoing_extended_overdue_events(complete=True, include_site=True)
+        if site_code:
+            events = AG.get_ongoing_extended_overdue_events(complete=True, include_site=True, site_code=site_code)
+        else:    
+            events = AG.get_ongoing_extended_overdue_events(complete=True, include_site=True)
 
         active_events_dict = { 
             "latest": [], "extended": [], "overdue": [],
@@ -452,8 +455,6 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch"):
                         print("FINISH EVENT")
                         result = PAT.update_public_alert_event(PAT, {"status": "finished"}, {"event_id": event_id})
                         print(result)
-                        # TODO: Create a model updating event row to finished status
-                        # update_public_alert_event_status(status="finished")
 
             except Exception as err:
                 raise err

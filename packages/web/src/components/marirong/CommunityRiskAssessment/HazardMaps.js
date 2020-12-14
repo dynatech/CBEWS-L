@@ -92,7 +92,6 @@ export default function HazardMaps() {
     const handleUpload = async () => {
         const data = new FormData();
         data.append("file", fileToUpload);
-        console.log("shit")
         const response = await MarCommunityRiskAssessment.UploadHazardMaps(
             data,
         );

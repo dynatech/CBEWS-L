@@ -381,7 +381,7 @@ function CurrentAlertArea(props) {
 
     };
 
-    if (leo !== "empty") {
+    if (leo !== null) {
         const as_of = moment(leo.data_ts).add(30, "mins").format("dddd, MMMM Do YYYY, h:mm A");
         const event_start = moment(leo.event_start).format("MMMM D, YYYY h:mm A");
         const validity = moment(leo.validity).format("MMMM D, YYYY h:mm A");
@@ -466,27 +466,28 @@ function CurrentAlertArea(props) {
 function LatestCurrentAlert() {
     const classes = useStyles();
     const [modal, setModal] = useState([<TransitionalModal status={false} />]);
-    const [leo, setLeo] = useState("empty");
+    const [leo, setLeo] = useState(null);
     const [releaseStatus, setReleaseStatus] = useState("No event on site.");
 
     useEffect(() => {
         initLatestCurrentAlert();
-    }, []);
+    }, [leo]);
 
     const initLatestCurrentAlert = async () => {
         const response = await AlertGeneration.GetOngoingAndExtendedMonitoring();
+        console.log("response", response);
         const { data, status } = response;
         if (status) {
-            let key = "";
-            if (data.latest.length > 0) key = "latest";
-            else if (data.overdue.length > 0) key = "overdue";
-            else if (data.extended.length > 0) key = "extended";
+            const temp = [...data.latest, ...data.overdue, ...data.extended];
+            console.log("temp", temp)
 
-            if (key in data) {
-                const site_data = data[key].find(site_data => site_data.site_id === 29);
+            const site_data = temp.find(row => row.site_id === 29);
+            console.log("site_data", site_data)
+            if (site_data !== "undefined") {
                 setLeo(site_data);
             } else {
-                console.error("There is something wrong with the code in latest current alert");
+                setLeo(null);
+                console.log("No alert on site");
             }
         }
     }
@@ -514,6 +515,7 @@ function LatestCurrentAlert() {
             alert("Print success!")
         }, 3000)
     }
+
 
     return (
         <Fragment>
