@@ -85,6 +85,7 @@ function ReusableInput(props) {
                     fullWidth
                     id={propKey}
                     label={label}
+                    type="datetime"
                     onChange={handleChange(`${key}`)}
                     onBlur={handleBlur(`${key}`)}
                     defaultValue={val}
@@ -102,7 +103,6 @@ export default function Forms(props) {
     console.log("DATA", data);
     const { string, int, ts } = data;
 
-    // const [defaultValues, setDefaultValues] = useState(Object.assign({}, string, int, ts));
     const [defaultValues, setDefaultValues] = useState(Object.assign({}, string, int, ts));
     const [cmd, setCmd] = useState("");
 
