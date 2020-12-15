@@ -16,7 +16,7 @@ export default function PageNotFound(props) {
                 {is_logged_out && (
                     <Typography>
                         {"You are currently logged out. Please "}
-                        <Link onClick={() => props.history.push("/")}>
+                        <Link onClick={() => props.history.push("/signin")}>
                             Sign In
                         </Link>
                     </Typography>

@@ -339,7 +339,7 @@ function SurficialMarker() {
         handleClose();
     }
 
-    if (dtRow.length === 0) setDtRow(<span align="center"><Typography>No Surficial Data available</Typography></span> )
+    if (dtRow.length === 0) setDtRow(<span align="center"><Typography>Loading Surficial Data</Typography></span> )
 
     return (
         <Fragment>
