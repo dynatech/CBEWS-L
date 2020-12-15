@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
 import moment from 'moment';
 import { Container, Paper, Grid, CardMedia, Box, makeStyles, Fab } from '@material-ui/core';
 import { AlertGeneration } from '@dynaslope/commons';
@@ -16,32 +16,42 @@ function AlertStatus(props) {
         const [menuUmiSize, setMenuUmiSize] = useState({height: window.innerHeight * 0.2, width: window.innerHeight * 0.2});
         const [menuMarSize, setMenuMarSize] = useState({height: window.innerHeight * 0.2, width: window.innerHeight * 0.2});
 
-        const init = () => {
-            const response = AlertGeneration.GetOngoingAndExtendedMonitoring();
-            const { data, status } = response;
+        useEffect(() => {
+            init();
+        }, []);
+
+        const init = async () => {
+            // MAR INIT
+            const mar_response = await AlertGeneration.MarGetOngoingAndExtendedMonitoring();
+            const { data, status } = mar_response;
             if (status) {
-                let key = "";
                 const { latest, overdue, extended } = data;
-                const alert_list = [ ...latest, ...overdue, ...extended ];
-    
-                const umi_site_data = alert_list.find(site_data => site_data.site_id === 50);
-                const mar_site_data = alert_list.find(site_data => site_data.site_id === 29);
-                setBody({
-                    umi: umi_site_data,
-                    mar: mar_site_data
-                });
+                const temp_list = [ ...latest, ...overdue, ...extended ];
+                const mar_data = temp_list.length > 0 ? temp_list[0] : null;
+                setBody({ ...body, umi: mar_data });
             } else {
-                console.error("There is something wrong with the code in latest current alert");
+                console.error("There is something wrong with the code in alert status");
+            }
+
+            // UMI INIT
+            const umi_response = await AlertGeneration.UmiGetOngoingAndExtendedMonitoring();
+            const { data: umiData, status: umiStatus } = umi_response;
+            if (umiStatus) {
+                const { latest, overdue, extended } = umiData;
+                const temp_list = [ ...latest, ...overdue, ...extended ];
+                const umi_data = temp_list.length > 0 ? temp_list[0] : null;
+                setBody({ ...body, umi: umi_data });
+            } else {
+                console.error("There is something wrong with the code in alert status");
             }
         }
-    
     
         return (
             <Fragment>
                 <Container style={{ marginTop: '5%' }}>
                     <Grid container align="center" spacing={2}>
-                        <Grid item xs={3}/>
-                        <Grid item xs={3}>
+                        <Grid item xs={2}/>
+                        <Grid item xs={4}>
                             <Grid container direction="column">
                                 <Grid item xs={12}>
                                     <CardMedia
@@ -70,7 +80,7 @@ function AlertStatus(props) {
                                                     Start of event:
                                                 </Box>
                                                 <Box fontSize={15} fontWeight={"bold"} style={{marginLeft: 5}}>
-                                                    {moment(body.umi.event_start, "MMMM D, YYYY HH:mm:SS")}
+                                                    {moment(body.umi.event_start).format("MMMM D, YYYY HH:mm:SS")}
                                                 </Box>
                                             </Box>
                                             <Box style={{display: 'inline-flex'}}>
@@ -78,7 +88,7 @@ function AlertStatus(props) {
                                                     Latest trigger:
                                                 </Box>
                                                 <Box fontSize={15} fontWeight={"bold"} style={{marginLeft: 5}}>
-                                                    {moment(body.umi.latest_event_triggers[0].timestamp, "MMMM D, YYYY HH:mm:SS")}
+                                                    {moment(body.umi.latest_event_triggers[0].timestamp).format("MMMM D, YYYY HH:mm:SS")}
                                                 </Box>
                                             </Box>
                                             <Box style={{display: 'inline-flex'}}>
@@ -129,7 +139,7 @@ function AlertStatus(props) {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs={4}>
                             <Grid container direction="column">
                                 <Grid item xs={12}>
                                     <CardMedia
@@ -143,7 +153,7 @@ function AlertStatus(props) {
                                     </Box>
                                 </Grid>
                                     {
-                                        body.umi !== null ? (
+                                        body.mar !== null ? (
                                             <Grid item xs={12} style={{paddingTop: 20, paddingBottom: 20}}>
                                                 <Box style={{display: 'inline-flex'}}>
                                                     <Box fontSize={20} style={{paddingTop: 10, paddingBottom: 10}}>
@@ -158,7 +168,7 @@ function AlertStatus(props) {
                                                         Start of event:
                                                     </Box>
                                                     <Box fontSize={15} fontWeight={"bold"} style={{marginLeft: 5}}>
-                                                        {moment(body.umi.event_start, "MMMM D, YYYY HH:mm:SS")}
+                                                        {moment(body.umi.event_start).format("MMMM D, YYYY HH:mm:SS")}
                                                     </Box>
                                                 </Box>
                                                 <Box style={{display: 'inline-flex'}}>
@@ -166,7 +176,7 @@ function AlertStatus(props) {
                                                         Latest trigger:
                                                     </Box>
                                                     <Box fontSize={15} fontWeight={"bold"} style={{marginLeft: 5}}>
-                                                        {moment(body.umi.latest_event_triggers[0].timestamp, "MMMM D, YYYY HH:mm:SS")}
+                                                        {moment(body.umi.latest_event_triggers[0].timestamp).format("MMMM D, YYYY HH:mm:SS")}
                                                     </Box>
                                                 </Box>
                                                 <Box style={{display: 'inline-flex'}}>
@@ -216,7 +226,7 @@ function AlertStatus(props) {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item xs={3} />
+                        <Grid item xs={2} />
                     </Grid>
                 </Container>
             </Fragment>
