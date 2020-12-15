@@ -41,8 +41,7 @@ function ReusableInput(props) {
     const key = propKey.replace(/\s/g, "");
 
     let component;
-    if (typeof(value) === "object") {
-        console.log("OBJECT!", value);
+    if (typeof(value) === "object" && !"_isAMomentObject" in value) {
         return (
             <Grid item xs={12}>
                 {value}
@@ -100,6 +99,7 @@ function ReusableInput(props) {
 export default function Forms(props) {
     const classes = ButtonStyle();
     const { data, submitForm, deleteForm, formData, command } = props;
+    console.log("DATA", data);
     const { string, int, ts } = data;
 
     // const [defaultValues, setDefaultValues] = useState(Object.assign({}, string, int, ts));
@@ -114,7 +114,7 @@ export default function Forms(props) {
         <Formik
             initialValues={defaultValues}
             onSubmit={(values) => {
-                formData.current.form_data = values;
+                formData.current = values;
                 submitForm();
             }}
         >
