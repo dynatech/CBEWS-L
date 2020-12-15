@@ -232,7 +232,7 @@ export default function MOMS() {
         if (features_response.status === true) {
             setFeatureOptions(features_response.data);
             if (instance_response.status === true) {
-                setInstanceOptions(instance_response.data);
+                // setInstanceOptions(instance_response.data);
                 feature_names_ref.current = instance_response.data;
 
                 const type_rows = features_response.data.map(feat => <MenuItem value={parseInt(feat.feature_id)}>{feat.feature_type}</MenuItem>);
@@ -249,6 +249,7 @@ export default function MOMS() {
     };
 
     const handleFeatureNameChange = ({ target: { value }}) => {
+        console.log("value", value);
         setDefaultStrValues({ ...defaultStrValues, "instance_id": value });
     };
 

@@ -483,7 +483,7 @@ function LatestCurrentAlert() {
 
             const site_data = temp.find(row => row.site_id === 29);
             console.log("site_data", site_data)
-            if (site_data !== "undefined") {
+            if (site_data !== undefined) {
                 setLeo(site_data);
             } else {
                 setLeo(null);

@@ -68,7 +68,7 @@ export default function UmiHeader(props) {
     const handleSignout = () => {
         removeCookie(["credentials"]);
         alert("Signing out!");
-        props.history.push("/");
+        props.history.push("/signin");
     };
 
     const toggleDrawer = (side, open) => (event) => {

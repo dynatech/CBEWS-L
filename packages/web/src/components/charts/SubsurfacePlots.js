@@ -369,38 +369,43 @@ export default function SubsurfaceColumnPositionPlot(props) {
     
     const initSubsurface = async () => {
         const response = await MarDataAnalysis.GetSubsurfacePlotData();
-        if (response.status) {
-            console.log(response);
-            let temp = [];
-            response.data.forEach(element => {
-                let processed_data = [];
-                element.forEach(({ type, data }) => {
-                    let temp = [];
-                    if (feature === "data_analysis") {
-                        if (type === "column_position") temp = plotColumnPosition(data, type);
-                    } else {
-                        if (type === "displacement") temp = plotDisplacement(data, type);
-                        else if (type === "velocity_alerts") temp = plotVelocityAlerts(data, type);
-                    }
-                    processed_data.push(temp)
-                });
-                processed_data.forEach(data => {
-                    data.forEach(inner => {
-                        const { type } = inner;
-                        let option;
+        // hotfix
+        if (response !== undefined) {
+            if (response.status) {
+                console.log(response);
+                let temp = [];
+                response.data.forEach(element => {
+                    let processed_data = [];
+                    element.forEach(({ type, data }) => {
+                        let temp = [];
                         if (feature === "data_analysis") {
-                            if (type === "column_position") option = prepareColumnPositionChartOption(inner, input);
+                            if (type === "column_position") temp = plotColumnPosition(data, type);
                         } else {
-                            if (type === "displacement") option = prepareDisplacementChartOption(inner, input);
-                            else if (type === "velocity_alerts") option = prepareVelocityAlertsOption(inner, input);
+                            if (type === "displacement") temp = plotDisplacement(data, type);
+                            else if (type === "velocity_alerts") temp = plotVelocityAlerts(data, type);
                         }
-                        temp.push(option);
+                        processed_data.push(temp)
+                    });
+                    processed_data.forEach(data => {
+                        data.forEach(inner => {
+                            const { type } = inner;
+                            let option;
+                            if (feature === "data_analysis") {
+                                if (type === "column_position") option = prepareColumnPositionChartOption(inner, input);
+                            } else {
+                                if (type === "displacement") option = prepareDisplacementChartOption(inner, input);
+                                else if (type === "velocity_alerts") option = prepareVelocityAlertsOption(inner, input);
+                            }
+                            temp.push(option);
+                        });
                     });
                 });
-            });
-            displayPlot(temp);
+                displayPlot(temp);
+            } else {
+                console.error(response.message);
+            }
         } else {
-            console.error(response.message);
+            console.log("Subsurface undergoing maintenance...");
         }
     }
     
@@ -448,7 +453,8 @@ export default function SubsurfaceColumnPositionPlot(props) {
                             <Grid item xs={12}>
                                 <Paper>
                                     <Typography align='center'>
-                                            Loading subsurface graph
+                                            {/* Loading subsurface graph */}
+                                            Subsurface graphs undergoing improvements...
                                     </Typography>
                                 </Paper>
                             </Grid>
