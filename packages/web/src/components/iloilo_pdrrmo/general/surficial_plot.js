@@ -6,7 +6,9 @@ import {
     Grid, Paper, Container, Fab, makeStyles
 } from "@material-ui/core";
 
-import { getSurficialPlotData } from './sample_surficial_not_final';
+// import { getSurficialPlotData } from './sample_surficial_not_final';
+
+import { MarGroundData, UmiGroundData } from '@dynaslope/commons';
 
 import TransitionalModal from '../../reducers/pdrrmo_iloilo/loading';
 
@@ -107,11 +109,35 @@ function prepareOptions(input, data, width) {
 function createSurficialGraph(input, surficial_data, chartRef, width = "md") {
     const options = prepareOptions(input, surficial_data, width);
 
+    console.log("options", options);
+
     return <HighchartsReact
         highcharts={Highcharts}
         options={options}
         ref={chartRef}
     />;
+}
+
+const getSurficialPlotData = async (site_code) => {
+    let api_req = null
+    
+    console.log("site_code", site_code);
+    if (site_code === "umi") api_req = UmiGroundData
+    else if (site_code === "umi") api_req = MarGroundData 
+    else console.error("site_code not in valid list");
+
+    console.log("api_req", api_req);
+    if (api_req !== null) {
+        const response = await api_req.getSurficialPlotData();
+
+        console.log("response", response);
+
+        if (response.status) {
+            return response.data;
+        } else {
+            return []
+        }
+    } else return [];
 }
 
 function SurficialPlot(props) {

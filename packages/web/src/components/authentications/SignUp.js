@@ -98,7 +98,6 @@ export default function SignUp(props) {
                     onSubmit={(values, { setSubmitting }) => {
                         setTimeout(async () => {
                             let response = await UserManagement.AuthRegistration(values);
-                            console.log("response", response);
                             if (response.status === true) {
                                 handleChangeRoute('signin');
                             } else {

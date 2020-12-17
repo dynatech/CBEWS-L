@@ -4,7 +4,6 @@ import { useCookies } from "react-cookie";
 
 export default function PageNotFound(props) {
     const [cookies] = useCookies(["credentials"]);
-    console.log("cookies", cookies);
     const is_logged_out = cookies.credentials === undefined ? true : false;
     console.log("is_logged_out", is_logged_out);
     return (
