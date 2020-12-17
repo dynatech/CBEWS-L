@@ -28,24 +28,25 @@ function AlertStatus(props) {
                 const { latest, overdue, extended } = data;
                 const temp_list = [ ...latest, ...overdue, ...extended ];
                 const mar_data = temp_list.length > 0 ? temp_list[0] : null;
-                setBody({ ...body, umi: mar_data });
+
+                // UMI INIT
+                const umi_response = await AlertGeneration.UmiGetOngoingAndExtendedMonitoring();
+                const { data: umiData, status: umiStatus } = umi_response;
+                if (umiStatus) {
+                    const { latest, overdue, extended } = umiData;
+                    const temp_list = [ ...latest, ...overdue, ...extended ];
+                    const umi_data = temp_list.length > 0 ? temp_list[0] : null;
+                    setBody({ mar: mar_data, umi: umi_data });
+                } else {
+                    console.error("There is something wrong with the code in alert status");
+                }
             } else {
                 console.error("There is something wrong with the code in alert status");
             }
 
-            // UMI INIT
-            const umi_response = await AlertGeneration.UmiGetOngoingAndExtendedMonitoring();
-            const { data: umiData, status: umiStatus } = umi_response;
-            if (umiStatus) {
-                const { latest, overdue, extended } = umiData;
-                const temp_list = [ ...latest, ...overdue, ...extended ];
-                const umi_data = temp_list.length > 0 ? temp_list[0] : null;
-                setBody({ ...body, umi: umi_data });
-            } else {
-                console.error("There is something wrong with the code in alert status");
-            }
         }
-    
+
+        console.log("body", body);    
         return (
             <Fragment>
                 <Container style={{ marginTop: '5%' }}>
@@ -160,7 +161,7 @@ function AlertStatus(props) {
                                                         Current Alert:
                                                     </Box>
                                                     <Box fontSize={20} color="#f5981c" fontWeight={"bold"} style={{paddingTop: 10, paddingBottom: 10, marginLeft: 5}}>
-                                                        Alert {body.umi.public_alert_level}
+                                                        Alert {body.mar.public_alert_level}
                                                     </Box>
                                                 </Box>
                                                 <Box style={{display: 'inline-flex'}}>
@@ -168,7 +169,7 @@ function AlertStatus(props) {
                                                         Start of event:
                                                     </Box>
                                                     <Box fontSize={15} fontWeight={"bold"} style={{marginLeft: 5}}>
-                                                        {moment(body.umi.event_start).format("MMMM D, YYYY HH:mm:SS")}
+                                                        {moment(body.mar.event_start).format("MMMM D, YYYY HH:mm:SS")}
                                                     </Box>
                                                 </Box>
                                                 <Box style={{display: 'inline-flex'}}>
@@ -176,7 +177,7 @@ function AlertStatus(props) {
                                                         Latest trigger:
                                                     </Box>
                                                     <Box fontSize={15} fontWeight={"bold"} style={{marginLeft: 5}}>
-                                                        {moment(body.umi.latest_event_triggers[0].timestamp).format("MMMM D, YYYY HH:mm:SS")}
+                                                        {moment(body.mar.latest_event_triggers[0].timestamp).format("MMMM D, YYYY HH:mm:SS")}
                                                     </Box>
                                                 </Box>
                                                 <Box style={{display: 'inline-flex'}}>
@@ -184,7 +185,7 @@ function AlertStatus(props) {
                                                         Validity:
                                                     </Box>
                                                     <Box fontSize={15} fontWeight={"bold"} style={{marginLeft: 5}}>
-                                                        {body.umi.validity}
+                                                        {body.mar.validity}
                                                     </Box>
                                                 </Box>
                                                 <Box style={{display: 'inline-flex'}}>
@@ -192,7 +193,7 @@ function AlertStatus(props) {
                                                         Details:
                                                     </Box>
                                                     <Box fontSize={15} fontWeight={"bold"} style={{marginLeft: 5}}>
-                                                        {body.umi.latest_event_triggers[0].info}
+                                                        {body.mar.latest_event_triggers[0].info}
                                                     </Box>
                                                 </Box>
                                             </Grid>

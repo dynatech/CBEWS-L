@@ -1,6 +1,6 @@
 import React, { useState, Fragment } from 'react';
-import Header from '../reducers/header';
-import UmiTabsMenu from '../reducers/umi_tabs_menu';
+import Header from '../reducers/pdrrmo_iloilo/header';
+import UmiTabsMenu from '../reducers/pdrrmo_iloilo/umi_tabs_menu';
 
 function UmiDashboard(props) {
     return (
