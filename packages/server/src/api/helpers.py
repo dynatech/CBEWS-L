@@ -1,5 +1,5 @@
-
 import pprint, os
+from geopy.geocoders import Nominatim
 import time as time_t
 from datetime import datetime, timedelta, time
 
@@ -166,3 +166,8 @@ class Helpers():
 
     def str_to_timedelta(string_value):
         return datetime.strptime(string_value, "%H:%M:%S").time()
+
+    def get_location_from_geocode(latitude, longitude):
+        geolocator = Nominatim(user_agent="CBEWSL")
+        location = geolocator.reverse(f"{latitude}, {longitude}")
+        return location.address
