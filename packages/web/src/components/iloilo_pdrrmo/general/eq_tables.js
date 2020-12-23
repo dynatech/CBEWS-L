@@ -1,10 +1,12 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import {
     Grid, Paper, Container,
     Fab, makeStyles, Table,
     TableBody, TableCell, TableHead,
     TableRow
 } from "@material-ui/core";
+
+import { MergedData } from '@dynaslope/commons';
 
 import TransitionalModal from '../../reducers/pdrrmo_iloilo/loading';
 
@@ -32,43 +34,40 @@ const useStyles = makeStyles(theme => ({
 
 
 function EarthquakeTables() {
+    const [rows, setRows] = useState([]);
 
-    function createData(date_time, depth, magnitude, location, latitude, longitude, ) {
-        return { date_time, depth, magnitude, location, latitude, longitude };
+    useEffect(() => {
+        init();
+    }, []);
+
+    const init = async () => {
+        const response = MergedData.GetIloiloEarthquakeData();
+        if (response.status) {
+            console.log("Response is: ", response);
+            setRows(response.data);
+        }
     }
-
-    const rows = [
-        createData('2019-10-06 04:20:00', '12km', '4', '009 km N 87° W of Calatagan (Batangas)', '13.84', '120.55'),
-        createData('2019-10-06 04:00:00', '19km', '6', '002 km N 32° E of Calamba (Laguna)', '14.21', '121.17'),
-        createData('2019-10-06 03:50:00', '23km', '2', '004 km S 44° W of Looc (Occidental Mindoro)', '13.70', '120.23'),
-        createData('2019-10-06 03:30:00', '42km', '3', '008 km N 64° W of Lipa City (Batangas)', '13.97', '121.10'),
-        createData('2019-10-06 03:20:00', '16km', '1', '003 km N 33° W of Aloguinsan (Cebu)', '10.24', '123.54'),
-        createData('2019-10-06 03:00:00', '02km', '1.2', '005 km S 51° W of Danao (Bohol)', '09.92', '124.18'),
-        createData('2019-10-06 02:20:00', '100km', '6', '004 km N 44° W of Cabangan (Zambales)', '15.19', '120.03'),
-        createData('2019-10-06 02:10:00', '33km', '2', '073 km N 68° E of Hinatuan (Surigao Del Sur)', '08.63', '126.96'),
-        createData('2019-10-06 02:00:00', '177km', '2', '17 km S 68° W of Nasugbu (Batangas)', '14.02', '120.48'),
-    ];
 
     const dt_classes = tableStyle();
     const classes = useStyles();
 
     const [modal, setModal] = useState([<TransitionalModal status={false} />])
 
-function download() {
-    setModal([<TransitionalModal status={true} />])
-    setTimeout(() => {
-        setModal([<TransitionalModal status={false} />])
-        alert("Download success!")
-    }, 3000)
-}
+    function download() {
+        setModal([<TransitionalModal status={true} />])
+        setTimeout(() => {
+            setModal([<TransitionalModal status={false} />])
+            alert("Download success!")
+        }, 3000)
+    }
 
-function print() {
-    setModal([<TransitionalModal status={true} />])
-    setTimeout(() => {
-        setModal([<TransitionalModal status={false} />])
-        alert("Print success!")
-    }, 3000)
-}
+    function print() {
+        setModal([<TransitionalModal status={true} />])
+        setTimeout(() => {
+            setModal([<TransitionalModal status={false} />])
+            alert("Print success!")
+        }, 3000)
+    }
 
     return (
         <Fragment>
@@ -82,7 +81,8 @@ function print() {
                                         <TableCell>Date and time</TableCell>
                                         <TableCell>Depth</TableCell>
                                         <TableCell>Magnitude</TableCell>
-                                        <TableCell>Location</TableCell>
+                                        {/* <TableCell>Location</TableCell> */}
+                                        <TableCell>Site Affected</TableCell>
                                         <TableCell>Longitude</TableCell>
                                         <TableCell>Latitude</TableCell>
                                     </TableRow>
@@ -95,7 +95,8 @@ function print() {
                                             </TableCell>
                                             <TableCell>{row.depth}</TableCell>
                                             <TableCell>{row.magnitude}</TableCell>
-                                            <TableCell>{row.location}</TableCell>
+                                            {/* <TableCell>{row.location}</TableCell> */}
+                                            <TableCell>{row.site}</TableCell>
                                             <TableCell>{row.latitude}</TableCell>
                                             <TableCell>{row.longitude}</TableCell>
                                         </TableRow>
