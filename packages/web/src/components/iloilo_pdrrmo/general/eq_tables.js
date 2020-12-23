@@ -41,7 +41,7 @@ function EarthquakeTables() {
     }, []);
 
     const init = async () => {
-        const response = MergedData.GetIloiloEarthquakeData();
+        const response = await MergedData.GetIloiloEarthquakeData();
         if (response.status) {
             console.log("Response is: ", response);
             setRows(response.data);
@@ -89,9 +89,9 @@ function EarthquakeTables() {
                                 </TableHead>
                                 <TableBody>
                                     {rows.map(row => (
-                                        <TableRow key={row.date_time}>
+                                        <TableRow key={row.ts}>
                                             <TableCell component="th" scope="row">
-                                                {row.date_time}
+                                                {row.ts}
                                             </TableCell>
                                             <TableCell>{row.depth}</TableCell>
                                             <TableCell>{row.magnitude}</TableCell>

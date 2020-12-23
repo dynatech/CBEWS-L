@@ -37,6 +37,11 @@ def fetch_iloilo_latest_eq_events():
         umi_site_id = APP_CONFIG["site_ids"]["umi"]
         umi_eq_data = Earthquake.get_latest_eq_events_by_site_id(umi_site_id)
         eq_data = umi_eq_data + mar_eq_data
+
+        for row in eq_data:
+            location = H.get_location_from_geocode(row["latitude"], row["longitude"])
+            row.update({ "location": location })
+
         response = {
             "status": True,
             "data": eq_data,
