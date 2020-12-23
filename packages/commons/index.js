@@ -5,6 +5,10 @@ import {
   UserAuthentication,
 } from "./src/UserManagement/Auth";
 
+import {
+  GetIloiloEarthquakeData,
+} from "./src/merged/Earthquake";
+
 // MAR
 import {
   UploadCommunityRiskAssessment,
@@ -187,6 +191,10 @@ const UserManagement = {
   UserAuthentication,
 };
 
+const MergedData = {
+  GetIloiloEarthquakeData,
+}
+
 const AlertGeneration = {
   UmiGetOngoingAndExtendedMonitoring,
   MarGetOngoingAndExtendedMonitoring
@@ -347,6 +355,7 @@ const UmiSensorMaintenance = {
 export {
     AppConfig,
     AlertGeneration,
+    MergedData,
     UserManagement,
     MarCommunityRiskAssessment,
     MarMaintenanceLogs,
