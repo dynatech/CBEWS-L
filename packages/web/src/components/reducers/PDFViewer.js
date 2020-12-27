@@ -4,6 +4,7 @@ import { Grid, Paper, Typography, Box, Fab } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import EmailModal from './EmailModal';
 import moment from "moment";
+import TransitionalModal from "./pdrrmo_iloilo/loading";
 import { MarMaintenanceLogs, UmiFieldSurvey, UmiSituationReport } from "@dynaslope/commons";
 
 const imageStyle = makeStyles(theme => ({
@@ -195,6 +196,24 @@ function PDFPreviewer(props) {
         }
     };
 
+    const [modal, setModal] = useState([<TransitionalModal status={false} />]);
+
+    const download = () => {
+        setModal([<TransitionalModal status={true} />])
+        setTimeout(() => {
+            setModal([<TransitionalModal status={false} />])
+            alert("Download success!")
+        }, 3000)
+    }
+    
+    const print = () => {
+        setModal([<TransitionalModal status={true} />])
+        setTimeout(() => {
+            setModal([<TransitionalModal status={false} />])
+            alert("Print success!")
+        }, 3000)
+    }
+
     return (
         <Box width="100%">
             <Paper>
@@ -252,6 +271,7 @@ function PDFPreviewer(props) {
                     />
                 </Grid>
             )}
+            {modal}
         </Box>
     );
 }

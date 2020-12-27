@@ -128,7 +128,7 @@ function MaintenanceLogs() {
                               ),
                           })),
                       )
-                    : console.error("Problem in UMI API");
+                    : console.error("Problem in MAR API");
         }
     };
 
@@ -163,7 +163,7 @@ function MaintenanceLogs() {
                     })),
                 );
                 setMarRows(data);
-            } else console.error("Problem in UMI API");
+            } else console.error("Problem in MAR API");
         }
     };
 
@@ -272,59 +272,17 @@ function MaintenanceLogs() {
                                 />
                             </Grid>
                             <Grid item xs={6}>
-                                <Grid container>
-                                    <PDFViewer
-                                        date={moment().format(
-                                            "YYYY-MM-DD hh:mm:ss",
-                                        )}
-                                        data={umi_rows}
-                                        dataType="umi_maintenance_report"
-                                        classes={classes}
-                                        handleDownload={() =>
-                                            console.log("clicked download")
-                                        }
-                                    />
-                                    <Grid item xs={12}>
-                                        <Grid
-                                            container
-                                            align="center"
-                                            style={{ paddingTop: 20 }}
-                                        >
-                                            <Grid item xs={3} />
-                                            <Grid item xs={3}>
-                                                <Fab
-                                                    variant="extended"
-                                                    color="primary"
-                                                    aria-label="add"
-                                                    className={
-                                                        classes.button_fluid
-                                                    }
-                                                    onClick={() => {
-                                                        download();
-                                                    }}
-                                                >
-                                                    Download
-                                                </Fab>
-                                            </Grid>
-                                            <Grid item xs={3}>
-                                                <Fab
-                                                    variant="extended"
-                                                    color="primary"
-                                                    aria-label="add"
-                                                    className={
-                                                        classes.button_fluid
-                                                    }
-                                                    onClick={() => {
-                                                        print();
-                                                    }}
-                                                >
-                                                    Print
-                                                </Fab>
-                                            </Grid>
-                                            <Grid item xs={3} />
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
+                                <PDFViewer
+                                    date={moment().format(
+                                        "YYYY-MM-DD hh:mm:ss",
+                                    )}
+                                    data={umi_rows}
+                                    dataType="umi_maintenance_report"
+                                    classes={classes}
+                                    handleDownload={() =>
+                                        console.log("clicked download")
+                                    }
+                                />
                             </Grid>
                             <Grid item xs={12}>
                                 <Paper className={dt_classes.root}>
@@ -376,6 +334,10 @@ function MaintenanceLogs() {
                         </Fragment>
                     )}
 
+                    {
+                        state.checked_umi && state.checked_mar ? (<Grid item xs={12}><hr/></Grid>) : (<div></div>)
+                    }
+
                     {state.checked_mar && (
                         <Fragment>
                             <Grid item xs={6}>
@@ -392,59 +354,17 @@ function MaintenanceLogs() {
                                 />
                             </Grid>
                             <Grid item xs={6}>
-                                <Grid container>
-                                    <PDFViewer
-                                        date={moment().format(
-                                            "YYYY-MM-DD hh:mm:ss",
-                                        )}
-                                        data={mar_rows}
-                                        dataType="mar_maintenance_report"
-                                        classes={classes}
-                                        handleDownload={() =>
-                                            console.log("clicked download")
-                                        }
-                                    />
-                                    <Grid item xs={12}>
-                                        <Grid
-                                            container
-                                            align="center"
-                                            style={{ paddingTop: 20 }}
-                                        >
-                                            <Grid item xs={3} />
-                                            <Grid item xs={3}>
-                                                <Fab
-                                                    variant="extended"
-                                                    color="primary"
-                                                    aria-label="add"
-                                                    className={
-                                                        classes.button_fluid
-                                                    }
-                                                    onClick={() => {
-                                                        download();
-                                                    }}
-                                                >
-                                                    Download
-                                                </Fab>
-                                            </Grid>
-                                            <Grid item xs={3}>
-                                                <Fab
-                                                    variant="extended"
-                                                    color="primary"
-                                                    aria-label="add"
-                                                    className={
-                                                        classes.button_fluid
-                                                    }
-                                                    onClick={() => {
-                                                        print();
-                                                    }}
-                                                >
-                                                    Print
-                                                </Fab>
-                                            </Grid>
-                                            <Grid item xs={3} />
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
+                                <PDFViewer
+                                    date={moment().format(
+                                        "YYYY-MM-DD hh:mm:ss",
+                                    )}
+                                    data={mar_rows}
+                                    dataType="mar_maintenance_report"
+                                    classes={classes}
+                                    handleDownload={() =>
+                                        console.log("clicked download")
+                                    }
+                                />
                             </Grid>
                             <Grid item xs={12}>
                                 <Paper className={dt_classes.root}>
