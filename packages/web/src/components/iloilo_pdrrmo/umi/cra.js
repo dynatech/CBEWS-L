@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import {
     Container, Grid, Paper, Box, CardMedia, Fab, Table,
     TableBody, TableCell, TableHead,
@@ -6,6 +6,8 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import TransitionalModal from '../../reducers/pdrrmo_iloilo/loading'
+
+import { UmiSituationReport, UmiRiskManagement } from "@dynaslope/commons";
 
 const useStyles = makeStyles(theme => ({
     buttons: {
@@ -28,17 +30,37 @@ function UmiCRA() {
     const classes = useStyles();
     const dt_classes = tableStyle();
 
-    function createData(hazard, speed_of_onset, ewi, impact) {
-        return { hazard, speed_of_onset, ewi, impact };
-    }
+    const [sit_rep, setSitRep] = useState("No available report");
+    const [rnc_rows, setRNCRows] = useState([]);
+    const [frp_rows, setFRPRows] = useState([]);
+    const [hd_rows, setHDrows] = useState([]);
 
-    function createRaCData(resource_capacity, status, owner) {
-        return { resource_capacity, status, owner };
-    }
+    useEffect(() => {
+        initSitRep();
+        initRnc();
+        initFrp();
+        initHd();
+    }, []);
 
-    function createFRPData(house_id, number_of_members, belonging_vulnerable_groups, nature_of_vulnerability) {
-        return { house_id, number_of_members, belonging_vulnerable_groups, nature_of_vulnerability }
-    }
+    const initSitRep = async () => {
+        const response = await UmiSituationReport.GetCurrentSituationReport();
+        if (response.status && response.data.length > 0) setSitRep(response.data[0].report_summary);
+    };
+
+    const initRnc = async () => {
+        const response = await UmiRiskManagement.GetAllResourceAndCapacities();
+        if (response.status && response.data.length > 0) setRNCRows(response.data);
+    };
+
+    const initFrp = async () => {
+        const response = await UmiRiskManagement.GetAllFamilyRiskProfile();
+        if (response.status && response.data.length > 0) setFRPRows(response.data);
+    };
+
+    const initHd = async () => {
+        const response = await UmiRiskManagement.GetAllHazardData();
+        if (response.status && response.data.length > 0) setHDrows(response.data);
+    };
 
     function getWindowDimensions() {
         const { innerWidth: width, innerHeight: height } = window;
@@ -48,35 +70,10 @@ function UmiCRA() {
         };
     }
 
-    const rows = [
-        createData('Drought', 'Slow', 'Early Warning', 'One Month'),
-        createData('Typhoon', 'Slow', 'PAGASA broadcast, Movement of birds', 'One Week'),
-        createData('Earthquake', 'Fast', 'None', 'One Month'),
-        createData('Landslide', 'Slow', 'EWS-L', 'One Month')
-    ];
-
-    const rows_rac = [
-        createRaCData('Evacuation center', 'Excellent', 'BLGU'),
-        createRaCData('Vehicles', 'Needs repair', 'BLGU'),
-        createRaCData('Batingting', 'Excellent', 'Community'),
-        createRaCData('Markers', 'Needs fence', 'Community'),
-        createRaCData('Radio', 'Excellent', 'BLGU, MLGU'),
-    ];
-
-    const rows_frp = [
-        createFRPData('1', '5', '1', 'PWD'),
-        createFRPData('2', '6', '4', 'Children'),
-        createFRPData('3', '5', '4', 'Children'),
-        createFRPData('4', '4', '2', 'Elderly'),
-        createFRPData('5', '2', 'None', 'None'),
-        createFRPData('6', '2', '1', 'Pregnant')
-    ]
-
     const [value, setValue] = useState("risk_profile");
     const [content, setContent] = useState(RiskProfile());
 
     const handleChange = (event, app_module) => {
-
         switch (app_module) {
             case "risk_profile":
                 setContent(RiskProfile());
@@ -130,7 +127,7 @@ function UmiCRA() {
                             October 20, 2019 12:00 PM
                             </Box>
                         <Box fontSize={25} fontWeight={200} style={{ padding: 20 }}>
-                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                            {sit_rep}
                             </Box>
                         <Box borderTop={2} borderRadius="50%" borderColor="#17526d" />
                     </Paper>
@@ -195,10 +192,11 @@ function UmiCRA() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rows_rac.map(row => (
-                                    <TableRow key={row.resource_capacity}>
+                                {/* {rows_rac.map(row => ( */}
+                                {rnc_rows.map(row => (
+                                    <TableRow key={row.resource_and_capacities}>
                                         <TableCell component="th" scope="row">
-                                            {row.resource_capacity}
+                                            {row.resource_and_capacities}
                                         </TableCell>
                                         <TableCell>{row.status}</TableCell>
                                         <TableCell>{row.owner}</TableCell>
@@ -250,17 +248,17 @@ function UmiCRA() {
                                         <TableCell>Household #</TableCell>
                                         <TableCell>Number of members</TableCell>
                                         <TableCell>Number of members belonging to vulnerable groups</TableCell>
-                                        <TableCell>nature of vulnerabiity</TableCell>
+                                        <TableCell>Nature of vulnerabiity</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {rows_frp.map(row => (
-                                        <TableRow key={row.house_id}>
+                                    {frp_rows.map(row => (
+                                        <TableRow key={row.id}>
                                             <TableCell component="th" scope="row">
-                                                {row.house_id}
+                                                {row.id}
                                             </TableCell>
                                             <TableCell>{row.number_of_members}</TableCell>
-                                            <TableCell>{row.belonging_vulnerable_groups}</TableCell>
+                                            <TableCell>{row.vulnerable_groups}</TableCell>
                                             <TableCell>{row.nature_of_vulnerability}</TableCell>
                                         </TableRow>
                                     ))}
@@ -316,13 +314,13 @@ function UmiCRA() {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {rows.map(row => (
+                                    {hd_rows.map(row => (
                                         <TableRow key={row.hazard}>
                                             <TableCell component="th" scope="row">
                                                 {row.hazard}
                                             </TableCell>
                                             <TableCell>{row.speed_of_onset}</TableCell>
-                                            <TableCell>{row.ewi}</TableCell>
+                                            <TableCell>{row.early_warning}</TableCell>
                                             <TableCell>{row.impact}</TableCell>
                                         </TableRow>
                                     ))}

@@ -4,6 +4,7 @@ import { Grid, Paper, Typography, Box, Fab } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import EmailModal from './EmailModal';
 import moment from "moment";
+import TransitionalModal from "./pdrrmo_iloilo/loading";
 import { MarMaintenanceLogs, UmiFieldSurvey, UmiSituationReport } from "@dynaslope/commons";
 
 const imageStyle = makeStyles(theme => ({
@@ -83,48 +84,84 @@ function convertToSimpleHTML(data_type, data) {
                     </table>
                 );
                 break;
+            case "umi_maintenance_report":
+                const sensor_main = data[0];
+                console.log("sensor_main", sensor_main);
+
+                return_element = (
+                    <div>
+                        <h3>Umi Maintenance Report</h3>
+                        <table border={1}>
+                            <tr>
+                                <th width={300}>Date</th>
+                                <th width={300}>Features</th>
+                                <th width={300}>Materials Characterization</th>
+                                <th width={200}>Mechanism</th>
+                                <th width={200}>Exposure</th>
+                            </tr>
+                            {
+                                data.map((row) => (
+                                    <tr>
+                                        <td width={300}>{sensor_main.timestamp}</td>
+                                        <td width={300}>{sensor_main.remarks}</td>
+                                        <td width={300}>{sensor_main.rain_gauge_status}</td>
+                                        <td width={200}>{sensor_main.working_nodes}</td>
+                                        <td width={200}>{sensor_main.anomalous_nodes}</td>
+                                    </tr>
+                                ))
+                            }
+                        </table>
+                    </div>
+                );
+                break;
             case "mar_incident_report":
                 return_element = (
-                    <table border={1}>
-                        <tr>
-                            <th width={300}>Date</th>
-                            <th width={200}>Report Narrative</th>
-                            <th width={200}>Reporter</th>
-                        </tr>
-                        {
-                            data.map((row) => (
-                                <tr>
-                                    <td width={300}>{row.incident_date}</td>
-                                    <td width={200}>{row.incident_report_narrative}</td>
-                                    <td width={200}>{row.reporter}</td>
-                                </tr>
-                            ))
-                        }
-                    </table>
+                    <div>
+                        <h3>Mar Incident Report</h3>
+                        <table border={1}>
+                            <tr>
+                                <th width={300}>Date</th>
+                                <th width={200}>Report Narrative</th>
+                                <th width={200}>Reporter</th>
+                            </tr>
+                            {
+                                data.map((row) => (
+                                    <tr>
+                                        <td width={300}>{row.incident_date}</td>
+                                        <td width={200}>{row.incident_report_narrative}</td>
+                                        <td width={200}>{row.reporter}</td>
+                                    </tr>
+                                ))
+                            }
+                        </table>
+                    </div>
                 );
                 break;
             case "mar_maintenance_report":
                 return_element = (
-                    <table border={1}>
-                        <tr>
-                            <th width={200}>Date</th>
-                            <th width={200}>Type</th>
-                            <th width={200}>Remarks</th>
-                            <th width={200}>In-Charge</th>
-                            <th width={200}>Updater</th>
-                        </tr>
-                        {
-                            data.map((row) => (
-                                <tr>
-                                    <td width={200}>{row.maintenance_date}</td>
-                                    <td width={200}>{row.type}</td>
-                                    <td width={200}>{row.remarks}</td>
-                                    <td width={200}>{row.in_charge}</td>
-                                    <td width={200}>{row.updater}</td>
-                                </tr>
-                            ))
-                        }
-                    </table>
+                    <div>
+                        <h3>Mar Maintenance Report</h3>
+                        <table border={1}>
+                            <tr>
+                                <th width={200}>Date</th>
+                                <th width={200}>Type</th>
+                                <th width={200}>Remarks</th>
+                                <th width={200}>In-Charge</th>
+                                <th width={200}>Updater</th>
+                            </tr>
+                            {
+                                data.map((row) => (
+                                    <tr>
+                                        <td width={200}>{row.maintenance_date}</td>
+                                        <td width={200}>{row.type}</td>
+                                        <td width={200}>{row.remarks}</td>
+                                        <td width={200}>{row.in_charge}</td>
+                                        <td width={200}>{row.updater}</td>
+                                    </tr>
+                                ))
+                            }
+                        </table>
+                    </div>
                 );
                 break;
             default:
@@ -158,6 +195,24 @@ function PDFPreviewer(props) {
             console.log("problem in PDF");
         }
     };
+
+    const [modal, setModal] = useState([<TransitionalModal status={false} />]);
+
+    const download = () => {
+        setModal([<TransitionalModal status={true} />])
+        setTimeout(() => {
+            setModal([<TransitionalModal status={false} />])
+            alert("Download success!")
+        }, 3000)
+    }
+    
+    const print = () => {
+        setModal([<TransitionalModal status={true} />])
+        setTimeout(() => {
+            setModal([<TransitionalModal status={false} />])
+            alert("Print success!")
+        }, 3000)
+    }
 
     return (
         <Box width="100%">
@@ -216,6 +271,7 @@ function PDFPreviewer(props) {
                     />
                 </Grid>
             )}
+            {modal}
         </Box>
     );
 }
