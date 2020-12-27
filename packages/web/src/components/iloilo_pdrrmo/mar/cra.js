@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
     Container, Grid, Paper, Box, CardMedia, Fab, Table,
     TableBody, TableCell, TableHead,
@@ -6,6 +6,7 @@ import {
 } from '@material-ui/core';
 import CustomGridList from '../../reducers/pdrrmo_iloilo/grid_list';
 import { makeStyles } from '@material-ui/core/styles';
+import { MarCommunityRiskAssessment } from "@dynaslope/commons";
 
 import TransitionalModal from '../../reducers/pdrrmo_iloilo/loading';
 
@@ -30,18 +31,29 @@ function MarCRA() {
     const classes = useStyles();
     const dt_classes = tableStyle();
 
+    const [cav_data, setCAVData] = useState([]);
+
+    useEffect(() => {
+        initCav();
+    }, []);
+
+    const initCav = async () => {
+        const response = await MarCommunityRiskAssessment.GetAllCapacityAndVulnerability();
+        if (response.status && response.data.length > 0) setCAVData(response.data);
+    };
+
     function createData(resource, quantity, status_description, owner, in_charge, updater) {
         return { resource, quantity, status_description, owner, in_charge, updater };
     }
 
-    const rows = [
-        createData('Megaphone', '6', 'working', 'Carlo Bontia', 'John Geliberte', 'Tine Dumagan'),
-        createData('Two-way radio', '2', 'working', 'Carlo Bontia', 'John Geliberte', 'Tine Dumagan'),
-        createData('Batingting', '1', 'broken', 'Carlo Bontia', 'John Geliberte', 'Tine Dumagan'),
-        createData('Sirena', '5', 'working', 'Carlo Bontia', 'John Geliberte', 'Tine Dumagan'),
-        createData('Cellphone', '10', 'broken', 'Carlo Bontia', 'John Geliberte', 'Tine Dumagan'),
-        createData('Landline', '2', 'working', 'Carlo Bontia', 'John Geliberte', 'Tine Dumagan'),
-    ];
+    // const cav_data = [
+    //     createData('Megaphone', '6', 'working', 'Carlo Bontia', 'John Geliberte', 'Tine Dumagan'),
+    //     createData('Two-way radio', '2', 'working', 'Carlo Bontia', 'John Geliberte', 'Tine Dumagan'),
+    //     createData('Batingting', '1', 'broken', 'Carlo Bontia', 'John Geliberte', 'Tine Dumagan'),
+    //     createData('Sirena', '5', 'working', 'Carlo Bontia', 'John Geliberte', 'Tine Dumagan'),
+    //     createData('Cellphone', '10', 'broken', 'Carlo Bontia', 'John Geliberte', 'Tine Dumagan'),
+    //     createData('Landline', '2', 'working', 'Carlo Bontia', 'John Geliberte', 'Tine Dumagan'),
+    // ];
 
     const cra_data = [{
         title: '<FILE_REPORT #1>',
@@ -135,13 +147,13 @@ function MarCRA() {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {rows.map(row => (
+                                        {cav_data.map(row => (
                                             <TableRow key={row.resource}>
                                                 <TableCell component="th" scope="row">
                                                     {row.resource}
                                                 </TableCell>
                                                 <TableCell>{row.quantity}</TableCell>
-                                                <TableCell>{row.status_description}</TableCell>
+                                                <TableCell>{row.stat_desc}</TableCell>
                                                 <TableCell>{row.owner}</TableCell>
                                                 <TableCell>{row.in_charge}</TableCell>
                                                 <TableCell>{row.updater}</TableCell>
