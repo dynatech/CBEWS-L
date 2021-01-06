@@ -3,47 +3,39 @@ from geopy.geocoders import Nominatim
 import time as time_t
 from datetime import datetime, timedelta, time
 
-
-def rename_file_type(f_type):
-    temp = f_type.lower()
-    file_types_dict = {
-        "txt": "Text",
-        "pdf": "PDF",
-        "ppt": "PowerPoint Presentation",
-        "pptx": "PowerPoint Presentation",
-        "doc": "Document",
-        "docx": "Document",
-        "json": "JSON"
-    }
-    try:
-        return_type = file_types_dict[temp]
-    except KeyError:
-        return_type = "undefined"
-
-    return return_type
+from pathlib import Path
 
 class Helpers():
-    def fetch(path):
+    def fetch_files(path):
         files = []
         try:
-            cra_list = os.listdir(path)
+            files = os.listdir(path)
 
-            for file in cra_list:
-                temp = os.path.join(path, file)
-                if not os.path.isdir(temp):
-                    file_type = file.split(".")[1]
-                    formatted_type = rename_file_type(file_type)
-                    files.append({
-                        "title": file,
-                        "sub_title": formatted_type,
-                        "value": path
-                    })
         except FileNotFoundError:
             files = []
         except Exception as err:
             raise(err)
 
         return files
+
+
+    def rename_file_type(f_type):
+        temp = f_type.lower()
+        file_types_dict = {
+            "txt": "Text",
+            "pdf": "PDF",
+            "ppt": "PowerPoint Presentation",
+            "pptx": "PowerPoint Presentation",
+            "doc": "Document",
+            "docx": "Document",
+            "json": "JSON"
+        }
+        try:
+            return_type = file_types_dict[temp]
+        except KeyError:
+            return_type = "undefined"
+
+        return return_type
 
 
     def upload(file, file_path):
@@ -67,11 +59,11 @@ class Helpers():
 
             temp = f"{filename}{file_type}"
             uniq = 1
-            while os.path.exists(f"{directory}{temp}"):
+            while os.path.exists(Path(directory) / temp):
                 temp = '%s_%d%s' % (filename, uniq, file_type)
                 uniq += 1
 
-            final_path = os.path.join(directory, temp)
+            final_path = os.path.join(Path(directory), temp)
             file.save(final_path)
 
         except Exception as err:
@@ -79,7 +71,6 @@ class Helpers():
             final_path = "ERROR"
 
         return final_path
-
 
 
     def round_down_data_ts(date_time):
