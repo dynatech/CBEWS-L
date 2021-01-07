@@ -174,7 +174,7 @@ def fetch_log_attachments(maintenance_log_id):
     try:
 
         file_path = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOGS/{maintenance_log_id}/"
-        files = helpers.fetch(file_path)
+        files = helpers.fetch_files(file_path)
 
         response = {
             "status": True,
