@@ -361,3 +361,48 @@ def delete_moms_feature():
             "message": f"Failed to fetch moms feature data. Error: {err}"
         }
     return jsonify(moms)
+
+
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/upload/ground_data/mar/moms", methods=["POST"])
+def fetch_moms_files():
+    try:
+        file = request.files['file']
+        directory = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MOMS/"
+        file_path = H.upload(file=file, file_path=directory)
+
+        response = {
+            "status": True,
+            "message": "Successfully uploaded file!",
+            "file_path": file_path
+        }
+    except Exception as err:
+        response = {
+            "status": False,
+            "message": "Failed attaching file.",
+            "file_path": "null"
+        }
+
+    return jsonify(response)
+
+
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/upload/ground_data/mar/moms", methods=["POST"])
+def upload_moms_file():
+    try:
+        file = request.files['file']
+        form_json = request.form.to_dict(flat=False)
+        directory = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MOMS/"
+        file_path = H.upload(file=file, file_path=directory)
+
+        response = {
+            "status": True,
+            "message": "Successfully uploaded file!",
+            "file_path": file_path
+        }
+    except Exception as err:
+        response = {
+            "status": False,
+            "message": "Failed attaching file.",
+            "file_path": "null"
+        }
+
+    return jsonify(response)

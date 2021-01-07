@@ -86,7 +86,6 @@ function convertToSimpleHTML(data_type, data) {
                 break;
             case "umi_maintenance_report":
                 const sensor_main = data[0];
-                console.log("sensor_main", sensor_main);
 
                 return_element = (
                     <div>

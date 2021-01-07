@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from calendar import monthrange
 from flask import Blueprint, jsonify, request
@@ -149,7 +150,7 @@ def upload_report_attachment():
         final_path = h.upload(file=file, file_path=file_path)
 
         response = {
-            "ok": True,
+            "status": True,
             "message": "Report attachment OKS!",
             "file_path": final_path
         }
@@ -157,7 +158,7 @@ def upload_report_attachment():
     except Exception as err:
         print(err)
         response = {
-            "ok": False,
+            "status": False,
             "message": "Report attachment NOT oks!",
             "file_path": "ERROR"
         }
@@ -171,12 +172,31 @@ def fetch_report_attachments(ir_id):
     try:
 
         file_path = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/INCIDENT_REPORTS/{ir_id}/"
-        files = h.fetch(file_path)
+        files = h.fetch_files(file_path)
+
+        ir_file_list = []
+        for file in files:
+            temp = os.path.join(file_path, file)
+            if not os.path.isdir(temp):
+                file_type = file.split(".")[1]
+                formatted_type = h.rename_file_type(file_type)
+                ir_file_list.append({
+                    "title": file,
+                    "sub_title": formatted_type,
+                    "value": file_path
+                })
 
         response = {
             "ok": True,
             "message": "Report attachment fetch OKS!",
-            "data": files
+            "data": ir_file_list
+        }
+    except FileNotFoundError as fnf_error:
+        print(fnf_error)
+        response = {
+            "ok": False,
+            "message": "File/s not found!",
+            "data": []
         }
 
     except Exception as err:
@@ -184,7 +204,7 @@ def fetch_report_attachments(ir_id):
         response = {
             "ok": False,
             "message": "Report attachment fetch NOT oks!",
-            "data": files
+            "data": []
         }
 
     return jsonify(response)
