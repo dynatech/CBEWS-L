@@ -40,6 +40,7 @@ import {
   InsertIncidentLogs,
   UpdateIncidentLogs,
   DeleteIncidentLogs,
+  FetchReportAttachments,
   UploadReportAttachment,
 } from "./src/MAR/MaintenanceLogs/IncidentLogs";
 import {
@@ -50,6 +51,7 @@ import {
   UpdateMaintenanceLogs,
   DeleteMaintenanceLogs,
   FetchLogAttachments,
+  UploadLogAttachments,
   SendPDFReportViaEmail,
 } from "./src/MAR/MaintenanceLogs/MaintenanceLogs";
 import {
@@ -254,6 +256,7 @@ const MarMaintenanceLogs = {
   InsertIncidentLogs,
   UpdateIncidentLogs,
   DeleteIncidentLogs,
+  FetchReportAttachments,
   UploadReportAttachment,
   GetMaintenanceLogs,
   GetDayMaintenanceLogs,
@@ -262,6 +265,7 @@ const MarMaintenanceLogs = {
   UpdateMaintenanceLogs,
   DeleteMaintenanceLogs,
   FetchLogAttachments,
+  UploadLogAttachments,
   RenderPDF,
   DownloadPDF,
   SendPDFReportViaEmail,

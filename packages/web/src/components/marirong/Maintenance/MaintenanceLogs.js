@@ -7,7 +7,9 @@ import {
     Button,
     Typography,
     TextField,
-    Input,
+    Input, Paper, Table,
+    TableBody, TableCell, TableHead,
+    TableRow, 
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import FullCalendar from "@fullcalendar/react";
@@ -30,24 +32,27 @@ import { useStyles, tableStyles } from "../../../styles/general_styles";
 
 import Forms from "../../utils/Forms";
 import FabMuiTable from "../../utils/MuiTable";
+import AttachmentsDialog from '../../reducers/AttachmentsDialog';
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import { useCookies } from "react-cookie";
 
 import { renderToString } from "react-dom/server";
+import ReactImageGallery from "react-image-gallery";
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const imageStyle = makeStyles((theme) => ({
-    img_size: {
-        height: "100%",
-        width: "100%",
+const tableStyle = makeStyles(theme => ({
+    root: {
+        width: '100%',
+        marginTop: theme.spacing(3),
+        overflowX: 'auto',
     },
-    summary_content: {
-        minHeight: 500,
+    table: {
+        minWidth: 100,
     },
 }));
 
@@ -67,9 +72,9 @@ function getWindowDimensions() {
 }
 
 export default function MaintenanceLogs() {
-    const cmd = "update-delete";
     const [cookies, setCookie] = useCookies(["credentials"]);
     const classes = useStyles();
+    const dt_classes = tableStyle();
 
     const [startRange, setStartRange] = useState("");
     const [endRange, setEndRange] = useState("");
@@ -159,6 +164,7 @@ export default function MaintenanceLogs() {
     };
 
     const handleEdit = (data) => {
+        console.log(data);
         setSelectedData(data);
         setDefaultStrValues({
             Type: data["type"],
@@ -321,7 +327,15 @@ export default function MaintenanceLogs() {
         alert(response.message);
     };
 
-    const handleUploadOpen = () => {
+    const download_attachment = () => {
+        alert("clicked download attachment!");
+    };
+
+    const handleUploadOpen = async (data) => {
+        console.log(data);
+        const response = await MarMaintenanceLogs.FetchLogAttachments(parseInt(data.id));
+        console.log("response 336", response)
+        setSelectedData(data);
         setUploadOpen(true);
     };
 
@@ -346,6 +360,21 @@ export default function MaintenanceLogs() {
             MarMaintenanceLogs.DownloadPDF(filename);
         }
     };
+
+    const samples = [
+        {
+            original: 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__340.jpg',
+            thumbnail: 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__340.jpg',
+        },
+        {
+            original: 'https://image.shutterstock.com/image-photo/bright-spring-view-cameo-island-260nw-1048185397.jpg',
+            thumbnail: 'https://image.shutterstock.com/image-photo/bright-spring-view-cameo-island-260nw-1048185397.jpg',
+        },
+        {
+            original: 'https://www.gettyimages.com/gi-resources/images/500px/983794168.jpg',
+            thumbnail: 'https://www.gettyimages.com/gi-resources/images/500px/983794168.jpg',
+        }
+    ]
 
     return (
         <Fragment>
@@ -391,9 +420,11 @@ export default function MaintenanceLogs() {
                                     handleAdd,
                                     handleEdit,
                                     handleDelete,
+                                    handleUploadOpen,
+                                    handleUploadClose,
                                 }}
                                 options={options}
-                                cmd={cmd}
+                                cmd={"update-delete-upload"}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -416,6 +447,9 @@ export default function MaintenanceLogs() {
                                 </Fab>
                             </Grid>
                             <Grid item xs={4} />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <ReactImageGallery items={samples} />
                         </Grid>
                     </Grid>
                 </Grid>
@@ -440,6 +474,29 @@ export default function MaintenanceLogs() {
                         submitForm={() => submit()}
                         deleteForm={() => handleOpenDelete()}
                     />
+                    <hr />
+                    <Paper>
+                        <Table className={dt_classes.table}>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Filename</TableCell>
+                                    <TableCell>File Type</TableCell>
+                                    <TableCell>Action</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {report_attachments.map(row => (
+                                    <TableRow key={row.filename}>
+                                        <TableCell component="th" scope="row">
+                                            {row.filename}
+                                        </TableCell>
+                                        <TableCell>{row.type}</TableCell>
+                                        <TableCell>{download_attachment(row.filename)}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </Paper>
                 </DialogContent>
             </Dialog>
 
@@ -487,46 +544,14 @@ export default function MaintenanceLogs() {
                 </Alert>
             </Snackbar>
 
-            <Dialog
+            <AttachmentsDialog
                 open={uploadOpen}
-                onClose={handleUploadClose}
-                aria-labelledby="form-dialog-title"
-            >
-                <DialogTitle id="form-dialog-title">File upload</DialogTitle>
-                <DialogContent>
-                    <Grid container>
-                        <Grid item xs={8}>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                id="name"
-                                label="File path"
-                                type="email"
-                                fullWidth
-                                value={filename}
-                            />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <Input
-                                name="file"
-                                type="file"
-                                onChange={handleFileSelection}
-                            />
-                        </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleUploadClose} color="primary">
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={handleClickUpload(selectedData.ir_id)}
-                        color="primary"
-                    >
-                        Upload
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                filename={filename}
+                handleClose={handleUploadClose}
+                attachment_list={[]}
+                handleFileSelection={handleFileSelection}
+                handleUpload={handleClickUpload}
+            />
         </Fragment>
     );
 }

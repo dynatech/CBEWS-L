@@ -14,6 +14,7 @@ import {
 import AddIcon from "@material-ui/icons/Add";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import UploadIcon from "@material-ui/icons/CloudUpload";
 
 function getAddButton(title, handler) {
     if (title !== "") {
@@ -42,6 +43,13 @@ function getDeleteButton(handler) {
         </IconButton>
     );
 }
+function getUploadButton(handler) {
+    return (
+        <IconButton onClick={handler} arial-label="upload" component="span">
+            <UploadIcon />
+        </IconButton>
+    );
+}
 
 function appendActions(cmd, data, handlers) {
     const { handleEdit, handleDelete } = handlers;
@@ -52,6 +60,14 @@ function appendActions(cmd, data, handlers) {
                 mod_set = [
                     getEditButton(() => handleEdit(element)),
                     getDeleteButton(() => handleDelete(element)),
+                ];
+                break;
+            case "update-delete-upload":
+                const { handleUploadOpen } = handlers;
+                mod_set = [
+                    getEditButton(() => handleEdit(element)),
+                    getDeleteButton(() => handleDelete(element)),
+                    getUploadButton(() => handleUploadOpen(element)),
                 ];
                 break;
             default:
