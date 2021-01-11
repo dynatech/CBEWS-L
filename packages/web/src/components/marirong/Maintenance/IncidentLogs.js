@@ -300,13 +300,14 @@ export default function IncidentLogs() {
         setFilename(file.name);
     };
 
-    const handleClickUpload = (ir_id) => async () => {
+    const handleClickUpload = async () => {
         const data = new FormData();
         const ir_id = selectedData.id;
         data.append("file", file_to_upload);
         data.append("ir_id", ir_id);
 
         const response = await MarMaintenanceLogs.UploadReportAttachment(data);
+        console.log("response", response);
         if (response.status === true) {
             handleUploadClose();
             setFileToUpload(null);

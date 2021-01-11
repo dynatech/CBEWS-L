@@ -15,6 +15,20 @@ const GetHazardMaps = () => {
     .catch((error) => console.error("Problem in commons GetHazMap", error));
 };
 
+const GetHazardMapsGallery = () => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/get/community_risk_assessment/mar/hazard_map/gallery`, {
+        method: "GET",
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        },
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => console.error("Problem in commons GetHazMap", error));
+};
 
 const UploadHazardMaps = (data) => {
     return fetch(`${AppConfig.HOSTNAME}/v2/upload/community_risk_assessment/mar/hazard_map`, {
@@ -30,5 +44,6 @@ const UploadHazardMaps = (data) => {
 
 export {
     GetHazardMaps,
+    GetHazardMapsGallery,
     UploadHazardMaps,
 }

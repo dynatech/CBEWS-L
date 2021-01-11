@@ -71,6 +71,13 @@ class Helpers():
             final_path = "ERROR"
 
         return final_path
+    
+    
+    def delete_file(full_path):
+        try:
+            os.remove(full_path)
+        except Exception as err:
+            raise(err)
 
 
     def round_down_data_ts(date_time):

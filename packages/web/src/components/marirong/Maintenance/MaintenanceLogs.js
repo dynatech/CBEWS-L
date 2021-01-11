@@ -77,6 +77,8 @@ export default function MaintenanceLogs() {
     const classes = useStyles();
     const dt_classes = tableStyle();
 
+    const image_ref = useRef();
+
     const [startRange, setStartRange] = useState("");
     const [endRange, setEndRange] = useState("");
 
@@ -329,6 +331,21 @@ export default function MaintenanceLogs() {
         alert(response.message);
     };
 
+    const handleClickDeleteUpload = async () => {
+        const current_attachment_index = image_ref.current.getCurrentIndex();
+        const temp_path = report_attachments[current_attachment_index];
+
+        const response = await MarMaintenanceLogs.DeleteLogAttachment({
+            temp_path,
+            maintenance_log_id: selectedData.id
+        });
+        
+        if (response.status) {
+            console.log("Delete successful");
+            alert("File successfully deleted.");
+        } else console.error("Delete failed!");
+    };
+
     const download_attachment = () => {
         alert("clicked download attachment!");
     };
@@ -517,6 +534,8 @@ export default function MaintenanceLogs() {
                 attachment_list={report_attachments}
                 handleFileSelection={handleFileSelection}
                 handleUpload={handleClickUpload}
+                handleClickDeleteUpload={handleClickDeleteUpload}
+                imageRef={image_ref}
             />
         </Fragment>
     );

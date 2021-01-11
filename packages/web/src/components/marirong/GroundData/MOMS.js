@@ -388,13 +388,13 @@ export default function MOMS() {
         setFilename(file.name);
     };
 
-    const handleClickUpload = (ir_id) => async () => {
+    const handleClickUpload = async () => {
         const data = new FormData();
         const moms_id = selectedData.id;
         data.append("file", file_to_upload);
         data.append("moms_id", moms_id);
 
-        const response = await MarGroundData.UploadMomsAttachments(data);
+        const response = await MarGroundData.UploadMOMSAttachment(data);
         if (response.status === true) {
             handleUploadClose();
             setFileToUpload(null);
@@ -406,7 +406,7 @@ export default function MOMS() {
 
     const handleUploadOpen = async (data) => {
         console.log(data);
-        const response = await MarGroundData.FetchMomsAttachments(parseInt(data.id));
+        const response = await MarGroundData.FetchMOMSAttachments(parseInt(data.id));
         console.log("response 336", response)
         setReportAttachments(response.data)
         setSelectedData(data);
@@ -424,7 +424,7 @@ export default function MOMS() {
         <Container fixed>
             <Grid container align="center" spacing={2}>
                 <Grid item xs={12} >
-                    <FabMuiTable
+                    {/* <FabMuiTable
                         classes={{}}
                         addLabel=""
                         data={{
@@ -438,6 +438,23 @@ export default function MOMS() {
                         }}
                         options={options}
                         cmd={cmd}
+                    /> */}
+                    <FabMuiTable
+                        classes={{}}
+                        addLabel=""
+                        data={{
+                            columns: columns,
+                            rows: tableData,
+                        }}
+                        handlers={{
+                            handleAdd,
+                            handleEdit,
+                            handleDelete,
+                            handleUploadOpen,
+                            handleUploadClose,
+                        }}
+                        options={options}
+                        cmd={"update-delete-upload"}
                     />
                 </Grid>
                 <Grid item xs={12}>

@@ -185,6 +185,52 @@ def fetch_hazard_map():
     return jsonify(response)
 
 
+@COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/community_risk_assessment/mar/hazard_map/gallery", methods=["GET"])
+def fetch_hazard_map_gallery_data():
+    try:
+        file_loc = APP_CONFIG['MARIRONG_DIR']
+
+        basepath = f'{file_loc}/MAPS'
+        map_list = glob.glob(basepath+"/*")
+        latest_file = max(map_list, key=os.path.getctime)
+        latest_file = latest_file.split("\\", 1)
+        map_list = [*latest_file]
+
+        entries = ((os.stat(path), path) for path in map_list)
+        # leave only regular files, insert creation date
+        entries = ((stat[ST_CTIME], path)
+                   for stat, path in entries if S_ISREG(stat[ST_MODE]))
+
+        maps = []
+        for map in map_list:
+            path = Path(basepath)
+            filepath = path / map
+            if not os.path.isdir(filepath):
+                file_type = map.split(".")[1]
+                head, filename = ntpath.split(map)
+
+                web_host_ip = "https://dynaslope.phivolcs.dost.gov.ph"
+                path = f"MARIRONG/MAPS"
+                http_path = f"{web_host_ip}/{path}/{filename}"
+
+                maps.append({
+                    "original": http_path,
+                    "thumbnail": http_path
+                })
+
+        response = {"status": True, "data": maps,
+                    "message": "Success loading map"}
+    except ValueError as val_err:
+        print(val_err)
+        response = {"status": False, "data": [], "message": "Value Error. See server for details."}
+    except Exception as err:
+        print(err)
+        response = {"status": False, "data": [],
+                    "message": "Failed loading map. See server for details"}
+
+    return jsonify(response)
+
+
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/upload/community_risk_assessment/mar/hazard_map", methods=["POST"])
 def upload_hazard_map():
     try:

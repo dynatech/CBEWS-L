@@ -142,7 +142,20 @@ const UploadLogAttachments = (data) => {
         return responseJson;
     })
     .catch((error) => {
-        console.error("Problem in common SubmitCAV", error);
+        console.error("Problem in Upload Log Attachments: ", error);
+    });
+}
+
+const DeleteLogAttachment = (data) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/maintenance/maintenance_logs/delete_log_attachment`, {
+        method: 'POST',
+        body: data,
+    }).then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        console.error("Problem in Delete Log Attachments: ", error);
     });
 }
 
@@ -176,6 +189,7 @@ export {
     UpdateMaintenanceLogs,
     DeleteMaintenanceLogs,
     FetchLogAttachments,
+    DeleteLogAttachment,
     UploadLogAttachments,
     SendPDFReportViaEmail,
 }
