@@ -168,6 +168,36 @@ def upload_log_attachment():
     return jsonify(response)
 
 
+@MAINTENANCE_LOGS_BLUEPRINT.route("/maintenance/maintenance_logs/delete_log_attachment", methods=["POST"])
+@cross_origin()
+def delete_log_attachment():
+    try:
+        json = request.get_json()
+        temp_path = json["temp_path"]
+        maintenance_log_id = json["maintenance_log_id"]
+
+        split_list = temp_path.split("\\")
+        helpers.var_checker("split_list", split_list)
+        filename = split_list[-1]
+        file_path = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOGS/{maintenance_log_id}/{filename}"
+        
+        helpers.delete_file(full_path=file_path)
+
+        response = {
+            "status": True,
+            "message": "Delete Log attachment OKS!"
+        }
+
+    except Exception as err:
+        print(err)
+        response = {
+            "status": False,
+            "message": "Delete Log attachment NOT oks!"
+        }
+
+    return jsonify(response)
+
+
 @MAINTENANCE_LOGS_BLUEPRINT.route("/maintenance/maintenance_logs/fetch_log_attachments/<maintenance_log_id>", methods=["GET"])
 @cross_origin()
 def fetch_log_attachments(maintenance_log_id):

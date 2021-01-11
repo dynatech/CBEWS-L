@@ -25,6 +25,7 @@ import {
 } from "./src/MAR/CommunityRiskAssessment/CapacityAndVulnerability";
 import {
   GetHazardMaps,
+  GetHazardMapsGallery,
   UploadHazardMaps,
 } from "./src/MAR/CommunityRiskAssessment/HazardMaps";
 import {
@@ -51,6 +52,7 @@ import {
   UpdateMaintenanceLogs,
   DeleteMaintenanceLogs,
   FetchLogAttachments,
+  DeleteLogAttachment,
   UploadLogAttachments,
   SendPDFReportViaEmail,
 } from "./src/MAR/MaintenanceLogs/MaintenanceLogs";
@@ -250,6 +252,7 @@ const MarCommunityRiskAssessment = {
   GetOneCapacityAndVulnerability,
   DeleteCapacityAndVulnerability,
   GetHazardMaps,
+  GetHazardMapsGallery,
   UploadHazardMaps,
 };
 
@@ -269,6 +272,7 @@ const MarMaintenanceLogs = {
   UpdateMaintenanceLogs,
   DeleteMaintenanceLogs,
   FetchLogAttachments,
+  DeleteLogAttachment,
   UploadLogAttachments,
   RenderPDF,
   DownloadPDF,
