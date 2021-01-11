@@ -167,7 +167,6 @@ export default function MaintenanceLogs() {
     };
 
     const handleEdit = (data) => {
-        console.log(data);
         setSelectedData(data);
         setDefaultStrValues({
             Type: data["type"],
@@ -333,7 +332,7 @@ export default function MaintenanceLogs() {
 
     const handleClickDeleteUpload = async () => {
         const current_attachment_index = image_ref.current.getCurrentIndex();
-        const temp_path = report_attachments[current_attachment_index];
+        const { original: temp_path } = report_attachments[current_attachment_index];
 
         const response = await MarMaintenanceLogs.DeleteLogAttachment({
             temp_path,
@@ -343,6 +342,8 @@ export default function MaintenanceLogs() {
         if (response.status) {
             console.log("Delete successful");
             alert("File successfully deleted.");
+            handleUploadClose();
+            handleUploadOpen(selectedData);
         } else console.error("Delete failed!");
     };
 
@@ -351,9 +352,7 @@ export default function MaintenanceLogs() {
     };
 
     const handleUploadOpen = async (data) => {
-        console.log(data);
         const response = await MarMaintenanceLogs.FetchLogAttachments(parseInt(data.id));
-        console.log("response 336", response)
         if (response.status) {
             setReportAttachments(response.data)
             setSelectedData(data);

@@ -107,7 +107,6 @@ const DeleteMaintenanceLogs = (data) => {
     })
     .then((response) => response.json())
     .then((responseJson) => {
-        console.log(responseJson);
         return responseJson;
     })
     .catch((error) => {
@@ -149,7 +148,11 @@ const UploadLogAttachments = (data) => {
 const DeleteLogAttachment = (data) => {
     return fetch(`${AppConfig.HOSTNAME}/v2/maintenance/maintenance_logs/delete_log_attachment`, {
         method: 'POST',
-        body: data,
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
     }).then((response) => response.json())
     .then((responseJson) => {
         return responseJson;
