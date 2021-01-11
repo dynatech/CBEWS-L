@@ -116,8 +116,8 @@ const DeleteIncidentLogs = (data) => {
     });
 }
 
-const FetchReportAttachments = (maintenance_log_id) => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/maintenance/incident_reports/fetch_report_attachments/${maintenance_log_id}`, {
+const FetchReportAttachments = (ir_id) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/maintenance/incident_reports/fetch_report_attachments/${ir_id}`, {
         method: 'GET',
         headers: {
             Accept: 'application/json',
