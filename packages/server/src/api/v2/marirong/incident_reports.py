@@ -170,26 +170,23 @@ def upload_report_attachment():
 @cross_origin()
 def fetch_report_attachments(ir_id):
     try:
+        web_host_ip = "https://dynaslope.phivolcs.dost.gov.ph"
+        path = f"MARIRONG/DOCUMENTS/INCIDENT_REPORTS/{maintenance_log_id}/"
+        file_path = f"{APP_CONFIG['MARIRONG_DIR']}/{path}"
+        files = helpers.fetch_files(file_path)
 
-        file_path = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/INCIDENT_REPORTS/{ir_id}/"
-        files = h.fetch_files(file_path)
-
-        ir_file_list = []
-        for file in files:
-            temp = os.path.join(file_path, file)
-            if not os.path.isdir(temp):
-                file_type = file.split(".")[1]
-                formatted_type = h.rename_file_type(file_type)
-                ir_file_list.append({
-                    "title": file,
-                    "sub_title": formatted_type,
-                    "value": file_path
-                })
+        temp = []
+        for row in files:
+            link = f"{web_host_ip}:5001/{path}{row}"
+            temp.append({
+                "thumbnail": link,
+                "original": link
+            })
 
         response = {
-            "ok": True,
+            "status": True,
             "message": "Report attachment fetch OKS!",
-            "data": ir_file_list
+            "data": temp
         }
     except FileNotFoundError as fnf_error:
         print(fnf_error)
