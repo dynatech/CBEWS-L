@@ -76,6 +76,8 @@ import {
     DeleteMomsFeatureType,
     DeleteMomsInstance,
     FetchMOMSAnalysis,
+    FetchMOMSAttachments,
+    UploadMOMSAttachment,
 } from "./src/MAR/GroundData/MOMS";
 import {
     GetOnDemandData,
@@ -233,6 +235,8 @@ const MarGroundData = {
     DeleteMomsFeatureType,
     DeleteMomsInstance,
     FetchMOMSAnalysis,
+    FetchMOMSAttachments, 
+    UploadMOMSAttachment,
 };
 
 const MarCommunityRiskAssessment = {

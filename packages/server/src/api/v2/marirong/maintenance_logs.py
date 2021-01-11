@@ -173,13 +173,13 @@ def upload_log_attachment():
 def fetch_log_attachments(maintenance_log_id):
     try:
         web_host_ip = "https://dynaslope.phivolcs.dost.gov.ph"
-        path = f"MARIRONG/DOCUMENTS/MAINTENANCE_LOGS/{maintenance_log_id}/"
+        path = f"DOCUMENTS/MAINTENANCE_LOGS/{maintenance_log_id}"
         file_path = f"{APP_CONFIG['MARIRONG_DIR']}/{path}"
         files = helpers.fetch_files(file_path)
 
         temp = []
         for row in files:
-            link = f"{web_host_ip}:5001/{path}{row}"
+            link = f"{web_host_ip}:5001/MARIRONG/{path}/{row}"
             temp.append({
                 "thumbnail": link,
                 "original": link

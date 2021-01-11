@@ -134,12 +134,8 @@ const FetchLogAttachments = (maintenance_log_id) => {
 }
 
 const UploadLogAttachments = (data) => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/maintenance/maintenance_logs/upload_log_attachment/${maintenance_log_id}`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/maintenance/maintenance_logs/upload_log_attachment`, {
         method: 'POST',
-        // headers: {
-        //     Accept: 'application/json',
-        //     'Content-Type': 'application/json',
-        // },
         body: data,
     }).then((response) => response.json())
     .then((responseJson) => {

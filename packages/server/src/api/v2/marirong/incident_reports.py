@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request
 from flask_cors import CORS, cross_origin
 from connections import SOCKETIO
 from src.model.v2.mar.maintenance_logs import Maintenance as maintenance
-from src.api.helpers import Helpers as h
+from src.api.helpers import Helpers as helpers
 from config import APP_CONFIG
 
 INCIDENT_REPORTS_BLUEPRINT = Blueprint("incident_reports_blueprint", __name__)
@@ -56,7 +56,7 @@ def fetch():
 @cross_origin()
 def fetch_day(input_date):
     try:
-        input_date = h.str_to_dt(input_date)
+        input_date = helpers.str_to_dt(input_date)
         start = datetime(input_date.year, input_date.month, input_date.day, 0, 0, 0)
         end = datetime(input_date.year, input_date.month, input_date.day, 23, 59, 0)
         result = maintenance.fetch_filtered_incident_report(start, end)
@@ -143,11 +143,10 @@ def remove():
 def upload_report_attachment():
     try:
         file = request.files['file']
-
         form_json = request.form.to_dict(flat=False)
         ir_id = form_json["ir_id"][0]
         file_path = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/INCIDENT_REPORTS/{ir_id}/"
-        final_path = h.upload(file=file, file_path=file_path)
+        final_path = helpers.upload(file=file, file_path=file_path)
 
         response = {
             "status": True,
@@ -171,13 +170,13 @@ def upload_report_attachment():
 def fetch_report_attachments(ir_id):
     try:
         web_host_ip = "https://dynaslope.phivolcs.dost.gov.ph"
-        path = f"MARIRONG/DOCUMENTS/INCIDENT_REPORTS/{maintenance_log_id}/"
+        path = f"DOCUMENTS/INCIDENT_REPORTS/{ir_id}"
         file_path = f"{APP_CONFIG['MARIRONG_DIR']}/{path}"
         files = helpers.fetch_files(file_path)
 
         temp = []
         for row in files:
-            link = f"{web_host_ip}:5001/{path}{row}"
+            link = f"{web_host_ip}:5001/MARIRONG/{path}/{row}"
             temp.append({
                 "thumbnail": link,
                 "original": link
@@ -188,18 +187,11 @@ def fetch_report_attachments(ir_id):
             "message": "Report attachment fetch OKS!",
             "data": temp
         }
-    except FileNotFoundError as fnf_error:
-        print(fnf_error)
-        response = {
-            "ok": False,
-            "message": "File/s not found!",
-            "data": []
-        }
 
     except Exception as err:
         print(err)
         response = {
-            "ok": False,
+            "status": False,
             "message": "Report attachment fetch NOT oks!",
             "data": []
         }

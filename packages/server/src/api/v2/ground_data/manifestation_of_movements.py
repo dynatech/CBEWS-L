@@ -363,46 +363,60 @@ def delete_moms_feature():
     return jsonify(moms)
 
 
-@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/upload/ground_data/mar/moms", methods=["POST"])
-def fetch_moms_files():
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/fetch/ground_data/mar/moms/attachments/<moms_id>", methods=["GET"])
+def fetch_moms_files(moms_id):
     try:
-        file = request.files['file']
-        directory = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MOMS/"
-        file_path = H.upload(file=file, file_path=directory)
+        web_host_ip = "https://dynaslope.phivolcs.dost.gov.ph"
+        path = f"DOCUMENTS/MOMS/{moms_id}"
+        file_path = f"{APP_CONFIG['MARIRONG_DIR']}/{path}"
+        files = H.fetch_files(file_path)
+
+        temp = []
+        for row in files:
+            link = f"{web_host_ip}:5001/MARIRONG/{path}/{row}"
+            temp.append({
+                "thumbnail": link,
+                "original": link
+            })
 
         response = {
             "status": True,
-            "message": "Successfully uploaded file!",
-            "file_path": file_path
+            "message": "MOMS files fetch OKS!",
+            "data": temp
         }
+
     except Exception as err:
+        print(err)
         response = {
             "status": False,
-            "message": "Failed attaching file.",
-            "file_path": "null"
+            "message": "MOMS files fetch NOT oks!",
+            "data": []
         }
 
     return jsonify(response)
 
 
-@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/upload/ground_data/mar/moms", methods=["POST"])
+@MANIFESTATION_OF_MOVEMENTS_BLUEPRINT.route("/upload/ground_data/mar/moms/attachments", methods=["POST"])
 def upload_moms_file():
     try:
         file = request.files['file']
         form_json = request.form.to_dict(flat=False)
-        directory = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MOMS/"
-        file_path = H.upload(file=file, file_path=directory)
+        moms_id = form_json["moms_id"][0]
+        file_path = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MOMS/{moms_id}/"
+        final_path = H.upload(file=file, file_path=file_path)
 
         response = {
             "status": True,
-            "message": "Successfully uploaded file!",
-            "file_path": file_path
+            "message": "Moms upload successful!",
+            "file_path": final_path
         }
+
     except Exception as err:
+        print(err)
         response = {
             "status": False,
-            "message": "Failed attaching file.",
-            "file_path": "null"
+            "message": "Moms upload failed!",
+            "file_path": "ERROR"
         }
 
     return jsonify(response)

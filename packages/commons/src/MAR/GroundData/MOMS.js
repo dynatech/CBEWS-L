@@ -267,8 +267,38 @@ const FetchMOMSAnalysis = () => {
     });  
 } 
 
+const FetchMOMSAttachments = (moms_id) => {
+  return fetch(`${AppConfig.HOSTNAME}/v2/fetch/ground_data/mar/moms/attachments/${moms_id}`, {
+      method: 'GET',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+      }
+  })
+  .then((response) => response.json())
+  .then((responseJson) => {
+      console.log(responseJson);
+      return responseJson;
+  })
+  .catch((error) => {
+      console.error("Problem in Fetch Report Attachments", error);
+  });
+}
+
+const UploadMOMSAttachment = (data) => {
+  return fetch(`${AppConfig.HOSTNAME}/v2/upload/ground_data/mar/moms/attachments`, {
+      method: 'POST',
+      body: data,
+  }).then(response => response.json())
+  .then((responseJson) => {
+      return responseJson;
+  })
+  .catch(error => console.error("Problem in Upload Incident reports", error));
+}
+
 export { 
   InsertMOMSData, GetMOMSData, UpdateMOMSData, DeleteMOMSData,
   InsertMomsFeatureType, GetMomsInstancesPerType, GetMomsInstancesPerSite, UpdateMomsFeatureType, DeleteMomsFeatureType,
   InsertMomsInstance, FetchMoMSFeatures, FetchOneMoMSFeatures, UpdateMomsInstance, DeleteMomsInstance, FetchMOMSAnalysis,
+  FetchMOMSAttachments, UploadMOMSAttachment,
 };

@@ -39,7 +39,8 @@ import MuiAlert from "@material-ui/lab/Alert";
 import { useCookies } from "react-cookie";
 
 import { renderToString } from "react-dom/server";
-import ReactImageGallery from "react-image-gallery";
+
+import '../../../styles/image-gallery.css';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -317,9 +318,9 @@ export default function MaintenanceLogs() {
         const data = new FormData();
         const ir_id = selectedData.id;
         data.append("file", file_to_upload);
-        data.append("ir_id", ir_id);
+        data.append("maintenance_log_id", ir_id);
 
-        const response = await MarMaintenanceLogs.UploadReportAttachment(data);
+        const response = await MarMaintenanceLogs.UploadLogAttachments(data);
         if (response.status === true) {
             handleUploadClose();
             setFileToUpload(null);
@@ -336,8 +337,13 @@ export default function MaintenanceLogs() {
         console.log(data);
         const response = await MarMaintenanceLogs.FetchLogAttachments(parseInt(data.id));
         console.log("response 336", response)
-        setSelectedData(data);
-        setUploadOpen(true);
+        if (response.status) {
+            setReportAttachments(response.data)
+            setSelectedData(data);
+            setUploadOpen(true);
+        } else {
+            alert("problem in click upload open");
+        }
     };
 
     const handleUploadClose = () => {
@@ -361,21 +367,6 @@ export default function MaintenanceLogs() {
             MarMaintenanceLogs.DownloadPDF(filename);
         }
     };
-
-    const samples = [
-        {
-            original: 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__340.jpg',
-            thumbnail: 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__340.jpg',
-        },
-        {
-            original: 'https://image.shutterstock.com/image-photo/bright-spring-view-cameo-island-260nw-1048185397.jpg',
-            thumbnail: 'https://image.shutterstock.com/image-photo/bright-spring-view-cameo-island-260nw-1048185397.jpg',
-        },
-        {
-            original: 'https://www.gettyimages.com/gi-resources/images/500px/983794168.jpg',
-            thumbnail: 'https://www.gettyimages.com/gi-resources/images/500px/983794168.jpg',
-        }
-    ]
 
     return (
         <Fragment>
@@ -449,9 +440,6 @@ export default function MaintenanceLogs() {
                             </Grid>
                             <Grid item xs={4} />
                         </Grid>
-                        <Grid item xs={12}>
-                            <ReactImageGallery items={samples} />
-                        </Grid>
                     </Grid>
                 </Grid>
             </Container>
@@ -475,29 +463,6 @@ export default function MaintenanceLogs() {
                         submitForm={() => submit()}
                         deleteForm={() => handleOpenDelete()}
                     />
-                    <hr />
-                    <Paper>
-                        <Table className={dt_classes.table}>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Filename</TableCell>
-                                    <TableCell>File Type</TableCell>
-                                    <TableCell>Action</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {report_attachments.map(row => (
-                                    <TableRow key={row.filename}>
-                                        <TableCell component="th" scope="row">
-                                            {row.filename}
-                                        </TableCell>
-                                        <TableCell>{row.type}</TableCell>
-                                        <TableCell>{download_attachment(row.filename)}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </Paper>
                 </DialogContent>
             </Dialog>
 
@@ -549,7 +514,7 @@ export default function MaintenanceLogs() {
                 open={uploadOpen}
                 filename={filename}
                 handleClose={handleUploadClose}
-                attachment_list={[]}
+                attachment_list={report_attachments}
                 handleFileSelection={handleFileSelection}
                 handleUpload={handleClickUpload}
             />
