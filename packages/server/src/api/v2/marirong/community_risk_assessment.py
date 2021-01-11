@@ -192,9 +192,6 @@ def fetch_hazard_map_gallery_data():
 
         basepath = f'{file_loc}/MAPS'
         map_list = glob.glob(basepath+"/*")
-        latest_file = max(map_list, key=os.path.getctime)
-        latest_file = latest_file.split("\\", 1)
-        map_list = [*latest_file]
 
         entries = ((os.stat(path), path) for path in map_list)
         # leave only regular files, insert creation date
@@ -211,7 +208,7 @@ def fetch_hazard_map_gallery_data():
 
                 web_host_ip = "https://dynaslope.phivolcs.dost.gov.ph"
                 path = f"MARIRONG/MAPS"
-                http_path = f"{web_host_ip}/{path}/{filename}"
+                http_path = f"{web_host_ip}:5001/{path}/{filename}"
 
                 maps.append({
                     "original": http_path,

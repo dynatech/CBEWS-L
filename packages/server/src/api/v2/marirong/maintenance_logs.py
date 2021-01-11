@@ -176,7 +176,10 @@ def delete_log_attachment():
         temp_path = json["temp_path"]
         maintenance_log_id = json["maintenance_log_id"]
 
-        split_list = temp_path.split("\\")
+        split_list = temp_path.split("/")
+        if len(split_list) <= 1:
+            split_list = temp_path.split("\\")
+
         helpers.var_checker("split_list", split_list)
         filename = split_list[-1]
         file_path = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOGS/{maintenance_log_id}/{filename}"
