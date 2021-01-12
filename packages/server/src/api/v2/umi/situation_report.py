@@ -65,10 +65,11 @@ def email_latest_report_summary():
 		'status': True
 	})
 
+@SITUATION_REPORT_BLUEPRINT.route("/get/situation_report/umi/situation_report_logs/<start>/<end>", methods=["GET"])
 @SITUATION_REPORT_BLUEPRINT.route("/get/situation_report/umi/situation_report_logs", methods=["GET"])
-def get_all_field_survey_logs():
+def get_all_field_survey_logs(start=None, end=None):
 	try:
-		summary = SituationReportModel.fetch_all_situation_report_logs()
+		summary = SituationReportModel.fetch_all_situation_report_logs(start, end)
 		ret_val = {
 			'status': True,
 			'message': "Successfully loaded Latest Situation Report Logs",
