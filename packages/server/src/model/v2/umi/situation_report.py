@@ -9,8 +9,13 @@ class SituationReportModel():
 		ret_val = DB.db_read(query, 'cbewsl_umi_collections')
 		return ret_val
 
-	def fetch_all_situation_report_logs():
-		query = "SELECT * FROM situation_report order by report_ts desc;"
+	def fetch_all_situation_report_logs(start=None, end=None):
+		query = "SELECT * FROM situation_report"
+		if (start and end):
+			query += f" WHERE report_ts BETWEEN '{start}' AND '{end}"
+
+		query += " ORDER BY report_ts DESC"
+
 		ret_val = DB.db_read(query, 'cbewsl_umi_collections')
 		return ret_val
 		
