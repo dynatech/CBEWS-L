@@ -79,9 +79,10 @@ def get_all_field_survey_logs(start=None, end=None):
             'data': summary
         }
     except Exception as err:
+        print(err)
         ret_val = {
             'status': False,
-            'message': "Failed to get Latest Field Survey Logs."
+            'message': f"Failed to get Latest Field Survey Logs.: {err}"
         }
     return jsonify(ret_val)
 
