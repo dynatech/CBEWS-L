@@ -12,7 +12,7 @@ class SituationReportModel():
 	def fetch_all_situation_report_logs(start=None, end=None):
 		query = "SELECT * FROM situation_report"
 		if (start and end):
-			query += f" WHERE report_ts BETWEEN '{start}' AND '{end}"
+			query += f" WHERE report_ts BETWEEN '{start}' AND '{end}'"
 
 		query += " ORDER BY report_ts DESC"
 

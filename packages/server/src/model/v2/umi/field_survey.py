@@ -12,7 +12,7 @@ class FieldSurveyModel():
 	def fetch_field_survey_logs(start=None, end=None):
 		query = "SELECT * FROM field_survey"
 		if (start and end):
-			query += f" WHERE report_date BETWEEN '{start}' AND '{end}"
+			query += f" WHERE report_date BETWEEN '{start}' AND '{end}'"
 
 		query += " ORDER BY report_date DESC"
 		ret_val = DB.db_read(query, 'cbewsl_umi_collections')
