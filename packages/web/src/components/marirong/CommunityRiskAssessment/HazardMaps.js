@@ -29,7 +29,6 @@ import { MarCommunityRiskAssessment, AppConfig } from "@dynaslope/commons";
 
 import PhotoAttachmentList from '../../reducers/PhotoAttachmentList';
 
-import '../../../styles/image-gallery.css';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -63,7 +62,6 @@ export default function HazardMaps() {
         const response = await MarCommunityRiskAssessment.GetHazardMaps();
         if (response.status) {
             if (response.data.length > 0) {
-                console.log(response.message);
                 setMapPreview(`${AppConfig.HOST_DIR}:5001/MARIRONG/MAPS/${response.data[0].filename}`);
 
                 const response2 = await MarCommunityRiskAssessment.GetHazardMapsGallery();
@@ -106,7 +104,7 @@ export default function HazardMaps() {
             <Container className={classes.img_container}>
                 <Grid container spacing={2} align="center">
                     <Grid item xs={12} />
-                    <Grid item xs={9}>
+                    {/* <Grid item xs={9}>
                         <Magnifier
                             imageSrc={mapPreview}
                             imageAlt="MAR Hazard Map"
@@ -114,7 +112,11 @@ export default function HazardMaps() {
                             touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
                         />
                     </Grid>
-                    <Grid item xs={3} />
+                    <Grid item xs={3} /> */}
+
+                    <Grid item xs={12}>
+                        <PhotoAttachmentList data={map_list} />
+                    </Grid>
                     <Grid item xs={12}>
                         <Fab
                             variant="extended"
@@ -125,6 +127,7 @@ export default function HazardMaps() {
                             Upload map
                         </Fab>
                     </Grid>
+                    <hr />
                 </Grid>
             </Container>
 
@@ -194,8 +197,6 @@ export default function HazardMaps() {
                     {notifText}
                 </Alert>
             </Snackbar>
-            
-            <PhotoAttachmentList data={map_list} />
 
         </Fragment>
     );

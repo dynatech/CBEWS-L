@@ -142,7 +142,11 @@ import {
   DownloadLatestReportSummary,
   EmailLatestReportSummary,
 } from "./src/UMI/FieldSurvey/ReportSummary";
-import { GetReportsByRange } from './src/UMI/Reports/ReportManager';
+import { 
+  GetReportsByRange,
+  GetAllFieldSurveyLogsByDate, 
+  GetAllSituationReportsByDate,
+} from './src/UMI/Reports/ReportManager';
 import {
   GetCurrentSituationReport,
   DownloadSituationReport,
@@ -335,7 +339,9 @@ const UmiSituationReport = {
 };
 
 const UmiReports = {
-    GetReportsByRange
+    GetReportsByRange,
+    GetAllFieldSurveyLogsByDate,
+    GetAllSituationReportsByDate,
 }
 
 const UmiDataAnalysis = {

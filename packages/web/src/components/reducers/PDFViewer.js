@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { renderToString } from 'react-dom/server';
 import { Grid, Paper, Typography, Box, Fab } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -6,6 +6,7 @@ import EmailModal from './EmailModal';
 import moment from "moment";
 import TransitionalModal from "./pdrrmo_iloilo/loading";
 import { MarMaintenanceLogs, UmiFieldSurvey, UmiSituationReport } from "@dynaslope/commons";
+import Pdf from 'react-to-pdf';
 
 const imageStyle = makeStyles(theme => ({
     img_size: {
@@ -52,6 +53,27 @@ function convertToSimpleHTML(data_type, data) {
                     </div>
                 );
                 break;
+            case "umi_situation_report_list":
+                return_element = (
+                    <div>
+                        <h3>Umi Situation Report</h3>
+                        <table border={1}>
+                            <tr>
+                                <th width={300}>Date</th>
+                                <th width={1000}>Summary</th>
+                            </tr>
+                            {
+                                data.map((row) => (
+                                    <tr>
+                                        <td width={300}>{row.report_ts}</td>
+                                        <td width={1000}>{row.report_summary}</td>
+                                    </tr>
+                                ))
+                            }
+                        </table>
+                    </div>
+                );
+                break;
             case "umi_field_survey":
                 const survey_rep = data[0];
                 console.log("survey_rep", survey_rep);
@@ -82,6 +104,35 @@ function convertToSimpleHTML(data_type, data) {
                             <td width={700}>{survey_rep.report_narrative}</td>
                         </tr>
                     </table>
+                );
+                break;
+            case "umi_field_survey_list":
+                return_element = (
+                    <div>
+                        <h3>Umi Field Survey Report</h3>
+                        <table border={1}>
+                            <tr>
+                                <th width={300}>Date</th>
+                                <th width={300}>Features</th>
+                                <th width={300}>Materials Characterization</th>
+                                <th width={300}>Mechanism</th>
+                                <th width={300}>Exposure</th>
+                                <th width={300}>Report Narrative</th>
+                            </tr>
+                            {
+                                data.map((row) => (
+                                    <tr>
+                                        <td width={300}>{row.report_date}</td>
+                                        <td width={1000}>{row.feature}</td>
+                                        <td width={300}>{row.materials_characterization}</td>
+                                        <td width={1000}>{row.mechanism}</td>
+                                        <td width={300}>{row.exposure}</td>
+                                        <td width={1000}>{row.report_narrative}</td>
+                                    </tr>
+                                ))
+                            }
+                        </table>
+                    </div>
                 );
                 break;
             case "umi_maintenance_report":
@@ -178,6 +229,8 @@ function PDFPreviewer(props) {
     const { date, data, dataType: data_type, noImport, classes, handleDownload } = props;
     const [emailOpen, setEmailOpen] = useState(false);
 
+    const download_ref = useRef();
+
     const html_string = data.length > 0 ? convertToSimpleHTML(data_type, data) : (<Typography>No data</Typography>);
 
     const handleSendEmail = (html_string, email_data) => async () => {
@@ -216,19 +269,21 @@ function PDFPreviewer(props) {
     return (
         <Box width="100%">
             <Paper>
+                <div ref={download_ref}>
                 {!noImport && (
-                    <Grid item xs={12}>
+                    <header>
                         <img src={require('../../assets/letter_header.png')} className={img.img_size} alt="footer" />
-                    </Grid>
+                    </header>
                 )}
-                <Grid item xs={12} className={summary.content}>
+                <body style={{ margin: "5%"}}>
                     {html_string}
-                </Grid>
+                </body>
                 {!noImport && (
-                    <Grid item xs={12}>
+                    <footer>
                         <img src={require('../../assets/letter_footer.png')} className={img.img_size} alt="footer" />
-                    </Grid>
+                    </footer>
                 )}
+                </div>
             </Paper>
             {data.length > 0 && (
                 <Grid item xs={12}>
@@ -239,15 +294,19 @@ function PDFPreviewer(props) {
                     >
                         <Grid item xs={3} />
                         <Grid item xs={3}>
-                            <Fab
-                                variant="extended"
-                                color="primary"
-                                aria-label="add"
-                                className={classes.button_fluid}
-                                onClick={handleDownload(html_string)}
-                            >
-                                Download
-                            </Fab>
+                            <Pdf targetRef={download_ref} filename="download.pdf">
+                                {({ toPdf }) =>     
+                                    <Fab
+                                        variant="extended"
+                                        color="primary"
+                                        aria-label="add"
+                                        className={classes.button_fluid}
+                                        onClick={toPdf}
+                                    >
+                                        Download
+                                    </Fab>
+                               }
+                            </Pdf>
                         </Grid>
                         <Grid item xs={3}>
                             <Fab
