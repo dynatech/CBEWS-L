@@ -43,34 +43,32 @@ export default function MarBody() {
 
     return (
         <Grid item container xs={12}
-            style={{ paddingTop: 100, paddingBottom: 100 }}
+            style={{ paddingTop: 93, paddingBottom: 100}}
             width="100%"
         >
             <Grid item xs={12}>
-                <Paper square>
-                    <Tabs
-                        value={value}
-                        indicatorColor="primary"
-                        textColor="primary"
-                        // variant="fullWidth"
-                        onChange={handleChange}
-                        centered
-                    >
-                        <Tab value="home" label="Home" />
-                        <Tab
-                            value="cra"
-                            label="Community Risk Assessment"
-                        />
-                        <Tab value="alertGen" label="Alert Generation" />
-                        <Tab value="dataAnalysis" label="Data Analysis" />
-                        <Tab value="sensorData" label="Sensor Data" />
-                        <Tab value="groundData" label="Ground Data" />
-                        <Tab value="events" label="Events" />
-                        <Tab value="maintenance" label="Maintenance" />
-                    </Tabs>
-                </Paper>
+                <Tabs
+                    value={value}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    onChange={handleChange}
+                    centered
+                    style={{backgroundColor: '#fa971f', height: 70}}
+                >
+                    <Tab value="home" label={<span style={{fontSize: 19, paddingTop: 15, fontWeight: 900}}>Home</span>} />
+                    <Tab
+                        value="cra"
+                        label={<span style={{fontSize: 19, paddingTop: 15, fontWeight: 900}}>Community Risk Assessment</span>}
+                    />
+                    <Tab value="alertGen" label={<span style={{fontSize: 19, paddingTop: 15, fontWeight: 900}}>Alert Generation</span>} />
+                    <Tab value="dataAnalysis" label={<span style={{fontSize: 19, paddingTop: 15, fontWeight: 900}}>Data Analysis</span>} />
+                    <Tab value="sensorData" label={<span style={{fontSize: 19, paddingTop: 15, fontWeight: 900}}>Sensor Data</span>} />
+                    <Tab value="groundData" label={<span style={{fontSize: 19, paddingTop: 15, fontWeight: 900}}>Ground Data</span>} />
+                    <Tab value="events" label={<span style={{fontSize: 19, paddingTop: 15, fontWeight: 900}}>Events</span>} />
+                    <Tab value="maintenance" label={<span style={{fontSize: 19, paddingTop: 15, fontWeight: 900}}>Maintenance</span>} />
+                </Tabs>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{paddingLeft: '10%', paddingRight: '10%'}}>
                 {body}
             </Grid>
         </Grid>

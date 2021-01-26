@@ -84,12 +84,13 @@ export default function MarHeader(props) {
 
     return (
         <Fragment>
-            <AppBar color="inherit" position="fixed">
+            <AppBar color="inherit" position="fixed" style={{backgroundColor: '#18516c'}}>
                 <Toolbar>
                     <IconButton
                         color="inherit"
                         edge="start"
                         aria-label="menu"
+                        style={{color: '#fa971f'}}
                         onClick={toggleDrawer("left", true)}
                     >
                         <MenuIcon />

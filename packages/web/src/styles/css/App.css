@@ -1,0 +1,5 @@
+@font-face {
+    font-family: 'Helvetica';
+    font-weight: '900';
+    src: local('Helvetica'), url(../../assets//fonts/HelveticaNeueLTCom-LtCn.ttf) format('truetype');
+}

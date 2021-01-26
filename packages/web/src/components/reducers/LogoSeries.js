@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Container, Grid, CardMedia } from "@material-ui/core";
+import { Container, Grid, CardMedia, Typography } from "@material-ui/core";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 
 import dost_seal from "../../assets/dost_seal.png";
@@ -18,20 +18,19 @@ const useStyles = makeStyles((theme) => ({
 function LogoSeries(props) {
     const { siteCode } = props;
     const classes = useStyles();
-    console.log("siteCode", siteCode);
 
     let site_preference;
     switch (siteCode) {
         case "umi":
             site_preference = (
-                <Grid item xs={4} md={2}>
+                <Grid item xs={2} md={2} style={{paddingLeft: 30}}>
                     <img className={classes.xs_image} src={umi_seal} />
                 </Grid>
             );
             break;
         case "mar":
             site_preference = (
-                <Grid item xs={4} md={2}>
+                <Grid item xs={2} md={2} style={{paddingLeft: 30}}>
                     <img className={classes.xs_image} src={mar_seal} />
                 </Grid>
             );
@@ -51,18 +50,20 @@ function LogoSeries(props) {
                 </Fragment>
             );
     }
-    console.log("site_preference", site_preference)
     return (
         <Container className={classes.logo_container}>
             <Grid container spacing={0} alignItems="center" justify="center">
-                <Grid item xs={4} md={2}>
+                <Grid item xs={1} md={1}>
                     <img className={classes.xs_image} src={dost_seal} />
                 </Grid>
-                <Grid item xs={4} md={2}>
+                <Grid item xs={1} md={1} style={{paddingLeft: 20}}>
                     <CardMedia />
                     <img className={classes.xs_image} src={dynaslope_seal} />
                 </Grid>
                 {site_preference}
+                <Grid item xs={8}>
+                    <Typography variant="h4" style={{color: 'white'}}>Community Based Early Warning System for Landslides</Typography>
+                </Grid>
             </Grid>
         </Container>
     );
