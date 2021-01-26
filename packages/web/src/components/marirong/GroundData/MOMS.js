@@ -29,6 +29,8 @@ import MuiAlert from '@material-ui/lab/Alert';
 import { useCookies } from 'react-cookie';
 
 import { MarGroundData } from '@dynaslope/commons';
+import AttachmentsDialog from '../../reducers/AttachmentsDialog';
+import '../../../styles/image-gallery.css';
 
 
 function MomsFeaturesDialog (props) {
@@ -170,6 +172,12 @@ export default function MOMS() {
     const [command, setCommand] = useState("add");
 
     const [tableData, setTableData] = useState([]);
+
+    const [uploadOpen, setUploadOpen] = useState(false);
+    const [file_to_upload, setFileToUpload] = useState(null);
+    const [filename, setFilename] = useState("");
+    const [report_attachments, setReportAttachments] = useState([]);
+
 
     // CONTAINERS
     const [feature_options, setFeatureOptions] = useState([]);
@@ -372,12 +380,51 @@ export default function MOMS() {
         setOpenNotif(true);
     }
 
+    // UPLOAD RELATED FNX
+
+    const handleFileSelection = (event) => {
+        const file = event.target.files[0];
+        setFileToUpload(file);
+        setFilename(file.name);
+    };
+
+    const handleClickUpload = async () => {
+        const data = new FormData();
+        const moms_id = selectedData.id;
+        data.append("file", file_to_upload);
+        data.append("moms_id", moms_id);
+
+        const response = await MarGroundData.UploadMOMSAttachment(data);
+        if (response.status === true) {
+            handleUploadClose();
+            setFileToUpload(null);
+            setFilename("");
+        } else console.error("Problem in click upload");
+        alert(response.message);
+    };
+
+
+    const handleUploadOpen = async (data) => {
+        console.log(data);
+        const response = await MarGroundData.FetchMOMSAttachments(parseInt(data.id));
+        console.log("response 336", response)
+        setReportAttachments(response.data)
+        setSelectedData(data);
+        setUploadOpen(true);
+    };
+
+    const handleUploadClose = () => {
+        setFileToUpload(null);
+        setFilename("");
+        setUploadOpen(false);
+    };
+
     return (
         <Fragment>
         <Container fixed>
             <Grid container align="center" spacing={2}>
                 <Grid item xs={12} >
-                    <FabMuiTable
+                    {/* <FabMuiTable
                         classes={{}}
                         addLabel=""
                         data={{
@@ -391,6 +438,23 @@ export default function MOMS() {
                         }}
                         options={options}
                         cmd={cmd}
+                    /> */}
+                    <FabMuiTable
+                        classes={{}}
+                        addLabel=""
+                        data={{
+                            columns: columns,
+                            rows: tableData,
+                        }}
+                        handlers={{
+                            handleAdd,
+                            handleEdit,
+                            handleDelete,
+                            handleUploadOpen,
+                            handleUploadClose,
+                        }}
+                        options={options}
+                        cmd={"update-delete-upload"}
                     />
                 </Grid>
                 <Grid item xs={12}>
@@ -712,6 +776,15 @@ export default function MOMS() {
                 {notifText}
             </Alert>
         </Snackbar>
+
+        <AttachmentsDialog
+            open={uploadOpen}
+            filename={filename}
+            handleClose={handleUploadClose}
+            attachment_list={report_attachments}
+            handleFileSelection={handleFileSelection}
+            handleUpload={handleClickUpload}
+        />
     </Fragment>
     )
 }

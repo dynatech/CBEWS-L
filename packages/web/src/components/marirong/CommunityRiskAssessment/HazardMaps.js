@@ -27,6 +27,9 @@ import MuiAlert from "@material-ui/lab/Alert";
 
 import { MarCommunityRiskAssessment, AppConfig } from "@dynaslope/commons";
 
+import PhotoAttachmentList from '../../reducers/PhotoAttachmentList';
+
+
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -35,6 +38,7 @@ export default function HazardMaps() {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
     const [mapPreview, setMapPreview] = useState([]);
+    const [map_list, setMapList] = useState([]);
     const [fileToUpload, setFileToUpload] = useState();
     const [filename, setFilename] = useState("");
 
@@ -58,30 +62,15 @@ export default function HazardMaps() {
         const response = await MarCommunityRiskAssessment.GetHazardMaps();
         if (response.status) {
             if (response.data.length > 0) {
-                console.log(response.message);
                 setMapPreview(`${AppConfig.HOST_DIR}:5001/MARIRONG/MAPS/${response.data[0].filename}`);
+
+                const response2 = await MarCommunityRiskAssessment.GetHazardMapsGallery();
+                if (response2.status) setMapList(response2.data);
             } else {
                 console.error(response.message);
             }
         }
     };
-
-    const importAll = (require) =>
-        require.keys().reduce((acc, next) => {
-            acc[next.replace("./", "")] = require(next);
-            return acc;
-        }, {});
-
-    const marirongMaps = {}
-    // const handleMapPreview = (map_data) => {
-    //     console.log("marirong maps", marirongMaps);
-    //     let temp = {
-    //         img: marirongMaps[map_data.filename],
-    //         title: "Dynaslope MAP (MAR)",
-    //         featured: true,
-    //     };
-    //     setMapPreview([temp]);
-    // };
 
     const handleFileSelection = (event) => {
         const file = event.target.files[0];
@@ -115,7 +104,7 @@ export default function HazardMaps() {
             <Container className={classes.img_container}>
                 <Grid container spacing={2} align="center">
                     <Grid item xs={12} />
-                    <Grid item xs={9}>
+                    {/* <Grid item xs={9}>
                         <Magnifier
                             imageSrc={mapPreview}
                             imageAlt="MAR Hazard Map"
@@ -123,7 +112,11 @@ export default function HazardMaps() {
                             touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
                         />
                     </Grid>
-                    <Grid item xs={3} />
+                    <Grid item xs={3} /> */}
+
+                    <Grid item xs={12}>
+                        <PhotoAttachmentList data={map_list} />
+                    </Grid>
                     <Grid item xs={12}>
                         <Fab
                             variant="extended"
@@ -134,6 +127,7 @@ export default function HazardMaps() {
                             Upload map
                         </Fab>
                     </Grid>
+                    <hr />
                 </Grid>
             </Container>
 
@@ -203,6 +197,7 @@ export default function HazardMaps() {
                     {notifText}
                 </Alert>
             </Snackbar>
+
         </Fragment>
     );
 }

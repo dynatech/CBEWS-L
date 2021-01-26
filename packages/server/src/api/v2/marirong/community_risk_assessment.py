@@ -12,7 +12,8 @@ from src.api.helpers import Helpers as h
 from config import APP_CONFIG
 
 
-COMMUNITY_RISK_ASSESSMENT_BLUEPRINT = Blueprint("capacity_and_vulnerability_blueprint", __name__)
+COMMUNITY_RISK_ASSESSMENT_BLUEPRINT = Blueprint(
+    "capacity_and_vulnerability_blueprint", __name__)
 
 
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/add/community_risk_assessment/mar/capacity_and_vulnerability", methods=["POST"])
@@ -49,7 +50,6 @@ def fetch_all_capacity_and_vulnerability():
         }
     finally:
         return jsonify(data)
-    
 
 
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/one/community_risk_assessment/mar/capacity_and_vulnerability/<id>", methods=["GET"])
@@ -129,28 +129,17 @@ def upload_community_risk_assessment_file():
     try:
         file = request.files['file']
         directory = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/"
-        filename = file.filename
+        file_path = h.upload(file=file, file_path=directory)
 
-        count = filename.count(".")
-        name_list = filename.split(".", count)
-        file_type = f".{name_list[count]}"
-        name_list.pop()
-        filename = f"{'.'.join(name_list)}"
-
-        temp = f"{filename}{file_type}"
-        uniq = 1
-        while os.path.exists(Path(directory) / temp):
-            # filename
-            temp = '%s_%d%s' % (filename, uniq, file_type)
-            uniq += 1
-
-        # file.save(new_path)
-        file.save(os.path.join(Path(directory), temp))
-
-        return_data = { "status": True }
+        response = {
+            "status": True, "message": "CRA File successfully uploaded!", "file_path": file_path}
     except Exception as err:
-        return_data = { "status": False }
-    return jsonify(return_data)
+        # raise err
+        print(err)
+        response = {"status": False,
+                    "message": "Failed uploading CRA file.", "file_path": "null"}
+    
+    return jsonify(response)
 
 
 @COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/community_risk_assessment/mar/hazard_map", methods=["GET"])
@@ -168,7 +157,7 @@ def fetch_hazard_map():
         entries = ((os.stat(path), path) for path in map_list)
         # leave only regular files, insert creation date
         entries = ((stat[ST_CTIME], path)
-        for stat, path in entries if S_ISREG(stat[ST_MODE]))
+                   for stat, path in entries if S_ISREG(stat[ST_MODE]))
 
         maps = []
         for map in map_list:
@@ -183,11 +172,58 @@ def fetch_hazard_map():
                     "file_path": basepath
                 })
 
-        response = {"status": True, "data": maps, "message": "Success loading map"}
+        response = {"status": True, "data": maps,
+                    "message": "Success loading map"}
     except ValueError as val_err:
-        response = {"status": True, "data": [], "message": "No maps found"}
+        print(val_err)
+        response = {"status": False, "data": [], "message": "Value Error. See server for details."}
     except Exception as err:
-        response = {"status": False, "data": maps, "message": "Failed loading map"}
+        print(err)
+        response = {"status": False, "data": [],
+                    "message": "Failed loading map. See server for details"}
+
+    return jsonify(response)
+
+
+@COMMUNITY_RISK_ASSESSMENT_BLUEPRINT.route("/get/community_risk_assessment/mar/hazard_map/gallery", methods=["GET"])
+def fetch_hazard_map_gallery_data():
+    try:
+        file_loc = APP_CONFIG['MARIRONG_DIR']
+
+        basepath = f'{file_loc}/MAPS'
+        map_list = glob.glob(basepath+"/*")
+
+        entries = ((os.stat(path), path) for path in map_list)
+        # leave only regular files, insert creation date
+        entries = ((stat[ST_CTIME], path)
+                   for stat, path in entries if S_ISREG(stat[ST_MODE]))
+
+        maps = []
+        for map in map_list:
+            path = Path(basepath)
+            filepath = path / map
+            if not os.path.isdir(filepath):
+                file_type = map.split(".")[1]
+                head, filename = ntpath.split(map)
+
+                web_host_ip = "https://dynaslope.phivolcs.dost.gov.ph"
+                path = f"MARIRONG/MAPS"
+                http_path = f"{web_host_ip}:5001/{path}/{filename}"
+
+                maps.append({
+                    "original": http_path,
+                    "thumbnail": http_path
+                })
+
+        response = {"status": True, "data": maps,
+                    "message": "Success loading map"}
+    except ValueError as val_err:
+        print(val_err)
+        response = {"status": False, "data": [], "message": "Value Error. See server for details."}
+    except Exception as err:
+        print(err)
+        response = {"status": False, "data": [],
+                    "message": "Failed loading map. See server for details"}
 
     return jsonify(response)
 
@@ -197,25 +233,14 @@ def upload_hazard_map():
     try:
         file = request.files['file']
         directory = f"{APP_CONFIG['MARIRONG_DIR']}/MAPS/"
-        filename = file.filename
+        file_path = h.upload(file=file, file_path=directory)
 
-        count = filename.count(".")
-        name_list = filename.split(".", count)
-        file_type = f".{name_list[count]}"
-        name_list.pop()
-        filename = f"{'.'.join(name_list)}"
-
-        temp = f"{filename}{file_type}"
-        uniq = 1
-        while os.path.exists(Path(directory) / temp):
-            temp = '%s_%d%s' % (filename, uniq, file_type)
-            uniq += 1
-
-        file.save(os.path.join(Path(directory), temp))
-
-        return_data = { "status": True }
+        response = {
+            "status": True, "message": "File successfully uploaded!", "file_path": file_path}
     except Exception as err:
         # raise err
-        return_data = { "status": False }
+        print(err)
+        response = {"status": False,
+                    "message": "Failed uploading file.", "file_path": "null"}
 
-    return jsonify(return_data)
+    return jsonify(response)

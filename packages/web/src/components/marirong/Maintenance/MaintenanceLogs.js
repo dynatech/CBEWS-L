@@ -7,7 +7,9 @@ import {
     Button,
     Typography,
     TextField,
-    Input,
+    Input, Paper, Table,
+    TableBody, TableCell, TableHead,
+    TableRow, 
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import FullCalendar from "@fullcalendar/react";
@@ -30,6 +32,7 @@ import { useStyles, tableStyles } from "../../../styles/general_styles";
 
 import Forms from "../../utils/Forms";
 import FabMuiTable from "../../utils/MuiTable";
+import AttachmentsDialog from '../../reducers/AttachmentsDialog';
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
@@ -37,17 +40,20 @@ import { useCookies } from "react-cookie";
 
 import { renderToString } from "react-dom/server";
 
+import '../../../styles/image-gallery.css';
+
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const imageStyle = makeStyles((theme) => ({
-    img_size: {
-        height: "100%",
-        width: "100%",
+const tableStyle = makeStyles(theme => ({
+    root: {
+        width: '100%',
+        marginTop: theme.spacing(3),
+        overflowX: 'auto',
     },
-    summary_content: {
-        minHeight: 500,
+    table: {
+        minWidth: 100,
     },
 }));
 
@@ -67,9 +73,11 @@ function getWindowDimensions() {
 }
 
 export default function MaintenanceLogs() {
-    const cmd = "update-delete";
     const [cookies, setCookie] = useCookies(["credentials"]);
     const classes = useStyles();
+    const dt_classes = tableStyle();
+
+    const image_ref = useRef();
 
     const [startRange, setStartRange] = useState("");
     const [endRange, setEndRange] = useState("");
@@ -307,12 +315,13 @@ export default function MaintenanceLogs() {
         setFilename(file.name);
     };
 
-    const handleClickUpload = (ir_id) => async () => {
+    const handleClickUpload = async () => {
         const data = new FormData();
+        const ir_id = selectedData.id;
         data.append("file", file_to_upload);
-        data.append("ir_id", ir_id);
+        data.append("maintenance_log_id", ir_id);
 
-        const response = await MarMaintenanceLogs.UploadReportAttachment(data);
+        const response = await MarMaintenanceLogs.UploadLogAttachments(data);
         if (response.status === true) {
             handleUploadClose();
             setFileToUpload(null);
@@ -321,8 +330,36 @@ export default function MaintenanceLogs() {
         alert(response.message);
     };
 
-    const handleUploadOpen = () => {
-        setUploadOpen(true);
+    const handleClickDeleteUpload = async () => {
+        const current_attachment_index = image_ref.current.getCurrentIndex();
+        const { original: temp_path } = report_attachments[current_attachment_index];
+
+        const response = await MarMaintenanceLogs.DeleteLogAttachment({
+            temp_path,
+            maintenance_log_id: selectedData.id
+        });
+        
+        if (response.status) {
+            console.log("Delete successful");
+            alert("File successfully deleted.");
+            handleUploadClose();
+            handleUploadOpen(selectedData);
+        } else console.error("Delete failed!");
+    };
+
+    const download_attachment = () => {
+        alert("clicked download attachment!");
+    };
+
+    const handleUploadOpen = async (data) => {
+        const response = await MarMaintenanceLogs.FetchLogAttachments(parseInt(data.id));
+        if (response.status) {
+            setReportAttachments(response.data)
+            setSelectedData(data);
+            setUploadOpen(true);
+        } else {
+            alert("problem in click upload open");
+        }
     };
 
     const handleUploadClose = () => {
@@ -391,9 +428,11 @@ export default function MaintenanceLogs() {
                                     handleAdd,
                                     handleEdit,
                                     handleDelete,
+                                    handleUploadOpen,
+                                    handleUploadClose,
                                 }}
                                 options={options}
-                                cmd={cmd}
+                                cmd={"update-delete-upload"}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -487,46 +526,16 @@ export default function MaintenanceLogs() {
                 </Alert>
             </Snackbar>
 
-            <Dialog
+            <AttachmentsDialog
                 open={uploadOpen}
-                onClose={handleUploadClose}
-                aria-labelledby="form-dialog-title"
-            >
-                <DialogTitle id="form-dialog-title">File upload</DialogTitle>
-                <DialogContent>
-                    <Grid container>
-                        <Grid item xs={8}>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                id="name"
-                                label="File path"
-                                type="email"
-                                fullWidth
-                                value={filename}
-                            />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <Input
-                                name="file"
-                                type="file"
-                                onChange={handleFileSelection}
-                            />
-                        </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleUploadClose} color="primary">
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={handleClickUpload(selectedData.ir_id)}
-                        color="primary"
-                    >
-                        Upload
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                filename={filename}
+                handleClose={handleUploadClose}
+                attachment_list={report_attachments}
+                handleFileSelection={handleFileSelection}
+                handleUpload={handleClickUpload}
+                handleClickDeleteUpload={handleClickDeleteUpload}
+                imageRef={image_ref}
+            />
         </Fragment>
     );
 }

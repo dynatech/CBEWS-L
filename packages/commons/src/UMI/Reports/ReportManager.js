@@ -36,4 +36,38 @@ const GetReportsByRange = async (start, end) => {
     return temp_field_survey.concat(temp_situation_report)
 }
 
-export { GetReportsByRange }
+const GetAllFieldSurveyLogsByDate = (start, end) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/get/field_survey/umi/field_survey_logs/${start}/${end}`, {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        console.error("Error on fetching field survey. Err: ", error);
+    }); 
+}
+
+const GetAllSituationReportsByDate = (start, end) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/get/situation_report/umi/situation_report_logs/${start}/${end}`, {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        console.error("Error on fetching field survey. Err: ", error);
+    }); 
+}
+
+export { GetReportsByRange, GetAllFieldSurveyLogsByDate, GetAllSituationReportsByDate }

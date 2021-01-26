@@ -25,6 +25,7 @@ import {
 } from "./src/MAR/CommunityRiskAssessment/CapacityAndVulnerability";
 import {
   GetHazardMaps,
+  GetHazardMapsGallery,
   UploadHazardMaps,
 } from "./src/MAR/CommunityRiskAssessment/HazardMaps";
 import {
@@ -40,6 +41,7 @@ import {
   InsertIncidentLogs,
   UpdateIncidentLogs,
   DeleteIncidentLogs,
+  FetchReportAttachments,
   UploadReportAttachment,
 } from "./src/MAR/MaintenanceLogs/IncidentLogs";
 import {
@@ -50,6 +52,8 @@ import {
   UpdateMaintenanceLogs,
   DeleteMaintenanceLogs,
   FetchLogAttachments,
+  DeleteLogAttachment,
+  UploadLogAttachments,
   SendPDFReportViaEmail,
 } from "./src/MAR/MaintenanceLogs/MaintenanceLogs";
 import {
@@ -74,6 +78,8 @@ import {
     DeleteMomsFeatureType,
     DeleteMomsInstance,
     FetchMOMSAnalysis,
+    FetchMOMSAttachments,
+    UploadMOMSAttachment,
 } from "./src/MAR/GroundData/MOMS";
 import {
     GetOnDemandData,
@@ -136,7 +142,11 @@ import {
   DownloadLatestReportSummary,
   EmailLatestReportSummary,
 } from "./src/UMI/FieldSurvey/ReportSummary";
-import { GetReportsByRange } from './src/UMI/Reports/ReportManager';
+import { 
+  GetReportsByRange,
+  GetAllFieldSurveyLogsByDate, 
+  GetAllSituationReportsByDate,
+} from './src/UMI/Reports/ReportManager';
 import {
   GetCurrentSituationReport,
   DownloadSituationReport,
@@ -231,6 +241,8 @@ const MarGroundData = {
     DeleteMomsFeatureType,
     DeleteMomsInstance,
     FetchMOMSAnalysis,
+    FetchMOMSAttachments, 
+    UploadMOMSAttachment,
 };
 
 const MarCommunityRiskAssessment = {
@@ -244,6 +256,7 @@ const MarCommunityRiskAssessment = {
   GetOneCapacityAndVulnerability,
   DeleteCapacityAndVulnerability,
   GetHazardMaps,
+  GetHazardMapsGallery,
   UploadHazardMaps,
 };
 
@@ -254,6 +267,7 @@ const MarMaintenanceLogs = {
   InsertIncidentLogs,
   UpdateIncidentLogs,
   DeleteIncidentLogs,
+  FetchReportAttachments,
   UploadReportAttachment,
   GetMaintenanceLogs,
   GetDayMaintenanceLogs,
@@ -262,6 +276,8 @@ const MarMaintenanceLogs = {
   UpdateMaintenanceLogs,
   DeleteMaintenanceLogs,
   FetchLogAttachments,
+  DeleteLogAttachment,
+  UploadLogAttachments,
   RenderPDF,
   DownloadPDF,
   SendPDFReportViaEmail,
@@ -323,7 +339,9 @@ const UmiSituationReport = {
 };
 
 const UmiReports = {
-    GetReportsByRange
+    GetReportsByRange,
+    GetAllFieldSurveyLogsByDate,
+    GetAllSituationReportsByDate,
 }
 
 const UmiDataAnalysis = {

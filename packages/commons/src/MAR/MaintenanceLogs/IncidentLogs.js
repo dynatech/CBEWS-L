@@ -116,6 +116,24 @@ const DeleteIncidentLogs = (data) => {
     });
 }
 
+const FetchReportAttachments = (ir_id) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/maintenance/incident_reports/fetch_report_attachments/${ir_id}`, {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        console.log(responseJson);
+        return responseJson;
+    })
+    .catch((error) => {
+        console.error("Problem in Fetch Report Attachments", error);
+    });
+}
+
 const UploadReportAttachment = (data) => {
     return fetch(`${AppConfig.HOSTNAME}/v2/maintenance/incident_reports/upload_report_attachment`, {
         method: 'POST',
@@ -124,7 +142,7 @@ const UploadReportAttachment = (data) => {
     .then((responseJson) => {
         return responseJson;
     })
-    .catch(error => console.error("Problem in Upload Incident Logs", error));
+    .catch(error => console.error("Problem in Upload Incident reports", error));
 }
 
 
@@ -135,5 +153,6 @@ export {
     InsertIncidentLogs,
     UpdateIncidentLogs,
     DeleteIncidentLogs,
+    FetchReportAttachments,
     UploadReportAttachment
 }

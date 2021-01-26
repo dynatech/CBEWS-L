@@ -92,7 +92,7 @@ const UpdateMaintenanceLogs = (data) => {
         return responseJson;
     })
     .catch((error) => {
-        console.error("Problem in common SubmitCAV", error);
+        console.error("Problem in common update maintenance logs", error);
     });
 }
 
@@ -107,11 +107,10 @@ const DeleteMaintenanceLogs = (data) => {
     })
     .then((response) => response.json())
     .then((responseJson) => {
-        console.log(responseJson);
         return responseJson;
     })
     .catch((error) => {
-        console.error("Problem in Delete CAV", error);
+        console.error("Problem in Delete maintenance logs", error);
     });
 }
 
@@ -126,14 +125,42 @@ const FetchLogAttachments = (maintenance_log_id) => {
     })
     .then((response) => response.json())
     .then((responseJson) => {
-        console.log(responseJson);
         return responseJson;
     })
     .catch((error) => {
-        console.error("Problem in Delete CAV", error);
+        console.error("Problem in Fetch Log Attachments", error);
     });
 }
 
+const UploadLogAttachments = (data) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/maintenance/maintenance_logs/upload_log_attachment`, {
+        method: 'POST',
+        body: data,
+    }).then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        console.error("Problem in Upload Log Attachments: ", error);
+    });
+}
+
+const DeleteLogAttachment = (data) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/maintenance/maintenance_logs/delete_log_attachment`, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    }).then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        console.error("Problem in Delete Log Attachments: ", error);
+    });
+}
 
 const SendPDFReportViaEmail = (data) => {
     console.log("data", data);
@@ -165,5 +192,7 @@ export {
     UpdateMaintenanceLogs,
     DeleteMaintenanceLogs,
     FetchLogAttachments,
+    DeleteLogAttachment,
+    UploadLogAttachments,
     SendPDFReportViaEmail,
 }

@@ -168,18 +168,60 @@ def upload_log_attachment():
     return jsonify(response)
 
 
+@MAINTENANCE_LOGS_BLUEPRINT.route("/maintenance/maintenance_logs/delete_log_attachment", methods=["POST"])
+@cross_origin()
+def delete_log_attachment():
+    try:
+        json = request.get_json()
+        temp_path = json["temp_path"]
+        maintenance_log_id = json["maintenance_log_id"]
+
+        split_list = temp_path.split("/")
+        if len(split_list) <= 1:
+            split_list = temp_path.split("\\")
+
+        helpers.var_checker("split_list", split_list)
+        filename = split_list[-1]
+        file_path = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOGS/{maintenance_log_id}/{filename}"
+        
+        helpers.delete_file(full_path=file_path)
+
+        response = {
+            "status": True,
+            "message": "Delete Log attachment OKS!"
+        }
+
+    except Exception as err:
+        print(err)
+        response = {
+            "status": False,
+            "message": "Delete Log attachment NOT oks!"
+        }
+
+    return jsonify(response)
+
+
 @MAINTENANCE_LOGS_BLUEPRINT.route("/maintenance/maintenance_logs/fetch_log_attachments/<maintenance_log_id>", methods=["GET"])
 @cross_origin()
 def fetch_log_attachments(maintenance_log_id):
     try:
+        web_host_ip = "https://dynaslope.phivolcs.dost.gov.ph"
+        path = f"DOCUMENTS/MAINTENANCE_LOGS/{maintenance_log_id}"
+        file_path = f"{APP_CONFIG['MARIRONG_DIR']}/{path}"
+        files = helpers.fetch_files(file_path)
 
-        file_path = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOGS/{maintenance_log_id}/"
-        files = helpers.fetch(file_path)
+        temp = []
+        for row in files:
+            link = f"{web_host_ip}:5001/MARIRONG/{path}/{row}"
+            temp.append({
+                "thumbnail": link,
+                "original": link
+            })
 
         response = {
             "status": True,
             "message": "Log attachment fetch OKS!",
-            "data": files
+            "data": temp
         }
 
     except Exception as err:

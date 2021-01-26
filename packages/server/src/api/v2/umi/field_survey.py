@@ -68,19 +68,21 @@ def email_latest_report_summary():
         'status': True
     })
 
+@FIELD_SURVEY_BLUEPRINT.route("/get/field_survey/umi/field_survey_logs/<start>/<end>", methods=["GET"])
 @FIELD_SURVEY_BLUEPRINT.route("/get/field_survey/umi/field_survey_logs", methods=["GET"])
-def get_all_field_survey_logs():
+def get_all_field_survey_logs(start=None, end=None):
     try:
-        summary = FieldSurveyModel.fetch_field_survey_logs()
+        summary = FieldSurveyModel.fetch_field_survey_logs(start, end)
         ret_val = {
             'status': True,
             'message': "Successfully loaded Latest Field Survey Logs",
             'data': summary
         }
     except Exception as err:
+        print(err)
         ret_val = {
             'status': False,
-            'message': "Failed to get Latest Field Survey Logs."
+            'message': f"Failed to get Latest Field Survey Logs.: {err}"
         }
     return jsonify(ret_val)
 

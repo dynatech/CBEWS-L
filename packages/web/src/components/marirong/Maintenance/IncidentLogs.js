@@ -23,7 +23,6 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContentText from "@material-ui/core/DialogContentText";
 
-import AttachmentsGridList from "../../reducers/AttachmentList";
 import PDFPreviewer from "../../reducers/PDFViewer";
 
 import { MarMaintenanceLogs } from "@dynaslope/commons";
@@ -32,12 +31,14 @@ import { useStyles, tableStyles } from "../../../styles/general_styles";
 
 import Forms from "../../utils/Forms";
 import FabMuiTable from "../../utils/MuiTable";
+import AttachmentsDialog from '../../reducers/AttachmentsDialog';
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import { useCookies } from "react-cookie";
 
 import { renderToString } from "react-dom/server";
+import '../../../styles/image-gallery.css';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -299,12 +300,14 @@ export default function IncidentLogs() {
         setFilename(file.name);
     };
 
-    const handleClickUpload = (ir_id) => async () => {
+    const handleClickUpload = async () => {
         const data = new FormData();
+        const ir_id = selectedData.id;
         data.append("file", file_to_upload);
         data.append("ir_id", ir_id);
 
         const response = await MarMaintenanceLogs.UploadReportAttachment(data);
+        console.log("response", response);
         if (response.status === true) {
             handleUploadClose();
             setFileToUpload(null);
@@ -314,7 +317,12 @@ export default function IncidentLogs() {
     };
 
 
-    const handleUploadOpen = () => {
+    const handleUploadOpen = async (data) => {
+        console.log(data);
+        const response = await MarMaintenanceLogs.FetchReportAttachments(parseInt(data.id));
+        console.log("response 336", response)
+        setReportAttachments(response.data)
+        setSelectedData(data);
         setUploadOpen(true);
     };
 
@@ -383,9 +391,11 @@ export default function IncidentLogs() {
                                     handleAdd,
                                     handleEdit,
                                     handleDelete,
+                                    handleUploadOpen,
+                                    handleUploadClose,
                                 }}
                                 options={options}
-                                cmd={cmd}
+                                cmd={"update-delete-upload"}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -480,46 +490,14 @@ export default function IncidentLogs() {
                 </Alert>
             </Snackbar>
 
-            <Dialog
+            <AttachmentsDialog
                 open={uploadOpen}
-                onClose={handleUploadClose}
-                aria-labelledby="form-dialog-title"
-            >
-                <DialogTitle id="form-dialog-title">File upload</DialogTitle>
-                <DialogContent>
-                    <Grid container>
-                        <Grid item xs={8}>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                id="name"
-                                label="File path"
-                                type="email"
-                                fullWidth
-                                value={filename}
-                            />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <Input
-                                name="file"
-                                type="file"
-                                onChange={handleFileSelection}
-                            />
-                        </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleUploadClose} color="primary">
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={handleClickUpload(selectedData.ir_id)}
-                        color="primary"
-                    >
-                        Upload
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                filename={filename}
+                handleClose={handleUploadClose}
+                attachment_list={report_attachments}
+                handleFileSelection={handleFileSelection}
+                handleUpload={handleClickUpload}
+            />
         </Fragment>
     );
 }
