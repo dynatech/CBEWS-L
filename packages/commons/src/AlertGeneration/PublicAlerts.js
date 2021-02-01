@@ -34,4 +34,61 @@ const UmiGetOngoingAndExtendedMonitoring = () => {
     );
 }
 
-export { MarGetOngoingAndExtendedMonitoring, UmiGetOngoingAndExtendedMonitoring }
+const InsertEWI = () => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/insert/alert_gen/ewi`, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+    }).then(response => response.json())
+        .then((responseJson) => {
+            return responseJson
+        })
+        .catch((error) => {
+            console.log("Problem in InsertEWI", error)
+        }
+    );
+}
+
+const GetMarAlertValidationData = () => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/get/alert_gen/mar/alert_validation_data`, {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        }
+    }).then(response => response.json())
+        .then((responseJson) => {
+            return responseJson
+        })
+        .catch((error) => {
+            console.log("Problem in GetMarAlertValidationData", error)
+        }
+    );
+}
+
+const GetUmiAlertValidationData = () => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/get/alert_gen/umi/alert_validation_data`, {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        }
+    }).then(response => response.json())
+        .then((responseJson) => {
+            return responseJson
+        })
+        .catch((error) => {
+            console.log("Problem in GetUmiAlertValidationData", error)
+        }
+    );
+}
+
+
+export { 
+    MarGetOngoingAndExtendedMonitoring, UmiGetOngoingAndExtendedMonitoring, 
+    GetUmiAlertValidationData, GetMarAlertValidationData,
+    InsertEWI
+}

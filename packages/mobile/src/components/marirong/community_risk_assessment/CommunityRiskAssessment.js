@@ -37,7 +37,7 @@ function CommunityRiskAssessment() {
     }
 
     const comfirmUpload = async () => {
-      const url = 'http://192.168.150.221:5000/v2/upload/community_risk_assessment/mar/community_risk_assessment'
+      const url = 'https://dynaslope.phivolcs.dost.gov.ph:5000/v2/upload/community_risk_assessment/mar/community_risk_assessment'
       const file = [{
         name: 'file',
         filename: filename,
