@@ -134,7 +134,7 @@ function MarirongDashboard(props) {
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Call and Text</Text>
               </View>
               <View style={[ContainerStyle.menu_container]}>
-                <TouchableOpacity onPress={() => { StackNavigator.navigate("AlertGeneration") }}>
+                <TouchableOpacity onPress={() => { StackNavigator.navigate("AlertGenerationStack") }}>
                   <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/marirong/menu/alert_gen.png')}></Image>
                 </TouchableOpacity>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Alert{"\n"}Generation</Text>

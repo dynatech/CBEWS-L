@@ -34,7 +34,7 @@ const UmiGetOngoingAndExtendedMonitoring = () => {
     );
 }
 
-const InsertEWI = () => {
+const InsertEWI = (payload) => {
     return fetch(`${AppConfig.HOSTNAME}/v2/insert/alert_gen/ewi`, {
         method: 'POST',
         headers: {
@@ -86,9 +86,27 @@ const GetUmiAlertValidationData = () => {
     );
 }
 
+const ValidateTrigger = (payload) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/validate_trigger/public_alerts`, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+    }).then(response => response.json())
+        .then((responseJson) => {
+            return responseJson
+        })
+        .catch((error) => {
+            console.log("Problem in GetUmiAlertValidationData", error)
+        }
+    );
+}
+
 
 export { 
     MarGetOngoingAndExtendedMonitoring, UmiGetOngoingAndExtendedMonitoring, 
     GetUmiAlertValidationData, GetMarAlertValidationData,
-    InsertEWI
+    InsertEWI, ValidateTrigger
 }

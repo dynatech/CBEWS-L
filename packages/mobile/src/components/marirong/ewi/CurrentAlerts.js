@@ -24,7 +24,7 @@ function CurrentAlerts() {
                 'CBEWS-L Local data will be used.',
                 [
                   { text: 'Ok', onPress: () => {
-                    MobileCaching.getItem('UmiCurrentAlert').then(response => {
+                    MobileCaching.getItem('MarCurrentAlert').then(response => {
                         init(response);
                         setCurrentAlertData(response);
                     });
@@ -38,7 +38,7 @@ function CurrentAlerts() {
     }, []);
 
     const fetchLatestData = async () => {
-        let { status, data } = await AlertGeneration.UmiGetOngoingAndExtendedMonitoring();
+        let { status, data } = await AlertGeneration.MarGetOngoingAndExtendedMonitoring();
         console.log("response data", data);
         if (status) {
             let key = "";
@@ -52,12 +52,12 @@ function CurrentAlerts() {
                 console.log("cachiiing");
                 init([site_data]);
                 setCurrentAlertData([site_data]);
-                MobileCaching.setItem('UmiCurrentAlert', [site_data]);
+                MobileCaching.setItem('MarCurrentAlert', [site_data]);
                 ToastAndroid.showWithGravity("Successfully retrieved current event", ToastAndroid.LONG, ToastAndroid.CENTER)
             } else {
                 init([]);
                 setCurrentAlertData([]);
-                MobileCaching.setItem('UmiCurrentAlert', []);
+                MobileCaching.setItem('MarCurrentAlert', []);
                 ToastAndroid.showWithGravity("No current event", ToastAndroid.LONG, ToastAndroid.CENTER)
             }
         } else {
@@ -174,13 +174,17 @@ function CurrentAlerts() {
                 <View style={{ padding: 20}}>
                     { currentAlert }
                 </View>
-                <View style={{alignItems: 'center'}}>
-                    <View style={{ alignItems: 'center', flexDirection: 'row' }}>
-                        <TouchableOpacity style={ButtonStyle.small} onPress={sendEWI} disabled={isDisabled}>
-                            <Text style={ButtonStyle.medium_text}>Send EWI</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                {
+                    currentAlertData.length > 0 && (
+                        <View style={{alignItems: 'center'}}>
+                            <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+                                <TouchableOpacity style={ButtonStyle.small} onPress={sendEWI} disabled={isDisabled}>
+                                    <Text style={ButtonStyle.medium_text}>Send EWI</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    )
+                }
             </View>
         </ScrollView>
     )

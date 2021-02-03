@@ -24,7 +24,7 @@ function AlertValidation() {
                 'CBEWS-L Local data will be used.',
                 [
                   { text: 'Ok', onPress: () => {
-                    MobileCaching.getItem('UmiCandidateAlert').then(response => {
+                    MobileCaching.getItem('MarCandidateAlert').then(response => {
                         init(response);
                         setEwiData(response);
                     });
@@ -38,11 +38,11 @@ function AlertValidation() {
     }, []);
 
     const fetchLatestData = async () => {
-        let { status, data, message } = await AlertGeneration.GetUmiAlertValidationData();
+        let { status, data, message } = await AlertGeneration.GetMarAlertValidationData();
         if (status) {
             init([data]);
             setEwiData([data]);
-            MobileCaching.setItem('UmiCandidateAlert', [data]);
+            MobileCaching.setItem('MarCandidateAlert', [data]);
             ToastAndroid.showWithGravity(message, ToastAndroid.LONG, ToastAndroid.BOTTOM)
         } else {
             ToastAndroid.showWithGravity(message, ToastAndroid.LONG, ToastAndroid.BOTTOM)
