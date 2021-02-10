@@ -5,6 +5,7 @@ import UminganDashboard from '../../components/umingan/UminganDashboard';
 import RATabStack from '../umingan/RATabStack';
 import FieldSurveyStack from '../umingan/FieldSurveyStack';
 import SituationReportStack from '../umingan/SituationReportStack';
+import EWIStack from '../umingan/EWIStack';
 import ReportSummary from '../../components/umingan/reports/ReportSummary';
 import SurficialDataStack from '../umingan/SurficialDataStack';
 import SensorMaintenanceStack from '../umingan/SensorMaintenanceStack';
@@ -38,6 +39,13 @@ function UminganDashboardStack() {
                     textAlign: 'center',
                   },
             }} component={SituationReportStack} />
+            <Stack.Screen name="EWIStack" options={{
+                title: 'Early Warning Information',
+                headerLeft: null,
+                headerTitleStyle: {
+                    textAlign: 'center',
+                  },
+            }} component={EWIStack} />
             <Stack.Screen name="ReportSummary" options={{
                 title: 'Reports',
                 headerLeft: null,

@@ -98,7 +98,7 @@ function UminganDashboard(props) {
                             <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Surficial Data</Text>
                         </View>
                         <View style={[ContainerStyle.menu_container]}>
-                            <TouchableOpacity onPress={() => { }}>
+                            <TouchableOpacity onPress={() => { navigator.navigate('EWIStack') }}>
                                 <Image style={ImageStyle.dashboard_menu_icon} source={require('../../assets/umingan/menu/ewi.png')}></Image>
                             </TouchableOpacity>
                             <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Early Warning{'\n'}Information</Text>

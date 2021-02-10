@@ -654,7 +654,7 @@ def main(to_update_pub_alerts=False, internal_gen_data=None):
 
     if to_update_pub_alerts:
         if platform.system() == "Windows":
-            os.system(f"python {APP_CONFIG['app_directory']}\\CBEWS-L\\packages\\server\\analysis_pycodes\\analysis\\publicalerts.py")
+            os.system(f"python '{APP_CONFIG['app_directory']}\\CBEWS-L\\packages\\server\\analysis_pycodes\\analysis\\publicalerts.py'")
         else:
             os.system("python ~/CBEWS-L/packages/server/analysis_pycodes/analysis/publicalerts.py")
 

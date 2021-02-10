@@ -88,6 +88,7 @@ import {
 } from "./src/MAR/GroundData/OnDemand";
 import {
   GetRainfallPlotData,
+  GetRainfallPlotDataWithDays,
   GetRainfallAnalysis,
 } from "./src/MAR/DataAnalysis/RainfallAnalysis";
 import {
@@ -95,7 +96,8 @@ import {
   GetSurficialPlotAnalysis
 } from "./src/MAR/DataAnalysis/SurficialAnalysis";
 import {
-  GetSubsurfacePlotData
+  GetSubsurfacePlotData,
+  GetSubsurfacePlotDataWithDays
 } from "./src/MAR/DataAnalysis/SubsurfaceAnalysis";
 import {
   GetEarthquakeData,
@@ -176,13 +178,15 @@ import {
 } from "./src/UMI/GroundData/SurficialData";
 
 import {
-  GetRainfallPlotData as UMIGetRainfallPlotData
+  GetRainfallPlotData as UMIGetRainfallPlotData,
+  GetRainfallPlotDataWithDays as UMIGetRainfallPlotDataWithDays
 } from "./src/UMI/DataAnalysis/RainfallAnalysis";
 import {
   GetSurficialPlotData as UMIGetSurficialPlotData
 } from "./src/UMI/DataAnalysis/SurficialAnalysis";
 import {
-  GetSubsurfacePlotData as UMIGetSubsurfacePlotData
+  GetSubsurfacePlotData as UMIGetSubsurfacePlotData,
+  GetSubsurfacePlotDataWithDays as UMIGetSubsurfacePlotDataWithDays
 } from "./src/UMI/DataAnalysis/SubsurfaceAnalysis";
 import {
   GetSensorMaintenanceLogs,
@@ -193,7 +197,14 @@ import {
   DeleteSensorMaintenanceLogs,
 } from "./src/UMI/SensorMaintenance/SensorMaintenance";
 
-import { UmiGetOngoingAndExtendedMonitoring, MarGetOngoingAndExtendedMonitoring } from "./src/AlertGeneration/PublicAlerts";
+import {
+  UmiGetOngoingAndExtendedMonitoring,
+  MarGetOngoingAndExtendedMonitoring,
+  GetMarAlertValidationData,
+  GetUmiAlertValidationData,
+  InsertEWI,
+  ValidateTrigger
+} from "./src/AlertGeneration/PublicAlerts";
 import { RenderPDF, DownloadPDF } from "./src/MAR/FileManager/PDFManager";
 
 const UserManagement = {
@@ -207,15 +218,22 @@ const MergedData = {
 
 const AlertGeneration = {
   UmiGetOngoingAndExtendedMonitoring,
-  MarGetOngoingAndExtendedMonitoring
+  MarGetOngoingAndExtendedMonitoring,
+  GetUmiAlertValidationData,
+  GetMarAlertValidationData,
+  InsertEWI,
+  ValidateTrigger
 };
 
 const MarDataAnalysis = {
   GetRainfallPlotData,
+  GetRainfallPlotDataWithDays,
+  GetRainfallPlotDataWithDays,
   GetRainfallAnalysis,
   GetSurficialPlotData,
   GetSurficialPlotAnalysis,
   GetSubsurfacePlotData,
+  GetSubsurfacePlotDataWithDays,
 };
 
 const MarGroundData = {
@@ -346,8 +364,10 @@ const UmiReports = {
 
 const UmiDataAnalysis = {
   GetRainfallPlotData: UMIGetRainfallPlotData,
+  GetRainfallPlotDataWithDays: UMIGetRainfallPlotDataWithDays,
   GetSurficialPlotData: UMIGetSurficialPlotData,
   GetSubsurfacePlotData: UMIGetSubsurfacePlotData,
+  GetSubsurfacePlotDataWithDays: UMIGetSubsurfacePlotDataWithDays
 };
 
 const UmiGroundData = {

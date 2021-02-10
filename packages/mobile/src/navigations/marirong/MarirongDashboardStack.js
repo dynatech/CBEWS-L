@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import MarirongDashboard from '../../components/marirong/MarirongDashboard';
 import CRATabStack from '../marirong/CRATabStack';
+import AlertGenerationStack from '../marirong/AlertGenerationStack';
 import MaintenanceLogsTabStack from '../marirong/MaintenanceLogsTabStack';
 import EventsTemplate from '../../components/marirong/events/EventsTemplate';
 import GroundDataTabStack from '../marirong/GroundDataTabStack';
@@ -23,6 +24,13 @@ function MarirongDashboardStack() {
                     textAlign: 'center',
                   },
             }} component={CRATabStack} />
+            <Stack.Screen name="AlertGenerationStack" options={{
+                title: 'Alert Generation',
+                headerLeft: null,
+                headerTitleStyle: {
+                    textAlign: 'center',
+                  },
+            }} component={AlertGenerationStack} />
             <Stack.Screen name="MaintenanceLogsTabStack" options={{
                 title: 'Maintenance Logs',
                 headerLeft: null,

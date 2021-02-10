@@ -48,7 +48,7 @@ function Signin(props) {
                     <Formik
                         initialValues={{username: '', password: ''}}
                         onSubmit={values => {
-                            setTimeout(async ()=> {
+                            setTimeout(async () => {
                                 let response = await UserManagement.UserAuthentication(values);
                                 if (response.status == true) {
                                     ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
@@ -59,7 +59,7 @@ function Signin(props) {
                                 }
                             })
                         }}
-                        >
+                    >
                         {({ handleChange, handleBlur, handleSubmit, values }) => (
                             <View style={ContainerStyle.login_content}>
                                 <Text style={[LabelStyle.large_label, LabelStyle.default, InputStyle.white]}>Community Based Early Warning System for Landslides</Text>

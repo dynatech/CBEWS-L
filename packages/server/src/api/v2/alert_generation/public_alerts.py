@@ -219,15 +219,15 @@ def validate_trigger():
         
         response = {
             "data": result,
-            "ok": True,
-            "status": 200
+            "status": True,
+            "message": "Trigger successfully validated."
         }
     except Exception as err:
         raise(err)
         response = {
             "data": None,
-            "ok": False,
-            "status": 404
+            "status": False,
+            "message": "Error in validating trigger"
         }
 
     return jsonify(response)
@@ -308,8 +308,6 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch", site_co
         run_ts (Datetime)
         source (String)
     """
-    routine_release_time = 12
-    extended_release_time = 12
     release_interval_hours = 4
     extended_monitoring_days = 3 
     run_ts=dt.now()
@@ -331,8 +329,6 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch", site_co
                 event_id = e["event_id"]
                 site_id = e["site_id"]
                 event_start = e["event_start"]
-                latest_release_id = int(e["latest_release_id"])
-                latest_trigger_id = int(e["latest_trigger_id"])
                 validity = e["validity"]
                 status = e["status"]
                 site_code = e["site_code"]
@@ -342,13 +338,16 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch", site_co
 
                 release_interval_hours = int(site_dynamic_vars["release_interval_hours"])
                 extended_monitoring_days = int(site_dynamic_vars["extended_monitoring_days"])
-                routine_release_time = int(site_dynamic_vars["routine_release_time"])
-                extended_release_time = int(site_dynamic_vars["extended_release_time"])
 
                 latest_release = AG.get_event_releases(event_id=event_id, return_count=1)
                 latest_release = latest_release[0]
-                ( release_id, data_timestamp,
-                    internal_alert_level, release_time, reporter_id_mt ) = latest_release.values()
+
+                release_id = latest_release["release_id"]
+                data_timestamp = latest_release["data_timestamp"]
+                internal_alert_level = latest_release["internal_alert_level"]
+                release_time = latest_release["release_time"]
+                reporter_id_mt = latest_release["reporter_id_mt"]
+
                 user_result = Users.fetch_user(profile_id=reporter_id_mt)
                 reporter = ""
                 if user_result:
@@ -458,6 +457,8 @@ def get_ongoing_and_extended_monitoring(run_ts=dt.now(), source="fetch", site_co
 
             except Exception as err:
                 raise err
+        
+        h.var_checker("active_events_dict", active_events_dict)
 
         alerts_list = {
             "status": True,
@@ -614,7 +615,7 @@ def insert_ewi(internal_ewi_data=None):
         status = ewi_data["status"]
         if status == "routine":
             for routine_entry in ewi_data["routine_list"]:
-                event_id = PAT.insert_public_alert_event(
+                event_id = PAT.insert_public_alert_event(PAT,
                     site_id=site_id, event_start=data_ts, latest_rel_id=None,
                     latest_trig_id=None, validity=None, status=status
                 )
@@ -638,7 +639,7 @@ def insert_ewi(internal_ewi_data=None):
                 try:
                     previous_event_id = ewi_data["previous_event_id"]
                     if previous_event_id:
-                        PAT.update_public_alert_event({
+                        PAT.update_public_alert_event(PAT, {
                             "status": "finished"
                         }, {
                             "event_id": previous_event_id
