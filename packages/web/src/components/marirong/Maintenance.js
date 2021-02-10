@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
         margin: theme.spacing(1),
     },
     menuContainer: {
-        // marginTop: '40%'
+        paddingTop: '100%'
     },
     menu: {
         width: '100%',
@@ -51,7 +51,7 @@ export default function Maintenance() {
 
     const classes = useStyles();
     return (
-        <Container maxWidth="xl" className={classes.root} spacing={24} style={{paddingTop: "2%"}}>
+        <Container maxWidth="xl" className={classes.root} spacing={24} style={{paddingTop: "5%"}}>
             <Grid container alignItems="flex-start" justify="center">
                 <Grid item xs={2} >
                     <Grid container direction="column" className={classes.menuContainer}>

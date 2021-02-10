@@ -46,7 +46,7 @@ export default function DataAnalysis() {
 
     return (
         <Fragment>
-            <Container maxWidth="xl" className={classes.root} spacing={24}>
+            <Container maxWidth="xl" className={classes.root} spacing={24} style={{paddingTop: '5%'}}>
                 <Grid container alignItems="flex-start" justify="center">
                     <Grid item xs={3}>
                         <Grid container direction="column" className={classes.menuContainer}>

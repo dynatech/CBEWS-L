@@ -198,7 +198,7 @@ export default function Events() {
 
     return (
         <Fragment>
-            <Container align="center">
+            <Container align="center" style={{paddingTop: '5%'}}>
                 <Grid container>
                     <Grid item xs={12} className={classes.header}>
                         <Typography variant="h4">
