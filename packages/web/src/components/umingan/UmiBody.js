@@ -44,7 +44,7 @@ export default function MarBody() {
             item
             container
             xs={12}
-            style={{ paddingTop: 220, paddingBottom: 100 }}
+            style={{ paddingTop: 120}}
             width="100%"
         >
             <Grid item xs={12}>

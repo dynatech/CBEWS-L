@@ -104,49 +104,24 @@ export default function UmiHeader(props) {
     );
 
     return (
-            <Fragment>
-                <HideOnScroll>
-                    <AppBar color="inherit">
-                        <Grid
-                            container
-                            spacing={0}
-                            alignItems="center"
-                            alignContent="left"
-                        >
-                            <Grid item xs={1}>
-                                <Toolbar>
-                                    <IconButton
-                                        color="inherit"
-                                        edge="start"
-                                        aria-label="menu"
-                                        onClick={toggleDrawer("right", true)}
-                                    >
-                                        <MenuIcon />
-                                    </IconButton>
-                                </Toolbar>
-                            </Grid>
-                            <Grid item xs={11}>
-                                <Typography>GOVPH</Typography>
-                            </Grid>
-                        </Grid>
-
-                        <img
-                            className={classes.xs_image}
-                            style={{ width: "100%" }}
-                            src={umi_banner}
-                        />
-                    </AppBar>
-                </HideOnScroll>
-                <Drawer
-                    open={state.right}
-                    onClose={toggleDrawer("right", false)}
+        <Fragment>
+        <AppBar color="inherit" position="fixed" style={{backgroundColor: '#18516c', padding: 10}}>
+            <Toolbar>
+                <IconButton
+                    color="inherit"
+                    edge="start"
+                    aria-label="menu"
+                    style={{color: '#fa971f'}}
+                    onClick={toggleDrawer("left", true)}
                 >
-                    {drawerList("right")}
-                </Drawer>
-
-                {/* <Grid item xs={12} style={{paddingTop: '80px'}}>
-                <img className={classes.xs_image} style={{width: '100%'}} src={umi_banner} />
-            </Grid> */}
-            </Fragment>
+                    <MenuIcon />
+                </IconButton>
+                <LogoSeries siteCode="umi" />
+            </Toolbar>
+        </AppBar>
+        <Drawer open={state.left} onClose={toggleDrawer("left", false)}>
+            {drawerList("left")}
+        </Drawer>
+    </Fragment>
     );
 }

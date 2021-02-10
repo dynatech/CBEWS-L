@@ -244,7 +244,7 @@ export default function FieldSurveyLogs(props) {
 
     return (
         <Fragment>
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{minHeight: window.innerHeight - 220}}>
                 <FabMuiTable
                     classes={{}}
                     addLabel="Field Survey Log"
