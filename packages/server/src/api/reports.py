@@ -6,7 +6,7 @@ import pdfkit
 import smtplib
 import os
 from flask import Blueprint, jsonify, request
-from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase

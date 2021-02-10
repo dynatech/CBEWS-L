@@ -100,30 +100,31 @@ export default function HazardMaps() {
                 <Typography variant="h6">
                     Hazard Map
                 </Typography>
-                <Container className={classes.img_container}>
-                    <Grid container spacing={2} align="center">
-                        <Grid item xs={12} />
-                        <Grid item xs={8}>
-                            <Magnifier
-                                imageSrc={mapPreview}
-                                imageAlt="MAR Hazard Map"
-                                mouseActivation={MOUSE_ACTIVATION.SINGLE_CLICK}
-                                touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
-                            />
+                <Paper elevation={3} className={classes.raPaper}>
+                    <Container className={classes.img_container}>
+                        <Grid container spacing={2} align="center">
+                            <Grid item xs={12}>
+                                <Magnifier
+                                    imageSrc={mapPreview}
+                                    imageAlt="MAR Hazard Map"
+                                    mouseActivation={MOUSE_ACTIVATION.SINGLE_CLICK}
+                                    touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
+                                />
+                            </Grid>
+                            <Grid item={true} xs={12}>
+                                <Fab
+                                    variant="extended"
+                                    color={"primary"}
+                                    aria-label="add"
+                                    onClick={handleClickOpen}
+                                >
+                                    Upload map
+                                </Fab>
+                            </Grid>
                         </Grid>
-                        <Grid item xs={4}/>
-                        <Grid item={true} xs={12}>
-                            <Fab
-                                variant="extended"
-                                color={"primary"}
-                                aria-label="add"
-                                onClick={handleClickOpen}
-                            >
-                                Upload map
-                        </Fab>
-                        </Grid>
-                    </Grid>
-                </Container>
+                    </Container>
+                </Paper>
+
 
                 <Dialog
                     open={open}

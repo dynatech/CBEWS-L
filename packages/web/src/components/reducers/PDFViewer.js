@@ -268,32 +268,37 @@ function PDFPreviewer(props) {
 
     return (
         <Box width="100%">
-            <Paper>
-                <div ref={download_ref}>
-                {!noImport && (
-                    <header>
-                        <img src={require('../../assets/letter_header.png')} className={img.img_size} alt="footer" />
-                    </header>
-                )}
-                <body style={{ margin: "5%"}}>
-                    {html_string}
-                </body>
-                {!noImport && (
-                    <footer>
-                        <img src={require('../../assets/letter_footer.png')} className={img.img_size} alt="footer" />
-                    </footer>
-                )}
-                </div>
-            </Paper>
+           <Grid container>
+               <Grid item xs={12} style={{paddingLeft: '10%', paddingRight: '10%'}}>
+                    <Paper>
+                        <div ref={download_ref}>
+                        {!noImport && (
+                            <header>
+                                <img src={require('../../assets/letter_header.png')} className={img.img_size} alt="footer" />
+                            </header>
+                        )}
+                        <body style={{ margin: "5%"}}>
+                            {html_string}
+                        </body>
+                        {!noImport && (
+                            <footer>
+                                <img src={require('../../assets/letter_footer.png')} className={img.img_size} alt="footer" />
+                            </footer>
+                        )}
+                        </div>
+                    </Paper>
+               </Grid>
+           </Grid>
             {data.length > 0 && (
                 <Grid item xs={12}>
                     <Grid
                         container
                         align="center"
                         style={{ paddingTop: 20 }}
+                        spacing={2}
                     >
-                        <Grid item xs={3} />
-                        <Grid item xs={3}>
+                        <Grid item xs={4} />
+                        <Grid item xs={2}>
                             <Pdf targetRef={download_ref} filename="download.pdf">
                                 {({ toPdf }) =>     
                                     <Fab
@@ -302,24 +307,26 @@ function PDFPreviewer(props) {
                                         aria-label="add"
                                         className={classes.button_fluid}
                                         onClick={toPdf}
+                                        style={{width: '100%'}}
                                     >
                                         Download
                                     </Fab>
                                }
                             </Pdf>
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs={2}>
                             <Fab
                                 variant="extended"
                                 color="primary"
                                 aria-label="add"
                                 className={classes.button_fluid}
                                 onClick={() => setEmailOpen(true)}
+                                style={{width: '100%'}}
                             >
                                 Email
                             </Fab>
                         </Grid>
-                        <Grid item xs={3} />
+                        <Grid item xs={4} />
                     </Grid>
                     <EmailModal
                         open={emailOpen}

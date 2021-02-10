@@ -24,22 +24,8 @@ export default function RiskAssessment(props) {
 
     return (
         <Fragment>
-            <Container maxWidth="xl" className={classes.root} spacing={24}>
+            <Container maxWidth="xl" className={classes.root} spacing={24} style={{padding: 10}}>
                 <Grid container alignItems="center" justify="center">
-                    <Grid item justify-xs-center className={classes.btnGroup}>
-                        <ButtonGroup
-                            variant="contained"
-                            color="primary"
-                            size="large"
-                            aria-label="contained primary button group"
-                        >
-                            <Button>Risk Assessment Summary</Button>
-                            <Button>Hazard Map</Button>
-                            <Button>Hazard Data</Button>
-                            <Button>Resources and Capacities</Button>
-                            <Button>Family Risk Profile</Button>
-                        </ButtonGroup>
-                    </Grid>
                     <RiskAssessmentSummary {...props} classes={classes} />
                     <HazardMaps {...props} classes={classes} />
                     <HazardData {...props} classes={classes} />
