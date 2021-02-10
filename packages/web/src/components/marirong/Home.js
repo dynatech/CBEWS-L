@@ -133,7 +133,7 @@ function LatestMoms () {
 export default function Home () {
 
     return (
-        <Grid container spacing={5} >
+        <Grid container spacing={5} style={{paddingTop: '5%'}}>
             <Grid item xs={12} justify="center" style={{paddingTop: '3%'}}>
                 <Typography variant="h3" align="center">Marirong, Leon, Iloilo<span style={{color: '#fa971f'}}> | </span>Current Alert Status as of {moment().format("LLL")}</Typography>
             </Grid>

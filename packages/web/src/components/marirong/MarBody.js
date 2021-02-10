@@ -68,7 +68,7 @@ export default function MarBody() {
                     <Tab value="maintenance" label={<span style={{fontSize: 19, paddingTop: 15, fontWeight: 900}}>Maintenance</span>} />
                 </Tabs>
             </Grid>
-            <Grid item xs={12} style={{paddingLeft: '10%', paddingRight: '10%'}}>
+            <Grid item xs={12} style={{paddingLeft: '10%', paddingRight: '10%', height: window.innerHeight}}>
                 {body}
             </Grid>
         </Grid>

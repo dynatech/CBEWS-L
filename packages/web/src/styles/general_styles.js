@@ -8,12 +8,14 @@ const useStyles = makeStyles((theme) => ({
             paddingBottom: 10,
         },
         footer: {
-            position: "absolute",
             backgroundColor: '#18516c',
             bottom: 0,
+            height: "100%",
             width: "100%",
             alignItems: "center",
-            color: "#fa971f"
+            color: "#fa971f",
+            paddingTop: 20,
+            paddingBottom: 20
         },
         contactDetails: {
             flexGrow: 1,

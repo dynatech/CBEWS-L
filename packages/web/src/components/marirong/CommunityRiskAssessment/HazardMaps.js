@@ -104,18 +104,10 @@ export default function HazardMaps() {
             <Container className={classes.img_container}>
                 <Grid container spacing={2} align="center">
                     <Grid item xs={12} />
-                    {/* <Grid item xs={9}>
-                        <Magnifier
-                            imageSrc={mapPreview}
-                            imageAlt="MAR Hazard Map"
-                            mouseActivation={MOUSE_ACTIVATION.SINGLE_CLICK}
-                            touchActivation={TOUCH_ACTIVATION.DOUBLE_TAP}
-                        />
-                    </Grid>
-                    <Grid item xs={3} /> */}
-
                     <Grid item xs={12}>
-                        <PhotoAttachmentList data={map_list} />
+                        <div>
+                            <PhotoAttachmentList data={map_list} />
+                        </div>
                     </Grid>
                     <Grid item xs={12}>
                         <Fab
