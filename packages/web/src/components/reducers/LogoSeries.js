@@ -38,26 +38,25 @@ function LogoSeries(props) {
         default:
             site_preference = (
                 <Fragment>
-                    <Grid item xs={4} md={2}>
+                    <Grid item xs={2} md={2}>
                         <img className={classes.xs_image} src={mar_seal} />
                     </Grid>
-                    <Grid item xs={4} md={2}>
+                    <Grid item xs={2} md={2}>
                         <img className={classes.xs_image} src={leon_seal} />
                     </Grid>
-                    <Grid item xs={4} md={2}>
+                    <Grid item xs={2} md={2}>
                         <img className={classes.xs_image} src={umi_seal} />
-                    </Grid>
+                    </Grid> 
                 </Fragment>
             );
     }
     return (
         <Container className={classes.logo_container}>
-            <Grid container spacing={0} alignItems="center" justify="center">
-                <Grid item xs={1} md={1}>
+            <Grid container spacing={6} alignItems="center" justify="center">
+                <Grid item xs={2} md={2}>
                     <img className={classes.xs_image} src={dost_seal} />
                 </Grid>
-                <Grid item xs={1} md={1} style={{paddingLeft: 20}}>
-                    <CardMedia />
+                <Grid item xs={2} md={2}>
                     <img className={classes.xs_image} src={dynaslope_seal} />
                 </Grid>
                 {site_preference}
