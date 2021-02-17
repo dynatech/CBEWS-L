@@ -23,14 +23,14 @@ function LogoSeries(props) {
     switch (siteCode) {
         case "umi":
             site_preference = (
-                <Grid item xs={2} md={2} style={{paddingLeft: 30}}>
+                <Grid item xs={2} md={2}>
                     <img className={classes.xs_image} src={umi_seal} />
                 </Grid>
             );
             break;
         case "mar":
             site_preference = (
-                <Grid item xs={2} md={2} style={{paddingLeft: 30}}>
+                <Grid item xs={2} md={2}>
                     <img className={classes.xs_image} src={mar_seal} />
                 </Grid>
             );
@@ -38,25 +38,27 @@ function LogoSeries(props) {
         default:
             site_preference = (
                 <Fragment>
-                    <Grid item xs={4} md={2}>
-                        <img className={classes.xs_image} src={mar_seal} />
-                    </Grid>
-                    <Grid item xs={4} md={2}>
-                        <img className={classes.xs_image} src={leon_seal} />
-                    </Grid>
-                    <Grid item xs={4} md={2}>
-                        <img className={classes.xs_image} src={umi_seal} />
-                    </Grid> 
+                    
+                        <Grid item xs={1} md={1}>
+                            <img className={classes.xs_image} src={mar_seal} />
+                        </Grid>
+                        <Grid item xs={1} md={1}>
+                            <img className={classes.xs_image} src={leon_seal} />
+                        </Grid>
+                        <Grid item xs={1} md={1}>
+                            <img className={classes.xs_image} src={umi_seal} />
+                        </Grid>
+                    
                 </Fragment>
             );
     }
     return (
         <Container className={classes.logo_container}>
-            <Grid container spacing={0} alignItems="center" justify="center">
+            <Grid container spacing={1} alignItems="center" justify="space-evenly">
                 <Grid item xs={1} md={1}>
                     <img className={classes.xs_image} src={dost_seal} />
                 </Grid>
-                <Grid item xs={1} md={1} style={{paddingLeft: 20}}>
+                <Grid item xs={1} md={1}>
                     <CardMedia />
                     <img className={classes.xs_image} src={dynaslope_seal} />
                 </Grid>
