@@ -79,10 +79,12 @@ function SurficialMarker() {
 
     let markerValueRef = useRef({});
 
+    // On page load call initSurficialMarker() function
     useEffect(() => {
         initSurficialMarker()
     }, [])
 
+    // Surficial Marker table pagination
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
         let start = newPage * 10;
@@ -90,19 +92,22 @@ function SurficialMarker() {
         setDtRow(markerData.slice(start, end))
     };
 
+    // Set table rows per page
     const handleChangeRowsPerPage = event => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
+    // Initialize Surficial Marker component - GET Request
     const initSurficialMarker = async () => {
         const response = await MarGroundData.GetSurficialMarkersData();
         if (response.status === true) {
-            let temp_th = []
+            let temp_th = []    // A, B, C, D
             let temp_tr = []
             let temp_dr = []
             let temp = []
 
+            // Set ground measurement markers A, B, C, D
             setMarkerNames(response.markers);
             response.markers.forEach(marker => {
                 temp_th.push( <TableCell id={`marker_id_${marker.marker_id}`}>{marker.marker_name.toUpperCase()}</TableCell> );
@@ -343,6 +348,7 @@ function SurficialMarker() {
 
     return (
         <Fragment>
+            {/* START Surficial Markers Modal */}
             <Dialog
                 open={modificationModal}
                 onClose={handleModificationModalClose}
@@ -376,7 +382,9 @@ function SurficialMarker() {
                     </Button>
                 </DialogActions>
             </Dialog>
+            {/* END Surficial Markers Modal */}
 
+            {/* START Surficial Markers Table */}
             <Container fixed>
                 <Grid container align="center" spacing={10}>
                     <Grid item xs={12}>
