@@ -84,7 +84,7 @@ function SurficialMarker() {
         initSurficialMarker()
     }, [])
 
-    // Surficial Marker table pagination
+    // Set Surficial Marker table pagination
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
         let start = newPage * 10;
@@ -112,8 +112,9 @@ function SurficialMarker() {
             response.markers.forEach(marker => {
                 temp_th.push( <TableCell id={`marker_id_${marker.marker_id}`}>{marker.marker_name.toUpperCase()}</TableCell> );
             });
+            // Set marker table headers (A, B, C, D)
             setMarkersTH(temp_th);
-
+            // Store values from response.data to temp_tr
             response.data.forEach(element => {
                 let temp_obj = {};
                 let marker_data = Object.values(element)[0];
@@ -127,7 +128,7 @@ function SurficialMarker() {
                 temp_obj['observer'] = marker_data.observer
                 temp_tr.push(temp_obj)
             });
-
+            // Populate table rows
             temp_tr.forEach(element => {
                 temp = [];
                 temp_dr.push(
@@ -151,6 +152,7 @@ function SurficialMarker() {
         }
     }
 
+    // Generate modal for new ground measurement data
     const handleClickOpen = () => {
         let temp = [];
         let grid =  12 / markerNames.length;
@@ -169,7 +171,9 @@ function SurficialMarker() {
                 </Grid>
             )
         });
+        // Add Markers A, B, C, D
         setAddMarkerFields(temp);
+        // Open modal
         setOpen(true);
     };
 
@@ -181,10 +185,12 @@ function SurficialMarker() {
         markerValueRef.current = temp;
     }
 
+    // Dialog (Modal) close / open
     const handleClose = () => {
         setOpen(false);
     };
 
+    // Close modal
     const handleModificationModalClose = () => {
         setModificationModal(false);
     };
@@ -206,6 +212,7 @@ function SurficialMarker() {
         setSelectedSurficialMarker(original)
     }
 
+    // Onclick of table - row, open MOMs modal for data update / delete
     const handleModificationModalOpen = (element) => {
         let ret_val = [];
 
@@ -262,6 +269,7 @@ function SurficialMarker() {
         setModificationModal(true);
     };
 
+    // Update (row - clicked) ground measurement data
     const updateMarkerData = async () => {
         let temp = selectedSurficialMarker;
         let temp_markers = {};
@@ -303,6 +311,7 @@ function SurficialMarker() {
         setModificationModal(false);
     }
 
+    // Delete (row - clicked) ground measurement data
     const deleteMarkerData = async () => {
         const json_input = {
             ts: selectedSurficialMarker.ts,
@@ -323,6 +332,7 @@ function SurficialMarker() {
         setModificationModal(false);
     }
 
+    // Add new ground measurement data  to DB
     const addMarkerData = async () => {
         const json_input = {
             "ts": addTs,
@@ -393,6 +403,7 @@ function SurficialMarker() {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Date and time</TableCell>
+                                        {/* // Set table headers (A, B, C, D) */}
                                         {markersTH}
                                         <TableCell>Weather</TableCell>
                                         <TableCell>Nag-sukat</TableCell>
@@ -416,51 +427,54 @@ function SurficialMarker() {
                     <Grid container align="center" style={{ paddingTop: 20 }}>
                         <Grid item xs={2} />
                         <Grid item xs={3}>
+                            {/* Mui floating action button - Add Ground Measurement */}
                             <Fab variant="extended"
                                 color="primary"
                                 aria-label="add" className={classes.button_fluid}
                                 onClick={handleClickOpen}>
                                 Add Ground Measurement
-                        </Fab>
+                            </Fab>
                         </Grid>
                         <Grid item xs={2}>
+                            {/* Mui floating action button - Download */}
                             <Fab variant="extended"
                                 color="primary"
                                 aria-label="add" className={classes.button_fluid}
                                 onClick={() => { }}>
                                 Download
-                        </Fab>
+                            </Fab>
                         </Grid>
                         <Grid item xs={2}>
+                            {/* Mui floating action button - Print */}
                             <Fab variant="extended"
                                 color="primary"
                                 aria-label="add" className={classes.button_fluid}
                                 onClick={() => { }}>
                                 Print
-                        </Fab>
+                            </Fab>
                         </Grid>
                         <Grid item xs={3} />
                     </Grid>
                 </Grid>
             </Container>
 
-
+            {/* Modal for Add Ground Measurement */}
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Ground measurement</DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                        <MuiPickersUtilsProvider utils={MomentUtils}>
-                            <DateTimePicker
-                                autoOk
-                                ampm={false}
-                                disableFuture
-                                value={addTs}
-                                onChange={(date) => { setAddTs(moment(date).format("YYYY-MM-DD HH:mm:ss")) }}
-                                label="Date time"
-                                fullWidth
-                            />
-                        </MuiPickersUtilsProvider>
+                            <MuiPickersUtilsProvider utils={MomentUtils}>
+                                <DateTimePicker
+                                    autoOk
+                                    ampm={false}
+                                    disableFuture
+                                    value={addTs}
+                                    onChange={(date) => { setAddTs(moment(date).format("YYYY-MM-DD HH:mm:ss")) }}
+                                    label="Date time"
+                                    fullWidth
+                                />
+                            </MuiPickersUtilsProvider>
                         </Grid>
                         {addMarkerFields}
                         <Grid item xs={12}>
