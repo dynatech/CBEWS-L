@@ -23,9 +23,11 @@ import moment from 'moment';
 import { useCookies } from 'react-cookie';
 
 import { MarGroundData } from '@dynaslope/commons';
+import { jsPDF } from "jspdf";
+import autoTable from 'jspdf-autotable'
 
 function Alert(props) {
-	return <MuiAlert elevation={6} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 const tableStyle = makeStyles(theme => ({
@@ -73,8 +75,8 @@ function SurficialMarker() {
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const [notifStatus, setNotifStatus] = useState('success');
-	const [openNotif, setOpenNotif] = useState(false);
-	const [notifText, setNotifText] = useState('');
+    const [openNotif, setOpenNotif] = useState(false);
+    const [notifText, setNotifText] = useState('');
     const [cookies, setCookie] = useCookies(['credentials']);
 
     let markerValueRef = useRef({});
@@ -136,6 +138,7 @@ function SurficialMarker() {
                         <TableCell component="th" scope="row">
                             {element.ts}
                         </TableCell>
+                        {/* change forEach to .map!!! */}
                         {response.markers.forEach(marker_element => {
                             temp.push(<TableCell>{element[marker_element.marker_name]}</TableCell>)
                         })}
@@ -151,6 +154,15 @@ function SurficialMarker() {
             console.error(response.message);
         }
     }
+
+    // Download data as PDF
+    // Set theme to "striped" - blue header highlight, "grid" - green header highlight, "plain" - no highlight
+    const handleDownload = () => {
+        const pdf = new jsPDF();
+
+        autoTable(pdf, { html: '.MuiTable-root', theme: 'plain', })
+        pdf.save("surficial_markers.pdf");
+    };
 
     // Generate modal for new ground measurement data
     const handleClickOpen = () => {
@@ -440,7 +452,7 @@ function SurficialMarker() {
                             <Fab variant="extended"
                                 color="primary"
                                 aria-label="add" className={classes.button_fluid}
-                                onClick={() => { }}>
+                                onClick={handleDownload}>
                                 Download
                             </Fab>
                         </Grid>
@@ -511,14 +523,14 @@ function SurficialMarker() {
                 </DialogActions>
             </Dialog>
             <Snackbar open={openNotif} 
-				autoHideDuration={3000} 
-				onClose={() => {setOpenNotif(false)}}
-				anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-				key={'top,right'}>
-				<Alert onClose={() => {setOpenNotif(false)}} severity={notifStatus}>
-					{notifText}
-				</Alert>
-			</Snackbar>
+                autoHideDuration={3000} 
+                onClose={() => {setOpenNotif(false)}}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                key={'top,right'}>
+                <Alert onClose={() => {setOpenNotif(false)}} severity={notifStatus}>
+                    {notifText}
+                </Alert>
+            </Snackbar>
         </Fragment>
     )
 }
