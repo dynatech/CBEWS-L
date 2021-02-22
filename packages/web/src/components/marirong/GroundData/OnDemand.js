@@ -24,6 +24,8 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 
 import { MarGroundData, AppConfig } from '@dynaslope/commons';
+import { jsPDF } from "jspdf";
+import autoTable from 'jspdf-autotable'
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -83,6 +85,24 @@ export default function OnDemand() {
         }
         setNotifText(response.message);
         setOpenNotif(true);
+    };
+
+    // Download data as PDF
+    // Set theme to "striped" - blue header highlight, "grid" - green header highlight, "plain" - no highlight
+    const handleDownload = () => {
+        const pdf = new jsPDF();
+
+        autoTable(pdf, { html: '.MuiTable-root', theme: 'plain', })
+        pdf.save("on-demand_monitoring.pdf");
+    };
+
+    // Print table function
+    const handlePrint = () => {
+        const pdf = new jsPDF();
+
+        autoTable(pdf, { html: '.MuiTable-root', theme: 'plain', })
+        pdf.autoPrint({variant: 'non-conform'});
+        pdf.output('pdfobjectnewwindow');
     };
 
     const handleClickOpen = () => {
@@ -207,7 +227,7 @@ export default function OnDemand() {
                         <Fab variant="extended"
                             color="primary"
                             aria-label="add" className={classes.button_fluid}
-                            onClick={() => {}}>
+                            onClick={handleDownload}>
                             Download
                         </Fab>
                     </Grid>
@@ -215,7 +235,7 @@ export default function OnDemand() {
                         <Fab variant="extended"
                             color="primary"
                             aria-label="add" className={classes.button_fluid}
-                            onClick={() => {}}>
+                            onClick={handlePrint}>
                             Print
                         </Fab>
                     </Grid>
