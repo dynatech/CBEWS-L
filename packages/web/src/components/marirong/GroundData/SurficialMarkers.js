@@ -164,6 +164,15 @@ function SurficialMarker() {
         pdf.save("surficial_markers.pdf");
     };
 
+    // Print table function
+    const handlePrint = () => {
+        const pdf = new jsPDF();
+
+        autoTable(pdf, { html: '.MuiTable-root', theme: 'plain', })
+        pdf.autoPrint({variant: 'non-conform'});
+        pdf.output('pdfobjectnewwindow');
+    };
+
     // Generate modal for new ground measurement data
     const handleClickOpen = () => {
         let temp = [];
@@ -461,7 +470,7 @@ function SurficialMarker() {
                             <Fab variant="extended"
                                 color="primary"
                                 aria-label="add" className={classes.button_fluid}
-                                onClick={() => { }}>
+                                onClick={handlePrint}>
                                 Print
                             </Fab>
                         </Grid>
