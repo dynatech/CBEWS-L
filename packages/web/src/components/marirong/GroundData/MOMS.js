@@ -601,6 +601,9 @@ export default function MOMS() {
                                             key="alert_level_txt"
                                             name="alert_level_txt"
                                             label={"Alert Level"}
+                                            type="number"
+                                            // inputProps={{maxLength :1}}
+                                            helperText={"Alert 0 to Alert 3(MAX)"}
                                             onChange={handleChange("alert_level")}
                                             onBlur={handleBlur("alert_level")}
                                             defaultValue={values.alert_level}
