@@ -212,11 +212,11 @@ export default function MOMS() {
         //"location": "",
         //"reporter": ""
         // id of feature type
-        "feature_id":"1",
-        "feature_name":"scarpace",
-        "location":"downtown",
-        "reporter":"userseroone",
-        "site_id":"29"
+        "feature_id":"",
+        "feature_name":"",
+        "location":"",
+        "reporter":"",
+        "site_id":""
     });
     const [isInstanceDialogOpen, setIsInstanceDialogOpen] = useState(false);
 
@@ -250,7 +250,7 @@ export default function MOMS() {
     const fetchLatestData = async () => {
         // Get MOMS data and populate table
         const response = await MarGroundData.GetMOMSData();
-        // Get list of MOMS features (feature_id, feature_type)
+        // Get list of MOMS features (feature_id, feature_type) Feature Type
         const features_response = await MarGroundData.FetchMoMSFeatures();
         console.log("features_response", features_response);    // list of MOMS features (feature_id, feature_type)
         // Get list of MOMS instance for a specific site
@@ -265,7 +265,6 @@ export default function MOMS() {
             if (instance_response.status === true) {
                 // setInstanceOptions(instance_response.data);
                 feature_names_ref.current = instance_response.data;
-
                 const type_rows = features_response.data.map((feat, i) => <MenuItem value={parseInt(feat.feature_id)} key={i}>{feat.feature_type}</MenuItem>);
             }
         } else {
@@ -277,9 +276,10 @@ export default function MOMS() {
     const handleFeatureTypeChange = ({ target: { value }}) => {
         console.log("feature_type_id: ", value);
         setDefaultStrValues({ ...defaultStrValues, "feature_id": value });
+        // Set Feature Name FormData - feature_id to match clicked feature type
+        setMomsInstancesFormData({ ...momsInstancesFormData, "feature_id": value });
         // Set Feature Name dropdown
         setInstanceOptions(feature_names_ref.current[value]);
-        console.log(instance_options);
         console.log(defaultStrValues);
     };
 
@@ -386,16 +386,19 @@ export default function MOMS() {
     }
 
     // onSubmit for new Feature Name
-    const submitNewFeatureName = async (json) => {
+    const submitNewFeatureName = async (values) => {
+        console.log("Feature Instance Form on submit:", values);
+        let json = values;
+        json.site_id = cookies.credentials.site_id;
         const response = await MarGroundData.InsertMomsInstance(json);
         if (response.status === true) {
-            console.log("added new feature type");
+            console.log("added new Feature Name");
             setIsInstanceDialogOpen(false);
             fetchLatestData();
             // handleClose();
             // setNotifStatus("success");
         } else {
-            // handleClose();
+            console.log(response.error);
             // setNotifStatus("error");
         }
         // setNotifText(response.message);
@@ -829,8 +832,8 @@ export default function MOMS() {
                                             key="feature_name_txt"
                                             name="feature_name_txt"
                                             label={"Feature Name"}
-                                            // onChange={handleChange("instance_id")}
-                                            // onBlur={handleBlur("instance_id")}
+                                            onChange={handleChange("feature_id")}
+                                            onBlur={handleBlur("feature_id")}
                                             onChange={handleChange("feature_name")}
                                             onBlur={handleBlur("feature_name")}
                                             variant="outlined"
