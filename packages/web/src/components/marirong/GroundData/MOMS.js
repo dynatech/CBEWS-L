@@ -6,7 +6,6 @@ import {
     FormControl, MenuItem, TextField,
     Select, Link
 } from "@material-ui/core";
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import { MuiPickersUtilsProvider, KeyboardDateTimePicker } from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
 
@@ -326,6 +325,7 @@ export default function MOMS() {
 
     const handleClose = () => {
         setOpen(false);
+        setCommand("add");
         resetState();
     };
 
@@ -409,7 +409,7 @@ export default function MOMS() {
         console.log("test");
     }; 
 
-    // onSubmit for Add Entry form
+    // onSubmit for Add / Update / Delete Entry form
     const submitFormAddEntry = async (values) => {
         console.log("form values on submit:", values);
         console.log(defaultStrValues);
