@@ -427,15 +427,17 @@ export default function MOMS() {
             // ADD new entry
             response = await MarGroundData.InsertMOMSData(json);
         } else {
-            // EDIT
+            // EDIT entry
             hasModifiedRow = true;
             json.moms_id = selectedData.moms_id;
             let temp_array = []
             console.log("JSON", json);
             Object.keys(json).forEach(key => {
-                console.log("key", key);
-                if (!["feature_id", "reporter", "description", "alert_level"].includes(key)) {
+                //console.log("key:"+ key + "json[key]:"+ json[key]);
+                //Filter the ff. data not to add to temp
+                if (!["feature_id", "reporter", "description", "alert_level", "site_id"].includes(key)) {
                     let temp = {[key]: json[key]};
+                    console.log("temp", temp);
                     temp_array.push(temp);
                 }
             });
