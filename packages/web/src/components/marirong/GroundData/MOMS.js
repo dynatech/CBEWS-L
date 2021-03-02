@@ -181,7 +181,7 @@ export default function MOMS() {
     const [notifText, setNotifText] = useState('');
 
     const [selectedData, setSelectedData] = useState({});
-    const [command, setCommand] = useState("add");
+    const [command, setCommand] = useState("Add");
 
     const [tableData, setTableData] = useState([]);
 
@@ -233,6 +233,7 @@ export default function MOMS() {
     // TEST
     const options = {
         filterType: "checkbox",
+        fixedHeader: true,
     };
     const columns = [
         { name: "observance_ts", label: "Observance TS" },
@@ -251,11 +252,12 @@ export default function MOMS() {
         const response = await MarGroundData.GetMOMSData();
         // Get list of MOMS features (feature_id, feature_type) Feature Type
         const features_response = await MarGroundData.FetchMoMSFeatures();
-        console.log("features_response", features_response);    // list of MOMS features (feature_id, feature_type)
+        // console.log("features_response", features_response);    // list of MOMS features (feature_id, feature_type)
         // Get list of MOMS instance for a specific site
         const instance_response = await MarGroundData.GetMomsInstancesPerSite(cookies.credentials.site_id);
 
         if (response.status === true) {
+            console.log("response.data",response.data);
             setTableData(response.data);    // populate data table
         } else console.error("problem retrieving MOMS.");
 
@@ -306,8 +308,9 @@ export default function MOMS() {
     };
 
     const handleEdit = (data) => {
-        setCommand("update");
+        // setCommand("Update");
         setSelectedData(data);
+        console.log(data);
         setInstanceOptions(feature_names_ref.current[data["feature_id"]]);
 
         setDefaultStrValues({
@@ -320,12 +323,13 @@ export default function MOMS() {
             "alert_level": data.op_trigger
         });
         setOpen(true);
-        setCommand("edit");
+        setCommand("Edit");
     };
 
     const handleClose = () => {
         setOpen(false);
-        setCommand("add");
+        // Reset command to default="Add"
+        setCommand("Add");
         resetState();
     };
 
@@ -434,13 +438,13 @@ export default function MOMS() {
             console.log("JSON", json);
             Object.keys(json).forEach(key => {
                 console.log("key:"+ key + " json[key]:"+ json[key]);
-                //Filter the ff. data not to add to temp
+                //Filter the ff. data to not add to temp
                 if (!["feature_id", "reporter", "description", "alert_level", "site_id"].includes(key)) {
                     let temp = {[key]: json[key]};
-                    console.log("temp", temp);
                     temp_array.push(temp);
                 }
             });
+            console.log("temp_array", temp_array);
             response = await MarGroundData.UpdateMOMSData(temp_array);
         }
 
@@ -501,21 +505,6 @@ export default function MOMS() {
         <Container fixed>
             <Grid container align="center" spacing={2}>
                 <Grid item xs={12} >
-                    {/* <FabMuiTable
-                        classes={{}}
-                        addLabel=""
-                        data={{
-                            columns: columns,
-                            rows: tableData,
-                        }}
-                        handlers={{
-                            handleAdd,
-                            handleEdit,
-                            handleDelete,
-                        }}
-                        options={options}
-                        cmd={cmd}
-                    /> */}
                     <FabMuiTable
                         classes={{}}
                         addLabel=""
@@ -556,7 +545,7 @@ export default function MOMS() {
 
         {/* Add Entry modal */}
         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-            <DialogTitle id="form-dialog-title">Add Entry</DialogTitle>
+            <DialogTitle id="form-dialog-title">Manifestation of Movement {command} Entry</DialogTitle>
             <DialogContent>
                 <Formik
                     initialValues={defaultStrValues}
@@ -678,7 +667,7 @@ export default function MOMS() {
                                             * Please review the details before submitting
                                         </Typography>
                                     </Grid>
-                                    {command != "add" ? (
+                                    {command != "Add" ? (
                                         <Fragment>
                                             <Grid item xs={6}>
                                                 <Button
