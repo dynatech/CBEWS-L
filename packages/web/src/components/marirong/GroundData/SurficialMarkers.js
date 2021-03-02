@@ -23,9 +23,11 @@ import moment from 'moment';
 import { useCookies } from 'react-cookie';
 
 import { MarGroundData } from '@dynaslope/commons';
+import { jsPDF } from "jspdf";
+import autoTable from 'jspdf-autotable'
 
 function Alert(props) {
-	return <MuiAlert elevation={6} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 const tableStyle = makeStyles(theme => ({
@@ -73,16 +75,18 @@ function SurficialMarker() {
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const [notifStatus, setNotifStatus] = useState('success');
-	const [openNotif, setOpenNotif] = useState(false);
-	const [notifText, setNotifText] = useState('');
+    const [openNotif, setOpenNotif] = useState(false);
+    const [notifText, setNotifText] = useState('');
     const [cookies, setCookie] = useCookies(['credentials']);
 
     let markerValueRef = useRef({});
 
+    // On page load call initSurficialMarker() function
     useEffect(() => {
         initSurficialMarker()
     }, [])
 
+    // Set Surficial Marker table pagination
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
         let start = newPage * 10;
@@ -90,25 +94,29 @@ function SurficialMarker() {
         setDtRow(markerData.slice(start, end))
     };
 
+    // Set table rows per page
     const handleChangeRowsPerPage = event => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
+    // Initialize Surficial Marker component - GET Request
     const initSurficialMarker = async () => {
         const response = await MarGroundData.GetSurficialMarkersData();
         if (response.status === true) {
-            let temp_th = []
+            let temp_th = []    // A, B, C, D
             let temp_tr = []
             let temp_dr = []
             let temp = []
 
+            // Set ground measurement markers A, B, C, D
             setMarkerNames(response.markers);
             response.markers.forEach(marker => {
                 temp_th.push( <TableCell id={`marker_id_${marker.marker_id}`}>{marker.marker_name.toUpperCase()}</TableCell> );
             });
+            // Set marker table headers (A, B, C, D)
             setMarkersTH(temp_th);
-
+            // Store values from response.data to temp_tr
             response.data.forEach(element => {
                 let temp_obj = {};
                 let marker_data = Object.values(element)[0];
@@ -122,7 +130,7 @@ function SurficialMarker() {
                 temp_obj['observer'] = marker_data.observer
                 temp_tr.push(temp_obj)
             });
-
+            // Populate table rows
             temp_tr.forEach(element => {
                 temp = [];
                 temp_dr.push(
@@ -130,6 +138,7 @@ function SurficialMarker() {
                         <TableCell component="th" scope="row">
                             {element.ts}
                         </TableCell>
+                        {/* change forEach to .map!!! */}
                         {response.markers.forEach(marker_element => {
                             temp.push(<TableCell>{element[marker_element.marker_name]}</TableCell>)
                         })}
@@ -146,6 +155,25 @@ function SurficialMarker() {
         }
     }
 
+    // Download data as PDF
+    // Set theme to "striped" - blue header highlight, "grid" - green header highlight, "plain" - no highlight
+    const handleDownload = () => {
+        const pdf = new jsPDF();
+
+        autoTable(pdf, { html: '.MuiTable-root', theme: 'plain', })
+        pdf.save("surficial_markers.pdf");
+    };
+
+    // Print table function
+    const handlePrint = () => {
+        const pdf = new jsPDF();
+
+        autoTable(pdf, { html: '.MuiTable-root', theme: 'plain', })
+        pdf.autoPrint({variant: 'non-conform'});
+        pdf.output('pdfobjectnewwindow');
+    };
+
+    // Generate modal for new ground measurement data
     const handleClickOpen = () => {
         let temp = [];
         let grid =  12 / markerNames.length;
@@ -164,7 +192,9 @@ function SurficialMarker() {
                 </Grid>
             )
         });
+        // Add Markers A, B, C, D
         setAddMarkerFields(temp);
+        // Open modal
         setOpen(true);
     };
 
@@ -176,10 +206,12 @@ function SurficialMarker() {
         markerValueRef.current = temp;
     }
 
+    // Dialog (Modal) close / open
     const handleClose = () => {
         setOpen(false);
     };
 
+    // Close modal
     const handleModificationModalClose = () => {
         setModificationModal(false);
     };
@@ -201,6 +233,7 @@ function SurficialMarker() {
         setSelectedSurficialMarker(original)
     }
 
+    // Onclick of table - row, open MOMs modal for data update / delete
     const handleModificationModalOpen = (element) => {
         let ret_val = [];
 
@@ -257,6 +290,7 @@ function SurficialMarker() {
         setModificationModal(true);
     };
 
+    // Update (row - clicked) ground measurement data
     const updateMarkerData = async () => {
         let temp = selectedSurficialMarker;
         let temp_markers = {};
@@ -298,6 +332,7 @@ function SurficialMarker() {
         setModificationModal(false);
     }
 
+    // Delete (row - clicked) ground measurement data
     const deleteMarkerData = async () => {
         const json_input = {
             ts: selectedSurficialMarker.ts,
@@ -318,6 +353,7 @@ function SurficialMarker() {
         setModificationModal(false);
     }
 
+    // Add new ground measurement data  to DB
     const addMarkerData = async () => {
         const json_input = {
             "ts": addTs,
@@ -343,6 +379,7 @@ function SurficialMarker() {
 
     return (
         <Fragment>
+            {/* START Surficial Markers Modal */}
             <Dialog
                 open={modificationModal}
                 onClose={handleModificationModalClose}
@@ -376,7 +413,9 @@ function SurficialMarker() {
                     </Button>
                 </DialogActions>
             </Dialog>
+            {/* END Surficial Markers Modal */}
 
+            {/* START Surficial Markers Table */}
             <Container fixed>
                 <Grid container align="center" spacing={10}>
                     <Grid item xs={12}>
@@ -385,6 +424,7 @@ function SurficialMarker() {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Date and time</TableCell>
+                                        {/* // Set table headers (A, B, C, D) */}
                                         {markersTH}
                                         <TableCell>Weather</TableCell>
                                         <TableCell>Nag-sukat</TableCell>
@@ -408,51 +448,54 @@ function SurficialMarker() {
                     <Grid container align="center" style={{ paddingTop: 20 }}>
                         <Grid item xs={2} />
                         <Grid item xs={3}>
+                            {/* Mui floating action button - Add Ground Measurement */}
                             <Fab variant="extended"
                                 color="primary"
                                 aria-label="add" className={classes.button_fluid}
                                 onClick={handleClickOpen}>
                                 Add Ground Measurement
-                        </Fab>
+                            </Fab>
                         </Grid>
                         <Grid item xs={2}>
+                            {/* Mui floating action button - Download */}
                             <Fab variant="extended"
                                 color="primary"
                                 aria-label="add" className={classes.button_fluid}
-                                onClick={() => { }}>
+                                onClick={handleDownload}>
                                 Download
-                        </Fab>
+                            </Fab>
                         </Grid>
                         <Grid item xs={2}>
+                            {/* Mui floating action button - Print */}
                             <Fab variant="extended"
                                 color="primary"
                                 aria-label="add" className={classes.button_fluid}
-                                onClick={() => { }}>
+                                onClick={handlePrint}>
                                 Print
-                        </Fab>
+                            </Fab>
                         </Grid>
                         <Grid item xs={3} />
                     </Grid>
                 </Grid>
             </Container>
 
-
+            {/* Modal for Add Ground Measurement */}
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Ground measurement</DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                        <MuiPickersUtilsProvider utils={MomentUtils}>
-                            <DateTimePicker
-                                autoOk
-                                ampm={false}
-                                disableFuture
-                                value={addTs}
-                                onChange={(date) => { setAddTs(moment(date).format("YYYY-MM-DD HH:mm:ss")) }}
-                                label="Date time"
-                                fullWidth
-                            />
-                        </MuiPickersUtilsProvider>
+                            <MuiPickersUtilsProvider utils={MomentUtils}>
+                                <DateTimePicker
+                                    autoOk
+                                    ampm={false}
+                                    disableFuture
+                                    value={addTs}
+                                    onChange={(date) => { setAddTs(moment(date).format("YYYY-MM-DD HH:mm:ss")) }}
+                                    label="Date time"
+                                    fullWidth
+                                />
+                            </MuiPickersUtilsProvider>
                         </Grid>
                         {addMarkerFields}
                         <Grid item xs={12}>
@@ -489,14 +532,14 @@ function SurficialMarker() {
                 </DialogActions>
             </Dialog>
             <Snackbar open={openNotif} 
-				autoHideDuration={3000} 
-				onClose={() => {setOpenNotif(false)}}
-				anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-				key={'top,right'}>
-				<Alert onClose={() => {setOpenNotif(false)}} severity={notifStatus}>
-					{notifText}
-				</Alert>
-			</Snackbar>
+                autoHideDuration={3000} 
+                onClose={() => {setOpenNotif(false)}}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                key={'top,right'}>
+                <Alert onClose={() => {setOpenNotif(false)}} severity={notifStatus}>
+                    {notifText}
+                </Alert>
+            </Snackbar>
         </Fragment>
     )
 }
