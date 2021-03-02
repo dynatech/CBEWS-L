@@ -266,6 +266,9 @@ export default function MOMS() {
             if (instance_response.status === true) {
                 // setInstanceOptions(instance_response.data);
                 feature_names_ref.current = instance_response.data;
+                // Set Feature Name dropdown
+                setInstanceOptions(feature_names_ref.current[defaultStrValues.feature_id]);
+                console.log("instance_options", instance_options);
                 const type_rows = features_response.data.map((feat, i) => <MenuItem value={parseInt(feat.feature_id)} key={i}>{feat.feature_type}</MenuItem>);
             }
         } else {
@@ -424,7 +427,7 @@ export default function MOMS() {
         json.reporter_id = cookies.credentials.user_id;
         json.remarks = json.description;
         json.op_trigger = json.alert_level;
-        console.log("json: "+json.data);
+        console.log("json: "+json);
         let hasModifiedRow = false;
         let response;
         if (!Object.keys(selectedData).length) {
@@ -444,6 +447,7 @@ export default function MOMS() {
                     temp_array.push(temp);
                 }
             });
+            
             console.log("temp_array", temp_array);
             response = await MarGroundData.UpdateMOMSData(temp_array);
         }
@@ -823,8 +827,8 @@ export default function MOMS() {
                                             key="feature_name_txt"
                                             name="feature_name_txt"
                                             label={"Feature Name"}
-                                            onChange={handleChange("feature_id")}
-                                            onBlur={handleBlur("feature_id")}
+                                            // onChange={handleChange("feature_id")}
+                                            // onBlur={handleBlur("feature_id")}
                                             onChange={handleChange("feature_name")}
                                             onBlur={handleBlur("feature_name")}
                                             variant="outlined"
