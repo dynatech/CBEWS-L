@@ -340,7 +340,7 @@ export default function MOMS() {
     };
 
     const handleCloseDelete = () => {
-        setOpen(true);
+        //setOpen(true);
         setOpenDelete(false);
         resetState();
     }
@@ -433,7 +433,7 @@ export default function MOMS() {
             let temp_array = []
             console.log("JSON", json);
             Object.keys(json).forEach(key => {
-                //console.log("key:"+ key + "json[key]:"+ json[key]);
+                console.log("key:"+ key + " json[key]:"+ json[key]);
                 //Filter the ff. data not to add to temp
                 if (!["feature_id", "reporter", "description", "alert_level", "site_id"].includes(key)) {
                     let temp = {[key]: json[key]};
@@ -723,7 +723,7 @@ export default function MOMS() {
             <DialogTitle id="alert-dialog-title">{"Are you sure you want to remove this entry?"}</DialogTitle>
             <DialogContent>
             <DialogContentText id="alert-dialog-description">
-                Removing this MOMS data cannot be undone. Are you sure you want to remove this entry?
+                Removing this MOMS data <strong><u>cannot</u></strong> be undone. Are you sure you want to remove this entry?
             </DialogContentText>
             </DialogContent>
             <DialogActions>
