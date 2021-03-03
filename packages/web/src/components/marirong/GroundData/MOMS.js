@@ -267,8 +267,8 @@ export default function MOMS() {
                 // setInstanceOptions(instance_response.data);
                 feature_names_ref.current = instance_response.data;
                 // Set Feature Name dropdown
-                setInstanceOptions(feature_names_ref.current[defaultStrValues.feature_id]);
-                console.log("instance_options", instance_options);
+                // setInstanceOptions(feature_names_ref.current[defaultStrValues.feature_id]);
+                // console.log("instance_options", instance_options);
                 const type_rows = features_response.data.map((feat, i) => <MenuItem value={parseInt(feat.feature_id)} key={i}>{feat.feature_type}</MenuItem>);
             }
         } else {
@@ -451,7 +451,7 @@ export default function MOMS() {
             console.log("temp_array", temp_array);
             response = await MarGroundData.UpdateMOMSData(temp_array);
         }
-
+        console.log("response.status", response.status);
         if (response.status === true) {
             fetchLatestData();
             handleClose();
