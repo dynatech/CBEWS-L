@@ -268,6 +268,7 @@ export default function MOMS() {
                 feature_names_ref.current = instance_response.data;
                 // Set Feature Name dropdown
                 if(defaultStrValues.feature_id.length){
+                    console.log("defaultStrValues.feature_id", defaultStrValues.feature_id);
                     setInstanceOptions(feature_names_ref.current[defaultStrValues.feature_id]);
                 }
                 const type_rows = features_response.data.map((feat, i) => <MenuItem value={parseInt(feat.feature_id)} key={i}>{feat.feature_type}</MenuItem>);
@@ -428,7 +429,6 @@ export default function MOMS() {
         json.reporter_id = cookies.credentials.user_id;
         json.remarks = json.description;
         json.op_trigger = json.alert_level;
-        console.log("json: "+json);
         let hasModifiedRow = false;
         let response;
         if (!Object.keys(selectedData).length) {
@@ -774,7 +774,7 @@ export default function MOMS() {
                                     </Grid>
                                     {command != "Add" ? (
                                         <Fragment>
-                                            <Grid item xs={6}>
+                                            <Grid item xs={4}>
                                                 <Button
                                                     className={btn_classes.small2}
                                                     onClick={handleSubmit}
@@ -783,7 +783,7 @@ export default function MOMS() {
                                                     Submit
                                                 </Button>
                                             </Grid>
-                                            <Grid item xs={6}>
+                                            <Grid item xs={4}>
                                                 <Button 
                                                     className={btn_classes.small2}
                                                     onClick={() => "deleteMomsFeatures"}>Delete</Button>
@@ -841,34 +841,16 @@ export default function MOMS() {
                                             * Please review the details before submitting
                                         </Typography>
                                     </Grid>
-                                    {command != "Add" ? (
-                                        <Fragment>
-                                            <Grid item xs={6}>
-                                                <Button
-                                                    className={btn_classes.small2}
-                                                    onClick={handleSubmit}
-                                                    type="submit"
-                                                >
-                                                    Submit
-                                                </Button>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <Button 
-                                                    className={btn_classes.small2}
-                                                    onClick={() => "deleteMomsFeatures"}>Delete</Button>
-                                            </Grid>
-                                        </Fragment>
-                                    ) : (
-                                        <Grid item xs={12}>
-                                            <Button
-                                                className={btn_classes.small}
-                                                onClick={handleSubmit}
-                                                type="submit"
-                                            >
-                                                Submit
-                                            </Button>
-                                        </Grid>
-                                    )}
+                                    <Grid item xs={12}>
+                                        <Button
+                                            className={btn_classes.small}
+                                            onClick={handleSubmit}
+                                            type="submit"
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Grid>
+                                   
                                 </Grid>
                             </form>
                         )
