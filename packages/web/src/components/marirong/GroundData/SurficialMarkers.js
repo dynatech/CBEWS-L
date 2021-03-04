@@ -167,8 +167,10 @@ function SurficialMarker() {
     // Print table function
     const handlePrint = () => {
         const pdf = new jsPDF();
-
-        autoTable(pdf, { html: '.MuiTable-root', theme: 'plain', })
+        
+        autoTable(pdf, { html: '.MuiTable-root', theme: 'striped', })
+        pdf.addImage("/static/media/letter_footer.42d31a1c.png","PNG", 10, 10, 1130, 106);
+        
         pdf.autoPrint({variant: 'non-conform'});
         pdf.output('pdfobjectnewwindow');
     };
