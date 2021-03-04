@@ -19,6 +19,8 @@ const theme = createMuiTheme({
 });
 
 function App() {
+  //Magic bura console 
+  console.log = () => {};
   return (
     <ThemeProvider theme={theme}>
     <CookiesProvider>
