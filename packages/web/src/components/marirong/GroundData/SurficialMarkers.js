@@ -24,7 +24,10 @@ import { useCookies } from 'react-cookie';
 
 import { MarGroundData } from '@dynaslope/commons';
 import { jsPDF } from "jspdf";
-import autoTable from 'jspdf-autotable'
+import autoTable from 'jspdf-autotable';
+
+import letter_header from '../../../assets/letter_header.png';
+import letter_footer from '../../../assets/letter_footer.png';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -160,7 +163,9 @@ function SurficialMarker() {
     const handleDownload = () => {
         const pdf = new jsPDF();
 
-        autoTable(pdf, { html: '.MuiTable-root', theme: 'plain', })
+        autoTable(pdf, { html: '.MuiTable-root', theme: 'grid', })
+        // pdf.addImage("https://images.pexels.com/photos/4581165/pexels-photo-4581165.jpeg","JPEG", 0, 400, auto, 50);
+        pdf.addImage("/static/media/letter_footer.f9de4b28.png","PNG", 0, 200, 100, 121);
         pdf.save("surficial_markers.pdf");
     };
 
@@ -168,9 +173,25 @@ function SurficialMarker() {
     const handlePrint = () => {
         const pdf = new jsPDF();
         
-        autoTable(pdf, { html: '.MuiTable-root', theme: 'striped', })
-        pdf.addImage("/static/media/letter_footer.42d31a1c.png","PNG", 10, 10, 1130, 106);
+        // Header (URL, file_type, left_margin, top, width, height)
+        pdf.addImage(letter_header,"PNG", 0, 0, 221, 15);
         
+        // Title
+        pdf.text("Surficial Markers", 30, 25, {align: "center"});
+
+        // Surficial Markers Table
+        // autoTable(pdf, { html: '.MuiTable-root', theme: 'striped', });
+        pdf.autoTable({
+            html: '.MuiTable-root',
+            startY: 30,
+            headStyles: {
+                fillColor: [27, 81, 109],
+            }
+        })
+
+        // Footer (URL, file_type, left_margin, top, width, height)
+        pdf.addImage(letter_footer,"PNG", 0, 272, 212, 20);
+
         pdf.autoPrint({variant: 'non-conform'});
         pdf.output('pdfobjectnewwindow');
     };
