@@ -133,14 +133,14 @@ function AlertValidation() {
                     rel_trig = release_triggers;
                     if ("day" in responseJson.data) setDay(responseJson.data.day)
 
-                    setNotifText("Successfully retrieved updated candidate data.");
+                    //setNotifText("Successfully retrieved updated candidate data.");
                 } else if (status === "no_alert") {
                     setPublicAlert(
                         <Typography variant="h2" color="#28a745" className={[classes.label_paddings, classes.alert_level]}>
                             NO CANDIDATE AS OF NOW
                         </Typography>
                         )
-                    setNotifText("No new candidate data.");
+                    //setNotifText("No new candidate data.");
                 } else {
                     rel_trig = [];
                     setPublicAlert(
@@ -148,11 +148,11 @@ function AlertValidation() {
                             {`Alert ${public_alert_level}`}
                         </Typography>
                     );
-                    setNotifText("No candidate data.");
+                    //setNotifText("No candidate data.");
                 }
 
-                setOpenNotif(true);
-                setNotifStatus("success");
+                //setOpenNotif(true);
+                //setNotifStatus("success");
 
                 return rel_trig;
             })
