@@ -108,8 +108,8 @@ function SurficialMarker() {
         const response = await MarGroundData.GetSurficialMarkersData();
         if (response.status === true) {
             let temp_th = []    // A, B, C, D
-            let temp_tr = []
-            let temp_dr = []
+            let temp_tr = []    // table rows
+            let temp_dr = []    // markerdata
             let temp = []
 
             // Set ground measurement markers A, B, C, D
@@ -153,20 +153,15 @@ function SurficialMarker() {
             });
             setMarkerData(temp_dr)
             setDtRow(temp_dr.slice(0, 10))
+            console.log("temp_tr", temp_tr);
         } else {
             console.error(response.message);
         }
     }
 
-    // Download data as PDF
-    // Set theme to "striped" - blue header highlight, "grid" - green header highlight, "plain" - no highlight
+    // Download data as CSV
     const handleDownload = () => {
-        const pdf = new jsPDF();
-
-        autoTable(pdf, { html: '.MuiTable-root', theme: 'grid', })
-        // pdf.addImage("https://images.pexels.com/photos/4581165/pexels-photo-4581165.jpeg","JPEG", 0, 400, auto, 50);
-        pdf.addImage("/static/media/letter_footer.f9de4b28.png","PNG", 0, 200, 100, 121);
-        pdf.save("surficial_markers.pdf");
+        
     };
 
     // Print table function
