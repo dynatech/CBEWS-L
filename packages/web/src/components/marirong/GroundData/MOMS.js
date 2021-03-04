@@ -36,7 +36,7 @@ import '../../../styles/image-gallery.css';
 function MomsFeaturesDialog (props) {
     const { classes, open, setOpen, data, setData, options, setFeatureOptions, } = props;
     const btn_classes = ButtonStyle();
-    const command = "add";
+    const command = "Add";
 
     const addFeatureType = async (values) => {
         const response = await MarGroundData.InsertMomsFeatureType(data);
@@ -126,7 +126,7 @@ function MomsFeaturesDialog (props) {
                                             * Please review your details before submitting
                                         </Typography>
                                     </Grid>
-                                    {command != "add" ? (
+                                    {command != "Add" ? (
                                         <Fragment>
                                             <Grid item xs={6}>
                                                 <Button
@@ -266,6 +266,11 @@ export default function MOMS() {
             if (instance_response.status === true) {
                 // setInstanceOptions(instance_response.data);
                 feature_names_ref.current = instance_response.data;
+                // Set Feature Name dropdown
+                if(defaultStrValues.feature_id.length){
+                    console.log("defaultStrValues.feature_id", defaultStrValues.feature_id);
+                    setInstanceOptions(feature_names_ref.current[defaultStrValues.feature_id]);
+                }
                 const type_rows = features_response.data.map((feat, i) => <MenuItem value={parseInt(feat.feature_id)} key={i}>{feat.feature_type}</MenuItem>);
             }
         } else {
@@ -308,7 +313,7 @@ export default function MOMS() {
     };
 
     const handleEdit = (data) => {
-        // setCommand("Update");
+        //setCommand("Update");
         setSelectedData(data);
         console.log(data);
         setInstanceOptions(feature_names_ref.current[data["feature_id"]]);
@@ -424,7 +429,6 @@ export default function MOMS() {
         json.reporter_id = cookies.credentials.user_id;
         json.remarks = json.description;
         json.op_trigger = json.alert_level;
-        console.log("json: "+json.data);
         let hasModifiedRow = false;
         let response;
         if (!Object.keys(selectedData).length) {
@@ -444,10 +448,11 @@ export default function MOMS() {
                     temp_array.push(temp);
                 }
             });
+            
             console.log("temp_array", temp_array);
             response = await MarGroundData.UpdateMOMSData(temp_array);
         }
-
+        console.log("response.status", response.status);
         if (response.status === true) {
             fetchLatestData();
             handleClose();
@@ -767,9 +772,9 @@ export default function MOMS() {
                                             * Please review the details before submitting
                                         </Typography>
                                     </Grid>
-                                    {command != "add" ? (
+                                    {command != "Add" ? (
                                         <Fragment>
-                                            <Grid item xs={6}>
+                                            <Grid item xs={4}>
                                                 <Button
                                                     className={btn_classes.small2}
                                                     onClick={handleSubmit}
@@ -778,7 +783,7 @@ export default function MOMS() {
                                                     Submit
                                                 </Button>
                                             </Grid>
-                                            <Grid item xs={6}>
+                                            <Grid item xs={4}>
                                                 <Button 
                                                     className={btn_classes.small2}
                                                     onClick={() => "deleteMomsFeatures"}>Delete</Button>
@@ -823,8 +828,8 @@ export default function MOMS() {
                                             key="feature_name_txt"
                                             name="feature_name_txt"
                                             label={"Feature Name"}
-                                            onChange={handleChange("feature_id")}
-                                            onBlur={handleBlur("feature_id")}
+                                            // onChange={handleChange("feature_id")}
+                                            // onBlur={handleBlur("feature_id")}
                                             onChange={handleChange("feature_name")}
                                             onBlur={handleBlur("feature_name")}
                                             variant="outlined"
@@ -836,34 +841,16 @@ export default function MOMS() {
                                             * Please review the details before submitting
                                         </Typography>
                                     </Grid>
-                                    {command != "add" ? (
-                                        <Fragment>
-                                            <Grid item xs={6}>
-                                                <Button
-                                                    className={btn_classes.small2}
-                                                    onClick={handleSubmit}
-                                                    type="submit"
-                                                >
-                                                    Submit
-                                                </Button>
-                                            </Grid>
-                                            <Grid item xs={6}>
-                                                <Button 
-                                                    className={btn_classes.small2}
-                                                    onClick={() => "deleteMomsFeatures"}>Delete</Button>
-                                            </Grid>
-                                        </Fragment>
-                                    ) : (
-                                        <Grid item xs={12}>
-                                            <Button
-                                                className={btn_classes.small}
-                                                onClick={handleSubmit}
-                                                type="submit"
-                                            >
-                                                Submit
-                                            </Button>
-                                        </Grid>
-                                    )}
+                                    <Grid item xs={12}>
+                                        <Button
+                                            className={btn_classes.small}
+                                            onClick={handleSubmit}
+                                            type="submit"
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Grid>
+                                   
                                 </Grid>
                             </form>
                         )
