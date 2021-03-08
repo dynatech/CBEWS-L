@@ -131,23 +131,10 @@ function SurficialMarker() {
                 let temp_obj = {};  //Temporary holder for each row data (ts, ABCD, observer, weather)
                 let marker_data = Object.values(element)[0];
                 
-                let temp_data = marker_data;    // Let temp_data be placeholder for marker_data Object
+                // Let temp_data be placeholder for marker_data Object
+                let temp_data = marker_data;    
 
-                var table_headers = {           // Replace object keys to that of MuiTable headers
-                    'observer' : 'Nag-sukat',
-                    'ts' : 'Date and time',
-                    'weather': 'Weather'
-                }
-                // Replace object keys to match MuiTable headers
-                let replaced_data_headers = Object.keys(temp_data).map((key)=>{
-                    const newKey = table_headers[key] || key;
-                    return{[newKey]:temp_data[key]};
-                });
-                // Reduce to array
-                temp_data = replaced_data_headers.reduce((a,b)=>Object.assign({}, a, b));
-
-                console.log("temp_data", temp_data);
-                // Save row data to table_data
+                // Save row data to table_data, prior to populating csv file
                 table_data.push(temp_data);
                 
                 temp_obj['ts'] = marker_data.ts
@@ -159,8 +146,19 @@ function SurficialMarker() {
                 temp_obj['observer'] = marker_data.observer
                 temp_tr.push(temp_obj) //Add row data to variable
             });
+            // Rename keys and Rearrange objects
+            const resultArray = table_data.map(e => ({
+                'Date and time':e.ts,
+                'A':e.A,
+                'B':e.B,
+                'C':e.C,
+                'D':e.D,
+                'Weather': e.weather,
+                'Nag-sukat': e.observer,
+            }));
+            console.log('resultArray', resultArray);
             // Set values of table, ready for csv download
-            setTableData(table_data);
+            setTableData(resultArray);
             
             // Populate table rows
             console.log("temp_tr", temp_tr);
@@ -509,7 +507,7 @@ function SurficialMarker() {
                         </Grid>
                         <Grid item xs={2}>
                             {/* Mui floating action button - Download */}
-                            <CsvDownloader datas={TableData} filename="SurficialMarkers">
+                            <CsvDownloader datas={TableData} filename="Surficial Markers">
                                 <Fab variant="extended"
                                     color="primary"
                                     aria-label="add" className={classes.button_fluid}
