@@ -24,7 +24,8 @@ import { useCookies } from 'react-cookie';
 
 import { MarGroundData } from '@dynaslope/commons';
 import { jsPDF } from "jspdf";
-import autoTable from 'jspdf-autotable';
+import autoTable, { __createTable } from 'jspdf-autotable';
+import CsvDownloader from 'react-csv-downloader';
 
 import letter_header from '../../../assets/letter_header.png';
 import letter_footer from '../../../assets/letter_footer.png';
@@ -52,6 +53,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function SurficialMarker() {
+    const [TableData, setTableData] = useState([]);
     const [markersTH, setMarkersTH] = useState([]);
     const [dtRow, setDtRow] = useState([]);
 
@@ -107,10 +109,15 @@ function SurficialMarker() {
     const initSurficialMarker = async () => {
         const response = await MarGroundData.GetSurficialMarkersData();
         if (response.status === true) {
+            let table_data = [] // Table data array
             let temp_th = []    // A, B, C, D
             let temp_tr = []    // table rows
             let temp_dr = []    // markerdata
             let temp = []
+
+            console.log("response", response);
+            console.log("response.data", response.data);
+            console.log("response.markers", response.markers);
 
             // Set ground measurement markers A, B, C, D
             setMarkerNames(response.markers);
@@ -121,9 +128,28 @@ function SurficialMarker() {
             setMarkersTH(temp_th);
             // Store values from response.data to temp_tr
             response.data.forEach(element => {
-                let temp_obj = {};
+                let temp_obj = {};  //Temporary holder for each row data (ts, ABCD, observer, weather)
                 let marker_data = Object.values(element)[0];
+                
+                let temp_data = marker_data;    // Let temp_data be placeholder for marker_data Object
 
+                var table_headers = {           // Replace object keys to that of MuiTable headers
+                    'observer' : 'Nag-sukat',
+                    'ts' : 'Date and time',
+                    'weather': 'Weather'
+                }
+                // Replace object keys to match MuiTable headers
+                let replaced_data_headers = Object.keys(temp_data).map((key)=>{
+                    const newKey = table_headers[key] || key;
+                    return{[newKey]:temp_data[key]};
+                });
+                // Reduce to array
+                temp_data = replaced_data_headers.reduce((a,b)=>Object.assign({}, a, b));
+
+                console.log("temp_data", temp_data);
+                // Save row data to table_data
+                table_data.push(temp_data);
+                
                 temp_obj['ts'] = marker_data.ts
                 response.markers.forEach(marker_element => {
                     const name = marker_element.marker_name;
@@ -131,9 +157,13 @@ function SurficialMarker() {
                 });
                 temp_obj['weather'] = marker_data.weather
                 temp_obj['observer'] = marker_data.observer
-                temp_tr.push(temp_obj)
+                temp_tr.push(temp_obj) //Add row data to variable
             });
+            // Set values of table, ready for csv download
+            setTableData(table_data);
+            
             // Populate table rows
+            console.log("temp_tr", temp_tr);
             temp_tr.forEach(element => {
                 temp = [];
                 temp_dr.push(
@@ -151,8 +181,9 @@ function SurficialMarker() {
                     </TableRow>
                 )
             });
+            console.log("temp_dr", temp_dr);    //temp_dr = object containing element + HTML
             setMarkerData(temp_dr)
-            setDtRow(temp_dr.slice(0, 10))
+            setDtRow(temp_dr.slice(0, 10))      //divide temp_dr data into rows of 10
             console.log("temp_tr", temp_tr);
         } else {
             console.error(response.message);
@@ -161,7 +192,9 @@ function SurficialMarker() {
 
     // Download data as CSV
     const handleDownload = () => {
-        
+        console.log("pressed download button");
+        // return <CSVDownload data={TableData} target="_blank" />;
+        // return <CsvDownloader datas={TableData} filename="myfile" />;
     };
 
     // Print table function
@@ -476,12 +509,14 @@ function SurficialMarker() {
                         </Grid>
                         <Grid item xs={2}>
                             {/* Mui floating action button - Download */}
-                            <Fab variant="extended"
-                                color="primary"
-                                aria-label="add" className={classes.button_fluid}
-                                onClick={handleDownload}>
-                                Download
-                            </Fab>
+                            <CsvDownloader datas={TableData} filename="SurficialMarkers">
+                                <Fab variant="extended"
+                                    color="primary"
+                                    aria-label="add" className={classes.button_fluid}
+                                    onClick={handleDownload}>
+                                    Download
+                                </Fab>
+                            </CsvDownloader>
                         </Grid>
                         <Grid item xs={2}>
                             {/* Mui floating action button - Print */}
