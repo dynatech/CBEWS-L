@@ -34,6 +34,8 @@
     "mui-datatables": "^2.15.0",
     "react": "^16.13.1",
     "react-cookie": "^4.0.3",
+    "react-csv": "^2.0.3",
+    "react-csv-downloader": "^2.2.0",
     "react-dom": "^16.13.1",
     "react-image-gallery": "^1.0.8",
     "react-image-magnifiers": "^1.4.0",

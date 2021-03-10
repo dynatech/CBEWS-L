@@ -24,7 +24,8 @@ import { useCookies } from 'react-cookie';
 
 import { MarGroundData } from '@dynaslope/commons';
 import { jsPDF } from "jspdf";
-import autoTable from 'jspdf-autotable';
+import autoTable, { __createTable } from 'jspdf-autotable';
+import CsvDownloader from 'react-csv-downloader';
 
 import letter_header from '../../../assets/letter_header.png';
 import letter_footer from '../../../assets/letter_footer.png';
@@ -52,6 +53,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function SurficialMarker() {
+    const [TableData, setTableData] = useState([]);
     const [markersTH, setMarkersTH] = useState([]);
     const [dtRow, setDtRow] = useState([]);
 
@@ -107,10 +109,15 @@ function SurficialMarker() {
     const initSurficialMarker = async () => {
         const response = await MarGroundData.GetSurficialMarkersData();
         if (response.status === true) {
+            let table_data = [] // Table data array
             let temp_th = []    // A, B, C, D
-            let temp_tr = []
-            let temp_dr = []
+            let temp_tr = []    // table rows
+            let temp_dr = []    // markerdata
             let temp = []
+
+            console.log("response", response);
+            console.log("response.data", response.data);
+            console.log("response.markers", response.markers);
 
             // Set ground measurement markers A, B, C, D
             setMarkerNames(response.markers);
@@ -121,9 +128,15 @@ function SurficialMarker() {
             setMarkersTH(temp_th);
             // Store values from response.data to temp_tr
             response.data.forEach(element => {
-                let temp_obj = {};
+                let temp_obj = {};  //Temporary holder for each row data (ts, ABCD, observer, weather)
                 let marker_data = Object.values(element)[0];
+                
+                // Let temp_data be placeholder for marker_data Object
+                let temp_data = marker_data;    
 
+                // Save row data to table_data, prior to populating csv file
+                table_data.push(temp_data);
+                
                 temp_obj['ts'] = marker_data.ts
                 response.markers.forEach(marker_element => {
                     const name = marker_element.marker_name;
@@ -131,9 +144,24 @@ function SurficialMarker() {
                 });
                 temp_obj['weather'] = marker_data.weather
                 temp_obj['observer'] = marker_data.observer
-                temp_tr.push(temp_obj)
+                temp_tr.push(temp_obj) //Add row data to variable
             });
+            // Rename keys and Rearrange objects
+            const resultArray = table_data.map(e => ({
+                'Date and time':e.ts,
+                'A':e.A,
+                'B':e.B,
+                'C':e.C,
+                'D':e.D,
+                'Weather': e.weather,
+                'Nag-sukat': e.observer,
+            }));
+            console.log('resultArray', resultArray);
+            // Set values of table, ready for csv download
+            setTableData(resultArray);
+            
             // Populate table rows
+            console.log("temp_tr", temp_tr);
             temp_tr.forEach(element => {
                 temp = [];
                 temp_dr.push(
@@ -151,22 +179,20 @@ function SurficialMarker() {
                     </TableRow>
                 )
             });
+            console.log("temp_dr", temp_dr);    //temp_dr = object containing element + HTML
             setMarkerData(temp_dr)
-            setDtRow(temp_dr.slice(0, 10))
+            setDtRow(temp_dr.slice(0, 10))      //divide temp_dr data into rows of 10
+            console.log("temp_tr", temp_tr);
         } else {
             console.error(response.message);
         }
     }
 
-    // Download data as PDF
-    // Set theme to "striped" - blue header highlight, "grid" - green header highlight, "plain" - no highlight
+    // Download data as CSV
     const handleDownload = () => {
-        const pdf = new jsPDF();
-
-        autoTable(pdf, { html: '.MuiTable-root', theme: 'grid', })
-        // pdf.addImage("https://images.pexels.com/photos/4581165/pexels-photo-4581165.jpeg","JPEG", 0, 400, auto, 50);
-        pdf.addImage("/static/media/letter_footer.f9de4b28.png","PNG", 0, 200, 100, 121);
-        pdf.save("surficial_markers.pdf");
+        console.log("pressed download button");
+        // return <CSVDownload data={TableData} target="_blank" />;
+        // return <CsvDownloader datas={TableData} filename="myfile" />;
     };
 
     // Print table function
@@ -481,12 +507,14 @@ function SurficialMarker() {
                         </Grid>
                         <Grid item xs={2}>
                             {/* Mui floating action button - Download */}
-                            <Fab variant="extended"
-                                color="primary"
-                                aria-label="add" className={classes.button_fluid}
-                                onClick={handleDownload}>
-                                Download
-                            </Fab>
+                            <CsvDownloader datas={TableData} filename="Surficial Markers">
+                                <Fab variant="extended"
+                                    color="primary"
+                                    aria-label="add" className={classes.button_fluid}
+                                    onClick={handleDownload}>
+                                    Download
+                                </Fab>
+                            </CsvDownloader>
                         </Grid>
                         <Grid item xs={2}>
                             {/* Mui floating action button - Print */}

@@ -26,6 +26,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 import { MarGroundData, AppConfig } from '@dynaslope/commons';
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
+import CsvDownloader from 'react-csv-downloader';
 
 import letter_header from '../../../assets/letter_header.png';
 import letter_footer from '../../../assets/letter_footer.png';
@@ -72,6 +73,7 @@ export default function OnDemand() {
     const [notifText, setNotifText] = useState("");
     const [notifStatus, setNotifStatus] = useState('success');
     const [cookies, setCookie] = useCookies(['credentials']);
+    const [TableData, setTableData] = useState([]);
 
     useEffect(() => {
         initOnDemand();
@@ -81,6 +83,21 @@ export default function OnDemand() {
         const response = await MarGroundData.GetOnDemandData();
         console.log("response", response);
         if (response.status === true) {
+            console.log(response.data);
+            
+            let data = response.data;
+            // Rename keys and Rearrange
+            const resultArray = data.map(e => ({
+                'Date and time':e.ts,
+                'Reporter': e.reporter,
+                'Reason for Monitoring': e.reason,
+                'Alert Level': e.alert_level, 
+            }));
+
+            console.log(resultArray);
+            setTableData(resultArray);
+
+            // Populate MUI Table
             setRows(response.data);
             setNotifStatus("success");
         } else {
@@ -90,23 +107,11 @@ export default function OnDemand() {
         setOpenNotif(true);
     };
 
-    // Download data as PDF
-    // Set theme to "striped" - blue header highlight, "grid" - green header highlight, "plain" - no highlight
     const handleDownload = () => {
-        const pdf = new jsPDF();
-
-        autoTable(pdf, { html: '.MuiTable-root', theme: 'plain', })
-        pdf.save("on-demand_monitoring.pdf");
+        console.log("pressed download button");
+        // return <CSVDownload data={TableData} target="_blank" />;
+        // return <CsvDownloader datas={TableData} filename="myfile" />;
     };
-
-    // Print table function
-    // const handlePrint = () => {
-    //     const pdf = new jsPDF();
-
-    //     autoTable(pdf, { html: '.MuiTable-root', theme: 'plain', })
-    //     pdf.autoPrint({variant: 'non-conform'});
-    //     pdf.output('pdfobjectnewwindow');
-    // };
 
     // Print table function
     const handlePrint = () => {
@@ -116,7 +121,7 @@ export default function OnDemand() {
         pdf.addImage(letter_header,"PNG", 0, 0, 221, 15);
         
         // Title
-        pdf.text("On-Demand Monitoring", 30, 25, {align: "center"});
+        pdf.text("On-Demand Monitoring", 40, 25, {align: "center"});
 
         // On-Demand Table
         // autoTable(pdf, { html: '.MuiTable-root', theme: 'striped', });
@@ -254,12 +259,14 @@ export default function OnDemand() {
                         </Fab>
                     </Grid>
                     <Grid item xs={3}>
+                        <CsvDownloader datas={TableData} filename="On-Demand Monitoring">
                         <Fab variant="extended"
                             color="primary"
                             aria-label="add" className={classes.button_fluid}
                             onClick={handleDownload}>
                             Download
                         </Fab>
+                        </CsvDownloader>
                     </Grid>
                     <Grid item xs={3}>
                         <Fab variant="extended"
