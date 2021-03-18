@@ -55,7 +55,6 @@ def fetch_status_analysis(site_code):
             plots = response["data"][0]["plot"]
             if plots:
                 sorted_data_list = sorted(plots, key=lambda i: i["distance"])
-                
                 nearest_gauge = None
                 latest_data = None
                 for item in sorted_data_list:
@@ -105,6 +104,8 @@ def fetch_status_analysis(site_code):
                         "1_day_threshold": one_day_threshold,
                         "3_day_threshold": three_day_threshold
                     }
+                else:
+                    analysis_data = None        
         else:
             analysis_data = None
         response = {

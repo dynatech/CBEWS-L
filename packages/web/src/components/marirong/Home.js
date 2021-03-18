@@ -63,11 +63,11 @@ function LatestGroundMeas () {
     return (
         <Fragment>
             {
-                data !== null ? (
+                data !== null && data.analysis !== "No data available" ? (
                     <Grid item align="center">
-                        <Typography variant="body">{data.latest_data}</Typography>
+                        <Typography variant="body1">{data.latest_data}</Typography>
                         <br /><br />
-                        <Typography variant="body">{data.analysis}</Typography>
+                        <Typography variant="body1">{data.analysis}</Typography>
                     </Grid>
 
                 ) : (
