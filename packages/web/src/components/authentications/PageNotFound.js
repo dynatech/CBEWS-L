@@ -10,16 +10,26 @@ export default function PageNotFound(props) {
         <Grid container>
             <Grid xs={12}>
                 <Typography variant="h2">
-                    We cannot find what you are looking for :(
+                    {"We cannot find what you are looking for :("}
                 </Typography>
-                {is_logged_out && (
+                {
+                is_logged_out ?
+                (
                     <Typography>
                         {"You are currently logged out. Please "}
                         <Link onClick={() => props.history.push("/signin")}>
                             Sign In
                         </Link>
                     </Typography>
-                )}
+                ):(
+                    <Typography>
+                        {"Back to "}
+                        <Link onClick={() => props.history.push("/dashboard")}>
+                            Dashboard
+                        </Link>
+                    </Typography>
+                )
+                }
             </Grid>
         </Grid>
     );

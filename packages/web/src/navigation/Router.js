@@ -14,9 +14,10 @@ import SigninIloilo from '../components/iloilo_pdrrmo/authentication/Signin';
 import IloiloDashboard from '../components/iloilo_pdrrmo/IloIloDashboard';
 
 import { useCookies } from "react-cookie";
+import {DashRedirectIfLoggedIn, PrivateRoute} from './RouteType';
 
 function RouterApp() {
-  const [cookies, setCookies] = useCookies(['credentials']);
+  const [cookies] = useCookies(['credentials']);
   const component_object = {
     29: (
       <Fragment>
@@ -32,14 +33,14 @@ function RouterApp() {
   const site_id = "credentials" in cookies && "site_id" in cookies.credentials ? cookies.credentials.site_id : null;
   return (
     <BrowserRouter>
-      <Switch>
         {
           site_id !== null && (component_object[parseInt(site_id)])
         }
+        <Switch>
         <Route path='/forgot-password' component={ForgotPassword} /> 
         <Route path='/signup' component={SignUp} />
-        <Route path='/signin' component={Signin} />
-        <Route exact path='/' component={DownloadPage} />
+        <DashRedirectIfLoggedIn path='/signin' component={Signin} />
+        <DashRedirectIfLoggedIn exact path='/' component={DownloadPage} />
         {/* PDRRMO SECTION */}
         <Route path='/iloilo/signin' component={SigninIloilo} />
         <Route path='/iloilo/dashboard' component={IloiloDashboard} />
