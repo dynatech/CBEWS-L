@@ -21,12 +21,12 @@ function RouterApp() {
   const component_object = {
     29: (
       <Fragment>
-        <Route path='/dashboard' component={MarDashboard} />
+        <Route exact path="/dashboard" component={MarDashboard} />
       </Fragment>
     ),
     50: (
       <Fragment>
-        <Route path='/dashboard' component={UmiDashboard} />
+        <Route exact path="/dashboard" component={UmiDashboard} />
       </Fragment>
     )
   }
@@ -37,14 +37,15 @@ function RouterApp() {
           site_id !== null && (component_object[parseInt(site_id)])
         }
         <Switch>
-        <Route path='/forgot-password' component={ForgotPassword} /> 
-        <Route path='/signup' component={SignUp} />
-        <DashRedirectIfLoggedIn path='/signin' component={Signin} />
-        <DashRedirectIfLoggedIn exact path='/' component={DownloadPage} />
         {/* PDRRMO SECTION */}
-        <Route path='/iloilo/signin' component={SigninIloilo} />
-        <Route path='/iloilo/dashboard' component={IloiloDashboard} />
+        <Route path="/iloilo/signin" component={SigninIloilo} />
+        <Route path="/iloilo/dashboard" component={IloiloDashboard} />
         {/* PDRRMO SECTION */}
+        <Route exact path="/forgot-password" component={ForgotPassword} /> 
+        <Route exact path="/signup" component={SignUp} />
+        <DashRedirectIfLoggedIn exact path="/signin" component={Signin} />
+        <DashRedirectIfLoggedIn exact path="/" component={DownloadPage} />
+
         <Route component={PageNotFound} />
       </Switch>
     </BrowserRouter>
