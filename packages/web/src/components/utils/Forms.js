@@ -70,6 +70,7 @@ function ReusableInput(props) {
                     fullWidth
                     id={propKey}
                     label={label}
+                    type="number"
                     onChange={handleChange(`${key}`)}
                     onBlur={handleBlur(`${key}`)}
                     defaultValue={value}
