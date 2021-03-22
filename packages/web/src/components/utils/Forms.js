@@ -142,7 +142,7 @@ export default function Forms(props) {
                                     * Please review your details before submitting
                                 </Typography>
                             </Grid>
-                            {command != "add" ? (
+                            {command != "Add" ? (
                                 <Fragment>
                                     <Grid item xs={6}>
                                         <Button
