@@ -235,7 +235,7 @@ function SurficialMarker() {
                         id={element[0]}
                         label={`Marker ${element.marker_name}`}
                         onChange={(e)=> {handleOnChangeAddMarkerValues(element.marker_name, e.target.value)}}
-                        type="text"
+                        type="number"
                         fullWidth
                     />
                 </Grid>
@@ -282,7 +282,7 @@ function SurficialMarker() {
         setSelectedSurficialMarker(original)
     }
 
-    // Onclick of table - row, open MOMs modal for data update / delete
+    // Onclick of table - row, open Surficial Marker's modal for data update / delete
     const handleModificationModalOpen = (element) => {
         let ret_val = [];
 
@@ -542,6 +542,7 @@ function SurficialMarker() {
                                     ampm={false}
                                     disableFuture
                                     value={addTs}
+                                    format="YYYY-MM-DD HH:mm:ss"
                                     onChange={(date) => { setAddTs(moment(date).format("YYYY-MM-DD HH:mm:ss")) }}
                                     label="Date time"
                                     fullWidth
