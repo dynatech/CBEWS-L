@@ -435,7 +435,7 @@ function SurficialMarker() {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Manifestation of Movements</DialogTitle>
+                <DialogTitle id="alert-dialog-title">Ground Measurement</DialogTitle>
                 <DialogContent>
                     <MuiPickersUtilsProvider utils={MomentUtils}>
                         <DateTimePicker
@@ -443,6 +443,7 @@ function SurficialMarker() {
                             ampm={false}
                             disableFuture
                             value={editableTS}
+                            format="YYYY-MM-DD HH:mm:ss"
                             onChange={(date) => { setEditableTS(moment(date).format("YYYY-MM-DD HH:mm:ss")) }}
                             label="Date time"
                             fullWidth
@@ -532,7 +533,7 @@ function SurficialMarker() {
 
             {/* Modal for Add Ground Measurement */}
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Ground measurement</DialogTitle>
+                <DialogTitle id="form-dialog-title">Ground Measurement</DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
