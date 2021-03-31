@@ -667,9 +667,9 @@ export default function MOMS() {
                                             helperText={"Alert 0 (Min) to Alert 3 (Max)"}
                                             >
                                             <option aria-label="None" value="" />
-                                            <option value={0}>Alert 0</option>
-                                            <option value={2}>Alert 2</option>
-                                            <option value={3}>Alert 3</option>
+                                            <option value={0}>Alert 0: No significant movement observed</option>
+                                            <option value={2}>Alert 2: Significant movement observed</option>
+                                            <option value={3}>Alert 3: Critical movement observed</option>
                                             </Select>
                                         </FormControl>
                                     </Grid>
