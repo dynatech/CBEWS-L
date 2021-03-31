@@ -503,7 +503,7 @@ export default function MOMS() {
         setFilename("");
         setUploadOpen(false);
     };
-
+    
     return (
         <Fragment>
         {/* MOMS Table component */}
@@ -652,19 +652,26 @@ export default function MOMS() {
                                     </Grid>
                                     <Grid item xs={12}>
                                         {/* Alert Level */}
-                                        <TextField
-                                            key="alert_level_txt"
-                                            name="alert_level_txt"
-                                            label={"Alert Level"}
-                                            type="number"
-                                            // inputProps={{maxLength :1}}
-                                            helperText={"Alert 0 (Min) to Alert 3 (Max)"}
+                                        <FormControl variant="outlined" className={classes.formControl} fullWidth>
+                                            <InputLabel htmlFor="outlined-age-native-simple">Alert Level</InputLabel>
+                                            <Select
+                                            native
+                                            value={values.alert_level}
                                             onChange={handleChange("alert_level")}
                                             onBlur={handleBlur("alert_level")}
-                                            defaultValue={values.alert_level}
-                                            variant="outlined"
-                                            fullWidth
-                                        />
+                                            label={"Alert Level"}
+                                            inputProps={{
+                                                name: 'alert_level',
+                                                id: 'outlined-alert_level-native-simple',
+                                            }}
+                                            helperText={"Alert 0 (Min) to Alert 3 (Max)"}
+                                            >
+                                            <option aria-label="None" value="" />
+                                            <option value={0}>Alert 0</option>
+                                            <option value={2}>Alert 2</option>
+                                            <option value={3}>Alert 3</option>
+                                            </Select>
+                                        </FormControl>
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Typography>* All fields are required</Typography>
