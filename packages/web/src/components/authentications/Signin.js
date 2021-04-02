@@ -67,6 +67,7 @@ export default function SignInSide(props) {
     const loginSeverityRef = useRef();
 
     const handleChangeRoute = route => {
+        window.location.reload();
         props.history.push(`/${route}`);
     };
 
