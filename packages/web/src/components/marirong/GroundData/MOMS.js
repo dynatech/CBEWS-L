@@ -230,11 +230,14 @@ export default function MOMS() {
         "alert_level": ""
     });
 
-    // TEST
     const options = {
+        filter: true,
+        selectableRows: false,
+        selectableRowsOnClick: false,
         filterType: "checkbox",
-        fixedHeader: true,
+        responsive: "vertical",
     };
+
     const columns = [
         { name: "observance_ts", label: "Observance TS" },
         { name: "remarks", label: "Description" },
@@ -516,6 +519,7 @@ export default function MOMS() {
                         data={{
                             columns: columns,
                             rows: tableData,
+                            options: options,
                         }}
                         handlers={{
                             handleAdd,
