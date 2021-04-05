@@ -454,11 +454,11 @@ class AlertGeneration():
             trigger_source (str) - 
             alert_level (int) - 
         """
-        select_option = "ots.*"
+        select_option = "ots.*, th.*"
         if return_col:
             select_option = return_col
         query = f"SELECT {select_option} FROM operational_trigger_symbols as ots "
-        query += "INNER JOIN trigger_hierarchies as th USING (source_id) "
+        query += "INNER JOIN trigger_hierarchies as th ON ots.source_id = th.id "
         query += f"WHERE th.trigger_source = '{trigger_source}' "
         query += f"AND ots.alert_level = {alert_level}"
 

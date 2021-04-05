@@ -82,7 +82,7 @@ class GroundData():
                 FROM
                     marker_data md
                         JOIN
-                    site_markers sm ON (sm.marker_id = md.marker_id)
+                    marker_names mn ON (mn.history_id = md.marker_id)
                 WHERE
                     mo_id = {mo_id}; 
             """

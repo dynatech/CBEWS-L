@@ -24,9 +24,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
     <CookiesProvider>
-      <BrowserRouter>
         <RouterApp />
-      </BrowserRouter>
     </CookiesProvider>
     </ThemeProvider>
   );

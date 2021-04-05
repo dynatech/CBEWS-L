@@ -14,36 +14,38 @@ import SigninIloilo from '../components/iloilo_pdrrmo/authentication/Signin';
 import IloiloDashboard from '../components/iloilo_pdrrmo/IloIloDashboard';
 
 import { useCookies } from "react-cookie";
+import {DashRedirectIfLoggedIn, PrivateRoute} from './RouteType';
 
 function RouterApp() {
-  const [cookies, setCookies] = useCookies(['credentials']);
+  const [cookies] = useCookies(['credentials']);
   const component_object = {
     29: (
       <Fragment>
-        <Route path='/dashboard' component={MarDashboard} />
+        <Route exact path="/dashboard" component={MarDashboard} />
       </Fragment>
     ),
     50: (
       <Fragment>
-        <Route path='/dashboard' component={UmiDashboard} />
+        <Route exact path="/dashboard" component={UmiDashboard} />
       </Fragment>
     )
   }
   const site_id = "credentials" in cookies && "site_id" in cookies.credentials ? cookies.credentials.site_id : null;
   return (
     <BrowserRouter>
-      <Switch>
         {
           site_id !== null && (component_object[parseInt(site_id)])
         }
-        <Route path='/forgot-password' component={ForgotPassword} /> 
-        <Route path='/signup' component={SignUp} />
-        <Route path='/signin' component={Signin} />
-        <Route exact path='/' component={DownloadPage} />
+        <Switch>
         {/* PDRRMO SECTION */}
-        <Route path='/iloilo/signin' component={SigninIloilo} />
-        <Route path='/iloilo/dashboard' component={IloiloDashboard} />
+        <Route path="/iloilo/signin" component={SigninIloilo} />
+        <Route path="/iloilo/dashboard" component={IloiloDashboard} />
         {/* PDRRMO SECTION */}
+        <Route exact path="/forgot-password" component={ForgotPassword} /> 
+        <Route exact path="/signup" component={SignUp} />
+        <DashRedirectIfLoggedIn exact path="/signin" component={Signin} />
+        <DashRedirectIfLoggedIn exact path="/" component={DownloadPage} />
+
         <Route component={PageNotFound} />
       </Switch>
     </BrowserRouter>

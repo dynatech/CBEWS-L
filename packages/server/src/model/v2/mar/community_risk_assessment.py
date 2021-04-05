@@ -7,8 +7,8 @@ schema = "cbewsl_mar_collections"
 class CommunityRiskAssessment():
 
 	def create_cav(data):
-		query = f"INSERT INTO capacity_and_vulnerability VALUES (0, '{data['resource']}', {data['quantity']}, '{data['stat_desc']}', " \
-				f"'{data['owner']}', '{data['in_charge']}', '{data['updater']}', '{data['date']}', {data['user_id']}, '{str(data['last_ts'])}')"
+		query = f"INSERT INTO capacity_and_vulnerability VALUES (0, '{data['resource']}', '{data['quantity']}', '{data['stat_desc']}', " \
+				f"'{data['owner']}', '{data['in_charge']}', '{data['updater']}', '{str(data['date'])}', '{data['user_id']}', '{str(data['last_ts'])}')"
 		try:
 			id = DB.db_modify(query, schema, True)
 		except Exception as err:

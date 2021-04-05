@@ -1,9 +1,9 @@
 // const AppDir = "'C:\\Users\\John Louie"
-const AppDir = "/home/dynaslope"
+ const AppDir = "/home/dynaslope"
+// const AppDir = "/home/pulidongz/Projects/CBEWS-L"
 
-const web_ip = "https://dynaslope.phivolcs.dost.gov.ph"
-// const web_ip = "http://192.168.1.186"
-// const web_ip = "http://192.168.42.226"
+ const web_ip = "https://dynaslope.phivolcs.dost.gov.ph"
+// const web_ip = "http://192.168.0.172"
 
 const AppConfig = {
     HOSTNAME: `${web_ip}:5000`,
