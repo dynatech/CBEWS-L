@@ -26,6 +26,14 @@ import { ButtonStyle } from "../../styles/button_style";
 import { LabelStyle } from "../../styles/label_style";
 import { Formik, Form, Field } from "formik";
 
+function validateIfEmpty(value, touched) {
+    let error;
+    if (touched && !value.propKey) {
+      error = '*Required';
+    }
+    return error;
+  }
+
 function ReusableInput(props) {
     const {
         propKey,
@@ -34,7 +42,7 @@ function ReusableInput(props) {
         handleBlur,
         handleChange,
         reference,
-        originalProps
+        originalProps,
     } = props;
     let label = temp[0].toUpperCase() + temp.slice(1);
     label = label.replace("_", " ");
@@ -58,6 +66,7 @@ function ReusableInput(props) {
                     onChange={handleChange(`${key}`)}
                     onBlur={handleBlur(`${key}`)}
                     defaultValue={value}
+                    type="string"
                     required
                 />
             </Grid>
@@ -74,7 +83,9 @@ function ReusableInput(props) {
                     onChange={handleChange(`${key}`)}
                     onBlur={handleBlur(`${key}`)}
                     defaultValue={value}
+                    required
                 />
+                
             </Grid>
         );
     } else if (propKey in reference.ts) {
@@ -114,6 +125,13 @@ export default function Forms(props) {
     return (
         <Formik
             initialValues={defaultValues}
+            validate={(values, touched) => {
+               const errors = {};
+               if (touched && !values) {
+                   errors = 'Required';
+                 }
+                 return errors;
+               }}
             onSubmit={(values) => {
                 formData.current = values;
                 submitForm();
@@ -123,16 +141,18 @@ export default function Forms(props) {
                 return (
                     <form className={classes.form} >
                         <Grid container spacing={1}>
-                            {Object.entries(defaultValues).map((e, l) => {
+                            {Object.entries(defaultValues).map((e, key) => {
                                 const reference = { string, int, ts };
                                 return (
                                     <ReusableInput
+                                        key={key}
                                         propKey={e[0]}
                                         label={e[0]}
                                         value={e[1]}
                                         reference={reference}
                                         handleBlur={handleBlur}
                                         handleChange={handleChange}
+                                        required
                                     />
                                 );
                             })}
