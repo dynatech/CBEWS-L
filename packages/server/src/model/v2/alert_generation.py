@@ -114,7 +114,7 @@ class AlertGeneration():
         """
         query = f"UPDATE senslopedb.operational_triggers "
         query += f"SET trigger_sym_id={trig_sym_id}, ts_updated='{ts_updated}' "
-        query += f"WHERE trigger_id = {op_trig_id}"
+        query += f"WHERE id = {op_trig_id}"
 
 
         schema = "senslopedb"
