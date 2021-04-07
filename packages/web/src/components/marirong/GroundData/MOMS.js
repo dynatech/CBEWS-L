@@ -544,7 +544,7 @@ export default function MOMS() {
                             color="primary"
                             aria-label="add" className={classes.button_fluid}
                             onClick={() => setOpen(true)}>
-                            Add Entry
+                            Add Manifestation of Movements
                         </Fab>
                     </Grid>
                     <Grid item xs={4} />
@@ -554,7 +554,7 @@ export default function MOMS() {
 
         {/* Add Entry modal */}
         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-            <DialogTitle id="form-dialog-title">Manifestation of Movement {command} Entry</DialogTitle>
+            <DialogTitle id="form-dialog-title">Manifestation of Movements {command} Entry</DialogTitle>
             <DialogContent>
                 <Formik
                     initialValues={defaultStrValues}
@@ -575,7 +575,7 @@ export default function MOMS() {
                                                     console.log("value",value);
                                                     setObservanceTS(value);
                                                 }}
-                                                label="Obs Trial"
+                                                label="Observance Timestamp"
                                                 onError={console.log}
                                                 // minDate={moment("2018-01-01 00:00:00").format("YYYY-MM-DD HH:mm:ss")}
                                                 format="yyyy-MM-dd HH:mm:ss"
@@ -671,9 +671,9 @@ export default function MOMS() {
                                             helperText={"Alert 0 (Min) to Alert 3 (Max)"}
                                             >
                                             <option aria-label="None" value="" />
-                                            <option value={0}>Alert 0: No significant movement observed</option>
-                                            <option value={2}>Alert 2: Significant movement observed</option>
-                                            <option value={3}>Alert 3: Critical movement observed</option>
+                                            <option value={0}>No significant movement observed</option>
+                                            <option value={2}>Significant movement observed</option>
+                                            <option value={3}>Critical movement observed</option>
                                             </Select>
                                         </FormControl>
                                     </Grid>
