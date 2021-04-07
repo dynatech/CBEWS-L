@@ -271,7 +271,7 @@ function PDFPreviewer(props) {
             setNotifText("Success in sending PDF");
         } else {
             setNotifStatus("error");
-            setNotifText("Problem in PDF");
+            setNotifText("Email report failed to send");
         }
         setOpenNotif(true);
         setEmailOpen(false);
