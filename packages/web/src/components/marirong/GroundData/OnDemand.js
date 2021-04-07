@@ -25,7 +25,6 @@ import MuiAlert from '@material-ui/lab/Alert';
 
 import { MarGroundData, AppConfig } from '@dynaslope/commons';
 import { jsPDF } from "jspdf";
-import autoTable from 'jspdf-autotable';
 import CsvDownloader from 'react-csv-downloader';
 
 import letter_header from '../../../assets/letter_header.png';
@@ -99,12 +98,15 @@ export default function OnDemand() {
 
             // Populate MUI Table
             setRows(response.data);
-            setNotifStatus("success");
+            // Disable FetchData success notification
+            // setNotifStatus("success");
+            // setNotifText(response.message);
+            // setOpenNotif(true);
         } else {
             setNotifStatus("error");
-        }
-        setNotifText(response.message);
-        setOpenNotif(true);
+            setNotifText(response.message);
+            setOpenNotif(true);
+        } 
     };
 
     const handleDownload = () => {
@@ -150,14 +152,14 @@ export default function OnDemand() {
     };
 
     const handleClickOpenRaise = row => () => {
-      setODInput(row);
-      setOpenRaise(true);
+        setODInput(row);
+        setOpenRaise(true);
     };
-  
+
     const handleCloseRaise = () => {
-      setODInput(default_vars);
-      setOpenRaise(false);
-    };
+        setODInput(default_vars);
+        setOpenRaise(false);
+      };
 
     const handleChangeValue = key => event => {
         const { value } = event.target;
@@ -180,7 +182,6 @@ export default function OnDemand() {
         console.log(response);
         if (response.status === true) {
             handleClose();
-            setODInput(default_vars);
             setNotifStatus("success");
             initOnDemand();
         } else {
@@ -192,16 +193,16 @@ export default function OnDemand() {
     }
 
     const handleRaise = async () => {
-        console.log("raise_input", od_input);
-        const response = await MarGroundData.RaiseOnDemandAlert({
-            "site_id": AppConfig.CONFIG.site_id,
-            "timestamp": od_input.ts
-        });
-        if (response.ok) {
+        var raise_input = {
+            "site_id": od_input.site_id,
+            "timestamp": moment().format("YYYY-MM-DD hh:mm:ss")
+        }
+        const response = await MarGroundData.RaiseOnDemandAlert(raise_input);
+        Alert(JSON.stringify(response));
+        if (response.status === true) {
             console.log(response);
-            handleClose();
+            handleCloseRaise();
             setNotifStatus("success");
-            setODInput(default_vars);
         } else {
             setODInput(default_vars);
             setNotifStatus("error");
@@ -280,83 +281,74 @@ export default function OnDemand() {
                 </Grid>
             </Grid>
         </Container>
-
+        
+        {/* MODAL: Add On-Demand Monitoring */}
         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-            <DialogTitle id="form-dialog-title">Capacity and Vulnerability</DialogTitle>
+            <DialogTitle id="form-dialog-title">Add On-Demand Monitoring</DialogTitle>
             <DialogContent>
-            <MuiPickersUtilsProvider utils={MomentUtils}>
-                <KeyboardDatePicker
-                    disableToolbar
-                    variant="inline"
-                    format="MM-DD-YYYY HH:mm:ss"
-                    margin="normal"
-                    id="date-picker-start"
-                    label="Date time"
-                    KeyboardButtonProps={{
-                        'aria-label': 'change date',
-                    }}
+                <MuiPickersUtilsProvider utils={MomentUtils}>
+                    <KeyboardDatePicker
+                        disableToolbar
+                        variant="inline"
+                        format="MM-DD-YYYY HH:mm:ss"
+                        margin="normal"
+                        id="date-picker-start"
+                        label="Date time"
+                        KeyboardButtonProps={{
+                            'aria-label': 'change date',
+                        }}
+                        fullWidth
+                        value={od_input.ts}
+                        onChange={dateHandler}
+                    />
+                </MuiPickersUtilsProvider>
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    id="name"
+                    label="Reporter"
+                    type="email"
                     fullWidth
-                    value={od_input.ts}
-                    onChange={dateHandler}
+                    value={od_input.reporter}
+                    onChange={handleChangeValue("reporter")}
                 />
-            </MuiPickersUtilsProvider>
-             <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Reporter"
-                type="email"
-                fullWidth
-                value={od_input.reporter}
-                onChange={handleChangeValue("reporter")}
-            />
-            <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Reason for monitoring"
-                type="email"
-                fullWidth
-                value={od_input.reason}
-                onChange={handleChangeValue("reason")}
-            />
-            <FormControl className={classes.formControl} fullWidth>
-                <InputLabel shrink id="demo-simple-select-placeholder-label-label">
-                    Alert Level
-                </InputLabel>
-                <Select
-                    labelId="demo-simple-select-placeholder-label-label"
-                    id="demo-simple-select-placeholder-label"
-                    value={od_input.alert_level}
-                    onChange={handleChangeValue("alert_level")}
-                >   
-                    <MenuItem value={1}><em>Alert 1</em></MenuItem>
-                    <MenuItem value={2}>Alert 2</MenuItem>
-                    <MenuItem value={3}>Alert 3</MenuItem>
-                </Select>
-            </FormControl>
-             {/* <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Attachment"
-                type="email"
-                fullWidth
-                onChange={handleChangeValue("attachm")}
-            /> */}
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    id="name"
+                    label="Reason for monitoring"
+                    type="email"
+                    fullWidth
+                    value={od_input.reason}
+                    onChange={handleChangeValue("reason")}
+                />
+                <FormControl className={classes.formControl} fullWidth>
+                    <InputLabel shrink id="demo-simple-select-placeholder-label-label">
+                        Alert Level
+                    </InputLabel>
+                    <Select
+                        labelId="demo-simple-select-placeholder-label-label"
+                        id="demo-simple-select-placeholder-label"
+                        value={od_input.alert_level}
+                        onChange={handleChangeValue("alert_level")}
+                    >   
+                        <MenuItem value={1}><em>Alert 1</em></MenuItem>
+                        <MenuItem value={2}>Alert 2</MenuItem>
+                        <MenuItem value={3}>Alert 3</MenuItem>
+                    </Select>
+                </FormControl>
             </DialogContent>
             <DialogActions>
-            <Button onClick={handleClose} color="primary">
-                Cancel
-            </Button>
-            <Button onClick={handleSubmit} color="primary">
-                Confirm
-            </Button>
+                <Button onClick={handleClose} color="primary">
+                    Cancel
+                </Button>
+                <Button onClick={handleSubmit} color="primary">
+                    Confirm
+                </Button>
             </DialogActions>
         </Dialog>
 
-
-
+        {/* MODAL: Raise On-demand monitoring? */}
         <Dialog
             open={openRaise}
             onClose={handleCloseRaise}

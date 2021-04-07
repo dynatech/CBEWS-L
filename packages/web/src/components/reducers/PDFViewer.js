@@ -1,12 +1,20 @@
 import React, { useState, useRef } from 'react';
 import { renderToString } from 'react-dom/server';
 import { Grid, Paper, Typography, Box, Fab } from '@material-ui/core';
+
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+
 import { makeStyles } from '@material-ui/core/styles';
 import EmailModal from './EmailModal';
 import moment from "moment";
 import TransitionalModal from "./pdrrmo_iloilo/loading";
 import { MarMaintenanceLogs, UmiFieldSurvey, UmiSituationReport } from "@dynaslope/commons";
 import Pdf from 'react-to-pdf';
+
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const imageStyle = makeStyles(theme => ({
     img_size: {
@@ -32,6 +40,20 @@ function getWindowDimensions() {
         height
     };
 }
+
+const thStyle = {
+    wordWrap: "break-word",
+};
+
+const tdStyle = {
+    wordWrap: "break-word",
+    textAlign: "center"
+};
+
+const options = {
+    orientation: 'p',
+    format: 'a4'
+};
 
 function convertToSimpleHTML(data_type, data) {
     let return_element = null;
@@ -59,14 +81,14 @@ function convertToSimpleHTML(data_type, data) {
                         <h3>Umi Situation Report</h3>
                         <table border={1}>
                             <tr>
-                                <th width={300}>Date</th>
-                                <th width={1000}>Summary</th>
+                                <th width={300} style={thStyle}>Date</th>
+                                <th width={1000} style={thStyle}>Summary</th>
                             </tr>
                             {
                                 data.map((row) => (
                                     <tr>
-                                        <td width={300}>{row.report_ts}</td>
-                                        <td width={1000}>{row.report_summary}</td>
+                                        <td width={300} style={thStyle}>{row.report_ts}</td>
+                                        <td width={1000} style={thStyle}>{row.report_summary}</td>
                                     </tr>
                                 ))
                             }
@@ -80,28 +102,28 @@ function convertToSimpleHTML(data_type, data) {
                 return_element = (
                     <table style={{width: "30%", borderSpacing: "5px", marginLeft: "10%"}}>
                         <tr>
-                            <td width={400}><strong>Date:</strong></td>
-                            <td width={700}>{survey_rep.report_date}</td>
+                            <td width={400} style={thStyle}><strong>Date:</strong></td>
+                            <td width={700} style={thStyle}>{survey_rep.report_date}</td>
                         </tr>
                         <tr>
-                            <td width={400}><strong>Features:</strong></td>
-                            <td width={700}>{survey_rep.feature}</td>
+                            <td width={400} style={thStyle}><strong>Features:</strong></td>
+                            <td width={700} style={thStyle}>{survey_rep.feature}</td>
                         </tr>
                         <tr>
-                            <td width={400}><strong>Materials Characterization:</strong></td>
-                            <td width={700}>{survey_rep.materials_characterization}</td>
+                            <td width={400} style={thStyle}><strong>Materials Characterization:</strong></td>
+                            <td width={700} style={thStyle}>{survey_rep.materials_characterization}</td>
                         </tr>
                         <tr>
-                            <td width={400}><strong>Mechanism:</strong></td>
-                            <td width={700}>{survey_rep.mechanism}</td>
+                            <td width={400} style={thStyle}><strong>Mechanism:</strong></td>
+                            <td width={700} style={thStyle}>{survey_rep.mechanism}</td>
                         </tr>
                         <tr>
-                            <td width={400}><strong>Exposure:</strong></td>
-                            <td width={700}>{survey_rep.exposure}</td>
+                            <td width={400} style={thStyle}><strong>Exposure:</strong></td>
+                            <td width={700} style={thStyle}>{survey_rep.exposure}</td>
                         </tr>
                         <tr>
-                            <td width={400}><strong>Report Narrative:</strong></td>
-                            <td width={700}>{survey_rep.report_narrative}</td>
+                            <td width={400} style={thStyle}><strong>Report Narrative:</strong></td>
+                            <td width={700} style={thStyle}>{survey_rep.report_narrative}</td>
                         </tr>
                     </table>
                 );
@@ -112,22 +134,22 @@ function convertToSimpleHTML(data_type, data) {
                         <h3>Umi Field Survey Report</h3>
                         <table border={1}>
                             <tr>
-                                <th width={300}>Date</th>
-                                <th width={300}>Features</th>
-                                <th width={300}>Materials Characterization</th>
-                                <th width={300}>Mechanism</th>
-                                <th width={300}>Exposure</th>
-                                <th width={300}>Report Narrative</th>
+                                <th width={300} style={thStyle}>Date</th>
+                                <th width={300} style={thStyle}>Features</th>
+                                <th width={300} style={thStyle}>Materials Characterization</th>
+                                <th width={300} style={thStyle}>Mechanism</th>
+                                <th width={300} style={thStyle}>Exposure</th>
+                                <th width={300} style={thStyle}>Report Narrative</th>
                             </tr>
                             {
                                 data.map((row) => (
                                     <tr>
-                                        <td width={300}>{row.report_date}</td>
-                                        <td width={1000}>{row.feature}</td>
-                                        <td width={300}>{row.materials_characterization}</td>
-                                        <td width={1000}>{row.mechanism}</td>
-                                        <td width={300}>{row.exposure}</td>
-                                        <td width={1000}>{row.report_narrative}</td>
+                                        <td width={300} style={tdStyle}>{row.report_date}</td>
+                                        <td width={1000} style={tdStyle}>{row.feature}</td>
+                                        <td width={300} style={tdStyle}>{row.materials_characterization}</td>
+                                        <td width={1000} style={tdStyle}>{row.mechanism}</td>
+                                        <td width={300} style={tdStyle}>{row.exposure}</td>
+                                        <td width={1000} style={tdStyle}>{row.report_narrative}</td>
                                     </tr>
                                 ))
                             }
@@ -143,20 +165,20 @@ function convertToSimpleHTML(data_type, data) {
                         <h3>Umi Maintenance Report</h3>
                         <table border={1}>
                             <tr>
-                                <th width={300}>Date</th>
-                                <th width={300}>Features</th>
-                                <th width={300}>Materials Characterization</th>
-                                <th width={200}>Mechanism</th>
-                                <th width={200}>Exposure</th>
+                                <th width={300} style={thStyle}>Date</th>
+                                <th width={300} style={thStyle}>Features</th>
+                                <th width={300} style={thStyle}>Materials Characterization</th>
+                                <th width={200} style={thStyle}>Mechanism</th>
+                                <th width={200} style={thStyle}>Exposure</th>
                             </tr>
                             {
                                 data.map((row) => (
                                     <tr>
-                                        <td width={300}>{sensor_main.timestamp}</td>
-                                        <td width={300}>{sensor_main.remarks}</td>
-                                        <td width={300}>{sensor_main.rain_gauge_status}</td>
-                                        <td width={200}>{sensor_main.working_nodes}</td>
-                                        <td width={200}>{sensor_main.anomalous_nodes}</td>
+                                        <td width={300} style={tdStyle}>{sensor_main.timestamp}</td>
+                                        <td width={300} style={tdStyle}>{sensor_main.remarks}</td>
+                                        <td width={300} style={tdStyle}>{sensor_main.rain_gauge_status}</td>
+                                        <td width={200} style={tdStyle}>{sensor_main.working_nodes}</td>
+                                        <td width={200} style={tdStyle}>{sensor_main.anomalous_nodes}</td>
                                     </tr>
                                 ))
                             }
@@ -170,16 +192,16 @@ function convertToSimpleHTML(data_type, data) {
                         <h3>Mar Incident Report</h3>
                         <table border={1}>
                             <tr>
-                                <th width={300}>Date</th>
-                                <th width={200}>Report Narrative</th>
-                                <th width={200}>Reporter</th>
+                                <th width={300} style={thStyle}>Date</th>
+                                <th width={200} style={thStyle}>Report Narrative</th>
+                                <th width={200} style={thStyle}>Reporter</th>
                             </tr>
                             {
                                 data.map((row) => (
                                     <tr>
-                                        <td width={300}>{row.incident_date}</td>
-                                        <td width={200}>{row.incident_report_narrative}</td>
-                                        <td width={200}>{row.reporter}</td>
+                                        <td width={300} style={tdStyle}>{row.incident_date}</td>
+                                        <td width={200} style={tdStyle}>{row.incident_report_narrative}</td>
+                                        <td width={200} style={tdStyle}>{row.reporter}</td>
                                     </tr>
                                 ))
                             }
@@ -191,22 +213,22 @@ function convertToSimpleHTML(data_type, data) {
                 return_element = (
                     <div>
                         <h3>Mar Maintenance Report</h3>
-                        <table border={1}>
+                        <table border={1} style={{width: "100%"}}>
                             <tr>
-                                <th width={200}>Date</th>
-                                <th width={200}>Type</th>
-                                <th width={200}>Remarks</th>
-                                <th width={200}>In-Charge</th>
-                                <th width={200}>Updater</th>
+                                <th width={150} style={thStyle}>Date</th>
+                                <th width={350} style={thStyle}>Type</th>
+                                <th width={350} style={thStyle}>Remarks</th>
+                                <th width={125} style={thStyle}>In-Charge</th>
+                                <th width={125} style={thStyle}>Updater</th>
                             </tr>
                             {
                                 data.map((row) => (
                                     <tr>
-                                        <td width={200}>{row.maintenance_date}</td>
-                                        <td width={200}>{row.type}</td>
-                                        <td width={200}>{row.remarks}</td>
-                                        <td width={200}>{row.in_charge}</td>
-                                        <td width={200}>{row.updater}</td>
+                                        <td width={150} style={tdStyle}>{row.maintenance_date}</td>
+                                        <td width={350} style={tdStyle}>{row.type}</td>
+                                        <td width={350} style={tdStyle}>{row.remarks}</td>
+                                        <td width={125} style={tdStyle}>{row.in_charge}</td>
+                                        <td width={125} style={tdStyle}>{row.updater}</td>
                                     </tr>
                                 ))
                             }
@@ -229,6 +251,10 @@ function PDFPreviewer(props) {
     const { date, data, dataType: data_type, noImport, classes, handleDownload } = props;
     const [emailOpen, setEmailOpen] = useState(false);
 
+    const [openNotif, setOpenNotif] = useState(false);
+    const [notifText, setNotifText] = useState("");
+    const [notifStatus, setNotifStatus] = useState('success');
+
     const download_ref = useRef();
 
     const html_string = data.length > 0 ? convertToSimpleHTML(data_type, data) : (<Typography>No data</Typography>);
@@ -241,11 +267,14 @@ function PDFPreviewer(props) {
         });
         if (response.status === true) {
             console.log("Success in sending PDF");
-            alert(response.message);
-            setEmailOpen(false);
+            setNotifStatus("success");
+            setNotifText("Success in sending PDF");
         } else {
-            console.log("problem in PDF");
+            setNotifStatus("error");
+            setNotifText("Email report failed to send");
         }
+        setOpenNotif(true);
+        setEmailOpen(false);
     };
 
     const [modal, setModal] = useState([<TransitionalModal status={false} />]);
@@ -277,7 +306,7 @@ function PDFPreviewer(props) {
                                 <img src={require('../../assets/letter_header.png')} className={img.img_size} alt="footer" />
                             </header>
                         )}
-                        <body style={{ margin: "5%"}}>
+                        <body style={{ margin: "5%", height: "400px"}}>
                             {html_string}
                         </body>
                         {!noImport && (
@@ -297,9 +326,9 @@ function PDFPreviewer(props) {
                         style={{ paddingTop: 20 }}
                         spacing={2}
                     >
-                        <Grid item xs={4} />
-                        <Grid item xs={2}>
-                            <Pdf targetRef={download_ref} filename="download.pdf">
+                        <Grid item xs={2} />
+                        <Grid item xs={4}>
+                            <Pdf targetRef={download_ref} filename="download.pdf" options={options} x={0} y={0} scale={1.92}>
                                 {({ toPdf }) =>     
                                     <Fab
                                         variant="extended"
@@ -314,7 +343,7 @@ function PDFPreviewer(props) {
                                }
                             </Pdf>
                         </Grid>
-                        <Grid item xs={2}>
+                        <Grid item xs={4}>
                             <Fab
                                 variant="extended"
                                 color="primary"
@@ -326,7 +355,7 @@ function PDFPreviewer(props) {
                                 Email
                             </Fab>
                         </Grid>
-                        <Grid item xs={4} />
+                        <Grid item xs={2} />
                     </Grid>
                     <EmailModal
                         open={emailOpen}
@@ -337,6 +366,16 @@ function PDFPreviewer(props) {
                 </Grid>
             )}
             {modal}
+
+        <Snackbar open={openNotif} 
+            autoHideDuration={3000} 
+            onClose={() => {setOpenNotif(false)}}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            key={'top,right'}>
+                <Alert onClose={() => {setOpenNotif(false)}} severity={notifStatus}>
+                    {notifText}
+                </Alert>
+        </Snackbar>
         </Box>
     );
 }

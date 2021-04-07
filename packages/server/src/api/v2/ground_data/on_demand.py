@@ -66,19 +66,23 @@ def add():
 @ON_DEMAND_BLUEPRINT.route("/raise/ground_data/on_demand", methods=["POST"])
 def raise_on_demand():
     try:
-        print(request.get_json())
+        print(request.get_json(), "\n")
         (site_id, timestamp) = request.get_json().values()
 
         trigger_sym_id = AlertGen.get_operational_trigger_symbol(
                                     trigger_source='on demand',
-                                    alert_level=1,
+                                    alert_level=1,          # alert_level for on-demand default = 1
                                     return_col="trigger_sym_id")
+
+        print("trigger_sym_id:", trigger_sym_id, "\n")
 
         op_trig_data_dict = AlertGen.fetch_recent_operational_trigger(
             AlertGen,
             site_id=site_id,
             trig_sym_id=trigger_sym_id
         )
+
+        print("op_trig_data_dict:", op_trig_data_dict, "\n")
 
         # If nothing exists in database:
         if not op_trig_data_dict:
@@ -98,12 +102,13 @@ def raise_on_demand():
 
         od_data_return = {
             "status": True,
-            "message": "Successfully added new on demand data."
+            "message": "Successfully raised on-demand data."
         }
     except Exception as err:
         raise(err)
         od_data_return = {
             "status": False,
-            "message": f"Failed to add OD data."
+            "message": f"Failed to raise on-demand data."
         }
+
     return jsonify(od_data_return)

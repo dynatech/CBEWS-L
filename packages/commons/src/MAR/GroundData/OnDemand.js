@@ -70,9 +70,9 @@ const GetOnDemandData = () => {
 //     });
 // };
 
-const RaiseOnDemandAlert = () => {
+const RaiseOnDemandAlert = (data) => {
     return fetch(`${AppConfig.HOSTNAME}/v2/raise/ground_data/on_demand`, {
-        method: 'DELETE',
+        method: 'POST',
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
