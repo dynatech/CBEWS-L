@@ -16,7 +16,8 @@ import MuiAlert from '@material-ui/lab/Alert';
 
 import {
     MuiPickersUtilsProvider,
-    DateTimePicker
+    DateTimePicker,
+    KeyboardDateTimePicker
 } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import moment from 'moment';
@@ -435,7 +436,7 @@ function SurficialMarker() {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Ground Measurement</DialogTitle>
+                <DialogTitle id="alert-dialog-title">Add Ground Measurement</DialogTitle>
                 <DialogContent>
                     <MuiPickersUtilsProvider utils={MomentUtils}>
                         <DateTimePicker
@@ -503,7 +504,7 @@ function SurficialMarker() {
                                 color="primary"
                                 aria-label="add" className={classes.button_fluid}
                                 onClick={handleClickOpen}>
-                                Add Ground Measurement
+                                Add Ground Measurements
                             </Fab>
                         </Grid>
                         <Grid item xs={2}>
@@ -533,7 +534,7 @@ function SurficialMarker() {
 
             {/* Modal for Add Ground Measurement */}
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Ground Measurement</DialogTitle>
+                <DialogTitle id="form-dialog-title">Add Ground Measurement</DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
