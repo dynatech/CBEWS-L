@@ -85,8 +85,8 @@ function convertToSimpleHTML(data_type, data) {
                                 <th width={1000} style={thStyle}>Summary</th>
                             </tr>
                             {
-                                data.map((row) => (
-                                    <tr>
+                                data.map((row, i) => (
+                                    <tr key={i}>
                                         <td width={300} style={thStyle}>{row.report_ts}</td>
                                         <td width={1000} style={thStyle}>{row.report_summary}</td>
                                     </tr>
@@ -142,8 +142,8 @@ function convertToSimpleHTML(data_type, data) {
                                 <th width={300} style={thStyle}>Report Narrative</th>
                             </tr>
                             {
-                                data.map((row) => (
-                                    <tr>
+                                data.map((row, i) => (
+                                    <tr key={i}>
                                         <td width={300} style={tdStyle}>{row.report_date}</td>
                                         <td width={1000} style={tdStyle}>{row.feature}</td>
                                         <td width={300} style={tdStyle}>{row.materials_characterization}</td>
@@ -163,22 +163,22 @@ function convertToSimpleHTML(data_type, data) {
                 return_element = (
                     <div>
                         <h3>Umi Maintenance Report</h3>
-                        <table border={1}>
+                        <table border={1} style={{width: "100%"}}>
                             <tr>
-                                <th width={300} style={thStyle}>Date</th>
-                                <th width={300} style={thStyle}>Features</th>
-                                <th width={300} style={thStyle}>Materials Characterization</th>
-                                <th width={200} style={thStyle}>Mechanism</th>
-                                <th width={200} style={thStyle}>Exposure</th>
+                                <th width={220} style={thStyle}>Date</th>
+                                <th width={330} style={thStyle}>Features</th>
+                                <th width={350} style={thStyle}>Materials Characterization</th>
+                                <th width={125} style={thStyle}>Mechanism</th>
+                                <th width={125} style={thStyle}>Exposure</th>
                             </tr>
                             {
-                                data.map((row) => (
-                                    <tr>
-                                        <td width={300} style={tdStyle}>{sensor_main.timestamp}</td>
-                                        <td width={300} style={tdStyle}>{sensor_main.remarks}</td>
-                                        <td width={300} style={tdStyle}>{sensor_main.rain_gauge_status}</td>
-                                        <td width={200} style={tdStyle}>{sensor_main.working_nodes}</td>
-                                        <td width={200} style={tdStyle}>{sensor_main.anomalous_nodes}</td>
+                                data.map((row, i) => (
+                                    <tr key={i}>
+                                        <td width={220} style={tdStyle}>{row.timestamp}</td>
+                                        <td width={330} style={tdStyle}>{row.remarks}</td>
+                                        <td width={350} style={tdStyle}>{row.rain_gauge_status}</td>
+                                        <td width={125} style={tdStyle}>{row.working_nodes}</td>
+                                        <td width={125} style={tdStyle}>{row.anomalous_nodes}</td>
                                     </tr>
                                 ))
                             }
@@ -197,8 +197,8 @@ function convertToSimpleHTML(data_type, data) {
                                 <th width={200} style={thStyle}>Reporter</th>
                             </tr>
                             {
-                                data.map((row) => (
-                                    <tr>
+                                data.map((row, i) => (
+                                    <tr key={i}>
                                         <td width={300} style={tdStyle}>{row.incident_date}</td>
                                         <td width={200} style={tdStyle}>{row.incident_report_narrative}</td>
                                         <td width={200} style={tdStyle}>{row.reporter}</td>
@@ -222,8 +222,8 @@ function convertToSimpleHTML(data_type, data) {
                                 <th width={125} style={thStyle}>Updater</th>
                             </tr>
                             {
-                                data.map((row) => (
-                                    <tr>
+                                data.map((row, i) => (
+                                    <tr key={i}>
                                         <td width={150} style={tdStyle}>{row.maintenance_date}</td>
                                         <td width={350} style={tdStyle}>{row.type}</td>
                                         <td width={350} style={tdStyle}>{row.remarks}</td>
@@ -266,9 +266,9 @@ function PDFPreviewer(props) {
             "date": moment(date).format("YYYY-MM-DD hh:mm:ss")
         });
         if (response.status === true) {
-            console.log("Success in sending PDF");
+            console.log("Email report sent successfully");
             setNotifStatus("success");
-            setNotifText("Success in sending PDF");
+            setNotifText("Email report sent successfully");
         } else {
             setNotifStatus("error");
             setNotifText("Email report failed to send");

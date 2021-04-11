@@ -360,7 +360,7 @@ export default function MaintenanceLogs() {
                                 <PDFViewer
                                     date={defaultTSValues["Timestamp"]}
                                     data={tableData}
-                                    dataType="mar_maintenance_report"
+                                    dataType="umi_maintenance_report"
                                     classes={classes}
                                     handleDownload={handleDownloadReport}
                                 />
