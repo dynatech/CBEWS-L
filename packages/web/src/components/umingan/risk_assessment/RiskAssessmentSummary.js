@@ -127,10 +127,10 @@ export default function RiskAssessmentSummary(props) {
         obj_to_delete.forEach(e => deleteTableEntry(e.id));
         initTable();
         resetState();
-    }
+    };
 
     const deleteTableEntry = async (data) => {
-         
+
         const input = {
             id: data,
         };
