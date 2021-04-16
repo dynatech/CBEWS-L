@@ -51,8 +51,15 @@ export default function FieldSurveyLogs(props) {
     const [defaultIntValues, setDefaultIntValues] = useState({});
 
     const options = {
+        filter: true,
+        selectableRows: "multiple",
+        selectableRowsOnClick: true,
         filterType: "checkbox",
-        // selectAllDisabled: true
+        responsive: "vertical",
+        onRowsDelete: (rowsDeleted) => {
+            const idsToDelete = rowsDeleted.data.map (item => item.dataIndex)
+            handleMuiTableBatchDelete(idsToDelete.sort());
+          }
     };
     const columns = [
         { name: "report_date", label: "Report Date" },
@@ -123,6 +130,48 @@ export default function FieldSurveyLogs(props) {
     const handleDelete = (data) => {
         setSelectedData(data);
         handleOpenDelete();
+    };
+
+    const handleMuiTableBatchDelete = (data) => {
+        var obj_to_delete = [];
+        var toDelete = [];
+        
+        var temp_data = tableData.map((e, key)=>({
+            "row_id": key,
+            "id": e.id,
+        }))
+
+        for (let index = 0; index < data.length; index++) {
+            toDelete = temp_data.filter(e => e.row_id === data[index]);
+
+            if (toDelete.length) {
+                obj_to_delete.push(toDelete);
+            }
+        }
+        obj_to_delete = obj_to_delete.flat()
+        obj_to_delete.forEach(e => deleteTableEntry(e.id));
+        initTable();
+        resetState();
+    };
+
+    const deleteTableEntry = async (data) => {
+
+        const input = {
+            id: data,
+        };
+        
+        const response = await UmiFieldSurvey.DeleteFieldSurveyLogs(input);
+        if (response.status === true) {
+            setOpenNotif(true);
+            setNotifStatus("success");
+            setNotifText("Successfully deleted field survey log(s).");
+        } else {
+            setOpenNotif(true);
+            setNotifStatus("error");
+            setNotifText(
+                "Failed to delete field survey log(s). Please contact the developers or file a bug report",
+            );
+        }
     };
 
     const handleOpenDelete = () => {
@@ -208,14 +257,14 @@ export default function FieldSurveyLogs(props) {
             setOpenNotif(true);
             setNotifStatus("success");
             if (!hasModifiedRow)
-                setNotifText("Successfully added new risk summary.");
-            else setNotifText("Successfully updated risk summary.");
+                setNotifText("Successfully added newfield survey log.");
+            else setNotifText("Successfully updated field survey log(s).");
         } else {
             handleClose();
             setOpenNotif(true);
             setNotifStatus("error");
             setNotifText(
-                "Failed to update risk summary. Please review your updates.",
+                "Failed to update field survey log(s). Please review your updates.",
             );
         }
     };
@@ -232,12 +281,12 @@ export default function FieldSurveyLogs(props) {
             resetState();
             setOpenNotif(true);
             setNotifStatus("success");
-            setNotifText("Successfully deleted risk summary.");
+            setNotifText("Successfully deleted field survey log(s).");
         } else {
             setOpenNotif(true);
             setNotifStatus("error");
             setNotifText(
-                "Failed to delete risk summary. Please contact the developers or file a bug report",
+                "Failed to delete field survey log(s). Please contact the developers or file a bug report",
             );
         }
     };
@@ -251,6 +300,7 @@ export default function FieldSurveyLogs(props) {
                     data={{
                         columns: columns,
                         rows: tableData,
+                        options: options,
                     }}
                     handlers={{
                         handleAdd,
