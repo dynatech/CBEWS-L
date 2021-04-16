@@ -112,7 +112,15 @@ export default function MaintenanceLogs() {
     });
 
     const options = {
+        filter: true,
+        selectableRows: "multiple",
+        selectableRowsOnClick: true,
         filterType: "checkbox",
+        responsive: "vertical",
+        onRowsDelete: (rowsDeleted) => {
+            const idsToDelete = rowsDeleted.data.map (item => item.dataIndex)
+            handleMuiTableBatchDelete(idsToDelete.sort());
+          }
     };
     const columns = [
         { name: "maintenance_date", label: "Maintenance Date" },
@@ -189,6 +197,47 @@ export default function MaintenanceLogs() {
     const handleDelete = (data) => {
         setSelectedData(data);
         handleOpenDelete();
+    };
+
+    const handleMuiTableBatchDelete = (data) => {
+        var obj_to_delete = [];
+        var toDelete = [];
+        
+        var temp_data = tableData.map((e, key)=>({
+            "row_id": key,
+            "id": e.id,
+        }))
+
+        for (let index = 0; index < data.length; index++) {
+            toDelete = temp_data.filter(e => e.row_id === data[index]);
+
+            if (toDelete.length) {
+                obj_to_delete.push(toDelete);
+            }
+        }
+        obj_to_delete = obj_to_delete.flat()
+        obj_to_delete.forEach(e => deleteTableEntry(e.id));
+        getMaintenanceLogsPerMonth(startRange, endRange);
+        getMaintenanceLogsPerDay(selectedData.last_ts);
+        resetState();
+    };
+
+    const deleteTableEntry = async (data) => {
+        const input = {
+            id: data,
+        }; 
+        const response = await MarMaintenanceLogs.DeleteMaintenanceLogs(input);
+        if (response.status === true) {
+            setOpenNotif(true);
+            setNotifStatus("success");
+            setNotifText("Successfully deleted maintenance log data.");
+        } else {
+            setOpenNotif(true);
+            setNotifStatus("error");
+            setNotifText(
+                "Failed to delete maintenance log data. Please contact the developers or file a bug report",
+            );
+        }
     };
 
     const handleOpenDelete = () => {
@@ -423,6 +472,7 @@ export default function MaintenanceLogs() {
                                 data={{
                                     columns: columns,
                                     rows: tableData,
+                                    options: options,
                                 }}
                                 handlers={{
                                     handleAdd,
