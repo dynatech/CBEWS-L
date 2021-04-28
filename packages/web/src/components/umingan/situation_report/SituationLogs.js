@@ -57,7 +57,7 @@ export default function IncidentLogs() {
     const [uploadOpen, setUploadOpen] = useState(false);
 
     const [selectedData, setSelectedData] = useState({});
-    const [command, setCommand] = useState("add");
+    const [command, setCommand] = useState("Add");
 
     const [file_to_upload, setFileToUpload] = useState(null);
     const [filename, setFilename] = useState("");
@@ -110,7 +110,7 @@ export default function IncidentLogs() {
         if (info.event.extendedProps) {
             const data = info.event.extendedProps.data;
             console.log(data)
-
+            alert(JSON.stringify(data));
             setSelectedData(data);
             setDefaultStrValues({
                 "Report Summary": data["report_summary"],
@@ -185,7 +185,7 @@ export default function IncidentLogs() {
             );
             json.report_summary = json.ReportSummary;
             json.report_ts = moment(json["ReportTS"]).format("YYYY-MM-DD HH:mm:ss");
-            json.attachment = "n/a";
+            json.attachment_path = "n/a";
             response = await UmiSituationReport.InsertSituationReport(
                 json,
             );
@@ -209,7 +209,8 @@ export default function IncidentLogs() {
                         break;
                 }
                 temp_array.push(temp);
-            }); 
+            });
+            alert(JSON.stringify(temp_array));
             console.log("temp_array", temp_array);
             response = await UmiSituationReport.UpdateSituationReport(temp_array);
         }
@@ -335,6 +336,7 @@ export default function IncidentLogs() {
                             int: {},
                             ts: defaultTSValues,
                         }}
+                        command = {command}
                         formData={formData}
                         closeForm={() => handleClose()}
                         submitForm={() => submit()}
