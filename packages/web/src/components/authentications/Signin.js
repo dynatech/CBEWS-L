@@ -67,7 +67,10 @@ export default function SignInSide(props) {
     const loginSeverityRef = useRef();
 
     const handleChangeRoute = route => {
-        window.location.reload();
+        // Fix to redirect not always working when user is logged-in
+        if(route == "dashboard"){
+            window.location.reload();
+        }
         props.history.push(`/${route}`);
     };
 

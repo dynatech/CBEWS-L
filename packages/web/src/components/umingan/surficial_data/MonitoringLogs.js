@@ -17,6 +17,13 @@ import Select from '@material-ui/core/Select';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 
+import { jsPDF } from "jspdf";
+import autoTable, { __createTable } from 'jspdf-autotable';
+import CsvDownloader from 'react-csv-downloader';
+
+import letter_header from '../../../assets/letter_header.png';
+import letter_footer from '../../../assets/letter_footer.png';
+
 import {
     MuiPickersUtilsProvider,
     DateTimePicker,
@@ -234,6 +241,42 @@ export default function MonitoringLogs() {
         }
         setSelectedFeatureName(feature_details);
     }
+
+    // Download data as CSV
+    const handleDownload = () => {
+        console.log("pressed download button");
+        // return <CSVDownload data={TableData} target="_blank" />;
+        // return <CsvDownloader datas={TableData} filename="myfile" />;
+    };
+
+    // Print table function
+    const handlePrint = () => {
+        const pdf = new jsPDF();
+        var pageHeight = pdf.internal.pageSize.height || pdf.internal.pageSize.getHeight();
+        var pageWidth = pdf.internal.pageSize.width || pdf.internal.pageSize.getWidth();
+        
+        // Header (URL, file_type, left_margin, top, width, height)
+        pdf.addImage(letter_header,"PNG", 0, 0, 221, 15);
+        
+        // Title
+        pdf.text("Surficial Markers - Monitoring Logs", 100, 25, {align: "center"});
+
+        // Surficial Markers Table
+        // autoTable(pdf, { html: '.MuiTable-root', theme: 'striped', });
+        pdf.autoTable({
+            html: '#table_monitoring_logs',
+            startY: 30,
+            headStyles: {
+                fillColor: [27, 81, 109],
+            }
+        })
+
+        // Footer (URL, file_type, left_margin, top, width, height)
+        pdf.addImage(letter_footer,"PNG", 0, 272, 212, 20);
+
+        pdf.autoPrint({variant: 'non-conform'});
+        pdf.output('pdfobjectnewwindow');
+    };
 
     const submitNewMoms = async () => {
         let api_func = '';
@@ -495,7 +538,7 @@ export default function MonitoringLogs() {
                 <Grid container align="center" spacing={2}>
                     <Grid item xs={12}>
                         <Paper className={dt_classes.root}>
-                            <Table className={dt_classes.table}>
+                            <Table id="table_monitoring_logs" className={dt_classes.table}>
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Date and time</TableCell>
@@ -549,18 +592,29 @@ export default function MonitoringLogs() {
                         </Fab>
                         </Grid>
                         <Grid item xs={2}>
+                        <CsvDownloader
+                            datas={datatable.map(e => ({
+                                observance_ts: e.observance_ts,
+                                feature_type: e.feature_type,
+                                feature_name: e.feature_name,
+                                location: e.location,
+                                validator: e.validator,
+                                remarks: e.remarks,
+                            }))}
+                            filename="Surficial Markers - Monitoring Logs">
                             <Fab variant="extended"
                                 color="primary"
                                 aria-label="add" className={classes.button_fluid}
-                                onClick={() => { }}>
+                                onClick={handleDownload}>
                                 Download
                         </Fab>
+                        </CsvDownloader>
                         </Grid>
                         <Grid item xs={2}>
                             <Fab variant="extended"
                                 color="primary"
                                 aria-label="add" className={classes.button_fluid}
-                                onClick={() => { }}>
+                                onClick={handlePrint}>
                                 Print
                         </Fab>
                         </Grid>
