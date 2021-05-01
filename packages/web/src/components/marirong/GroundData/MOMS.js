@@ -443,6 +443,7 @@ export default function MOMS() {
     const submitNewFeatureName = async (values) => {
         console.log("Feature Instance Form on submit:", values);
         let json = values;
+        json.reporter  = cookies.credentials.firstname + " " + cookies.credentials.lastname;
         json.site_id = cookies.credentials.site_id;
         const response = await MarGroundData.InsertMomsInstance(json);
         if (response.status === true) {
@@ -885,6 +886,19 @@ export default function MOMS() {
                                             // onBlur={handleBlur("feature_id")}
                                             onChange={handleChange("feature_name")}
                                             onBlur={handleBlur("feature_name")}
+                                            variant="outlined"
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            key="location_txt"
+                                            name="location_txt"
+                                            label={"Location"}
+                                            // onChange={handleChange("feature_id")}
+                                            // onBlur={handleBlur("feature_id")}
+                                            onChange={handleChange("location")}
+                                            onBlur={handleBlur("location")}
                                             variant="outlined"
                                             fullWidth
                                         />
