@@ -535,7 +535,7 @@ export default function MonitoringLogs() {
                 </DialogActions>
             </Dialog>
 
-            <Container fixed>
+            <Container style={{minHeight: window.innerHeight - 220}}>
                 <Grid container align="center" spacing={2}>
                     <Grid item xs={12}>
                         <Paper className={dt_classes.root}>
