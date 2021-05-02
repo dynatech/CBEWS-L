@@ -425,7 +425,11 @@ function SurficialMarker() {
         handleClose();
     }
 
-    if (dtRow.length === 0) setDtRow(<span align="center"><Typography>Loading Surficial Data</Typography></span> )
+    if (dtRow.length === 0) setDtRow(
+    <Grid container direction="row" justify="center" alignItems="center">
+        <span align="center" style={{display: 'block', textAlign: 'center', marginLeft: '50%'}}><Typography>Loading Surficial Data</Typography></span>
+    </Grid>
+    )
 
     return (
         <Fragment>
