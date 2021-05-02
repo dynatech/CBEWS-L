@@ -241,7 +241,7 @@ function AlertValidation() {
 
     return (
         <Fragment>
-            <Container fixed>
+            <Container style={{minHeight: window.innerHeight - 220}}>
                 <Grid container align="center" spacing={4}>
                     <Grid item xs={12} container spacing={2} >
                         <Grid item={12}><Typography variant="h3"> </Typography></Grid>
