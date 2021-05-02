@@ -446,7 +446,7 @@ function CurrentAlertArea(props) {
         );
     } else {
         return (
-            <Typography variant="h2">No current alert</Typography>
+            <Typography variant="h2" align="center">No current alert</Typography>
         )
     }
 }
@@ -505,8 +505,8 @@ function CurrentAlert() {
 
     return (
         <Fragment>
-            <Container fixed>
-                <Grid container spacing={2}>
+            <Container style={{minHeight: window.innerHeight - 220}}>
+                <Grid container spacing={2} justify="center" alignItems="center">
                     <CurrentAlertArea leo={leo} classes={classes} actions={{sendEmail, download, print}} />
                 </Grid>
             </Container>
