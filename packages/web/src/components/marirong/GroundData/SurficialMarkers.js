@@ -427,7 +427,7 @@ function SurficialMarker() {
 
     if (dtRow.length === 0) setDtRow(
     <Grid container direction="row" justify="center" alignItems="center">
-        <span align="center" style={{display: 'block', textAlign: 'center', marginLeft: '50%'}}><Typography>Loading Surficial Data</Typography></span>
+        <span align="center" style={{display: 'block', textAlign: 'center', marginLeft: '60%'}}><Typography>Loading Surficial Data</Typography></span>
     </Grid>
     )
 
