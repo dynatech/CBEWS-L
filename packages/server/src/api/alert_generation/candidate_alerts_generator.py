@@ -215,7 +215,15 @@ def prepare_sites_for_routine_release(no_alerts, excluded_indexes_list, invalid_
 
             if month in matrix[season - 1]:
                 print("IT IS IN ROUTINE")
-                # TODO: FINISH ROUTINE TASKS. TEST FOR NOW.
+                return_list.append({
+                   "site_code": site_code,
+                   "data_ts": ts,
+                   "site_id": item["site_id"],
+                   "public_alert_level": 0,
+                   "internal_alert": "A0",
+                   "release_time": None,
+                   "comments": "Routine release" 
+                })
     
     return return_list
 
