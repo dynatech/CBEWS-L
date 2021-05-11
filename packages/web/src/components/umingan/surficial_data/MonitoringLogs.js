@@ -206,6 +206,7 @@ export default function MonitoringLogs() {
                         instance_id:element.instance_id
                     })
                 });
+								// For Autocomplete
                 setFeatureNameList({
                     options: f_list,
                     getOptionLabel: (options) => {
@@ -230,12 +231,12 @@ export default function MonitoringLogs() {
     }
 
     const handleFeatureNameChange = (feature_name) => {
-        setAutoCompleteFeaturename(feature_name)
+        setAutoCompleteFeaturename(feature_name);
         let feature_details = {};
         feature_details = featureDetails.find(o => o.feature_name === feature_name);
         if (feature_details == null) {
             feature_details = {
-                instance_id: 0,
+                instance_id: "new_entry",
                 feature_name: feature_name
             }
         }
@@ -282,6 +283,7 @@ export default function MonitoringLogs() {
         let api_func = '';
         let json = '';
         let response;
+				let feat_name_resp;
         if (modificationDisabled === true) {
             api_func = 'update';
             json = {
@@ -299,39 +301,62 @@ export default function MonitoringLogs() {
             response = await UmiGroundData.UpdateMOMSData(json);
         } else {
             api_func = 'add';
-            json = {
+						
+						// Check if user added new Feature Name,
+						// Submit and insert first the new Feature Name
+						if(selectedFeatureName.instance_id === "new_entry"){
+							json = {
+								"site_id": cookies.credentials.site_id,
+								"feature_id": selectedMomsFeatures,
+								"feature_name": selectedFeatureName.feature_name,
+								"location": selectedLocation,
+								"reporter": selectedReporter
+							}
+						}
+						feat_name_resp = await UmiGroundData.InsertMOMSInstance(json);
+						
+						if (feat_name_resp.status === true) {
+							// Successfully inserted new Feature Name to DB,
+							// Next insert new MOMS data
+							json = {
                 "observance_ts": selectedTS,
                 "feature_id": selectedMomsFeatures,
-                "feature_name": selectedFeatureName.feature_name,
+                "instance_id": feat_name_resp.instance_id,
                 "reporter": selectedReporter,
                 "location": selectedLocation,
                 "remarks": selectedRemarks,
                 "site_id": cookies.credentials.site_id,
                 "reporter_id": cookies.credentials.user_id,
-                "op_trigger": selectedAlertLevel
+                "alert_level": selectedAlertLevel
             }
-            alert(JSON.stringify(json));
-            response = await UmiGroundData.InsertMOMSData(json);
+							response = await UmiGroundData.InsertMOMSData(json);
+						}else{
+							setOpenNotif(true);
+							setNotifStatus("error");
+							if (api_func == 'add') {
+								setNotifText("Failed to add manifestation of movements.");
+							}
+						}
         }
 
         if (response.status === true) {
-            initMoms();
-            handleCloseForm();
-            setOpenNotif(true);
-            setNotifStatus("success");
-            if (api_func == 'add') {
-                setNotifText("Successfully added new manifestation of movements.");
-            } else {
-                setNotifText("Successfully updated manifestation of movements.");
-            }
-            } else {
-                setOpenNotif(true);
-                setNotifStatus("error");
-            if (api_func == 'add') {
-                setNotifText("Failed to add manifestation of movements.");
-            } else {
-                setNotifText("Failed to update manifestation of movements.");
-            }
+					initMoms();
+					handleCloseForm();
+					setOpenNotif(true);
+					setNotifStatus("success");
+					if (api_func == 'add') {
+						setNotifText("Successfully added new manifestation of movements.");
+					} else {
+						setNotifText("Successfully updated manifestation of movements.");
+					}
+        } else {
+					setOpenNotif(true);
+					setNotifStatus("error");
+					if (api_func == 'add') {
+						setNotifText("Failed to add manifestation of movements.");
+					} else {
+						setNotifText("Failed to update manifestation of movements.");
+					}
         }
 
     }
@@ -452,16 +477,16 @@ export default function MonitoringLogs() {
                                     Feature name
                                 </InputLabel>
                                 <Autocomplete
-                                    {...featureNameList}
-                                    id="feature-name"
-                                    clearOnEscape
-                                    freeSolo
-                                    inputValue={autoCompleteFeaturename}
-                                    disabled={modificationDisabled}
-                                    onInputChange={(e,v) => {handleFeatureNameChange(v)}}
-                                    renderInput={(params) => (
-                                    <TextField {...params} margin="normal"/>
-                                    )}
+																	{...featureNameList}
+																	id="feature-name"
+																	clearOnEscape
+																	freeSolo
+																	inputValue={autoCompleteFeaturename}
+																	disabled={modificationDisabled}
+																	onInputChange={(e,v) => {handleFeatureNameChange(v)}}
+																	renderInput={(params) => (
+																	<TextField {...params} margin="normal"/>
+																	)}
                                 />
                             </FormControl>
                         </Grid>
