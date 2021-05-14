@@ -33,7 +33,7 @@ import moment from 'moment';
 
 import { useCookies } from 'react-cookie';
 
-import { MarGroundData, AppConfig } from '@dynaslope/commons'
+import { UmiGroundData, AppConfig } from '@dynaslope/commons'
 
 const tableStyle = makeStyles(theme => ({
     root: {
@@ -118,14 +118,14 @@ export default function MonitoringLogs() {
         initMoms(cookies.credentials.site_id);
     }, []);
 
-    const initMoms = async (site_id = 29) => {
-        const response = await MarGroundData.GetMOMSData(site_id);
+    const initMoms = async (site_id = 50) => {
+        const response = await UmiGroundData.GetMOMSData(site_id);
         console.log("response", response)
         if (response.status === true) {
             let moms_container = [];
             response.data.forEach(element => {
                 const { feature_id, instance_id, site_id, feature_name,
-                    location, reporter, moms_id, observace_ts, reporter_id,
+                    location, moms_reporter, moms_id, observance_ts, reporter_id,
                     remarks, validator, op_trigger, feature_type, feature_desc } = element;
                 let temp = {
                     "instance_id": instance_id,
@@ -133,9 +133,9 @@ export default function MonitoringLogs() {
                     "feature_id": feature_id,
                     "feature_name": feature_name,
                     "location": location,
-                    "reporter": reporter,
+                    "moms_reporter": moms_reporter,
                     "moms_id": moms_id,
-                    "observance_ts": moment(observace_ts).format('YYYY-MM-DD HH:mm:ss'),
+                    "observance_ts": moment(observance_ts).format('YYYY-MM-DD HH:mm:ss'),
                     "reporter_id": reporter_id,
                     "remarks": remarks,
                     "validator": validator,
@@ -187,7 +187,8 @@ export default function MonitoringLogs() {
 
     const handleChangeFeatureType = (feature_id) => {
         setSelectedMomsFeatures(feature_id);
-        fetch(`${AppConfig.HOSTNAME}/api/ground_data/moms/fetch/feature/${feature_id}/${cookies.credentials.site_id}`, {
+        fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/instance/${feature_id}/${cookies.credentials.site_id}`, {
+        //fetch(`${AppConfig.HOSTNAME}/api/ground_data/moms/fetch/feature/${feature_id}/${cookies.credentials.site_id}`, {
             method: 'GET',
             headers: {
               Accept: 'application/json',
@@ -198,7 +199,6 @@ export default function MonitoringLogs() {
               if (responseJson.data.length !== 0) {
                 let f_list = [];
                 let f_container = [];
-                
                 responseJson.data.forEach(element => {
                     f_container.push(element);
                     f_list.push({
@@ -206,6 +206,7 @@ export default function MonitoringLogs() {
                         instance_id:element.instance_id
                     })
                 });
+								// For Autocomplete
                 setFeatureNameList({
                     options: f_list,
                     getOptionLabel: (options) => {
@@ -215,7 +216,7 @@ export default function MonitoringLogs() {
                           if (options.inputValue) {
                             return options.inputValue;
                           }
-                          return options.title;
+                        return options.title;
                     }
                 });
                 setFeatureDetails(f_container);
@@ -230,12 +231,12 @@ export default function MonitoringLogs() {
     }
 
     const handleFeatureNameChange = (feature_name) => {
-        setAutoCompleteFeaturename(feature_name)
+        setAutoCompleteFeaturename(feature_name);
         let feature_details = {};
         feature_details = featureDetails.find(o => o.feature_name === feature_name);
         if (feature_details == null) {
             feature_details = {
-                instance_id: 0,
+                instance_id: "new_entry",
                 feature_name: feature_name
             }
         }
@@ -282,6 +283,7 @@ export default function MonitoringLogs() {
         let api_func = '';
         let json = '';
         let response;
+				let feat_name_resp;
         if (modificationDisabled === true) {
             api_func = 'update';
             json = {
@@ -296,47 +298,71 @@ export default function MonitoringLogs() {
                 "alert_level": selectedAlertLevel,
                 "moms_id": selectedMomsID
             }
-            response = await MarGroundData.UpdateMOMSData(json);
+            response = await UmiGroundData.UpdateMOMSData(json);
         } else {
             api_func = 'add';
-            json = {
-                "datetime": selectedTS,
-                "feature_type": selectedMomsFeatures,
-                "feature_name": selectedFeatureName.feature_name,
+						
+						// Check if user added new Feature Name,
+						// Submit and insert first the new Feature Name
+						if(selectedFeatureName.instance_id === "new_entry"){
+							json = {
+								"site_id": cookies.credentials.site_id,
+								"feature_id": selectedMomsFeatures,
+								"feature_name": selectedFeatureName.feature_name,
+								"location": selectedLocation,
+								"reporter": selectedReporter
+							}
+						}
+						feat_name_resp = await UmiGroundData.InsertMOMSInstance(json);
+						
+						if (feat_name_resp.status === true) {
+							// Successfully inserted new Feature Name to DB,
+							// Next insert new MOMS data
+							json = {
+                "observance_ts": selectedTS,
+                "feature_id": selectedMomsFeatures,
+                "instance_id": feat_name_resp.instance_id,
                 "reporter": selectedReporter,
                 "location": selectedLocation,
                 "remarks": selectedRemarks,
                 "site_id": cookies.credentials.site_id,
-                "user_id": cookies.credentials.user_id,
+                "reporter_id": cookies.credentials.user_id,
                 "alert_level": selectedAlertLevel
             }
-            response = await MarGroundData.InsertMOMSData(json);
+							response = await UmiGroundData.InsertMOMSData(json);
+						}else{
+							setOpenNotif(true);
+							setNotifStatus("error");
+							if (api_func == 'add') {
+								setNotifText("Failed to add manifestation of movements.");
+							}
+						}
         }
 
         if (response.status === true) {
-            initMoms();
-            handleCloseForm();
-            setOpenNotif(true);
-            setNotifStatus("success");
-            if (api_func == 'add') {
-                setNotifText("Successfully added new manifestation of movements.");
-            } else {
-                setNotifText("Successfully updated manifestation of movements.");
-            }
-            } else {
-                setOpenNotif(true);
-                setNotifStatus("error");
-            if (api_func == 'add') {
-                setNotifText("Failed to add manifestation of movements.");
-            } else {
-                setNotifText("Failed to update manifestation of movements.");
-            }
+					initMoms();
+					handleCloseForm();
+					setOpenNotif(true);
+					setNotifStatus("success");
+					if (api_func == 'add') {
+						setNotifText("Successfully added new manifestation of movements.");
+					} else {
+						setNotifText("Successfully updated manifestation of movements.");
+					}
+        } else {
+					setOpenNotif(true);
+					setNotifStatus("error");
+					if (api_func == 'add') {
+						setNotifText("Failed to add manifestation of movements.");
+					} else {
+						setNotifText("Failed to update manifestation of movements.");
+					}
         }
 
     }
 
     const deleteMoms = async () => {
-        const response = await MarGroundData.DeleteMOMSData({"moms_id": selectedMomsID});
+        const response = await UmiGroundData.DeleteMOMSData({"moms_id": selectedMomsID});
         if (response.status === true) {
             initMoms();
             handleCloseForm();
@@ -440,7 +466,7 @@ export default function MonitoringLogs() {
                                     <MenuItem value={5}>Tilted/Split trees</MenuItem>
                                     <MenuItem value={6}>Damaged structures</MenuItem>
                                     <MenuItem value={7}>Slope failure</MenuItem>
-                                    <MenuItem value={8}>Bulgin/Depression</MenuItem>
+                                    <MenuItem value={8}>Bulging/Depression</MenuItem>
                                     <MenuItem value={9}><em>No landslide manifestation observed</em></MenuItem>
                                 </Select>
                             </FormControl>
@@ -451,16 +477,16 @@ export default function MonitoringLogs() {
                                     Feature name
                                 </InputLabel>
                                 <Autocomplete
-                                    {...featureNameList}
-                                    id="feature-name"
-                                    clearOnEscape
-                                    freeSolo
-                                    inputValue={autoCompleteFeaturename}
-                                    disabled={modificationDisabled}
-                                    onInputChange={(e,v) => {handleFeatureNameChange(v)}}
-                                    renderInput={(params) => (
-                                    <TextField {...params} margin="normal"/>
-                                    )}
+																	{...featureNameList}
+																	id="feature-name"
+																	clearOnEscape
+																	freeSolo
+																	inputValue={autoCompleteFeaturename}
+																	disabled={modificationDisabled}
+																	onInputChange={(e,v) => {handleFeatureNameChange(v)}}
+																	renderInput={(params) => (
+																	<TextField {...params} margin="normal"/>
+																	)}
                                 />
                             </FormControl>
                         </Grid>
@@ -508,12 +534,12 @@ export default function MonitoringLogs() {
                                 fullWidth
                             />
                         </Grid>
-                        <Grid item xs={12} align="center">
+                        {/* <Grid item xs={12} align="center">
                             <Fab variant="extended">
                                 <CloudUploadIcon style={{padding: 10}}/>
                                 Upload photo(s) of Manifestation of Movements
                             </Fab>
-                        </Grid>
+                        </Grid> */}
                     </Grid>
                 </DialogContent>
                 <DialogActions>
@@ -534,7 +560,7 @@ export default function MonitoringLogs() {
                 </DialogActions>
             </Dialog>
 
-            <Container fixed>
+            <Container style={{minHeight: window.innerHeight - 220}}>
                 <Grid container align="center" spacing={2}>
                     <Grid item xs={12}>
                         <Paper className={dt_classes.root}>
@@ -558,15 +584,15 @@ export default function MonitoringLogs() {
                                             </Typography>
                                             </TableRow>
                                             :
-                                            datatable.map(row => (
-                                                <TableRow key={row.observance_ts} onClick={() => { handleMomsModification(row) }} >
+                                            datatable.map((row, i) => (
+                                                <TableRow key={i} onClick={() => { handleMomsModification(row) }} >
                                                     <TableCell component="th" scope="row">
                                                         {row.observance_ts}
                                                     </TableCell>
                                                     <TableCell>{row.feature_type}</TableCell>
                                                     <TableCell>{row.feature_name}</TableCell>
                                                     <TableCell>{row.location}</TableCell>
-                                                    <TableCell>{row.validator}</TableCell>
+                                                    <TableCell>{row.moms_reporter}</TableCell>
                                                     <TableCell>{row.remarks}</TableCell>
                                                 </TableRow>
                                             ))
@@ -598,7 +624,7 @@ export default function MonitoringLogs() {
                                 feature_type: e.feature_type,
                                 feature_name: e.feature_name,
                                 location: e.location,
-                                validator: e.validator,
+                                reporter: e.moms_reporter,
                                 remarks: e.remarks,
                             }))}
                             filename="Surficial Markers - Monitoring Logs">

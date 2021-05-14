@@ -168,6 +168,7 @@ import {
   UpdateMOMSData as UMIUpdateMOMSData,
   InsertMOMSData as UMIInsertMOMSData,
   DeleteMOMSData as UMIDeleteMOMSData,
+  InsertMOMSInstance as UMIInsertMOMSInstance,
 } from "./src/UMI/GroundData/MOMS";
 
 import {
@@ -375,6 +376,7 @@ const UmiGroundData = {
   UpdateMOMSData: UMIUpdateMOMSData,
   InsertMOMSData: UMIInsertMOMSData,
   DeleteMOMSData: UMIDeleteMOMSData,
+  InsertMOMSInstance: UMIInsertMOMSInstance,
   GetSurficialMarkersData: UMIGetSurficialMarkersData,
   UpdateSurficialMarkerData: UMIUpdateSurficialMarkerData,
   InsertSurficialMarkersData: UMIInsertSurficialMarkersData,

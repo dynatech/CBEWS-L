@@ -357,7 +357,7 @@ export default function RainfallPlot(props) {
     return (
         <Fragment>
         <br/>
-            <Container>
+        <Container style={{minHeight: window.innerHeight - 220}}>
                 <Grid container spacing={4}>
                     {
                         loadGraph ? options.map((option, i) => {

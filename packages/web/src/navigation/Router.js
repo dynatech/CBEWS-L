@@ -18,6 +18,7 @@ import {DashRedirectIfLoggedIn, PrivateRoute} from './RouteType';
 
 function RouterApp() {
   const [cookies] = useCookies(['credentials']);
+  var site_id = [];
   const component_object = {
     29: (
       <Fragment>
@@ -30,7 +31,13 @@ function RouterApp() {
       </Fragment>
     )
   }
-  const site_id = "credentials" in cookies && "site_id" in cookies.credentials ? cookies.credentials.site_id : null;
+  // const site_id = "credentials" in cookies && "site_id" in cookies.credentials ? cookies.credentials.site_id : null;
+  
+  if(cookies.credentials){
+    site_id = cookies.credentials.site_id;
+  }else{
+    site_id = null;
+  }
   return (
     <BrowserRouter>
         {

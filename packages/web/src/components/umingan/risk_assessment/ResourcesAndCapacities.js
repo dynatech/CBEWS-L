@@ -39,7 +39,7 @@ export default function ResourcesAndCapacities(props) {
     const [notifText, setNotifText] = useState('');
 
     const [selectedData, setSelectedData] = useState({});
-    const [command, setCommand] = useState("add");
+    const [command, setCommand] = useState("Add");
     
     const formData = useRef();
     const [defaultStringValues, setDefaultStrValues] = useState({
@@ -89,7 +89,7 @@ export default function ResourcesAndCapacities(props) {
             "Status": "",
             "Owner": "",
         });
-        setCommand("add");
+        setCommand("Add");
     };
 
     const handleAdd = () => {
