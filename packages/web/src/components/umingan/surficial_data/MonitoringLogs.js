@@ -118,6 +118,19 @@ export default function MonitoringLogs() {
         initMoms(cookies.credentials.site_id);
     }, []);
 
+		const resetState = () => {
+			setSelectedMomsFeatures(0);
+			setSelectedFeatureName(0);
+			setSelectedTS(moment(new Date()).format("YYYY-MM-DD HH:mm:ss"));
+			setSelectedRemarks("");
+			setSelectedReporter("");
+			setSelectedLocation("");
+			setSelectedAlertLevel(0);
+			setSelectedMomsID("");
+			setModificationDisabled(false);
+			setAutoCompleteFeaturename("");
+	}
+
     const initMoms = async (site_id = 50) => {
         const response = await UmiGroundData.GetMOMSData(site_id);
         console.log("response", response)
@@ -172,6 +185,7 @@ export default function MonitoringLogs() {
 
     const handleCloseRaise = () => {
         setOpenRaise(false);
+				resetState();
     };
 
     const [openForm, setOpenForm] = React.useState(false);
@@ -183,6 +197,7 @@ export default function MonitoringLogs() {
 
     const handleCloseForm = () => {
         setOpenForm(false);
+				resetState();
     };
 
     const handleChangeFeatureType = (feature_id) => {
@@ -231,16 +246,16 @@ export default function MonitoringLogs() {
     }
 
     const handleFeatureNameChange = (feature_name) => {
-        setAutoCompleteFeaturename(feature_name);
-        let feature_details = {};
-        feature_details = featureDetails.find(o => o.feature_name === feature_name);
-        if (feature_details == null) {
-            feature_details = {
-                instance_id: "new_entry",
-                feature_name: feature_name
-            }
-        }
-        setSelectedFeatureName(feature_details);
+			setAutoCompleteFeaturename(feature_name);
+			let feature_details = {};
+			feature_details = featureDetails.find(o => o.feature_name === feature_name);
+			if (feature_details == null) {
+				feature_details = {
+					instance_id: "new_entry",
+					feature_name: feature_name
+				}
+			}
+			setSelectedFeatureName(feature_details);
     }
 
     // Download data as CSV
@@ -285,58 +300,63 @@ export default function MonitoringLogs() {
         let response;
 				let feat_name_resp;
         if (modificationDisabled === true) {
-            api_func = 'update';
-            json = {
-                "datetime": selectedTS,
-                "feature_type": selectedMomsFeatures,
-                "feature_name": autoCompleteFeaturename,
-                "reporter": selectedReporter,
-                "location": selectedLocation,
-                "remarks": selectedRemarks,
-                "site_id": cookies.credentials.site_id,
-                "user_id": cookies.credentials.user_id,
-                "alert_level": selectedAlertLevel,
-                "moms_id": selectedMomsID
-            }
-            response = await UmiGroundData.UpdateMOMSData(json);
+					api_func = 'update';
+					json = {
+						"datetime": selectedTS,
+						"feature_type": selectedMomsFeatures,
+						"feature_name": autoCompleteFeaturename,
+						"reporter": selectedReporter,
+						"location": selectedLocation,
+						"remarks": selectedRemarks,
+						"site_id": cookies.credentials.site_id,
+						"user_id": cookies.credentials.user_id,
+						"alert_level": selectedAlertLevel,
+						"moms_id": selectedMomsID
+					}
+					response = await UmiGroundData.UpdateMOMSData(json);
+
         } else {
-            api_func = 'add';
-						
-						// Check if user added new Feature Name,
-						// Submit and insert first the new Feature Name
-						if(selectedFeatureName.instance_id === "new_entry"){
-							json = {
-								"site_id": cookies.credentials.site_id,
-								"feature_id": selectedMomsFeatures,
-								"feature_name": selectedFeatureName.feature_name,
-								"location": selectedLocation,
-								"reporter": selectedReporter
-							}
+					api_func = 'add';		
+					// Check if user added new Feature Name,
+					// Submit and insert first the new Feature Name
+					if(selectedFeatureName.instance_id === "new_entry"){
+						json = {
+							"site_id": cookies.credentials.site_id,
+							"feature_id": selectedMomsFeatures,
+							"feature_name": selectedFeatureName.feature_name,
+							"location": selectedLocation,
+							"reporter": selectedReporter
 						}
 						feat_name_resp = await UmiGroundData.InsertMOMSInstance(json);
-						
-						if (feat_name_resp.status === true) {
-							// Successfully inserted new Feature Name to DB,
-							// Next insert new MOMS data
-							json = {
-                "observance_ts": selectedTS,
-                "feature_id": selectedMomsFeatures,
-                "instance_id": feat_name_resp.instance_id,
-                "reporter": selectedReporter,
-                "location": selectedLocation,
-                "remarks": selectedRemarks,
-                "site_id": cookies.credentials.site_id,
-                "reporter_id": cookies.credentials.user_id,
-                "alert_level": selectedAlertLevel
-            }
-							response = await UmiGroundData.InsertMOMSData(json);
-						}else{
-							setOpenNotif(true);
-							setNotifStatus("error");
-							if (api_func == 'add') {
-								setNotifText("Failed to add manifestation of movements.");
-							}
+					}else{
+						// AKA. instance_id
+						feat_name_resp = {
+							"status": true,
+							"instance_id": selectedFeatureName.instance_id
 						}
+					}
+					if (feat_name_resp.status === true) {
+						// Successfully inserted new Feature Name to DB,
+						// Next insert new MOMS data
+						json = {
+							"observance_ts": selectedTS,
+							"feature_id": selectedMomsFeatures,
+							"instance_id": feat_name_resp.instance_id,
+							"reporter": selectedReporter,
+							"location": selectedLocation,
+							"remarks": selectedRemarks,
+							"site_id": cookies.credentials.site_id,
+							"reporter_id": cookies.credentials.user_id,
+							"alert_level": selectedAlertLevel
+					}
+						response = await UmiGroundData.InsertMOMSData(json);
+					}else{
+						setOpenNotif(true);
+						setNotifStatus("error");
+						if (api_func == 'add') {
+							setNotifText("Failed to add manifestation of movements.");
+						}
+					}
         }
 
         if (response.status === true) {
@@ -350,15 +370,15 @@ export default function MonitoringLogs() {
 						setNotifText("Successfully updated manifestation of movements.");
 					}
         } else {
-					setOpenNotif(true);
-					setNotifStatus("error");
+						setOpenNotif(true);
+						setNotifStatus("error");
 					if (api_func == 'add') {
 						setNotifText("Failed to add manifestation of movements.");
 					} else {
 						setNotifText("Failed to update manifestation of movements.");
 					}
         }
-
+			resetState();
     }
 
     const deleteMoms = async () => {
