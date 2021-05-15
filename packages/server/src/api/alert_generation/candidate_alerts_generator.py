@@ -216,15 +216,21 @@ def prepare_sites_for_routine_release(no_alerts, excluded_indexes_list, invalid_
             if month in matrix[season - 1]:
                 print("IT IS IN ROUTINE")
                 return_list.append({
-                   "site_code": site_code,
-                   "data_ts": ts,
-                   "site_id": item["site_id"],
-                   "public_alert_level": 0,
-                   "internal_alert": "A0",
-                   "release_time": None,
-                   "comments": "Routine release" 
+                    "site_code": site_code,
+                    "data_ts": ts,
+                    "site_id": item["site_id"],
+                    "public_alert_level": 0,
+                    "internal_alert": item["internal_alert"],
+                    "release_time": dt.strftime(dt.now(), "%H:%M:%S"),
+                    "comments": "CBEWSL Routine release",
+                    "status": "routine",
+                    "bulletin_number": "",
+                    "previous_validity": "",
+                    "previous_event_id": "",
+                    "event_id": "",
                 })
-    
+                # insert_ewi will handle the rest.
+
     return return_list
 
 
