@@ -471,6 +471,40 @@ function CurrentAlertArea(props) {
     }
 }
 
+function generatePDFReport(data){
+    const thStyle = {
+        wordWrap: "break-word",
+    };
+    const tdStyle = {
+        wordWrap: "break-word",
+        textAlign: "center"
+    };
+
+    let output = (
+        <div>
+            <h3>Marirong Latest Current Alert Level Information</h3>
+            <table id='mar_latest_current_alert' style={{width: "30%", borderSpacing: "5px", marginLeft: "10%"}}>
+                <tr>
+                    <td width={400} style={thStyle}>Date/Time:</td>
+                    <td width={700} style={thStyle}><strong>{data.report_date}</strong></td>
+                </tr>
+                <tr>
+                    <td width={400} style={thStyle}>Alert Level Released:</td>
+                    <td width={700} style={thStyle}><strong>Alert {data.public_alert_level} ({data.latest_event_triggers.info}, valid until {data.validity})</strong></td>
+                </tr>
+                <tr>
+                    <td width={400} style={thStyle}>Recommended Response:</td>
+                    <td width={700} style={thStyle}><strong>{data.recommended_response}</strong></td>
+                </tr>
+                <tr>
+                    <td width={400} style={thStyle}>Released by:</td>
+                    <td width={700} style={thStyle}>{data.reporter}</td>
+                </tr>
+            </table>
+        </div>
+    );
+    return output;
+}
 
 function LatestCurrentAlert() {
     const classes = useStyles();
@@ -483,14 +517,6 @@ function LatestCurrentAlert() {
     const [openNotif, setOpenNotif] = useState(false);
     const [notifText, setNotifText] = useState("");
     const [notifStatus, setNotifStatus] = useState('success');
-
-    const thStyle = {
-        wordWrap: "break-word",
-    };
-    const tdStyle = {
-        wordWrap: "break-word",
-        textAlign: "center"
-    };
 
     useEffect(() => {
         initLatestCurrentAlert();
@@ -508,41 +534,13 @@ function LatestCurrentAlert() {
             console.log("site_data", site_data)
             if (site_data !== undefined) {
                 setLeo(site_data);
+                setHtmlString(generatePDFReport(site_data));
             } else {
                 setLeo(null);
                 console.log("No alert on site");
+                setHtmlString(<Typography>No data</Typography>);
             }
         }
-    }
-
-    const generatePDFReport = (data) => {
-        let output = null;
-        if(data.length > 0){
-            output = (
-                <div>
-                    <h3>Marirong Latest Current Alert Level Information</h3>
-                    <table id='mar_latest_current_alert' style={{width: "30%", borderSpacing: "5px", marginLeft: "10%"}}>
-                        <tr>
-                            <td width={400} style={thStyle}>Date/Time:</td>
-                            <td width={700} style={thStyle}><strong>{data.report_date}</strong></td>
-                        </tr>
-                        <tr>
-                            <td width={400} style={thStyle}>Alert Level Released:</td>
-                            <td width={700} style={thStyle}><strong>Alert {data.public_alert_level} ({data.latest_event_triggers.info}, valid until {data.validity})</strong></td>
-                        </tr>
-                        <tr>
-                            <td width={400} style={thStyle}>Recommended Response:</td>
-                            <td width={700} style={thStyle}><strong>{data.recommended_response}</strong></td>
-                        </tr>
-                        <tr>
-                            <td width={400} style={thStyle}>Released by:</td>
-                            <td width={700} style={thStyle}>{data.reporter}</td>
-                        </tr>
-                    </table>
-                </div>
-            );
-        }
-        return output;
     }
 
     //alert(renderToString(html_string));
@@ -565,13 +563,6 @@ function LatestCurrentAlert() {
     };
 
     function sendEmail() {
-        console.log(leo);
-        if(leo){
-            setHtmlString(generatePDFReport(leo));
-        } else {
-            setHtmlString(<Typography>No data</Typography>);
-        }
-        
         // setModal([<TransitionalModal status={true} />])
         // setTimeout(() => {
         //     setModal([<TransitionalModal status={false} />])
