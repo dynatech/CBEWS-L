@@ -1,4 +1,5 @@
 import React, { useState, Fragment, useEffect } from 'react';
+import { renderToString } from 'react-dom/server';
 import green from '@material-ui/core/colors/green';
 import TransitionalModal from '../reducers/loading';
 import {
@@ -8,11 +9,14 @@ import {
 } from '@material-ui/core';
 import moment from "moment";
 import { useStyles, tableStyle } from '../../styles/general_styles';
-import { AlertGeneration, AppConfig } from '@dynaslope/commons';
+import { AlertGeneration, MarMaintenanceLogs, AppConfig } from '@dynaslope/commons';
 
 // import RainfallPlot from './rainfall_plot';
 // import SurficialPlot from './surficial_plot';
 // import SubsurfacePlot from './subsurface_plot';
+
+import PDFPreviewer from '../reducers/PDFViewer';
+import EmailModal from '../reducers/EmailModal';
 
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -361,6 +365,7 @@ function CurrentAlertArea(props) {
     const { leo, classes, actions } = props;
     const { sendEmail, download, print } = actions;
 
+    console.log(JSON.stringify(leo));
     const prepareTriggers = (triggers) => {
         if (triggers.length > 0) {
             return triggers.map(trigger => {
@@ -466,11 +471,26 @@ function CurrentAlertArea(props) {
     }
 }
 
+
 function LatestCurrentAlert() {
     const classes = useStyles();
     const [modal, setModal] = useState([<TransitionalModal status={false} />]);
     const [leo, setLeo] = useState(null);
     const [releaseStatus, setReleaseStatus] = useState("No event on site.");
+    const [htmlString, setHtmlString] = useState(null);
+
+    const [emailOpen, setEmailOpen] = useState(false);
+    const [openNotif, setOpenNotif] = useState(false);
+    const [notifText, setNotifText] = useState("");
+    const [notifStatus, setNotifStatus] = useState('success');
+
+    const thStyle = {
+        wordWrap: "break-word",
+    };
+    const tdStyle = {
+        wordWrap: "break-word",
+        textAlign: "center"
+    };
 
     useEffect(() => {
         initLatestCurrentAlert();
@@ -495,12 +515,70 @@ function LatestCurrentAlert() {
         }
     }
 
+    const generatePDFReport = (data) => {
+        let output = null;
+        if(data.length > 0){
+            output = (
+                <div>
+                    <h3>Marirong Latest Current Alert Level Information</h3>
+                    <table id='mar_latest_current_alert' style={{width: "30%", borderSpacing: "5px", marginLeft: "10%"}}>
+                        <tr>
+                            <td width={400} style={thStyle}>Date/Time:</td>
+                            <td width={700} style={thStyle}><strong>{data.report_date}</strong></td>
+                        </tr>
+                        <tr>
+                            <td width={400} style={thStyle}>Alert Level Released:</td>
+                            <td width={700} style={thStyle}><strong>Alert {data.public_alert_level} ({data.latest_event_triggers.info}, valid until {data.validity})</strong></td>
+                        </tr>
+                        <tr>
+                            <td width={400} style={thStyle}>Recommended Response:</td>
+                            <td width={700} style={thStyle}><strong>{data.recommended_response}</strong></td>
+                        </tr>
+                        <tr>
+                            <td width={400} style={thStyle}>Released by:</td>
+                            <td width={700} style={thStyle}>{data.reporter}</td>
+                        </tr>
+                    </table>
+                </div>
+            );
+        }
+        return output;
+    }
+
+    //alert(renderToString(html_string));
+    const handleSendEmail = (htmlString, email_data) => async () => {
+        const response = await MarMaintenanceLogs.SendPDFReportViaEmail({
+            "email_data": email_data,
+            "html": renderToString(htmlString),
+            "date": moment().format("YYYY-MM-DD hh:mm:ss")
+        });
+        if (response.status === true) {
+            console.log("Email report sent successfully");
+            setNotifStatus("success");
+            setNotifText("Email report sent successfully");
+        } else {
+            setNotifStatus("error");
+            setNotifText("Email report failed to send");
+        }
+        setOpenNotif(true);
+        setEmailOpen(false);
+    };
+
     function sendEmail() {
-        setModal([<TransitionalModal status={true} />])
-        setTimeout(() => {
-            setModal([<TransitionalModal status={false} />])
-            alert("Successfully sent email!")
-        }, 3000)
+        console.log(leo);
+        if(leo){
+            setHtmlString(generatePDFReport(leo));
+        } else {
+            setHtmlString(<Typography>No data</Typography>);
+        }
+        
+        // setModal([<TransitionalModal status={true} />])
+        // setTimeout(() => {
+        //     setModal([<TransitionalModal status={false} />])
+        //     alert("Successfully sent email!")
+        // }, 3000)
+        setEmailOpen(true);
+
     }
 
     function download() {
@@ -519,15 +597,29 @@ function LatestCurrentAlert() {
         }, 3000)
     }
 
-
     return (
         <Fragment>
             <Container fixed>
                 <Grid container spacing={2}>
                     <CurrentAlertArea leo={leo} classes={classes} actions={{sendEmail, download, print}} />
                 </Grid>
+                <EmailModal
+                    open={emailOpen}
+                    setOpen={setEmailOpen}
+                    html={htmlString}
+                    handleSubmit={handleSendEmail}
+                /> 
             </Container>
             {modal}
+            <Snackbar open={openNotif} 
+                autoHideDuration={3000} 
+                onClose={() => {setOpenNotif(false)}}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                key={'top,right'}>
+                    <Alert onClose={() => {setOpenNotif(false)}} severity={notifStatus}>
+                        {notifText}
+                    </Alert>
+            </Snackbar>
         </Fragment>
     )
 }
