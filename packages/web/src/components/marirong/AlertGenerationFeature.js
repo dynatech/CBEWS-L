@@ -458,7 +458,10 @@ function CurrentAlertArea(props) {
         );
     } else {
         return (
-            <Typography variant="h2">No activity in site</Typography>
+            <Grid item xs={12} align="center">
+                <Typography variant="h2" align="center">No activity in site</Typography>
+            </Grid>
+            
         )
     }
 }
@@ -471,7 +474,7 @@ function LatestCurrentAlert() {
 
     useEffect(() => {
         initLatestCurrentAlert();
-    }, [leo]);
+    }, []);
 
     const initLatestCurrentAlert = async () => {
         const response = await AlertGeneration.MarGetOngoingAndExtendedMonitoring();
