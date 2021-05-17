@@ -155,7 +155,7 @@ export default function SurficialPlot(props) {
                     <Grid item xs={12}>
                         <Paper>
                             {
-                                load ? graphComponent : <Typography>Loading</Typography>
+                                load ? graphComponent : <Typography>Loading surficial graphs</Typography>
                             }
                         </Paper>
                     </Grid>
