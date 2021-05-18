@@ -225,7 +225,7 @@ const AlertGeneration = {
   GetMarAlertValidationData,
   InsertEWI,
   ValidateTrigger,
-  SendLatestCurrentAlertReportViaEmail
+  SendMarLatestCurrentAlertReportViaEmail
 };
 
 const MarDataAnalysis = {

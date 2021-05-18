@@ -104,7 +104,7 @@ const ValidateTrigger = (payload) => {
     );
 }
 
-const SendLatestCurrentAlertReportViaEmail = (data) => {
+const SendMarLatestCurrentAlertReportViaEmail = (data) => {
     console.log("data", data);
     return fetch(`${AppConfig.HOSTNAME}/v2/send/maintenance_logs/report`, {
         method: 'POST',
@@ -129,5 +129,5 @@ const SendLatestCurrentAlertReportViaEmail = (data) => {
 export { 
     MarGetOngoingAndExtendedMonitoring, UmiGetOngoingAndExtendedMonitoring, 
     GetUmiAlertValidationData, GetMarAlertValidationData,
-    InsertEWI, ValidateTrigger, SendLatestCurrentAlertReportViaEmail
+    InsertEWI, ValidateTrigger, SendMarLatestCurrentAlertReportViaEmail
 }
