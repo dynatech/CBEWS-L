@@ -15,6 +15,10 @@ from email import encoders
 
 from config import APP_CONFIG
 
+from utils.send_email import send_email
+from utils.write_pdf import write_pdf_internal
+
+
 FILE_MANAGEMENT_BLUEPRINT = Blueprint("file_management_blueprint", __name__)
     
 @FILE_MANAGEMENT_BLUEPRINT.route("/download/mar/maintenance_log/<path:filename>", methods=["GET"])
@@ -71,104 +75,106 @@ def delete_mar_community_risk_assessment():
 
 
 ### UTIL ###
-def send_email(recipients_list, subject, message, file_location):
-    try:
-        email = "dynaslopeswat@gmail.com"
-        password = "dynaslopeswat"
-        send_to_email = recipients_list
+# def send_email(recipients_list, subject, message, file_location):
+#     try:
+#         # email = "dynaslopeswat@gmail.com"
+#         # password = "dynaslopeswat"
+#         email = "noreply.habhub@gmail.com"
+#         password = "biomemsihabhub2021"
+#         send_to_email = recipients_list
 
-        if file_location:
-            path, filename = ntpath.split(file_location)
+#         if file_location:
+#             path, filename = ntpath.split(file_location)
 
-        msg = MIMEMultipart()
-        msg['From'] = email
-        msg['To'] = ", ".join(recipients_list)
-        msg['Subject'] = subject
+#         msg = MIMEMultipart()
+#         msg['From'] = email
+#         msg['To'] = ", ".join(recipients_list)
+#         msg['Subject'] = subject
 
-        msg.attach(MIMEText(message, 'html'))
+#         msg.attach(MIMEText(message, 'html'))
 
 
-        if file_location:
-            with open(file_location, "rb") as attachment:
-                part = MIMEBase("application", "octet-stream")
-                part.set_payload(attachment.read())
+#         if file_location:
+#             with open(file_location, "rb") as attachment:
+#                 part = MIMEBase("application", "octet-stream")
+#                 part.set_payload(attachment.read())
 
-            encoders.encode_base64(part)
+#             encoders.encode_base64(part)
 
-        part.add_header(
-            "Content-Disposition",
-            f"attachment; filename= {filename}",
-        )
-        msg.attach(part)
+#         part.add_header(
+#             "Content-Disposition",
+#             f"attachment; filename= {filename}",
+#         )
+#         msg.attach(part)
 
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(email, password)
-        text = msg.as_string()
-        try:
-            server.sendmail(email, recipients_list, text)
-        except Exception as e:
-            print(e)
-        finally:
-            server.quit()
+#         server = smtplib.SMTP('smtp.gmail.com', 587)
+#         server.starttls()
+#         server.login(email, password)
+#         text = msg.as_string()
+#         try:
+#             server.sendmail(email, recipients_list, text)
+#         except Exception as e:
+#             print(e)
+#         finally:
+#             server.quit()
 
-        response = {
-            "status": True,
-            "message": "Email sent successfully!"
-        }
-    except Exception as err:
-        print(err)
-        response = {
-            "status": False,
-            "message": "Failed sending email! Backend concerns."
-        }
+#         response = {
+#             "status": True,
+#             "message": "Email sent successfully!"
+#         }
+#     except Exception as err:
+#         print(err)
+#         response = {
+#             "status": False,
+#             "message": "Failed sending email! Backend concerns."
+#         }
 
-    return response
+#     return response
 
 
 ###################
 # WRITE_PDF STUFF #
 ###################
-class MyFPDF(FPDF, HTMLMixin):
-    def header(self):
-        self.image(f"{APP_CONFIG['WEB_ASSETS_DIR']}/assets/letter_header.png", 0, 10, 210)
-        self.set_font('Arial', 'B', 15)
-        self.cell(80)
-        self.ln(20)
-    def footer(self):
-        self.image(f"{APP_CONFIG['WEB_ASSETS_DIR']}/assets/letter_footer.png", 0, 270, 210)
-        self.set_y(-15)
-    pass
+# class MyFPDF(FPDF, HTMLMixin):
+#     def header(self):
+#         self.image(f"{APP_CONFIG['WEB_ASSETS_DIR']}/assets/letter_header.png", 0, 10, 210)
+#         self.set_font('Arial', 'B', 15)
+#         self.cell(80)
+#         self.ln(20)
+#     def footer(self):
+#         self.image(f"{APP_CONFIG['WEB_ASSETS_DIR']}/assets/letter_footer.png", 0, 270, 210)
+#         self.set_y(-15)
+#     pass
 
 
-def write_pdf_internal(json):
-    try:
-        html = f"""{json["html"]}"""
-        filename = json["filename"]
+# def write_pdf_internal(json):
+#     try:
+#         html = f"""{json["html"]}"""
+#         filename = json["filename"]
 
-        pdf = MyFPDF()
-        #First page
-        pdf.add_page()
-        pdf.write_html(html)
-        directory = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOG/"
-        path = Path(f"{directory}{filename}")
-        pdf.output(path, "F")
+#         pdf = MyFPDF()
+#         #First page
+#         pdf.add_page()
+#         pdf.write_html(html)
+#         directory = f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOG/"
+#         path = Path(f"{directory}{filename}")
+#         pdf.output(path, "F")
 
-        response = {
-            "status": True,
-            "message": "Success",
-            "path": path
-        }
-    except Exception as err:
-        print(err)
-        response = {
-            "status": False,
-            "message": "Failed",
-            "path": None
-        }
-        raise
+#         response = {
+#             "status": True,
+#             "message": "Success",
+#             "path": path
+#         }
+#     except Exception as err:
+#         print(err)
+#         response = {
+#             "status": False,
+#             "message": "Failed",
+#             "path": None
+#         }
+#         raise
 
-    return response
+#     return response
 
 
 @FILE_MANAGEMENT_BLUEPRINT.route("/send/maintenance_logs/report", methods=["POST"])
@@ -185,13 +191,14 @@ def send_maintenance_logs_pdf_via_email():
 
         response = write_pdf_internal({
             "html": json["html"],
-            "filename": "file_to_send.pdf"
+            "filename": "file_to_send.pdf",
+            "directory": f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/MAINTENANCE_LOG/"
         })
         file_location = response["path"]
 
         email_body = f"""<b>Maintenance report for:</b> {date}<br>{email_body}"""
         
-        response = file_management.send_email(recipients_list, subject, email_body, file_location)
+        response = send_email(recipients_list, subject, email_body, file_location)
         
         if response["status"] == True:
             response = {
@@ -200,7 +207,7 @@ def send_maintenance_logs_pdf_via_email():
                 "data": []
             }
         else:
-            raise Exception("test")
+            raise Exception("Failed to send email")
     
     except Exception as err:
         raise err
