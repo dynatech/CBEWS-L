@@ -15,8 +15,8 @@ from email import encoders
 
 from config import APP_CONFIG
 
-from utils.send_email import send_email
-from utils.write_pdf import write_pdf_internal
+from src.utils.send_email import send_email
+from src.utils.write_pdf import write_pdf_internal
 
 
 FILE_MANAGEMENT_BLUEPRINT = Blueprint("file_management_blueprint", __name__)
