@@ -15,7 +15,12 @@ import { AlertGeneration, AppConfig } from '@dynaslope/commons';
 // import SurficialPlot from './surficial_plot';
 // import SubsurfacePlot from './subsurface_plot';
 
-import PDFPreviewer from '../reducers/PDFViewer';
+import { jsPDF } from "jspdf";
+import autoTable, { __createTable } from 'jspdf-autotable';
+
+import letter_header from '../../assets/letter_header.png';
+import letter_footer from '../../assets/letter_footer.png';
+
 import EmailModal from '../reducers/EmailModal';
 
 import Snackbar from '@material-ui/core/Snackbar';
@@ -543,7 +548,6 @@ function LatestCurrentAlert() {
         }
     }
 
-    //alert(renderToString(html_string));
     const handleSendEmail = (htmlString, email_data) => async () => {
         const response = await AlertGeneration.SendMarLatestCurrentAlertReportViaEmail({
             "email_data": email_data,
@@ -560,32 +564,69 @@ function LatestCurrentAlert() {
         }
         setOpenNotif(true);
         setEmailOpen(false);
+
+    };
+
+    const handleDownloadPDF = () => {
+        const pdf = new jsPDF();
+        var pageHeight = pdf.internal.pageSize.height || pdf.internal.pageSize.getHeight();
+        var pageWidth = pdf.internal.pageSize.width || pdf.internal.pageSize.getWidth();
+
+        // Header (URL, file_type, left_margin, top, width, height)
+        pdf.addImage(letter_header,"PNG", 0, 0, 221, 15);
+        
+        // Content
+        if(htmlString){
+            pdf.text("Marirong Latest Alert Report", 100, 25, {align: "center"});
+            // pdf.autoTable({
+            //     html: htmlString,
+            //     startY: 32,
+            //     headStyles: {
+            //         fillColor: [27, 81, 109],
+            //     }
+            // })
+        } else {
+            pdf.text("No Data", 100, 25, {align: "center"});
+        }
+
+        // Footer (URL, file_type, left_margin, top, width, height)
+        pdf.addImage(letter_footer,"PNG", 0, 272, 212, 20);
+
+        pdf.save('report.pdf')
+    };
+
+    // Print table function
+    const handlePrintPDF = () => {
+        const pdf = new jsPDF();
+        
+        // Header (URL, file_type, left_margin, top, width, height)
+        pdf.addImage(letter_header,"PNG", 0, 0, 221, 15);
+        
+        // Title
+        pdf.text("Marirong Latest Alert Report", 100, 25, {align: "center"});
+
+        // Content
+        
+        // Footer (URL, file_type, left_margin, top, width, height)
+        pdf.addImage(letter_footer,"PNG", 0, 272, 212, 20);
+
+        pdf.autoPrint({variant: 'non-conform'});
+        pdf.output('pdfobjectnewwindow');
     };
 
     function sendEmail() {
+        setEmailOpen(true);
+    }
+    function download() {
+        handleDownloadPDF();
+    }
+    function print() {
+        handlePrintPDF();
         // setModal([<TransitionalModal status={true} />])
         // setTimeout(() => {
         //     setModal([<TransitionalModal status={false} />])
-        //     alert("Successfully sent email!")
+        //     alert("Print success!")
         // }, 3000)
-        setEmailOpen(true);
-
-    }
-
-    function download() {
-        setModal([<TransitionalModal status={true} />])
-        setTimeout(() => {
-            setModal([<TransitionalModal status={false} />])
-            alert("Download success!")
-        }, 3000)
-    }
-
-    function print() {
-        setModal([<TransitionalModal status={true} />])
-        setTimeout(() => {
-            setModal([<TransitionalModal status={false} />])
-            alert("Print success!")
-        }, 3000)
     }
 
     return (
