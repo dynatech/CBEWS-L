@@ -557,9 +557,12 @@ def insert_ewi(internal_ewi_data=None):
         # TODO: Find a way to get the two ff data
         reporter_id_mt = 1
         reporter_id_ct = 2
+        temp_release_time = ewi_data["release_time"]
+        if temp_release_time is None:
+            temp_release_time = dt.now()
         release_dict = {
             "data_ts": data_ts, 
-            "release_time": ewi_data["release_time"],
+            "release_time": temp_release_time,
             "comments": ewi_data["comments"],
             "reporter_id_mt": reporter_id_mt,
             "reporter_id_ct": reporter_id_ct
