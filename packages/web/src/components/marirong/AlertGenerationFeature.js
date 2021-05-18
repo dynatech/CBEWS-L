@@ -579,12 +579,18 @@ function LatestCurrentAlert() {
         if(htmlString){
             pdf.text("Marirong Latest Alert Report", 100, 25, {align: "center"});
             // pdf.autoTable({
-            //     html: htmlString,
+            //     html: renderToString(htmlString),
             //     startY: 32,
             //     headStyles: {
             //         fillColor: [27, 81, 109],
             //     }
             // })
+            pdf.html(
+                renderToString(htmlString), {
+                    x: 10,
+                    y: 32
+                }
+            )
         } else {
             pdf.text("No Data", 100, 25, {align: "center"});
         }
