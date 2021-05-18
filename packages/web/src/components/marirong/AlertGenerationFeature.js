@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import moment from "moment";
 import { useStyles, tableStyle } from '../../styles/general_styles';
-import { AlertGeneration, MarMaintenanceLogs, AppConfig } from '@dynaslope/commons';
+import { AlertGeneration, AppConfig } from '@dynaslope/commons';
 
 // import RainfallPlot from './rainfall_plot';
 // import SurficialPlot from './surficial_plot';
@@ -545,7 +545,7 @@ function LatestCurrentAlert() {
 
     //alert(renderToString(html_string));
     const handleSendEmail = (htmlString, email_data) => async () => {
-        const response = await MarMaintenanceLogs.SendPDFReportViaEmail({
+        const response = await AlertGeneration.SendLatestCurrentAlertReportViaEmail({
             "email_data": email_data,
             "html": renderToString(htmlString),
             "date": moment().format("YYYY-MM-DD hh:mm:ss")

@@ -204,7 +204,8 @@ import {
   GetMarAlertValidationData,
   GetUmiAlertValidationData,
   InsertEWI,
-  ValidateTrigger
+  ValidateTrigger,
+  SendLatestCurrentAlertReportViaEmail
 } from "./src/AlertGeneration/PublicAlerts";
 import { RenderPDF, DownloadPDF } from "./src/MAR/FileManager/PDFManager";
 
@@ -223,7 +224,8 @@ const AlertGeneration = {
   GetUmiAlertValidationData,
   GetMarAlertValidationData,
   InsertEWI,
-  ValidateTrigger
+  ValidateTrigger,
+  SendLatestCurrentAlertReportViaEmail
 };
 
 const MarDataAnalysis = {
