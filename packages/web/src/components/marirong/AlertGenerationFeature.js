@@ -545,7 +545,7 @@ function LatestCurrentAlert() {
 
     //alert(renderToString(html_string));
     const handleSendEmail = (htmlString, email_data) => async () => {
-        const response = await AlertGeneration.SendLatestCurrentAlertReportViaEmail({
+        const response = await AlertGeneration.SendMarLatestCurrentAlertReportViaEmail({
             "email_data": email_data,
             "html": renderToString(htmlString),
             "date": moment().format("YYYY-MM-DD hh:mm:ss")

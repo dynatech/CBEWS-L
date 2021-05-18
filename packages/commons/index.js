@@ -205,7 +205,7 @@ import {
   GetUmiAlertValidationData,
   InsertEWI,
   ValidateTrigger,
-  SendLatestCurrentAlertReportViaEmail
+  SendMarLatestCurrentAlertReportViaEmail
 } from "./src/AlertGeneration/PublicAlerts";
 import { RenderPDF, DownloadPDF } from "./src/MAR/FileManager/PDFManager";
 

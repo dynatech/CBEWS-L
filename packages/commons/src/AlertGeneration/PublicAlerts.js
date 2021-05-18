@@ -106,7 +106,7 @@ const ValidateTrigger = (payload) => {
 
 const SendMarLatestCurrentAlertReportViaEmail = (data) => {
     console.log("data", data);
-    return fetch(`${AppConfig.HOSTNAME}/v2/send/maintenance_logs/report`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/send/latest_current_alert/report`, {
         method: 'POST',
         headers: {
             Accept: 'application/json',
