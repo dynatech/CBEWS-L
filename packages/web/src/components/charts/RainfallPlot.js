@@ -417,7 +417,7 @@ export default function RainfallPlot(props) {
                             <Grid item xs={12}>
                                 <Paper>
                                     <Typography align='center'>
-                                            Loading rainfall graph
+                                            Loading rainfall graphs
                                     </Typography>
                                 </Paper>
                             </Grid>

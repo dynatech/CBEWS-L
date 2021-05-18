@@ -9,6 +9,10 @@ from src.model.v2.dynamic_variables import DynamicVariables as dv
 from src.api.helpers import Helpers as h
 from src.api.v2.alert_generation import candidate_alerts_generator
 
+from src.utils.send_email import send_email
+from src.utils.write_pdf import write_pdf_internal
+
+from config import APP_CONFIG
 
 PUBLIC_ALERTS_BLUEPRINT = Blueprint("public_alerts_blueprint", __name__)
 
@@ -164,6 +168,49 @@ def get_umi_alert_validation_data():
     
     except Exception as err:
         raise(err)
+
+    return jsonify(response)
+
+
+@PUBLIC_ALERTS_BLUEPRINT.route("/send/latest_current_alert/report", methods=["POST"])
+def send_latest_current_alert_pdf_via_email():
+    """
+    """
+    try:
+        json = request.get_json()
+        date = json["date"]
+        email_data = json["email_data"]
+        recipients_list = email_data["recipient_list"]
+        subject = email_data["subject"]
+        email_body = email_data["email_body"]
+
+        response = write_pdf_internal({
+            "html": json["html"],
+            "filename": "MAR_latest_alert_report.pdf",
+            "directory": f"{APP_CONFIG['MARIRONG_DIR']}/DOCUMENTS/LATEST_CURRENT_ALERT/"
+        })
+        file_location = response["path"]
+
+        email_body = f"""<b>Marirong Latest Current Report</b> {date}<br>{email_body}"""
+        
+        response = send_email(recipients_list, subject, email_body, file_location)
+        
+        if response["status"] == True:
+            response = {
+                "status": True,
+                "message": "Success",
+                "data": []
+            }
+        else:
+            raise Exception("Failed to send email")
+    
+    except Exception as err:
+        raise err
+        response = {
+            "status": False,
+            "message": "Failed",
+            "data": []
+        }
 
     return jsonify(response)
 
