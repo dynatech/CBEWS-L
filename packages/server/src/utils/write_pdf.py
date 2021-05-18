@@ -28,7 +28,7 @@ def write_pdf_internal(json):
         #First page
         pdf.add_page()
         pdf.write_html(html)
-        directory = f"{APP_CONFIG['MARIRONG_DIR']}{direc}"
+        directory = "{direc}"
         path = Path(f"{directory}{filename}")
         pdf.output(path, "F")
 
