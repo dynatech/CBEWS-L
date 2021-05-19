@@ -17,9 +17,9 @@ export default function ChangeSystemTimeDash() {
     });
   }
 
-  function changeTime (e) {
-    console.log("e change", e);
-    // setTime(e)
+  const onDateChange = (date, value) => {
+    setTime(date);
+    // setInputValue(value);
   };
 
   return (
@@ -39,7 +39,7 @@ export default function ChangeSystemTimeDash() {
                       value={time}
                       format="YYYY-MM-DD hh:mm:ss"
                       // inputValue={}
-                      onChange={changeTime}
+                      onChange={onDateChange}
                     />
               </MuiPickersUtilsProvider>
             </Grid>

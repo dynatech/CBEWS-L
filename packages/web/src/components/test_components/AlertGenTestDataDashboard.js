@@ -6,7 +6,7 @@ import TruncateDataDash from "./sub_folders/TruncateDataDash"
 
 export default function AlertGenTestDataDashboard () {
   const [value, setValue] = useState(0);
-  const [component, setComponent] = useState()
+  const [component, setComponent] = useState(<AddDataDash />)
 
   const handleChange = (event, newValue) => {
     event.preventDefault();

@@ -207,6 +207,8 @@ import {
 } from "./src/AlertGeneration/PublicAlerts";
 import { RenderPDF, DownloadPDF } from "./src/MAR/FileManager/PDFManager";
 
+import { ChangeServerTime } from "./src/AlertGeneration/DataGeneration";
+
 const UserManagement = {
   AuthRegistration,
   UserAuthentication,
@@ -390,6 +392,10 @@ const UmiSensorMaintenance = {
   DeleteSensorMaintenanceLogs,
 }
 
+const ServerDataGen = {
+  ChangeServerTime,
+}
+
 export {
     AppConfig,
     AlertGeneration,
@@ -408,4 +414,5 @@ export {
     UmiDataAnalysis,
     UmiGroundData,
     UmiSensorMaintenance,
+    ServerDataGen,   
 }
