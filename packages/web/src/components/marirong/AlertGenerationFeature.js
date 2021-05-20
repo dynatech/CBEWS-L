@@ -183,7 +183,6 @@ function AlertValidation() {
         // "#ee9d01"
 
         // "#195770"
-        alert(JSON.stringify(data));
         let alert_validity = 0;
         let remark = "";
         if (status) {
