@@ -183,6 +183,7 @@ function AlertValidation() {
         // "#ee9d01"
 
         // "#195770"
+        alert(JSON.stringify(data));
         let alert_validity = 0;
         let remark = "";
         if (status) {
@@ -391,11 +392,26 @@ function CurrentAlertArea(props) {
 
     };
 
-    if (leo !== null) {
+    if (leo === null){
+        return (
+            <Grid item xs={12} align="center">
+                <Typography variant="h4" align="center">Loading...</Typography>
+            </Grid>
+            
+        );
+    }
+    else if(leo === "no_alert"){
+        return (
+            <Grid item xs={12} align="center">
+                <Typography variant="h2" align="center">No activity in site</Typography>
+            </Grid>
+            
+        );
+    }
+    else {
         const as_of = moment(leo.data_ts).add(30, "mins").format("dddd, MMMM Do YYYY, h:mm A");
         const event_start = moment(leo.event_start).format("MMMM D, YYYY h:mm A");
         const validity = moment(leo.validity).format("MMMM D, YYYY h:mm A");
-
         const color_class = identifyAlertStyle(leo.public_alert_level, classes);
 
         return (
@@ -466,13 +482,6 @@ function CurrentAlertArea(props) {
                 </Grid>
             </Fragment>
         );
-    } else {
-        return (
-            <Grid item xs={12} align="center">
-                <Typography variant="h2" align="center">No activity in site</Typography>
-            </Grid>
-            
-        )
     }
 }
 
@@ -541,7 +550,7 @@ function LatestCurrentAlert() {
                 setLeo(site_data);
                 setHtmlString(generatePDFReport(site_data));
             } else {
-                setLeo(null);
+                setLeo("no_alert");
                 console.log("No alert on site");
                 setHtmlString(<Typography>No data</Typography>);
             }
