@@ -405,7 +405,7 @@ export default function SubsurfaceColumnPositionPlot(props) {
                 console.error(response.message);
             }
         } else {
-            console.log("Subsurface undergoing maintenance...");
+            console.log("Loading subsurface graphs");
         }
     }
     
@@ -454,7 +454,7 @@ export default function SubsurfaceColumnPositionPlot(props) {
                                 <Paper>
                                     <Typography align='center'>
                                             {/* Loading subsurface graph */}
-                                            Subsurface graphs undergoing improvements...
+                                            Loading subsurface graphs
                                     </Typography>
                                 </Paper>
                             </Grid>

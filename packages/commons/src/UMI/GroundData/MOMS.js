@@ -1,7 +1,7 @@
 import AppConfig from '../../utils/AppConfig';
 
 const InsertMOMSData = (data) => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/add/ground_data/umi/moms`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/add/ground_data/moms`, {
         method: 'POST',
         headers: {
             Accept: 'application/json',
@@ -69,9 +69,28 @@ const DeleteMOMSData = (data) => {
     });
 };
 
+const InsertMOMSInstance = (data) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/add/ground_data/moms/instance`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        return responseJson;
+      })
+      .catch((error) => {
+        console.error("Error on adding moms feature. Err: ", error);
+      });
+  };
+
 export { 
     InsertMOMSData,
     UpdateMOMSData,
     GetMOMSData,
     DeleteMOMSData,
+    InsertMOMSInstance,
 }

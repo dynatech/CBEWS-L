@@ -33,7 +33,7 @@ export default function RiskAssessmentSummary(props) {
     const [notifText, setNotifText] = useState("");
 
     const [selectedData, setSelectedData] = useState({});
-    const [command, setCommand] = useState("add");
+    const [command, setCommand] = useState("Add");
 
     const formData = useRef();
     const [defaultStringValues, setDefaultStrValues] = useState({
@@ -85,7 +85,7 @@ export default function RiskAssessmentSummary(props) {
             'Adaptive Capacity': '',
             'Vulnerability': ''
         });
-        setCommand("add");
+        setCommand("Add");
     };
 
     const handleAdd = () => {

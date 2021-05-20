@@ -33,7 +33,7 @@ export default function FamilyRiskProfile(props) {
     const [notifText, setNotifText] = useState("");
 
     const [selectedData, setSelectedData] = useState({});
-    const [command, setCommand] = useState("add");
+    const [command, setCommand] = useState("Add");
 
     const formData = useRef();
     const [defaultStringValues, setDefaultStrValues] = useState({
@@ -83,7 +83,7 @@ export default function FamilyRiskProfile(props) {
             "Vulnerable Groups": "",
             "Nature of Vulnerability": "",
         });
-        setCommand("add");
+        setCommand("Add");
     };
 
     const handleAdd = () => {

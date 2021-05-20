@@ -104,9 +104,30 @@ const ValidateTrigger = (payload) => {
     );
 }
 
+const SendMarLatestCurrentAlertReportViaEmail = (data) => {
+    console.log("data", data);
+    return fetch(`${AppConfig.HOSTNAME}/v2/send/latest_current_alert/report`, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        return {
+            "status": false,
+            "message": error
+        };
+    });
+}
 
 export { 
     MarGetOngoingAndExtendedMonitoring, UmiGetOngoingAndExtendedMonitoring, 
     GetUmiAlertValidationData, GetMarAlertValidationData,
-    InsertEWI, ValidateTrigger
+    InsertEWI, ValidateTrigger, SendMarLatestCurrentAlertReportViaEmail
 }

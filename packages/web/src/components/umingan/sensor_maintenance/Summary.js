@@ -143,7 +143,7 @@ export default function Summary(props) {
 
     return (
         <Fragment>
-            <Container style={{ marginTop: 24 }}>
+            <Container style={{ marginTop: 24 , minHeight: window.innerHeight - 220}}>
                 <Paper style={{ padding: "2%" }}>
                     <Grid container alignItems="flex-start" justify="flex-end" direction="row" spacing={2}>
                         <Grid item xs={12}>

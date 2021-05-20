@@ -7,7 +7,7 @@ export default function LatestMeasurement(props) {
     const { classes, latestMeas } = props; 
     console.log("latestMeas", latestMeas);
     return (
-        <Container>
+        <Container style={{minHeight: window.innerHeight - 220}}>
             <Paper style={{ padding: "2%" }}>
                 <Typography variant="h5">Surficial Measurement</Typography>
                 {

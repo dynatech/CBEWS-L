@@ -168,6 +168,7 @@ import {
   UpdateMOMSData as UMIUpdateMOMSData,
   InsertMOMSData as UMIInsertMOMSData,
   DeleteMOMSData as UMIDeleteMOMSData,
+  InsertMOMSInstance as UMIInsertMOMSInstance,
 } from "./src/UMI/GroundData/MOMS";
 
 import {
@@ -203,7 +204,8 @@ import {
   GetMarAlertValidationData,
   GetUmiAlertValidationData,
   InsertEWI,
-  ValidateTrigger
+  ValidateTrigger,
+  SendMarLatestCurrentAlertReportViaEmail
 } from "./src/AlertGeneration/PublicAlerts";
 import { RenderPDF, DownloadPDF } from "./src/MAR/FileManager/PDFManager";
 
@@ -224,7 +226,8 @@ const AlertGeneration = {
   GetUmiAlertValidationData,
   GetMarAlertValidationData,
   InsertEWI,
-  ValidateTrigger
+  ValidateTrigger,
+  SendMarLatestCurrentAlertReportViaEmail
 };
 
 const MarDataAnalysis = {
@@ -377,6 +380,7 @@ const UmiGroundData = {
   UpdateMOMSData: UMIUpdateMOMSData,
   InsertMOMSData: UMIInsertMOMSData,
   DeleteMOMSData: UMIDeleteMOMSData,
+  InsertMOMSInstance: UMIInsertMOMSInstance,
   GetSurficialMarkersData: UMIGetSurficialMarkersData,
   UpdateSurficialMarkerData: UMIUpdateSurficialMarkerData,
   InsertSurficialMarkersData: UMIInsertSurficialMarkersData,

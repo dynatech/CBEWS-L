@@ -34,7 +34,7 @@ export default function FieldSurveyLogs(props) {
     const [notifText, setNotifText] = useState("");
 
     const [selectedData, setSelectedData] = useState({});
-    const [command, setCommand] = useState("add");
+    const [command, setCommand] = useState("Add");
 
     const formData = useRef();
     const [defaultStringValues, setDefaultStrValues] = useState({
@@ -104,7 +104,7 @@ export default function FieldSurveyLogs(props) {
         setDefaultTSValues({
             'Report Date': moment(),
         })
-        setCommand("add");
+        setCommand("Add");
     };
 
     const handleAdd = () => {

@@ -73,7 +73,7 @@ function convertToSimpleHTML(data_type, data) {
                 return_element = (
                     <div style={{width: "100%", borderSpacing: "5px", marginLeft: "10%"}}>
                         <h3>Umingan Situation Report</h3>
-                        <table id='toExport' border={0} style={tableStyle}>
+                        <table id='umi_situation_report_table' border={0} style={tableStyle}>
                             <tr>
                                 <td width={300} style={thStyle}>Date:</td>
                             </tr>
@@ -95,8 +95,8 @@ function convertToSimpleHTML(data_type, data) {
             case "umi_situation_report_list":
                 return_element = (
                     <div>
-                        <h3>Umi Situation Report</h3>
-                        <table id='toExport' border={1}>
+                        <h3>Umingan Situation Report</h3>
+                        <table id='umi_situation_report_list_table' border={1}>
                             <tr>
                                 <th width={300} style={thStyle}>Date</th>
                                 <th width={1000} style={thStyle}>Summary</th>
@@ -119,7 +119,7 @@ function convertToSimpleHTML(data_type, data) {
                 return_element = (
                     <div>
                         <h3>Umingan Field Survey</h3>
-                        <table id='toExport' style={{width: "30%", borderSpacing: "5px", marginLeft: "10%"}}>
+                        <table id='umi_field_survey_table' style={{width: "30%", borderSpacing: "5px", marginLeft: "10%"}}>
                             <tr>
                                 <td width={400} style={thStyle}><strong>Date:</strong></td>
                                 <td width={700} style={thStyle}>{survey_rep.report_date}</td>
@@ -151,8 +151,8 @@ function convertToSimpleHTML(data_type, data) {
             case "umi_field_survey_list":
                 return_element = (
                     <div>
-                        <h3>Umi Field Survey Report</h3>
-                        <table id='toExport' border={1}>
+                        <h3>Umingan Field Survey Report</h3>
+                        <table id='umi_field_survey_list_table' border={1} style={{width: "30%"}}>
                             <tr>
                                 <th width={300} style={thStyle}>Date</th>
                                 <th width={300} style={thStyle}>Features</th>
@@ -161,7 +161,7 @@ function convertToSimpleHTML(data_type, data) {
                                 <th width={300} style={thStyle}>Exposure</th>
                                 <th width={300} style={thStyle}>Report Narrative</th>
                             </tr>
-                            {
+                            {/* {
                                 data.map((row, i) => (
                                     <tr key={i}>
                                         <td width={300} style={tdStyle}>{row.report_date}</td>
@@ -172,6 +172,18 @@ function convertToSimpleHTML(data_type, data) {
                                         <td width={1000} style={tdStyle}>{row.report_narrative}</td>
                                     </tr>
                                 ))
+                            } */}
+                            {
+                                data.map((row, i) => (
+                                    <tr key={i}>
+                                        <td width={300} style={tdStyle}>{row.report_date}</td>
+                                        <td width={300} style={tdStyle}>{row.feature}</td>
+                                        <td width={300} style={tdStyle}>{row.materials_characterization}</td>
+                                        <td width={300} style={tdStyle}>{row.mechanism}</td>
+                                        <td width={300} style={tdStyle}>{row.exposure}</td>
+                                        <td width={300} style={tdStyle}>{row.report_narrative}</td>
+                                    </tr>
+                                ))
                             }
                         </table>
                     </div>
@@ -179,11 +191,10 @@ function convertToSimpleHTML(data_type, data) {
                 break;
             case "umi_maintenance_report":
                 const sensor_main = data[0];
-
                 return_element = (
                     <div>
-                        <h3>Umi Maintenance Report</h3>
-                        <table id='toExport' border={1} style={{width: "100%"}}>
+                        <h3>Umingan Maintenance Report</h3>
+                        <table id='umi_maintenance_report_table' border={1} style={{width: "100%"}}>
                             <tr>
                                 <th width={220} style={thStyle}>Date</th>
                                 <th width={330} style={thStyle}>Features</th>
@@ -210,7 +221,7 @@ function convertToSimpleHTML(data_type, data) {
                 return_element = (
                     <div>
                         <h3>Mar Incident Report</h3>
-                        <table id='toExport' border={1}>
+                        <table id='mar_incident_report_table' border={1}>
                             <tr>
                                 <th width={300} style={thStyle}>Date</th>
                                 <th width={200} style={thStyle}>Report Narrative</th>
@@ -233,7 +244,7 @@ function convertToSimpleHTML(data_type, data) {
                 return_element = (
                     <div>
                         <h3>Mar Maintenance Report</h3>
-                        <table id='toExport' border={1} style={{width: "100%"}}>
+                        <table id='mar_maintenance_report_table' border={1} style={{width: "100%"}}>
                             <tr>
                                 <th width={150} style={thStyle}>Date</th>
                                 <th width={350} style={thStyle}>Type</th>
@@ -310,36 +321,85 @@ function PDFPreviewer(props) {
         switch(data_type) {
             case "umi_situation_report":
                 pdf.text("Umingan Situation Report", 100, 25, {align: "center"});
+                pdf.autoTable({
+                    html: '#umi_situation_report_table',
+                    startY: 32,
+                    headStyles: {
+                        fillColor: [27, 81, 109],
+                    }
+                })
                 break;
             case "umi_situation_report_list":
-                pdf.text("Umingan Situation Report List", 100, 25, {align: "center"});
+                pdf.text("Umingan Situation Report", 100, 25, {align: "center"});
+                pdf.autoTable({
+                    html: '#umi_situation_report_list_table',
+                    startY: 32,
+                    headStyles: {
+                        fillColor: [27, 81, 109],
+                    }
+                })
                 break;
             case "umi_field_survey":
                 pdf.text("Umingan Field Survey", 100, 25, 'center');
+                pdf.autoTable({
+                    html: '#umi_field_survey_table',
+                    startY: 32,
+                    headStyles: {
+                        fillColor: [27, 81, 109],
+                    }
+                })
                 break;
             case "umi_field_survey_list":
-                pdf.text("Umingan Field Survey List", 100, 25, {align: "center"});
+                pdf.text("Umingan Field Survey Report", 100, 25, {align: "center"});
+                pdf.autoTable({
+                    html: '#umi_field_survey_list_table',
+                    startY: 32,
+                    headStyles: {
+                        fillColor: [27, 81, 109],
+                    }
+                })
                 break;
             case "umi_maintenance_report":
                 pdf.text("Umingan Maintenance Report", 100, 25, {align: "center"});
+                pdf.autoTable({
+                    html: '#umi_maintenance_report_table',
+                    startY: 32,
+                    headStyles: {
+                        fillColor: [27, 81, 109],
+                    }
+                })
                 break;
             case "mar_incident_report":
                 pdf.text("Marirong Incident Report", 100, 25, {align: "center"});
+                pdf.autoTable({
+                    html: '#mar_incident_report_table',
+                    startY: 32,
+                    headStyles: {
+                        fillColor: [27, 81, 109],
+                    }
+                })
                 break;
             case "mar_maintenance_report":
                 pdf.text("Marirong Maintenance Report", 100, 25, {align: "center"});
+                pdf.autoTable({
+                    html: '#mar_maintenance_report_table',
+                    startY: 32,
+                    headStyles: {
+                        fillColor: [27, 81, 109],
+                    }
+                })
                 break;
             default:
                 pdf.text("No Data", 100, 25, {align: "center"});
         }
         
-        pdf.autoTable({
-            html: '#toExport',
-            startY: 32,
-            headStyles: {
-                fillColor: [27, 81, 109],
-            }
-        })
+        // pdf.autoTable({
+        //     html: '#toExport',
+        //     startY: 32,
+        //     headStyles: {
+        //         fillColor: [27, 81, 109],
+        //     }
+        // })
 
         // Footer (URL, file_type, left_margin, top, width, height)
         pdf.addImage(letter_footer,"PNG", 0, 272, 212, 20);
