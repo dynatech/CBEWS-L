@@ -83,8 +83,8 @@ class DatabaseConnection():
         return final_list
 
     def db_read(query, schema):
+        db, cur = DatabaseConnection.db_connect(schema)
         try:
-            db, cur = DatabaseConnection.db_connect(schema)
             a = cur.execute(query)
             out = []
             if a:
@@ -92,13 +92,15 @@ class DatabaseConnection():
                 colnames = [desc[0] for desc in cur.description]
                 out = DatabaseConnection.match_kv_pairs(colnames, out)
                 
-                db.close()
+                # db.close()
             return out
 
         except MySQLdb.OperationalError as err:
             # self.error_logger.store_error_log(self.exception_to_string(err))
             print("MySQLdb OP Error:", err)
             time.sleep(20)
+        finally:
+            db.close()
     
     def db_switcher(site_id):
         schema = ""
