@@ -6,9 +6,9 @@ import sys, json
 from datetime import datetime as dt, timedelt
 
 
-ALERTGEN_TEST_UTILS = Blueprint("public_alerts_blueprint", __name__)
+ALERTGEN_TEST_UTILS_BLUEPRINT = Blueprint("alert_gen_test_utils_blueprint", __name__)
 
-@ALERTGEN_TEST_UTILS.route("/change_server_time", methods=["POST"])
+@ALERTGEN_TEST_UTILS_BLUEPRINT.route("/change_server_time", methods=["POST"])
 def change_system_time():
     json_input = request.get_json()
     response = {

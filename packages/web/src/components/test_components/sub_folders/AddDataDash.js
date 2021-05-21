@@ -77,18 +77,19 @@ export default function ChangeSystemTimeDash(props) {
     setTriggerType(e.target.value);
   };
 
-  function handleStatusChange(e) {
-    setStatus(e.target.value);
-    const ia = lookUpTable[triggerType][e.target.value];
+  function handleStatusChange(e) {    
+    const val = e.target.value;
+    setStatus(val);
+    const ia = lookUpTable[triggerType][val];
     switch (triggerType) {
       case "rainfall":
-        setRainfallData({...rainfallData, internal_alert: ia})
+        setRainfallData({...rainfallData, internal_alert: ia, alert_level: val})
         break;
       case "surficial":
-        setSurficialData({...surficialData, internal_alert: ia})
+        setSurficialData({...surficialData, internal_alert: ia, alert_level: val})
         break;
       case "subsurface":
-        setSubsurfaceData({...subsurfaceData, internal_alert: ia})
+        setSubsurfaceData({...subsurfaceData, internal_alert: ia, alert_level: val})
         break;
       default:
         break;
