@@ -90,7 +90,8 @@ def get_create_engine(dbc):
     try:
         engine = create_engine('mysql+pymysql://' + 
             dbc['user'] + ':'+ dbc['password'] + '@' + 
-            dbc['host'] +':3306/' + dbc['schema'])
+            dbc['host'] +':3306/' + dbc['schema'],
+            pool_size=20, max_overflow=10, pool_pre_ping=True)
         return engine
     except sqlalchemy.exc.OperationalError:
         print (">> Error in connetion")
