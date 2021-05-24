@@ -117,7 +117,7 @@ function AlertValidation() {
             .then(responseJson => {
                 console.log("get_mar_alert_validation_data responseJson", responseJson);
                 const { public_alert_level, as_of_ts, status } = responseJson.data;
-                const as_of_ts_format = moment(as_of_ts).format("H:mm A, D MMMM YYYY, dddd");
+                const as_of_ts_format = moment(as_of_ts).format("hh:mm A, D MMMM YYYY, dddd");
                 setAsOfTs(as_of_ts_format);
                 setEwiData({
                     ...responseJson.data,
