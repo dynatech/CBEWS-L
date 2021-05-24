@@ -106,7 +106,7 @@ const ValidateTrigger = (payload) => {
 
 const SendMarLatestCurrentAlertReportViaEmail = (data) => {
     console.log("data", data);
-    return fetch(`${AppConfig.HOSTNAME}/v2/send/latest_current_alert/report`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/send/mar/latest_current_alert/report`, {
         method: 'POST',
         headers: {
             Accept: 'application/json',
@@ -128,7 +128,7 @@ const SendMarLatestCurrentAlertReportViaEmail = (data) => {
 
 const SendUmiLatestCurrentAlertReportViaEmail = (data) => {
     console.log("data", data);
-    return fetch(`${AppConfig.HOSTNAME}/v2/send/latest_current_alert/report`, {
+    return fetch(`${AppConfig.HOSTNAME}/v2/send/umi/latest_current_alert/report`, {
         method: 'POST',
         headers: {
             Accept: 'application/json',

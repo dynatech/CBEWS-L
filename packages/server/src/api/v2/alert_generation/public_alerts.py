@@ -172,8 +172,8 @@ def get_umi_alert_validation_data():
     return jsonify(response)
 
 
-@PUBLIC_ALERTS_BLUEPRINT.route("/send/latest_current_alert/report", methods=["POST"])
-def send_latest_current_alert_pdf_via_email():
+@PUBLIC_ALERTS_BLUEPRINT.route("/send/mar/latest_current_alert/report", methods=["POST"])
+def send_mar_latest_current_alert_pdf_via_email():
     """
     """
     try:
@@ -192,6 +192,48 @@ def send_latest_current_alert_pdf_via_email():
         file_location = response["path"]
 
         email_body = f"""<b>Marirong Latest Current Report</b> {date}<br>{email_body}"""
+        
+        response = send_email(recipients_list, subject, email_body, file_location)
+        
+        if response["status"] == True:
+            response = {
+                "status": True,
+                "message": "Success",
+                "data": []
+            }
+        else:
+            raise Exception("Failed to send email")
+    
+    except Exception as err:
+        raise err
+        response = {
+            "status": False,
+            "message": "Failed",
+            "data": []
+        }
+
+    return jsonify(response)
+
+@PUBLIC_ALERTS_BLUEPRINT.route("/send/umi/latest_current_alert/report", methods=["POST"])
+def send_umi_latest_current_alert_pdf_via_email():
+    """
+    """
+    try:
+        json = request.get_json()
+        date = json["date"]
+        email_data = json["email_data"]
+        recipients_list = email_data["recipient_list"]
+        subject = email_data["subject"]
+        email_body = email_data["email_body"]
+
+        response = write_pdf_internal({
+            "html": json["html"],
+            "filename": "UMI_latest_alert_report.pdf",
+            "directory": f"{APP_CONFIG['UMINGAN_DIR']}/DOCUMENTS/LATEST_CURRENT_ALERT/"
+        })
+        file_location = response["path"]
+
+        email_body = f"""<b>Umingan Latest Current Report</b> {date}<br>{email_body}"""
         
         response = send_email(recipients_list, subject, email_body, file_location)
         
