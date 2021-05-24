@@ -654,6 +654,12 @@ function CurrentAlert() {
                 <Grid container spacing={2} justify="center" alignItems="center">
                     <CurrentAlertArea leo={leo} classes={classes} actions={{sendEmail, download, print}} />
                 </Grid>
+                <EmailModal
+                    open={emailOpen}
+                    setOpen={setEmailOpen}
+                    html={htmlString}
+                    handleSubmit={handleSendEmail}
+                /> 
             </Container>
             {modal}
             <Snackbar open={openNotif} 
