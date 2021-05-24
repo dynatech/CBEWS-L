@@ -554,7 +554,10 @@ function CurrentAlert() {
                 setLeo(site_data);
                 setHtmlString(generatePDFReport(site_data));
             } else {
-                console.error("There is something wrong with the code in latest current alert");
+                //console.error("There is something wrong with the code in latest current alert");
+                setLeo("no_alert");
+                console.log("No alert on site");
+                setHtmlString(<Typography>No data</Typography>);
             }
         }
     }
