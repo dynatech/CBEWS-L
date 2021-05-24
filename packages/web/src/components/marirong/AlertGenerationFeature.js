@@ -403,8 +403,7 @@ function CurrentAlertArea(props) {
         return (
             <Grid item xs={12} align="center">
                 <Typography variant="h2" align="center">No activity in site</Typography>
-            </Grid>
-            
+            </Grid>      
         );
     }
     else {
@@ -636,11 +635,6 @@ function LatestCurrentAlert() {
     }
     function print() {
         handlePrintPDF();
-        // setModal([<TransitionalModal status={true} />])
-        // setTimeout(() => {
-        //     setModal([<TransitionalModal status={false} />])
-        //     alert("Print success!")
-        // }, 3000)
     }
 
     return (

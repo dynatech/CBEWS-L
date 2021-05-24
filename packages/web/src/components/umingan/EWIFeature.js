@@ -1,4 +1,5 @@
 import React, { useState, Fragment, useEffect } from 'react';
+import { renderToString } from 'react-dom/server';
 import green from '@material-ui/core/colors/green';
 import TransitionalModal from '../reducers/loading';
 import {
@@ -13,6 +14,14 @@ import { AlertGeneration, AppConfig } from '@dynaslope/commons';
 // import RainfallPlot from './rainfall_plot';
 // import SurficialPlot from './surficial_plot';
 // import SubsurfacePlot from './subsurface_plot';
+
+import { jsPDF } from "jspdf";
+import autoTable, { __createTable } from 'jspdf-autotable';
+
+import letter_header from '../../assets/letter_header.png';
+import letter_footer from '../../assets/letter_footer.png';
+
+import EmailModal from '../reducers/EmailModal';
 
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -381,7 +390,23 @@ function CurrentAlertArea(props) {
 
     };
 
-    if (leo !== "empty" && leo !== "undefined") {
+    if(leo === null){
+        return (
+            <Grid item xs={12} align="center">
+                <Typography variant="h4" align="center">Loading...</Typography>
+            </Grid>
+            
+        );
+    }
+    else if(leo === "no_alert"){
+        return (
+            <Grid item xs={12} align="center">
+                <Typography variant="h2" align="center">No current alert</Typography>
+            </Grid>
+            
+        );
+    }
+    else{
         console.log("leo", leo);
         const as_of = moment(leo.data_ts).add(30, "mins").format("dddd, MMMM Do YYYY, h:mm A");
         const event_start = moment(leo.event_start).format("MMMM D, YYYY h:mm A");
@@ -441,21 +466,75 @@ function CurrentAlertArea(props) {
                             Email
                         </Fab>
                     </Grid>
-                </Grid>
+                    <Grid item xs={2} align="center">
+                        <Fab variant="extended"
+                            color="primary"
+                            aria-label="add" className={classes.button_fluid}
+                            onClick={() => { download() }}>
+                            Download
+                        </Fab>
+                    </Grid>
+                    <Grid item xs={2} align="center">
+                        <Fab variant="extended"
+                            color="primary"
+                            aria-label="add" className={classes.button_fluid}
+                            onClick={() => { print() }}>
+                            Print
+                        </Fab>
+                    </Grid>
+                </Grid>     
             </Fragment>
         );
-    } else {
-        return (
-            <Typography variant="h2" align="center">No current alert</Typography>
-        )
     }
+}
+
+function generatePDFReport(data){
+    const thStyle = {
+        wordWrap: "break-word",
+    };
+    const tdStyle = {
+        wordWrap: "break-word",
+        textAlign: "center"
+    };
+
+    let output = (
+        <div>
+            <h3>Umingan Latest Current Alert Level Information</h3>
+            <table id='mar_latest_current_alert' style={{width: "30%", borderSpacing: "5px", marginLeft: "10%"}}>
+                <tr>
+                    <td width={400} style={thStyle}>Date/Time:</td>
+                    <td width={700} style={thStyle}><strong>{data.report_date}</strong></td>
+                </tr>
+                <tr>
+                    <td width={400} style={thStyle}>Alert Level Released:</td>
+                    <td width={700} style={thStyle}><strong>Alert {data.public_alert_level} ({data.latest_event_triggers.info}, valid until {data.validity})</strong></td>
+                </tr>
+                <tr>
+                    <td width={400} style={thStyle}>Recommended Response:</td>
+                    <td width={700} style={thStyle}><strong>{data.recommended_response}</strong></td>
+                </tr>
+                <tr>
+                    <td width={400} style={thStyle}>Released by:</td>
+                    <td width={700} style={thStyle}>{data.reporter}</td>
+                </tr>
+            </table>
+        </div>
+    );
+    return output;
 }
 
 function CurrentAlert() {
     const classes = useStyles();
     const [modal, setModal] = useState([<TransitionalModal status={false} />]);
-    const [leo, setLeo] = useState("empty");
+    // const [leo, setLeo] = useState("empty");
+    const [leo, setLeo] = useState(null);
     const [releaseStatus, setReleaseStatus] = useState("No event on site.");
+    const [htmlString, setHtmlString] = useState(null);
+
+    const [emailOpen, setEmailOpen] = useState(false);
+    const [openNotif, setOpenNotif] = useState(false);
+    const [notifText, setNotifText] = useState("");
+    const [notifStatus, setNotifStatus] = useState('success');
 
     useEffect(() => {
         initLatestCurrentAlert();
@@ -473,34 +552,100 @@ function CurrentAlert() {
             if (key in data) {
                 const site_data = data[key].find(site_data => site_data.site_id === 50);
                 setLeo(site_data);
+                setHtmlString(generatePDFReport(site_data));
             } else {
                 console.error("There is something wrong with the code in latest current alert");
             }
         }
     }
 
+    const handleSendEmail = (htmlString, email_data) => async () => {
+        const response = await AlertGeneration.SendUmiLatestCurrentAlertReportViaEmail({
+            "email_data": email_data,
+            "html": renderToString(htmlString),
+            "date": moment().format("YYYY-MM-DD hh:mm:ss")
+        });
+        if (response.status === true) {
+            console.log("Email report sent successfully");
+            setNotifStatus("success");
+            setNotifText("Email report sent successfully");
+        } else {
+            setNotifStatus("error");
+            setNotifText("Email report failed to send");
+        }
+        setOpenNotif(true);
+        setEmailOpen(false);
+
+    };
+
+    const handleDownloadPDF = () => {
+        const pdf = new jsPDF();
+        var pageHeight = pdf.internal.pageSize.height || pdf.internal.pageSize.getHeight();
+        var pageWidth = pdf.internal.pageSize.width || pdf.internal.pageSize.getWidth();
+
+        // Header (URL, file_type, left_margin, top, width, height)
+        pdf.addImage(letter_header,"PNG", 0, 0, 221, 15);
+        
+        // Content
+        if(htmlString){
+            pdf.text("Umingan Latest Alert Report", 100, 25, {align: "center"});
+            // pdf.autoTable({
+            //     html: renderToString(htmlString),
+            //     startY: 32,
+            //     headStyles: {
+            //         fillColor: [27, 81, 109],
+            //     }
+            // })
+            pdf.html(
+                renderToString(htmlString), {
+                    x: 10,
+                    y: 32
+                }
+            )
+        } else {
+            pdf.text("No Data", 100, 25, {align: "center"});
+        }
+
+        // Footer (URL, file_type, left_margin, top, width, height)
+        pdf.addImage(letter_footer,"PNG", 0, 272, 212, 20);
+
+        pdf.save('report.pdf')
+    };
+
+    // Print table function
+    const handlePrintPDF = () => {
+        const pdf = new jsPDF();
+        
+        // Header (URL, file_type, left_margin, top, width, height)
+        pdf.addImage(letter_header,"PNG", 0, 0, 221, 15);
+        
+        // Title
+        pdf.text("Umingan Latest Alert Report", 100, 25, {align: "center"});
+
+        // Content
+        
+        // Footer (URL, file_type, left_margin, top, width, height)
+        pdf.addImage(letter_footer,"PNG", 0, 272, 212, 20);
+
+        pdf.autoPrint({variant: 'non-conform'});
+        pdf.output('pdfobjectnewwindow');
+    };
+
     function sendEmail() {
-        setModal([<TransitionalModal status={true} />])
-        setTimeout(() => {
-            setModal([<TransitionalModal status={false} />])
-            alert("Successfully sent email!")
-        }, 3000)
+        setEmailOpen(true);
+        // setModal([<TransitionalModal status={true} />])
+        // setTimeout(() => {
+        //     setModal([<TransitionalModal status={false} />])
+        //     alert("Successfully sent email!")
+        // }, 3000)
     }
 
     function download() {
-        setModal([<TransitionalModal status={true} />])
-        setTimeout(() => {
-            setModal([<TransitionalModal status={false} />])
-            alert("Download success!")
-        }, 3000)
+        handleDownloadPDF();
     }
 
     function print() {
-        setModal([<TransitionalModal status={true} />])
-        setTimeout(() => {
-            setModal([<TransitionalModal status={false} />])
-            alert("Print success!")
-        }, 3000)
+        handlePrintPDF();
     }
 
     return (
@@ -511,6 +656,15 @@ function CurrentAlert() {
                 </Grid>
             </Container>
             {modal}
+            <Snackbar open={openNotif} 
+                autoHideDuration={3000} 
+                onClose={() => {setOpenNotif(false)}}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                key={'top,right'}>
+                    <Alert onClose={() => {setOpenNotif(false)}} severity={notifStatus}>
+                        {notifText}
+                    </Alert>
+            </Snackbar>
         </Fragment>
     )
 }
