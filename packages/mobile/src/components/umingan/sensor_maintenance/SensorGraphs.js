@@ -6,12 +6,30 @@ import { ButtonStyle } from '../../../styles/button_style';
 import { ColPos, Displacement, Velocity } from '../../utils/SubsurfaceGraph';
 import { RainfallGraph } from '../../utils/RainfallGraph';
 
+import { UmiDataAnalysis } from "@dynaslope/commons";
+
+
 function SensorGraphs() {
     const temp = require('../../../assets/blcsb.json');
     const temp_rain = require('../../../assets/rain_data_mar.json');
+    const [rainfallData, setRainfallData] = useState([]);
 
     useEffect(()=> {
-    },[]);
+        console.log("temp_rain", temp_rain);
+        initRainfall();
+    }, []);
+
+    const initRainfall = async () => {
+        const response = await UmiDataAnalysis.GetRainfallPlotData();
+        console.log("response", response)
+        if (response.status === true) {
+            let rainfall_data = response.data[0];
+            console.log("rainfall_data", rainfall_data)
+            setRainfallData(rainfall_data);
+        } else {
+            console.error(response.message);
+        }
+    }
 
     return(
         <ScrollView>
