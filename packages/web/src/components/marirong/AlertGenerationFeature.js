@@ -117,7 +117,7 @@ function AlertValidation() {
             .then(responseJson => {
                 console.log("get_mar_alert_validation_data responseJson", responseJson);
                 const { public_alert_level, as_of_ts, status } = responseJson.data;
-                const as_of_ts_format = moment(as_of_ts).format("H:mm A, D MMMM YYYY, dddd");
+                const as_of_ts_format = moment(as_of_ts).format("hh:mm A, D MMMM YYYY, dddd");
                 setAsOfTs(as_of_ts_format);
                 setEwiData({
                     ...responseJson.data,
@@ -391,11 +391,25 @@ function CurrentAlertArea(props) {
 
     };
 
-    if (leo !== null) {
+    if (leo === null){
+        return (
+            <Grid item xs={12} align="center">
+                <Typography variant="h4" align="center">Loading...</Typography>
+            </Grid>
+            
+        );
+    }
+    else if(leo === "no_alert"){
+        return (
+            <Grid item xs={12} align="center">
+                <Typography variant="h2" align="center">No activity in site</Typography>
+            </Grid>      
+        );
+    }
+    else {
         const as_of = moment(leo.data_ts).add(30, "mins").format("dddd, MMMM Do YYYY, h:mm A");
         const event_start = moment(leo.event_start).format("MMMM D, YYYY h:mm A");
         const validity = moment(leo.validity).format("MMMM D, YYYY h:mm A");
-
         const color_class = identifyAlertStyle(leo.public_alert_level, classes);
 
         return (
@@ -466,13 +480,6 @@ function CurrentAlertArea(props) {
                 </Grid>
             </Fragment>
         );
-    } else {
-        return (
-            <Grid item xs={12} align="center">
-                <Typography variant="h2" align="center">No activity in site</Typography>
-            </Grid>
-            
-        )
     }
 }
 
@@ -541,7 +548,7 @@ function LatestCurrentAlert() {
                 setLeo(site_data);
                 setHtmlString(generatePDFReport(site_data));
             } else {
-                setLeo(null);
+                setLeo("no_alert");
                 console.log("No alert on site");
                 setHtmlString(<Typography>No data</Typography>);
             }
@@ -628,11 +635,6 @@ function LatestCurrentAlert() {
     }
     function print() {
         handlePrintPDF();
-        // setModal([<TransitionalModal status={true} />])
-        // setTimeout(() => {
-        //     setModal([<TransitionalModal status={false} />])
-        //     alert("Print success!")
-        // }, 3000)
     }
 
     return (
