@@ -59,9 +59,9 @@ def query_rainfall_alerts(site_id, latest_trigger_ts):
         return result
     
 def query_surficial_alerts(site_id, latest_trigger_ts):
-        query = "SELECT *, ma.id as ma_id FROM marker_alerts as ma "
+        query = "SELECT *, ma.marker_id as ma_id FROM marker_alerts as ma "
         query += "JOIN site_markers as sm "
-        query += "ON ma.id = sm.marker_id "
+        query += "ON ma.marker_id = sm.marker_id "
         query += "WHERE sm.site_id = '%s' and ts = '%s'" %(site_id, latest_trigger_ts)
         query += "AND alert_level > 0"
         result = qdb.get_db_dataframe(query)
@@ -167,7 +167,7 @@ def get_subsurface_tech_info(site_id, start_ts, latest_trigger_ts):
 def get_rainfall_tech_info(site_id, latest_trigger_ts):
     try:
         alert_detail = query_rainfall_alerts(site_id, latest_trigger_ts)
-        
+
         rain_gauge = alert_detail['gauge_name'][0]
         if alert_detail['data_source'][0] == "noah":
             rain_gauge = "NOAH " + str(rain_gauge)
@@ -175,6 +175,7 @@ def get_rainfall_tech_info(site_id, latest_trigger_ts):
         
         one_day_data = alert_detail[(alert_detail.rain_alert == 'a')]
         three_day_data = alert_detail[(alert_detail.rain_alert == 'b')].reset_index(drop=True)
+
         
         days = []
         cumulatives = []
@@ -225,10 +226,10 @@ def formulate_surficial_tech_info(alert_detail):
 def get_surficial_tech_info(site_id, latest_trigger_ts):
     try:
         alert_detail = query_surficial_alerts(site_id, latest_trigger_ts)
-        
+
         l2_triggers = alert_detail[(alert_detail.alert_level == 2)]
         l3_triggers = alert_detail[(alert_detail.alert_level == 3)]
-        
+
         surficial_tech_info = {}
         group_array = [l2_triggers, l3_triggers]
         for index, group in enumerate(group_array):
@@ -320,7 +321,7 @@ def get_eq_tech_info(site_id, latest_trigger_ts):
 def main(trigger_df):
     trigger_group = trigger_df.groupby('trigger_source', as_index=False)
     site_id = trigger_df.iloc[0]['site_id']
-    
+
     technical_info = {}
     
     for trigger_source, group in trigger_group:
@@ -329,16 +330,22 @@ def main(trigger_df):
                     - timedelta(hours=4)
         if trigger_source == 'subsurface':
             technical_info['subsurface'] = get_subsurface_tech_info(site_id, start_ts, latest_trigger_ts)
+            print("subsurface_techinfo:", technical_info)
         elif trigger_source == 'rainfall':
             technical_info['rainfall'] = get_rainfall_tech_info(site_id, latest_trigger_ts)
+            print("rainfall_techinfo:", technical_info)
         elif trigger_source == 'surficial':
             technical_info['surficial'] = get_surficial_tech_info(site_id, latest_trigger_ts)
+            print("surficial_techinfo:", technical_info)
         elif trigger_source == 'moms':
             technical_info['moms'] = get_moms_tech_info(site_id, latest_trigger_ts)
+            print("moms_techinfo:", technical_info)
         elif trigger_source == 'on demand':
             technical_info['on demand'] = get_od_tech_info(site_id, latest_trigger_ts)
+            print("on_demand_techinfo:", technical_info)
         elif trigger_source == 'earthquake':
             technical_info['earthquake'] = get_eq_tech_info(site_id, latest_trigger_ts)
+            print("earthquake_techinfo:", technical_info)
             # technical_info['earthquake'] = "This is a dummy earthquake info"
-    
+        
     return technical_info

@@ -549,7 +549,7 @@ def push_db_dataframe(df,table_name,index=True, hostdb='local'):
     Userdb = sc['db']['user']
     Passdb = sc['db']['password']
     Namedb = sc['db']['name']
-    engine = create_engine('mysql://'+Userdb+':'+Passdb+'@'+Hostdb+':3306/'+Namedb)
+    engine = create_engine('mysql://'+Userdb+':'+Passdb+'@'+Hostdb+':3306/'+Namedb, pool_size=20, max_overflow=10, pool_pre_ping=True)
     df.to_sql(name = table_name, con = engine, if_exists = 'append', schema = Namedb, index=index)
 
 #update memcache if ever there is changes 

@@ -49,7 +49,7 @@ export default function Reports () {
     }
 
     return (
-        <Container>
+        <Container style={{minHeight: window.innerHeight - 220}}>
             <Grid container spacing={5}>
                 <Grid item xs={12} />
                 <Grid item xs={12}>
