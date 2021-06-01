@@ -133,19 +133,21 @@ def get_site_moms_alerts(site_id, start, end):
 
     return site_moms_alerts_df, moms_op_trigger
 
-def get_ground_data_last_ts():
+def get_ground_data_last_ts(site_id):
     """
     Returns timestamp of last ground data inserted to the database
     """
-    query =  """
-        SELECT last_ts as ts FROM moms_instances
-        UNION
-        SELECT ts FROM node_alerts 
-        UNION
-        SELECT ts FROM marker_observations
-        ORDER BY ts DESC
-        LIMIT 1
-    """
+    query =  "(SELECT last_ts as ts FROM moms_instances WHERE site_id = %s) " %site_id
+    query+=  "UNION "
+    query+=  "(SELECT ts FROM tsm_sensors AS tsm "
+    query+=  "JOIN node_alerts AS na "
+    query+=  "ON tsm.id = na.tsm_id "
+    query+=  "WHERE site_id = %s) " %site_id
+    query+=  "UNION "
+    query+=  "(SELECT ts FROM marker_observations WHERE site_id = %s) " %site_id
+    query+=  "ORDER BY ts DESC "
+    query+=  "LIMIT 1"
+
     ground_data_last_ts = qdb.get_db_dataframe(query)
     
     return ground_data_last_ts
@@ -793,7 +795,13 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
 
 
     # GROUND DATA LAST RECEIVED TIMESTAMP (for ND)
-    ts_last_ground_data = get_ground_data_last_ts().ts[0]
+    ts_last_ground_data = get_ground_data_last_ts(site_id=site_id).ts[0]
+    print("ts_last_ground_data: ", ts_last_ground_data)
+    if validity:
+        ts = ts_last_ground_data - datetime.strptime(validity, "%Y-%m-%d %H:%M:%S")
+    #ts = datetime.now() - datetime.strptime(validity, "%Y-%m-%d %H:%M:%S")
+    print("TS: ", validity)
+
     ts_since_last_ground_data = datetime.now() - datetime.strptime(ts_last_ground_data, "%Y-%m-%d %H:%M:%S")
     
     # Use below when testing, set a predefined timestamp i.e. '2021-05-30 08:00:00'
