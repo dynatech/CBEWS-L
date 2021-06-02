@@ -133,6 +133,23 @@ def get_site_moms_alerts(site_id, start, end):
 
     return site_moms_alerts_df, moms_op_trigger
 
+def get_ground_data_last_ts():
+    """
+    Returns timestamp of last ground data inserted to the database
+    """
+    query =  """
+        SELECT last_ts as ts FROM moms_instances
+        UNION
+        SELECT ts FROM node_alerts 
+        UNION
+        SELECT ts FROM marker_observations
+        ORDER BY ts DESC
+        LIMIT 1
+    """
+    ground_data_last_ts = qdb.get_db_dataframe(query)
+    
+    return ground_data_last_ts
+
 def get_public_symbols():
     """Dataframe containing public alert level and its corresponding symbol.
     """
@@ -746,11 +763,6 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
         is_within_alert_extension = validity + timedelta(3) > end + timedelta(hours=0.5)
         has_no_ground_data = ground_alert == -1
 
-        if has_no_ground_data == True:
-            ts_last_ground_data = datetime.strptime('2021-05-30 08:00:00', "%Y-%m-%d %H:%M:%S")
-
-        ts_since_last_ground_data = datetime.now() - ts_last_ground_data
-
         # check if end of validity: lower alert if with data and not rain75
         if validity > end + timedelta(hours=0.5):
             pass
@@ -778,6 +790,17 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
         internal_alert = internal_symbols[(internal_symbols.alert_level == \
                          ground_alert) & (internal_symbols.source_id == \
                          internal_id)]['alert_symbol'].values[0]
+
+
+    # GROUND DATA LAST RECEIVED TIMESTAMP (for ND)
+    ts_last_ground_data = get_ground_data_last_ts().ts[0]
+    ts_since_last_ground_data = datetime.now() - datetime.strptime(ts_last_ground_data, "%Y-%m-%d %H:%M:%S")
+    
+    # Use below when testing, set a predefined timestamp i.e. '2021-05-30 08:00:00'
+    # ts_last_ground_data = datetime.strptime('2021-05-30 08:00:00', "%Y-%m-%d %H:%M:%S")
+    # ts_since_last_ground_data = datetime.now() - ts_last_ground_data
+    print("COUNTDOWN FOR GROUND DATA: ", ts_since_last_ground_data)
+
 
     # start of event
     if monitoring_type != 'event' and len(pos_trig) != 0:
@@ -825,6 +848,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
                     'rainfall': [rainfall], 'moms': [moms_alert],
                     'triggers': [triggers], 'tech_info': [tech_info],
                     'has_no_ground_data': [has_no_ground_data],
+                    'ts_since_last_ground_data' : [ts_since_last_ground_data.days],
                     'is_within_alert_extension': [is_within_alert_extension],
                     'has_unresolved_moms': [has_unresolved_moms]})
 
@@ -954,8 +978,6 @@ def main(end=datetime.now()):
     # LOUIE
     if not os.path.exists(output_path+sc['fileio']['output_path']):
         os.makedirs(output_path+sc['fileio']['output_path'])
-    
-    print(output_path)
 
     with open(output_path+sc['fileio']['output_path']+'PublicAlertRefDB.json', 'w') as w:
         w.write(public_json)

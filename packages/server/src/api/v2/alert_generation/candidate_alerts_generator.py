@@ -151,13 +151,6 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         is_higher_alert = site_db_pub_al_lvl < int(candidate["public_alert_level"])
         is_release_time = False
 
-        # Timestamp since last received Ground Data
-        if candidate["has_no_ground_data"] == True:
-            # ts_last_ground_data = dt.now()
-            ts_last_ground_data = dt.strptime('2021-05-30 08:00:00', "%Y-%m-%d %H:%M:%S")
-            ts_since_last_ground_data = dt.now() - ts_last_ground_data  
-        print("COUNTDOWN GROUND DATA: ", ts_since_last_ground_data)
-
         # NOTE: CODE THAT ALLOWS RELEASE BEYOND :30
         # if candidate_ts in [target_data_ts, scheduled_release_time]:
         if target_data_ts == candidate_ts:
@@ -180,17 +173,13 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
                     internal += "Rx"
 
         is_end_of_validity = candidate_ts + timedelta(hours=0.5) == site_db_validity
-
-        print("end valid: ", candidate_ts + timedelta(hours=0.5))
-        print(target_data_ts)
-        print(candidate_ts)
-
+        
         # Check for NO GROUND DATA
         # If status is "lowering" and w/o Ground Data, extend validity to MAX: 72 hours before lowering:
-        if candidate["status"] == "lowering" and ts_since_last_ground_data.days < 3:
+        if candidate["status"] == "lowering" and int(candidate["ts_since_last_ground_data"]) < 3:
             is_release_time = False
-                
-                
+
+
         if candidate["has_no_ground_data"] and candidate["public_alert_level"] > 0 and site_db_alert and is_end_of_validity:
             candidate["extend_ND"] = True
 
