@@ -80,7 +80,9 @@ def fetch_status_analysis(site_code):
                     "latest_data": f"{ts_str} | {latest_data_str}",
                     "ts": ts_str
                 }
-            message = "Successful"    
+                message = "Successful"
+            else:
+                message = "No operational trigger data"
         else:
             message = "No available surficial data"
 

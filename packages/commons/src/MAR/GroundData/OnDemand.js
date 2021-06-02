@@ -8,12 +8,31 @@ const InsertOnDemandData = (data) => {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
-    }).then((response) => response.json())
+    })
+    .then((response) => response.json())
     .then((responseJson) => {
         return responseJson;
     })
     .catch((error) => {
         console.error("Error on adding on demand data. Err: ", error);
+    });
+};
+
+const UpdateOnDemandData = (data) => {
+    return fetch(`${AppConfig.HOSTNAME}/v2/update/ground_data/on_demand`, {
+        method: 'PATCH',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        return responseJson;
+    })
+    .catch((error) => {
+        console.error("Error on updating on demand data. Err: ", error);
     });
 };
 
@@ -90,6 +109,7 @@ const RaiseOnDemandAlert = (data) => {
 
 export { 
     InsertOnDemandData,
+    UpdateOnDemandData,
     GetOnDemandData,
     RaiseOnDemandAlert,
 };
