@@ -312,7 +312,7 @@ def validate_trigger():
             "message": "Trigger successfully validated."
         }
     except Exception as err:
-        raise(err)
+        # raise(err)
         response = {
             "data": None,
             "status": False,
@@ -804,6 +804,7 @@ def insert_ewi(internal_ewi_data=None):
 
         return_data = {
             "status": True,
+            "message": "EWI Release successful",
             "data": event_id
         }
     except Exception as err:

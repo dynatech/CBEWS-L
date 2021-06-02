@@ -167,17 +167,25 @@ function AlertValidation() {
                     {
                         status !== "no_alert" && (
                             <Text key={'alert_level_value'} style={alert_style}>
-                                `Candidate Alert Level ${ data[0].public_alert_level }`
+                                `Candidate Alert Level { data[0].public_alert_level }`
                                 </Text>
                         )
                     }
-                    <View key={'site_status_container'} style={{flexDirection:'row'}, {flexWrap:'wrap'}}>
-                        <Text key="site_status_label" style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
+                    {/* <View key="trigger_timestamp">
+                        <Text  style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left', fontWeight: 'bold'}]}>
+                            Time of trigger
+                        </Text>
+                        <Text style={[LabelStyle.small_label, LabelStyle.brand, {textAlign: 'center'}]}>
+                            {row.date_time}
+                        </Text>
+                    </View> */}
+                    <View key={'site_status_container'}>
+                        <Text key="site_status_label" style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'center'}]}>
                             Site Status
                         </Text>
                         {
                             status === "extended" ? (
-                                <Text key="site_status_value" style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left', fontWeight: 'bold'}]}>
+                                <Text key="site_status_value" style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'center', fontWeight: 'bold'}]}>
                                     Day { data[0].day } of Extended Monitoring
                                 </Text>
                             ) : (
@@ -190,10 +198,10 @@ function AlertValidation() {
                     {
                         ![null, ''].includes(data[0].validity) && (
                             <View key={'validity_container'}>
-                                <Text key="validity_label" style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
+                                <Text key="validity_label" style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'center'}]}>
                                     Validity 
                                 </Text>
-                                <Text key={'validity_value'} style={[LabelStyle.large_label, LabelStyle.brand, {textAlign: 'left', fontWeight: 'bold'}]}>
+                                <Text key={'validity_value'} style={[LabelStyle.large_label, LabelStyle.brand, {textAlign: 'center', fontWeight: 'bold'}]}>
                                     { moment(data[0].validity).format("H:mm A, D MMMM YYYY, dddd") }
                                 </Text>
                             </View>

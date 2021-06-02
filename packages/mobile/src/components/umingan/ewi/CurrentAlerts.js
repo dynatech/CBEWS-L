@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ToastAndroid, Alert, Linking, Platform } from 'react-native';
 import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
 import { ButtonStyle } from '../../../styles/button_style';
@@ -14,6 +14,7 @@ function CurrentAlerts() {
     const [currentAlertData, setCurrentAlertData] = useState([]);
     const [ewiDate, setEwiDate] = useState(moment().format('MMMM Do YYYY, h:mm:ss a'));
     const [isDisabled, setDisabled] = useState(false);
+    const [ewiSMS, setEWISMS] = useState("")
 
     useEffect(()=> {
         setTimeout( async ()=> {
@@ -90,9 +91,16 @@ function CurrentAlerts() {
         const alert_style = [LabelStyle.large_label, LabelStyle.brand, {textAlign: 'center', fontWeight: 'bold'}];
 
         if (data.length != 0) {
-            if (data[0].public_alert_level === 1) alert_style.push(LabelStyle.level_one);
-            else if (data[0].public_alert_level === 2) alert_style.push(LabelStyle.level_two);
-            else if (data[0].public_alert_level === 3) alert_style.push(LabelStyle.level_three);
+            if (data[0].public_alert_level === 1) {
+                alert_style.push(LabelStyle.level_one);
+                setEWISMS(`Ang barangay Umingan po ay kasalukuyang nasa Alert Level 1.`);
+            } else if (data[0].public_alert_level === 2) {
+                alert_style.push(LabelStyle.level_two);
+                setEWISMS(`Ang barangay Umingan po ay kasalukuyang nasa Alert Level 2. Mangyari po tayo'y maghanda upang lumikas kung sakaling tumaas sa Alert Level 3.`);
+            } else if (data[0].public_alert_level === 3) {
+                alert_style.push(LabelStyle.level_three);
+                setEWISMS(`EVACUATE. Ang barangay Umingan po ay itinalaga sa Alert Level 3.`);
+            }
 
             temp.push(
                 <View key={'container'}>
@@ -165,6 +173,18 @@ function CurrentAlerts() {
     const sendEWI = async () => {
         // TODO: Connect to messaging APP?
         console.log("EWI SEND CLICKED")
+        // const url = (Platform.OS === 'android')
+        //     ? 'sms:1-408-555-1212?body=yourMessage'
+        //     : 'sms:1-408-555-1212'
+      
+        // Linking.canOpenURL(url).then(supported => {
+        //     if (!supported) {
+        //         console.log('Unsupported url: ' + url)
+        //     } else {
+        //         return Linking.openURL(url)
+        //     }
+        // }).catch(err => console.error('An error occurred', err))
+        Linking.openURL(`sms:?addresses=null&body=${ewiSMS}`);
     }
 
     return(
