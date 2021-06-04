@@ -35,7 +35,7 @@ import querydb as qdb
 def query_tsm_alerts(site_id, start_ts, latest_trigger_ts):   
         query =  "SELECT ts, t_s.tsm_name, node_id, disp_alert, vel_alert FROM node_alerts "
         query += "JOIN tsm_sensors AS t_s"
-        query += "  ON node_alerts.tsm_id = t_s.tsm_id "
+        query += "  ON node_alerts.tsm_id = t_s.id "
         query += "JOIN "
         query += "  (SELECT site_code, sites.id as site_id FROM cbewsl_commons_db.sites as sites WHERE id = '%s') AS sc " %(site_id)
         query += "  ON t_s.site_id = sc.site_id "
