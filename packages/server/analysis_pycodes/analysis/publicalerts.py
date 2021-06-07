@@ -122,8 +122,6 @@ def get_site_moms_alerts(site_id, start, end):
     query = f"{query} AND moms.observance_ts <= '{end}'"
     query = f"{query} ORDER BY moms.observance_ts DESC"
 
-    print("query", query)
-
     site_moms_alerts_df = qdb.get_db_dataframe(query)
     sorted_df = site_moms_alerts_df.sort_values(['op_trigger'], ascending=[False])
 
@@ -134,7 +132,6 @@ def get_site_moms_alerts(site_id, start, end):
         moms_op_trigger = -1
 
     return site_moms_alerts_df, moms_op_trigger
-
 
 def get_public_symbols():
     """Dataframe containing public alert level and its corresponding symbol.
@@ -369,15 +366,16 @@ def get_internal_alert(pos_trig, release_op_trig, internal_symbols):
     with_data = release_op_trig[release_op_trig.alert_level != -1]
     with_data_id = with_data['source_id'].values
     with_data = highest_triggers[highest_triggers.source_id.isin(with_data_id)]
-    
+
     # SPECIAL CASE FOR ON-DEMAND ALERTS
     on_demand_id = internal_symbols[internal_symbols.trigger_source == \
             'on demand']['trigger_sym_id'].values[0]
     check_for_on_demand = highest_triggers[highest_triggers["trigger_sym_id"] \
                                            == on_demand_id]
+
     if len(check_for_on_demand) != 0:
         with_data = with_data.append(check_for_on_demand)
-        
+
     # SPECIAL CASE FOR EARTHQUAKE ALERTS
     earthquake_id = internal_symbols[internal_symbols.trigger_source == \
             'earthquake']['trigger_sym_id'].values[0]
@@ -392,7 +390,7 @@ def get_internal_alert(pos_trig, release_op_trig, internal_symbols):
     internal_df = internal_symbols[(internal_symbols.trigger_sym_id.isin(sym_id)) \
             | ((internal_symbols.source_id.isin(nd_source_id)) & \
                (internal_symbols.alert_level == -1))]
-    
+
     # REPLACE NO DATA TRIGGERS
     if len(no_data) != 0:
         no_data_grp = no_data.groupby('source_id', as_index=False)
@@ -590,8 +588,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     site_dynamic_vars = get_site_dynamic_variables(site_id)
 
     rel_interval_hour = int(site_dynamic_vars['release_interval_hours'][0])
-
-    release_op_trig = op_trig[op_trig.ts_updated >= \
+    release_op_trig = op_trig[op_trig.ts_updated <= \
             # release_time(end)-timedelta(hours=4)]
             release_time(end)-timedelta(hours=rel_interval_hour)]
     release_op_trig = release_op_trig.drop_duplicates(['source_id', \
@@ -612,7 +609,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
 
     # public alert based on highest alert level in operational triggers
     public_alert = max(list(pos_trig['alert_level'].values) + [0])
-    print('Public Alert %s' %public_alert)   
+    print('Public Alert: %s' %public_alert)   
     print()
 
     # SUBSURFACE ALERT
@@ -677,6 +674,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
         # internal alert based on positive triggers and data presence
         internal_df = get_internal_alert(pos_trig, release_op_trig,       
                                   internal_symbols)
+
 
         # check if rainfall > 0.75% of threshold
         rain75_id = internal_symbols[(internal_symbols.source_id == \
@@ -793,11 +791,13 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
         #tech_info = pd.DataFrame(columns=['subsurface', 'surficial', 'rainfall', \
         #  'earthquake', 'on demand'])
         pos_trig = pd.merge(pos_trig, internal_symbols, on='trigger_sym_id')
+
         tech_info = tech_info_maker.main(pos_trig)
     except:
         tech_info = pd.DataFrame()
 
-    
+    print("techinfo", tech_info)
+
     try:    
         ts = max(op_trig[op_trig.alert_level != -1]['ts_updated'].values)
         ts = round_data_ts(pd.to_datetime(ts))
@@ -866,7 +866,7 @@ def main(end=datetime.now()):
         end (datetime): Optional. Public alert timestamp.
     """
     start_time = datetime.now()
-    print(start_time)
+    print("Running publicalerts.py @", start_time)
     # LOUIE
     # qdb.print_out(start_time)
 
@@ -957,6 +957,8 @@ def main(end=datetime.now()):
     # LOUIE
     print(f"PublicAlertRefDB.json written at {output_path+sc['fileio']['output_path']}")
     print('runtime = %s' %(datetime.now() - start_time))
+    print("Done publicalerts.py @", datetime.now())
+    print()
     
     return alerts
 
