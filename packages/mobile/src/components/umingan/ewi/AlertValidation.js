@@ -167,7 +167,7 @@ function AlertValidation() {
                     {
                         status !== "no_alert" && (
                             <Text key={'alert_level_value'} style={alert_style}>
-                                `Candidate Alert Level { data[0].public_alert_level }`
+                                Candidate Alert Level { data[0].public_alert_level }
                                 </Text>
                         )
                     }
