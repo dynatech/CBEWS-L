@@ -360,7 +360,6 @@ def get_internal_alert(pos_trig, release_op_trig, internal_symbols):
     Returns:
         dataframe: alert symbol indicating event triggers and data presence.
     """
-
     highest_triggers = pos_trig.sort_values('alert_level',
                         ascending=False).drop_duplicates('source_id')
     with_data = release_op_trig[release_op_trig.alert_level != -1]
@@ -582,6 +581,9 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
         start_monitor = end - timedelta(1)
 
     # operational triggers for monitoring at timestamp end
+    print("MON_TYPE: ", monitoring_type)
+    print("START: ", start_monitor)
+    print("END: ", end)
     op_trig = get_operational_trigger(site_id, start_monitor, end)
 
     # NOTE: Retrieves CBEWS-L dynamic variables
@@ -591,6 +593,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     release_op_trig = op_trig[op_trig.ts_updated <= \
             # release_time(end)-timedelta(hours=4)]
             release_time(end)-timedelta(hours=rel_interval_hour)]
+
     release_op_trig = release_op_trig.drop_duplicates(['source_id', \
             'alert_level'])
     subsurface_id = internal_symbols[internal_symbols.trigger_source == \
@@ -670,11 +673,10 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
         
         if public_alert == 3:
             validity += timedelta(1)
-            
+
         # internal alert based on positive triggers and data presence
         internal_df = get_internal_alert(pos_trig, release_op_trig,       
                                   internal_symbols)
-
 
         # check if rainfall > 0.75% of threshold
         rain75_id = internal_symbols[(internal_symbols.source_id == \
@@ -743,7 +745,12 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
         is_not_yet_write_time = not (is_release_time_run and is_45_minute_beyond)
         is_within_alert_extension = validity + timedelta(3) > end + timedelta(hours=0.5)
         has_no_ground_data = ground_alert == -1
-        
+
+        if has_no_ground_data == True:
+            ts_last_ground_data = datetime.strptime('2021-05-30 08:00:00', "%Y-%m-%d %H:%M:%S")
+
+        ts_since_last_ground_data = datetime.now() - ts_last_ground_data
+
         # check if end of validity: lower alert if with data and not rain75
         if validity > end + timedelta(hours=0.5):
             pass
@@ -752,17 +759,18 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
                     or is_not_yet_write_time:
                     # or is_not_yet_write_time \
                     #     or is_within_alert_extension and has_unresolved_moms:
-            validity = release_time(end)
 
+            validity = release_time(end)
+        
             if is_release_time_run:
                 if not(is_45_minute_beyond):
                     do_not_write_to_db = True
         else:
-            validity = ''
-            public_alert = 0
-            internal_alert = internal_symbols[(internal_symbols.alert_level == \
-                             ground_alert) & (internal_symbols.source_id == \
-                             internal_id)]['alert_symbol'].values[0]
+                validity = ''
+                public_alert = 0
+                internal_alert = internal_symbols[(internal_symbols.alert_level == \
+                                ground_alert) & (internal_symbols.source_id == \
+                                internal_id)]['alert_symbol'].values[0]
     else:
         validity = ''
         public_alert = 0
@@ -795,8 +803,6 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
         tech_info = tech_info_maker.main(pos_trig)
     except:
         tech_info = pd.DataFrame()
-
-    print("techinfo", tech_info)
 
     try:    
         ts = max(op_trig[op_trig.alert_level != -1]['ts_updated'].values)
@@ -837,7 +843,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     try:
         do_not_write_to_db
     except:
-        print("")
+        print()
         qdb.alert_to_db(site_public_df, 'public_alerts')
     
     return public_df
@@ -957,7 +963,7 @@ def main(end=datetime.now()):
     # LOUIE
     print(f"PublicAlertRefDB.json written at {output_path+sc['fileio']['output_path']}")
     print('runtime = %s' %(datetime.now() - start_time))
-    print("Done publicalerts.py @", datetime.now())
+    print("Done runnning publicalerts.py @", datetime.now())
     print()
     
     return alerts
