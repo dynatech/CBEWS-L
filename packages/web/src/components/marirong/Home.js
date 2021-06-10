@@ -6,7 +6,7 @@ import { MarDataAnalysis, MarGroundData } from '@dynaslope/commons';
 
 
 function LatestRainfall () {
-    const [data, setData] = React.useState(null);
+    const [data, setData] = React.useState("loading");
     
     React.useEffect(() => {
         init();
@@ -20,30 +20,35 @@ function LatestRainfall () {
         }
     }
     
-    return (
-        <Fragment>
-            {
-                data !== null ? (
-                    <Fragment>
-                        <Grid item align="center">
-                            <Typography variant="h6"><span style={{fontWeight: 900}}>{data.rain_gauge.toUpperCase()}</span>{` as of `}<span style={{fontWeight: 900}}>{moment(data.data_ts).format("LLL")}</span></Typography>
-                            <Typography variant="h6" color="primary">{`1-day cumulative rainfall: ${data["1_day_cumulative"]} (${data["1_day_percent"]}% of threshold)`}</Typography>
-                            <Typography variant="h6" color="secondary">{`3-day cumulative rainfall: ${data["3_day_cumulative"]} (${Math.round((parseInt(data["3_day_cumulative"]) + Number.EPSILON) * 100) / 100}% of threshold)`}</Typography>
-                            <Typography variant="body1">DATA ANALYSIS: {data.analysis}</Typography>
-                        </Grid>
-                    </Fragment>
-
-                ) : (
-                    <Typography variant="h5" align="center" color="secondary">No data available</Typography>
-                )
-            }
-        </Fragment>
-    );
+    if (data === "loading"){
+        return (
+            <Grid item xs={12} align="center">
+                 <Typography variant="h5" align="center" color="primary">Loading...</Typography>
+            </Grid> 
+        );
+    }
+    else if(data === null){
+        return (
+            <Grid item xs={12} align="center">
+                <Typography variant="h5" align="center" color="secondary">No data available</Typography>
+            </Grid>      
+        );
+    }
+    else {
+        return (
+            <Grid item align="center">
+                <Typography variant="h6"><span style={{fontWeight: 900}}>{data.rain_gauge.toUpperCase()}</span>{` as of `}<span style={{fontWeight: 900}}>{moment(data.data_ts).format("LLL")}</span></Typography>
+                <Typography variant="h6" color="primary">{`1-day cumulative rainfall: ${data["1_day_cumulative"]} (${data["1_day_percent"]}% of threshold)`}</Typography>
+                <Typography variant="h6" color="secondary">{`3-day cumulative rainfall: ${data["3_day_cumulative"]} (${Math.round((parseInt(data["3_day_cumulative"]) + Number.EPSILON) * 100) / 100}% of threshold)`}</Typography>
+                <Typography variant="body1">DATA ANALYSIS: {data.analysis}</Typography>
+            </Grid>          
+        );
+    }
 }
 
 
 function LatestGroundMeas () {
-    const [data, setData] = React.useState(null);
+    const [data, setData] = React.useState("loading");
     
     React.useEffect(() => {
         init();
@@ -60,26 +65,33 @@ function LatestGroundMeas () {
         }
     }
 
-    return (
-        <Fragment>
-            {
-                data !== null && data.analysis !== "No data available" ? (
-                    <Grid item align="center">
-                        <Typography variant="body1">{data.latest_data}</Typography>
-                        <br /><br />
-                        <Typography variant="body1">{data.analysis}</Typography>
-                    </Grid>
-
-                ) : (
-                    <Typography variant="h5" align="center" color="secondary">No data available</Typography>
-                )
-            }
-        </Fragment>
-    );
+    if (data === "loading"){
+        return (
+            <Grid item xs={12} align="center">
+                 <Typography variant="h5" align="center" color="primary">Loading...</Typography>
+            </Grid> 
+        );
+    }
+    else if(data.analysis === "No data available"){
+        return (
+            <Grid item xs={12} align="center">
+                <Typography variant="h5" align="center" color="secondary">No data available</Typography>
+            </Grid>      
+        );
+    }
+    else {
+        return (
+            <Grid item align="center">
+                <Typography variant="body1">{data.latest_data}</Typography>
+                <br /><br />
+                <Typography variant="body1">{data.analysis}</Typography>
+            </Grid>       
+        );
+    }
 }
 
 function LatestMoms () {
-    const [data, setData] = React.useState(null);
+    const [data, setData] = React.useState("loading");
     
     React.useEffect(() => {
         init();
@@ -94,40 +106,50 @@ function LatestMoms () {
         }
     }
 
-    return (
-        <Fragment>
-            {
-                data !== null ? (
-                    <Fragment>
-                        <Grid container>
-                            <Grid item xs={6} align="center">
-                                <Typography variant="button" color="primary">Observance Timestamp</Typography>
-                                <br />
-                                <Typography variant="body1"><span style={{fontWeight: 900}}>{data[0].observance_ts}</span></Typography>
-                            </Grid>
-                            <Grid item xs={6} align="center">
-                                <Typography variant="button" color="primary">Remarks</Typography>
-                                <br />
-                                <Typography variant="body1"><span style={{fontWeight: 900}}>{data[0].remarks}</span></Typography>
-                            </Grid>
-                            <Grid item xs={6} align="center">
-                                <Typography variant="button" color="primary">Feature Type</Typography>
-                                <br />
-                                <Typography variant="body1"><span style={{fontWeight: 900}}>{data[0].feature_type}</span></Typography>
-                            </Grid>
-                            <Grid item xs={6} align="center">
-                                <Typography variant="button" color="primary">Feature Name</Typography>
-                                <br />
-                                <Typography variant="body1"><span style={{fontWeight: 900}}>{data[0].feature_name}</span></Typography>
-                            </Grid>
-                        </Grid>
-                    </Fragment>
-                ) : (
-                    <Typography variant="h5" align="center" color="secondary">No data available</Typography>
-                )
-            }
-        </Fragment>
-    );
+    if (data === "loading"){
+        return (
+            <Grid item xs={12} align="center">
+                 <Typography variant="h5" align="center" color="primary">Loading...</Typography>
+            </Grid> 
+        );
+    }
+    else if(data.length === 0){
+        return (
+            <Grid item xs={12} align="center">
+                <Typography variant="h5" align="center" color="secondary">No data available</Typography>
+            </Grid>      
+        );
+    }
+    else{
+        console.log(data);
+        return (            
+            <Fragment>
+                <Grid container>
+                    <Grid item xs={6} align="center">
+                        <Typography variant="button" color="primary">Observance Timestamp</Typography>
+                        <br />
+                        <Typography variant="body1"><span style={{fontWeight: 900}}>{data[0].observance_ts}</span></Typography>
+                    </Grid>
+                    <Grid item xs={6} align="center">
+                        <Typography variant="button" color="primary">Remarks</Typography>
+                        <br />
+                        <Typography variant="body1"><span style={{fontWeight: 900}}>{data[0].remarks}</span></Typography>
+                    </Grid>
+                    <Grid item xs={6} align="center">
+                        <Typography variant="button" color="primary">Feature Type</Typography>
+                        <br />
+                        <Typography variant="body1"><span style={{fontWeight: 900}}>{data[0].feature_type}</span></Typography>
+                    </Grid>
+                    <Grid item xs={6} align="center">
+                        <Typography variant="button" color="primary">Feature Name</Typography>
+                        <br />
+                        <Typography variant="body1"><span style={{fontWeight: 900}}>{data[0].feature_name}</span></Typography>
+                    </Grid>
+                </Grid>
+            </Fragment>
+        );
+    }
+    
 }
 
 export default function Home () {
