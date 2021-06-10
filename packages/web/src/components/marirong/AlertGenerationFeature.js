@@ -407,7 +407,7 @@ function CurrentAlertArea(props) {
         );
     }
     else {
-        const as_of = moment(leo.data_ts).add(30, "mins").format("dddd, MMMM Do YYYY, h:mm A");
+        const as_of = moment(leo.data_ts).add(30, "mins").format("dddd MMMM D, YYYY, h:mm A");
         const event_start = moment(leo.event_start).format("MMMM D, YYYY h:mm A");
         const validity = moment(leo.validity).format("MMMM D, YYYY h:mm A");
         const color_class = identifyAlertStyle(leo.public_alert_level, classes);

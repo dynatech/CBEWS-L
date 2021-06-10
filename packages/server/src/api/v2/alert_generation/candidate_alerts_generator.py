@@ -21,11 +21,8 @@ def format_release_triggers(candidate, all_event_triggers):
     ###########################################
     new_trigger_list = []
     try:
-        print("candidate: ", candidate)
-        print("ALL EVENT TRIGGERS: ", all_event_triggers)
         raw_triggers = candidate["triggers"]
         tech_info_dict = candidate["tech_info"]
-        print("TECH_INFO_DICT: ", tech_info_dict)
         all_validated = True
         for trigger in raw_triggers:
             ias_symbol = AG.get_internal_alert_symbol_row(trigger_symbol=trigger["alert"], return_col="ias.alert_symbol")
@@ -33,15 +30,10 @@ def format_release_triggers(candidate, all_event_triggers):
 
             if not saved_trigger: 
                 source_id = trigger["source_id"]
-                print("source_id", source_id)
                 trigger_source = AG.get_trigger_hierarchy(source_id, "trigger_source")
-                print("trigger_source", trigger_source)
                 ots_symbol = trigger["alert"]
-                print("ots_symbol", ots_symbol)
                 trigger_type = AG.get_internal_alert_symbol_row(trigger_symbol=ots_symbol, return_col="ias.alert_symbol")
-                print("trigger_type", trigger_type)
                 tech_info = tech_info_dict[trigger_source]
-                print("tech_info", tech_info)
 
                 trigger_payload = {
                     "trigger_type": trigger_type,
@@ -79,7 +71,6 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
     """
     """
     merged_db_alerts = latest_events + overdue_events
-    print("CANDIDATE_ALERTS_LIST: ", candidate_alerts_list)
 
     for candidate in candidate_alerts_list:
         # Containers
@@ -96,7 +87,6 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         # FIND ONGOING DB ALERTS
         ongoing_db_alerts = list(filter(lambda x: x["event_status"] == "on-going", merged_db_alerts))
         site_db_alert = next(filter(lambda x: x["site_code"] == site_code, ongoing_db_alerts), None)
-        print("site_db_alert", site_db_alert)
 
         # If site_code is already in active events:
         site_db_validity = None
@@ -125,15 +115,11 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         # If site_code not found in db alerts:
         else:
             day_0_extended_events = list(filter(lambda x: x["event_status"] == "extended", latest_events))
-            print("day_0_extended_events", day_0_extended_events)
             extended_events = extended_events + day_0_extended_events
-            print("extended_events", extended_events)
 
             site_ext_event = next(filter(lambda x: x["site_code"] == site_code, extended_events), None)
-            print("site_ext_event", site_ext_event)
             release_trigs, are_all_validated = format_release_triggers(candidate, [])
             candidate["release_triggers"] = release_trigs
-            print("candidate[release_triggers]", candidate["release_triggers"])
 
             if candidate["status"] == "extended":
                 # NOTE: Ff line Redudant?
@@ -188,12 +174,17 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
 
         is_end_of_validity = candidate_ts + timedelta(hours=0.5) == site_db_validity
 
+        # Check for NO GROUND DATA RECEIVED
+        # If status is "lowering" and w/o Ground Data, extend validity to MAX: 72 hours before lowering:
+        # if is_end_of_validity and int(candidate["ts_since_last_ground_data"]) < 3 and candidate["has_no_ground_data"]:
+        #     is_release_time = False
+
+
         if candidate["has_no_ground_data"] and candidate["public_alert_level"] > 0 and site_db_alert and is_end_of_validity:
             candidate["extend_ND"] = True
 
-        # NOTE: LOUIE Study more on this code
-        if candidate["status"] == "lowering":
-            is_release_time = True
+        # if candidate["status"] == "lowering":
+        #     is_release_time = True
 
         # ADD MISSING DATA
         candidate.update({
@@ -582,8 +573,6 @@ def process_with_alerts_entries(with_alerts, merged_list, invalids):
     """
     candidates_list = []
 
-    print("WITH_ALERTS: \n", with_alerts)
-
     for w_alert in with_alerts:
         entry = w_alert
         site_code = entry["site_code"]
@@ -637,15 +626,11 @@ def process_candidate_alerts(generated_alerts, db_alerts):
     candidate_alerts_list = []
 
     no_alerts, with_alerts = separate_with_alerts_to_no_alerts_on_JSON(all_alerts)
-    print("with_alerts: ", with_alerts)
     merged_list = latest + overdue
 
     return_list = process_with_alerts_entries(with_alerts, merged_list, invalids)
     invalid_entries = list(filter(lambda x: x["status"] == "invalid", return_list))
     candidate_alerts_list.extend(return_list)
-
-    print("return-list: ", return_list)
-    print("candidate-alerts: ", candidate_alerts_list)
     
     return_list = tag_sites_for_lowering(merged_list, no_alerts)
     # TODO: Somethings wrong with the lowering indexes list
@@ -660,7 +645,7 @@ def process_candidate_alerts(generated_alerts, db_alerts):
     if no_alerts:
         return_list = prepare_sites_for_routine_release(no_alerts, extended_indexes_list, invalid_entries)
     
-    # FUCKING STAMP THE STATUSES AND VALIDITIES
+    # STAMP THE STATUSES AND VALIDITIES
     print("latest", latest)
     print("overdue", overdue)
     print("extended", extended)
@@ -673,9 +658,6 @@ def process_candidate_alerts(generated_alerts, db_alerts):
 def main(to_update_pub_alerts=False, internal_gen_data=None):
     start_time = dt.now()
     generated_alerts_dict = []
-
-    print("to_update_pub_alerts", to_update_pub_alerts)
-    print("internal_gen_data", internal_gen_data)
 
     if to_update_pub_alerts:
         if platform.system() == "Windows":
@@ -698,8 +680,6 @@ def main(to_update_pub_alerts=False, internal_gen_data=None):
     db_alerts = PA.get_ongoing_and_extended_monitoring(source="api")
     db_alerts = json.loads(db_alerts)["data"]
 
-    print("GENERATED_ALERTS: ", generated_alerts_dict)
-
     candidate_alerts_list = process_candidate_alerts(
         generated_alerts=generated_alerts_dict,
         db_alerts=db_alerts
@@ -720,4 +700,4 @@ def main(to_update_pub_alerts=False, internal_gen_data=None):
     return json_data
 
 if __name__ == "__main__":
-    main()
+    main(to_update_pub_alerts=True, internal_gen_data=None)
