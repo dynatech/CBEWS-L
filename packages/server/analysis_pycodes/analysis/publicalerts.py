@@ -403,7 +403,7 @@ def get_internal_alert(pos_trig, release_op_trig, internal_symbols):
         with_data = with_data.append(check_for_earthquake)
     
     sym_id = with_data['trigger_sym_id'].values
-    no_data = highest_triggers[~highest_triggers.source_id.isin(with_data_id)]
+    no_data = highest_triggers[highest_triggers.source_id.isin(with_data_id)]
     nd_source_id = no_data['source_id'].values
     internal_df = internal_symbols[(internal_symbols.trigger_sym_id.isin(sym_id)) \
             | ((internal_symbols.source_id.isin(nd_source_id)) & \
@@ -419,7 +419,7 @@ def get_internal_alert(pos_trig, release_op_trig, internal_symbols):
     # NOTE: LOUIE CHANGES FILTERS ON NO DATA. PACHECK KAY MERYLL
     internal_df = internal_df.drop_duplicates(subset = 'source_id', keep = 'last')
     internal_df = internal_df.reset_index(drop=True)
-    
+
     return internal_df
 
 def get_tsm_alert(site_id, end):
@@ -684,6 +684,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     # INTERNAL ALERT
     internal_id = internal_symbols[internal_symbols.trigger_source == \
             'internal']['source_id'].values[0]
+
     if public_alert > 0:
         # validity of alert
         validity = pd.to_datetime(max(pos_trig['ts_updated'].values)) \
@@ -697,7 +698,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
         internal_df = get_internal_alert(pos_trig, release_op_trig,       
                                   internal_symbols)
 
-        # check if rainfall > 0.75% of threshold
+        # check if rainfall > 75% of threshold
         rain75_id = internal_symbols[(internal_symbols.source_id == \
                         rainfall_id)&(internal_symbols.alert_level \
                         == -2)]['trigger_sym_id'].values[0]
@@ -728,13 +729,9 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
             ground_alert = 0
 
         if public_alert == 0 or ground_alert == -1:
-            shet = internal_symbols[(internal_symbols.alert_level == \
-                             ground_alert) & (internal_symbols.source_id == \
-                             internal_id)]
             pub_internal = internal_symbols[(internal_symbols.alert_level == \
                              ground_alert) & (internal_symbols.source_id == \
                              internal_id)]['alert_symbol'].values[0]
-            
             if public_alert == 0:
                 internal_alert = ''
                 hyphen = ''
@@ -795,21 +792,14 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
 
 
     # GROUND DATA LAST RECEIVED TIMESTAMP (for ND)
-    ts_last_ground_data = get_ground_data_last_ts(site_id=site_id).ts[0]
-    print("ts_last_ground_data: ", ts_last_ground_data)
-    if validity:
-        ts = ts_last_ground_data - datetime.strptime(validity, "%Y-%m-%d %H:%M:%S")
-    #ts = datetime.now() - datetime.strptime(validity, "%Y-%m-%d %H:%M:%S")
-    print("TS: ", validity)
-
-    ts_since_last_ground_data = datetime.now() - datetime.strptime(ts_last_ground_data, "%Y-%m-%d %H:%M:%S")
+    ts_last_ground_data = datetime.strptime(get_ground_data_last_ts(site_id=site_id).ts[0], "%Y-%m-%d %H:%M:%S")
+    # if validity:
+    #     ts_since_last_ground_data = (validity - ts_last_ground_data).days
+    #     # validity = validity + timedelta(hours=4)
+    # else:
+    #     ts_since_last_ground_data = -1
+    ts_since_last_ground_data = (datetime.now() - ts_last_ground_data).days
     
-    # Use below when testing, set a predefined timestamp i.e. '2021-05-30 08:00:00'
-    # ts_last_ground_data = datetime.strptime('2021-05-30 08:00:00', "%Y-%m-%d %H:%M:%S")
-    # ts_since_last_ground_data = datetime.now() - ts_last_ground_data
-    print("COUNTDOWN FOR GROUND DATA: ", ts_since_last_ground_data)
-
-
     # start of event
     if monitoring_type != 'event' and len(pos_trig) != 0:
         ts_onset = min(pos_trig['ts'].values)
@@ -856,7 +846,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
                     'rainfall': [rainfall], 'moms': [moms_alert],
                     'triggers': [triggers], 'tech_info': [tech_info],
                     'has_no_ground_data': [has_no_ground_data],
-                    'ts_since_last_ground_data' : [ts_since_last_ground_data.days],
+                    'ts_since_last_ground_data' : [ts_since_last_ground_data],
                     'is_within_alert_extension': [is_within_alert_extension],
                     'has_unresolved_moms': [has_unresolved_moms]})
 

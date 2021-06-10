@@ -173,11 +173,11 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
                     internal += "Rx"
 
         is_end_of_validity = candidate_ts + timedelta(hours=0.5) == site_db_validity
-        
-        # Check for NO GROUND DATA
+
+        # Check for NO GROUND DATA RECEIVED
         # If status is "lowering" and w/o Ground Data, extend validity to MAX: 72 hours before lowering:
-        if candidate["status"] == "lowering" and int(candidate["ts_since_last_ground_data"]) < 3:
-            is_release_time = False
+        # if is_end_of_validity and int(candidate["ts_since_last_ground_data"]) < 3 and candidate["has_no_ground_data"]:
+        #     is_release_time = False
 
 
         if candidate["has_no_ground_data"] and candidate["public_alert_level"] > 0 and site_db_alert and is_end_of_validity:
@@ -679,8 +679,6 @@ def main(to_update_pub_alerts=False, internal_gen_data=None):
 
     db_alerts = PA.get_ongoing_and_extended_monitoring(source="api")
     db_alerts = json.loads(db_alerts)["data"]
-
-    print("GENERATED_ALERTS: \n", generated_alerts_dict)
 
     candidate_alerts_list = process_candidate_alerts(
         generated_alerts=generated_alerts_dict,
