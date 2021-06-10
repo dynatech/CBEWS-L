@@ -197,7 +197,7 @@ class GroundData():
             query = f'DELETE FROM marker_data WHERE mo_id = "{mo_id}"'
             status = DB.db_modify(query, 'senslopedb', True)
             result = {
-                "status": True, "message": f"Successfully delete surficial data. => {status}"}
+                "status": True, "message": f"Successfully delete surficial data."}
         except Exception as err:
             result = {"status": False,
                 "message": f"Failed to delete marker value. => {err}"}

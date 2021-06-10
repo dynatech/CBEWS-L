@@ -425,11 +425,19 @@ function SurficialMarker() {
         handleClose();
     }
 
+    // if (dtRow.length === 0) setDtRow(
+    // <Grid container direction="row" justify="center" alignItems="center">
+    //     <span align="center" style={{display: 'block', textAlign: 'center', marginLeft: '60%'}}><Typography>Sorry, no matching records found</Typography></span>
+    // </Grid>
+    // )
+
     if (dtRow.length === 0) setDtRow(
-    <Grid container direction="row" justify="center" alignItems="center">
-        <span align="center" style={{display: 'block', textAlign: 'center', marginLeft: '60%'}}><Typography>Loading Surficial Data</Typography></span>
-    </Grid>
-    )
+        
+            <TableCell colspan="7">
+            <Typography align='center' display='block'>Sorry, no matching records found</Typography>
+            </TableCell>   
+        
+        )
 
     return (
         <Fragment>
