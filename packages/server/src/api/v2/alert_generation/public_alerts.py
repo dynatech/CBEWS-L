@@ -122,6 +122,7 @@ def get_mar_alert_validation_data():
                     "public_alert_level": 0,
                     "status": "no_alert"
                 },
+                "message": "Latest validation data retrieved",
                 "status": True
             }
             
@@ -167,6 +168,7 @@ def get_umi_alert_validation_data():
                     "public_alert_level": 0,
                     "status": "no_alert"
                 },
+                "message": "Latest validation data retrieved",
                 "status": 200,
                 "ok": True
             }
