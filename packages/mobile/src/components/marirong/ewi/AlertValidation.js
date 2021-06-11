@@ -101,7 +101,7 @@ function AlertValidation() {
                             </View>
                             <View key="trigger_type">
                                 <Text style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left', fontWeight: 'bold'}]}>
-                                    Trigger Type"
+                                    Trigger Type
                                 </Text>
                                 <Text style={[LabelStyle.small_label, LabelStyle.brand, {textAlign: 'center'}]}>
                                     {row.trigger}
@@ -150,7 +150,8 @@ function AlertValidation() {
         let temp = [];
         const alert_style = [LabelStyle.large_label, LabelStyle.brand, {textAlign: 'center', fontWeight: 'bold'}];
 
-        if (data.length != 0) {
+        if (data.length > 0 && data[0]) {
+            console.log("data", data);
             if (data[0].public_alert_level === 1) alert_style.push(LabelStyle.level_one);
             else if (data[0].public_alert_level === 2) alert_style.push(LabelStyle.level_two);
             else if (data[0].public_alert_level === 3) alert_style.push(LabelStyle.level_three);

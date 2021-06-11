@@ -7,6 +7,7 @@ import { AlertGeneration } from '@dynaslope/commons';
 import moment from 'moment';
 import MobileCaching from '../../../utils/MobileCaching';
 import NetworkUtils from '../../../utils/NetworkUtils';
+import Helpers from '../../utils/Helpers';
 
 function CurrentAlerts() {
 
@@ -14,7 +15,7 @@ function CurrentAlerts() {
     const [currentAlertData, setCurrentAlertData] = useState([]);
     const [ewiDate, setEwiDate] = useState(moment().format('MMMM Do YYYY, h:mm:ss a'));
     const [isDisabled, setDisabled] = useState(false);
-    const [ewiSMS, setEWISMS] = useState("")
+    const [ewiSMS, setEWISMS] = useState("");
 
     useEffect(()=> {
         setTimeout( async ()=> {
@@ -83,24 +84,30 @@ function CurrentAlerts() {
                 </Text>
             )
         }   
-    }
+    } 
 
     const init = async (data) => {
         console.log("CURRENT ALERT", data);
         let temp = [];
         const alert_style = [LabelStyle.large_label, LabelStyle.brand, {textAlign: 'center', fontWeight: 'bold'}];
 
-        if (data.length != 0) {
-            if (data[0].public_alert_level === 1) {
+        if (data.length > 0 && data[0]) {
+            const alert_level = data[0].public_alert_level;
+            const ts_str = data[0].data_ts;
+            
+            let ewi_sms_str = `Magandang ${Helpers.getGreeting(moment())} po.\n\nAlert ${alert_level} ang alert level sa Brgy. Umingan, Alimodian, Iloilo ngayong ${ts_str}. Ang recommended response ay `;
+            let response = "";
+            if (alert_level === 1) {
                 alert_style.push(LabelStyle.level_one);
-                setEWISMS(`Ang barangay Umingan po ay kasalukuyang nasa Alert Level 1.`);
-            } else if (data[0].public_alert_level === 2) {
+                response = " MANATILI SA BAHAY AT MAGHANDA PARA SA SUSUNOD NA EWI."
+            } else if (alert_level === 2) {
                 alert_style.push(LabelStyle.level_two);
-                setEWISMS(`Ang barangay Umingan po ay kasalukuyang nasa Alert Level 2. Mangyari po tayo'y maghanda upang lumikas kung sakaling tumaas sa Alert Level 3.`);
-            } else if (data[0].public_alert_level === 3) {
+                response = " MAGHANDANG LUMIKAS KUNG SAKALING TUMAAS PA ANG ALERT."
+            } else if (alert_level === 3) {
                 alert_style.push(LabelStyle.level_three);
-                setEWISMS(`EVACUATE. Ang barangay Umingan po ay itinalaga sa Alert Level 3.`);
+                response = " LUMIKAS MULA SA SITE."
             }
+            setEWISMS(`${ewi_sms_str} ${response}`);
 
             temp.push(
                 <View key={'container'}>
@@ -171,19 +178,6 @@ function CurrentAlerts() {
     }
 
     const sendEWI = async () => {
-        // TODO: Connect to messaging APP?
-        console.log("EWI SEND CLICKED")
-        // const url = (Platform.OS === 'android')
-        //     ? 'sms:1-408-555-1212?body=yourMessage'
-        //     : 'sms:1-408-555-1212'
-      
-        // Linking.canOpenURL(url).then(supported => {
-        //     if (!supported) {
-        //         console.log('Unsupported url: ' + url)
-        //     } else {
-        //         return Linking.openURL(url)
-        //     }
-        // }).catch(err => console.error('An error occurred', err))
         Linking.openURL(`sms:?addresses=null&body=${ewiSMS}`);
     }
 

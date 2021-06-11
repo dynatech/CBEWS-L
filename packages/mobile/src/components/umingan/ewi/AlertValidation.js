@@ -38,14 +38,15 @@ function AlertValidation() {
     }, []);
 
     const fetchLatestData = async () => {
-        let { status, data, message } = await AlertGeneration.GetUmiAlertValidationData();
+        let temp = await AlertGeneration.GetUmiAlertValidationData();
+        const { status, data, message } = temp;
         if (status) {
             init([data]);
             setEwiData([data]);
             MobileCaching.setItem('UmiCandidateAlert', [data]);
-            ToastAndroid.showWithGravity(message, ToastAndroid.LONG, ToastAndroid.BOTTOM)
+            ToastAndroid.showWithGravity(message, ToastAndroid.LONG, ToastAndroid.CENTER)
         } else {
-            ToastAndroid.showWithGravity(message, ToastAndroid.LONG, ToastAndroid.BOTTOM)
+            ToastAndroid.showWithGravity(message, ToastAndroid.LONG, ToastAndroid.CENTER)
         }
     }
 
@@ -71,10 +72,10 @@ function AlertValidation() {
 
         const response = await AlertGeneration.ValidateTrigger(payload);
         if (status) {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.BOTTOM)
+            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
             fetchLatestData();
         } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.BOTTOM)
+            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
         };
     }
     
@@ -150,7 +151,7 @@ function AlertValidation() {
         let temp = [];
         const alert_style = [LabelStyle.large_label, LabelStyle.brand, {textAlign: 'center', fontWeight: 'bold'}];
 
-        if (data.length != 0) {
+        if (data.length > 0 && data[0]) {
             if (data[0].public_alert_level === 1) alert_style.push(LabelStyle.level_one);
             else if (data[0].public_alert_level === 2) alert_style.push(LabelStyle.level_two);
             else if (data[0].public_alert_level === 3) alert_style.push(LabelStyle.level_three);
@@ -227,7 +228,7 @@ function AlertValidation() {
         if (response.status) {
             fetchLatestData();
         } else console.error("Problem in releasing ewi: ", response.message);
-        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.BOTTOM)
+        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
     }
 
     const getButton = (data) => {

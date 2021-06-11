@@ -3,9 +3,9 @@ import { View, Text, ScrollView } from 'react-native';
 import { LabelStyle } from '../../../styles/label_style';
 import { ContainerStyle } from '../../../styles/container_style';
 import { ColPos, Displacement } from '../../utils/SubsurfaceGraph';
+import NetworkUtils from '../../../utils/NetworkUtils';
 
 function SubsurfacePlot() {
-    
     const temp = require('../../../assets/blcsb.json');
     const [subsurfaceData, setSubsurfaceData] = useState([]);
     const [latestSubTs, setLatestSubTs] = useState(null);

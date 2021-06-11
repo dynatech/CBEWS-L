@@ -4,6 +4,7 @@ import { LabelStyle } from '../../../styles/label_style';
 import { ContainerStyle } from '../../../styles/container_style';
 import { RainfallGraph } from '../../utils/RainfallGraph';
 import { MarDataAnalysis } from '@dynaslope/commons';
+import NetworkUtils from '../../../utils/NetworkUtils';
 
 function RainfallPlot() {
     const temp_rain = require('../../../assets/rain_data_mar.json');
