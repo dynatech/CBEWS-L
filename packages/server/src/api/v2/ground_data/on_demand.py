@@ -63,18 +63,60 @@ def add():
     return jsonify(od_data_return)
 
 
+@ON_DEMAND_BLUEPRINT.route("/update/ground_data/on_demand", methods=["PATCH"])
+def update():
+    try:
+        data_list = request.get_json()
+        data_list["ts_updated"] = dt.now()
+        
+        result = GroundData.update_latest_od_events(data_list)
+        if result['status']:
+            od_data_return = {
+                "status": True,
+                "message": "Successfully updated on demand data.",
+                "data": result['data']
+            }
+        else:
+            od_data_return = {
+                "status": False,
+                "message": f"Failed to update on demand data."
+            }
+    except Exception as err:
+        raise(err)
+        od_data_return = {
+            "status": False,
+            "message": f"Failed to update on demand data."
+        }
+    return jsonify(od_data_return)
+
+
 @ON_DEMAND_BLUEPRINT.route("/raise/ground_data/on_demand", methods=["POST"])
 def raise_on_demand():
-    try:
-        print(request.get_json(), "\n")
-        (site_id, timestamp) = request.get_json().values()
+    """
+    A function used to raise On-Demand to Alert Level 1
 
+    Args:
+    site_id (String) : current site ID
+    ts_updated (String) : current timestamp
+    ts (String) : old timestamp
+    user_id : current user ID from cookies
+    remarks : on-demand reason
+    alert_level: current alert level (default=1)
+    """
+    try:
+        json = request.get_json()
+        site_id = json["site_id"]
+        user_id = json["user_id"]
+        timestamp = json["ts_updated"]
+        remarks = json["reason"]
+
+        # Update ts to current on on-demand table
+        update_on_demand = GroundData.update_latest_od_events(json)
+        
         trigger_sym_id = AlertGen.get_operational_trigger_symbol(
                                     trigger_source='on demand',
                                     alert_level=1,          # alert_level for on-demand default = 1
                                     return_col="trigger_sym_id")
-
-        print("trigger_sym_id:", trigger_sym_id, "\n")
 
         op_trig_data_dict = AlertGen.fetch_recent_operational_trigger(
             AlertGen,
@@ -82,14 +124,18 @@ def raise_on_demand():
             trig_sym_id=trigger_sym_id
         )
 
-        print("op_trig_data_dict:", op_trig_data_dict, "\n")
-
         # If nothing exists in database:
         if not op_trig_data_dict:
             result = AlertGen.insert_operational_trigger(
                 site_id=site_id,
                 trig_sym_id=trigger_sym_id,
                 ts_updated=timestamp
+            )
+            # Fetch recently added on-demand data, for insert of new alert purposes
+            op_trig_data_dict = AlertGen.fetch_recent_operational_trigger(
+                AlertGen,
+                site_id=site_id,
+                trig_sym_id=trigger_sym_id
             )
         # Else update especially ts in database:
         else:
@@ -99,6 +145,18 @@ def raise_on_demand():
                 trig_sym_id=trigger_sym_id,
                 ts_updated=timestamp
             )
+
+        # Insert On-demand alert to database 
+        alert_id = AlertGen.insert_alert_status(
+            self=AlertGen,
+            trigger_id=op_trig_data_dict["trigger_id"],
+            ts_last_retrigger=op_trig_data_dict["ts_updated"],
+            ts_set=timestamp,
+            ts_ack=timestamp,
+            alert_status=1,
+            remarks="valid trigger",
+            user_id=user_id
+        )
 
         od_data_return = {
             "status": True,

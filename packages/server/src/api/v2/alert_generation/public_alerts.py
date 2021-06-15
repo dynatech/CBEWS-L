@@ -43,6 +43,8 @@ def prepare_triggers(row):
     trigger_source = row["trigger_source"]
     info = ""
 
+    print("PREPARE TRIGGERS ROW: ", row)
+
     data_source = "UnDefined"
     if trigger_source == "rainfall":
         info = row["info"]
@@ -139,6 +141,9 @@ def get_umi_alert_validation_data():
         as_of_ts = h.dt_to_str(h.round_down_data_ts(dt.now()))
         if umi_data:
             release_triggers = umi_data["release_triggers"]
+
+            print("PREPARE TRIGGERS: \n", prepare_triggers)
+            print("UMI DATA RELEASE TRIGGERS: ", release_triggers)
 
             new_rel_trigs = list(map(prepare_triggers, release_triggers))
 
@@ -785,7 +790,8 @@ def insert_ewi(internal_ewi_data=None):
                 if "extend_ND" in ewi_data or "extend_rain_x" in ewi_data:
                     # TODO: NO DATA EXTENSION VALUE
                     site_dv = dv.get_site_dynamic_variables(site_id)
-                    no_data_extension_hours = int(site_dv["no_data_extension_hours"])
+                    print("SITE_DV: \n", site_dv)
+                    no_data_extension_hours = int(site_dv["no_data_hours_extension"])
                     # updated_validity = h.str_to_dt(event_validity) + timedelta(hours=4)
                     updated_validity = h.str_to_dt(event_validity) + timedelta(hours=no_data_extension_hours)
                     update_event_container.update({"validity": h.dt_to_str(updated_validity)})

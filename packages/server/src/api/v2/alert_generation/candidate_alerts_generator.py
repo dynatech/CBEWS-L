@@ -72,7 +72,6 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
     """
     merged_db_alerts = latest_events + overdue_events
 
-
     for candidate in candidate_alerts_list:
         # Containers
         site_db_pub_al_lvl = 0
@@ -88,7 +87,6 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         # FIND ONGOING DB ALERTS
         ongoing_db_alerts = list(filter(lambda x: x["event_status"] == "on-going", merged_db_alerts))
         site_db_alert = next(filter(lambda x: x["site_code"] == site_code, ongoing_db_alerts), None)
-        print("site_db_alert", site_db_alert)
 
         # If site_code is already in active events:
         site_db_validity = None
@@ -176,12 +174,17 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
 
         is_end_of_validity = candidate_ts + timedelta(hours=0.5) == site_db_validity
 
+        # Check for NO GROUND DATA RECEIVED
+        # If status is "lowering" and w/o Ground Data, extend validity to MAX: 72 hours before lowering:
+        # if is_end_of_validity and int(candidate["ts_since_last_ground_data"]) < 3 and candidate["has_no_ground_data"]:
+        #     is_release_time = False
+
+
         if candidate["has_no_ground_data"] and candidate["public_alert_level"] > 0 and site_db_alert and is_end_of_validity:
             candidate["extend_ND"] = True
 
-        # NOTE: LOUIE Study more on this code
-        if candidate["status"] == "lowering":
-            is_release_time = True
+        # if candidate["status"] == "lowering":
+        #     is_release_time = True
 
         # ADD MISSING DATA
         candidate.update({
@@ -612,6 +615,7 @@ def separate_with_alerts_to_no_alerts_on_JSON(alerts_list):
 def process_candidate_alerts(generated_alerts, db_alerts):
     """
     """
+    
     all_alerts = generated_alerts["alerts"]
     invalids = generated_alerts["invalids"]
 
@@ -622,7 +626,6 @@ def process_candidate_alerts(generated_alerts, db_alerts):
     candidate_alerts_list = []
 
     no_alerts, with_alerts = separate_with_alerts_to_no_alerts_on_JSON(all_alerts)
-
     merged_list = latest + overdue
 
     return_list = process_with_alerts_entries(with_alerts, merged_list, invalids)
@@ -642,7 +645,11 @@ def process_candidate_alerts(generated_alerts, db_alerts):
     if no_alerts:
         return_list = prepare_sites_for_routine_release(no_alerts, extended_indexes_list, invalid_entries)
     
-    # FUCKING STAMP THE STATUSES AND VALIDITIES
+    # STAMP THE STATUSES AND VALIDITIES
+    print("latest", latest)
+    print("overdue", overdue)
+    print("extended", extended)
+    print("invalids", invalids)
     candidate_alerts_list = finalize_candidates_before_release(candidate_alerts_list, latest, overdue, extended, invalids)
 
     return candidate_alerts_list
@@ -656,7 +663,7 @@ def main(to_update_pub_alerts=False, internal_gen_data=None):
         if platform.system() == "Windows":
             os.system(f"python '{APP_CONFIG['app_directory']}\\CBEWS-L\\packages\\server\\analysis_pycodes\\analysis\\publicalerts.py'")
         else:
-            os.system("python ~/CBEWS-L/packages/server/analysis_pycodes/analysis/publicalerts.py")
+            os.system(f"python '{APP_CONFIG['app_directory']}/CBEWS-L/packages/server/analysis_pycodes/analysis/publicalerts.py'")
 
     if internal_gen_data:
         generated_alerts_dict = internal_gen_data
@@ -693,4 +700,4 @@ def main(to_update_pub_alerts=False, internal_gen_data=None):
     return json_data
 
 if __name__ == "__main__":
-    main()
+    main(to_update_pub_alerts=True, internal_gen_data=None)

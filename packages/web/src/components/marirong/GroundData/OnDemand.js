@@ -329,12 +329,12 @@ export default function OnDemand() {
                     <Select
                         labelId="demo-simple-select-placeholder-label-label"
                         id="demo-simple-select-placeholder-label"
-                        value={od_input.alert_level}
+                        disabled={true}
+                        // value={od_input.alert_level}
+                        value={"1"}
                         onChange={handleChangeValue("alert_level")}
                     >   
                         <MenuItem value={1}><em>Alert 1</em></MenuItem>
-                        <MenuItem value={2}>Alert 2</MenuItem>
-                        <MenuItem value={3}>Alert 3</MenuItem>
                     </Select>
                 </FormControl>
             </DialogContent>

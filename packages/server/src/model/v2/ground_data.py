@@ -197,7 +197,7 @@ class GroundData():
             query = f'DELETE FROM marker_data WHERE mo_id = "{mo_id}"'
             status = DB.db_modify(query, 'senslopedb', True)
             result = {
-                "status": True, "message": f"Successfully delete surficial data. => {status}"}
+                "status": True, "message": f"Successfully delete surficial data."}
         except Exception as err:
             result = {"status": False,
                 "message": f"Failed to delete marker value. => {err}"}
@@ -585,6 +585,26 @@ class GroundData():
 
         return od_data
 
+    def update_latest_od_events(data):
+
+        ts = data["ts"]
+        ts_updated = data["ts_updated"]
+        site_id = data["site_id"]
+        reason = data["reason"]
+        reporter = data["reporter"]
+        alert_level = data["alert_level"]
+
+        try:
+            query = f'UPDATE public_alert_on_demand SET ts = "{ts_updated}", ' \
+                f'reason = "{reason}", reporter = "{reporter}", ' \
+                f'alert_level="{alert_level}" '\
+                f'WHERE site_id = "{site_id}" AND ts = "{ts}";'
+            update_status = DB.db_modify(query, 'senslopedb', True)
+            result = {"status": True, "data": update_status, "message": "Success" }
+        except Exception as err:
+            result = {"status": False, "data": None, "message": err}
+        finally:
+            return result
 
     def insert_on_demand_alert(ts, site_id, reason, reporter, alert_level):
         """
