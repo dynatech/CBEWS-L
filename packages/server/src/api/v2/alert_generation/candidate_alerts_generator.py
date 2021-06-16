@@ -179,12 +179,16 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         # if is_end_of_validity and int(candidate["ts_since_last_ground_data"]) < 3 and candidate["has_no_ground_data"]:
         #     is_release_time = False
 
-
         if candidate["has_no_ground_data"] and candidate["public_alert_level"] > 0 and site_db_alert and is_end_of_validity:
             candidate["extend_ND"] = True
 
         # if candidate["status"] == "lowering":
         #     is_release_time = True
+
+        if candidate["extend_rain_x"] or candidate["extend_ND"]:
+            no_data_ext_hours = int(site_dv["no_data_hours_extension"])
+            updated_validity = site_db_validity + timedelta(hours=no_data_ext_hours)
+            candidate.update({"validity": h.dt_to_str(updated_validity)})
 
         # ADD MISSING DATA
         candidate.update({
