@@ -789,7 +789,7 @@ def insert_ewi(internal_ewi_data=None):
             if status == "routine":
                 event_id = release_dict["event_id"]
             elif status in ["new", "on-going"]:
-                if "extend_ND" in ewi_data or "extend_rain_x" in ewi_data:
+                if ewi_data["extend_ND"] or ewi_data["extend_rain_x"]:
                     # TODO: NO DATA EXTENSION VALUE
                     site_dv = dv.get_site_dynamic_variables(site_id)
                     print("SITE_DV: \n", site_dv)

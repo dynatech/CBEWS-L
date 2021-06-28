@@ -163,7 +163,56 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         ################
         # CHECK FOR RX #
         ################
+        candidate["extend_rain_x"] = False
         if candidate["rainfall"] == "rx" or 'x' in candidate["internal_alert"]:
+            rx_data = AG.get_rx_data(ts=candidate_ts, site_id=site_id)
+
+            print("rx_data",rx_data)
+            final_rx_data = {}
+            
+            if rx_data:
+                rain_gauge = rx_data[0]['gauge_name']
+                if rx_data[0]['data_source'] == "noah":
+                    rain_gauge = "NOAH " + str(rain_gauge)
+                rain_gauge = rain_gauge.upper()
+                
+                one_day_data = list(filter(lambda x: x["rain_alert"] == 'a', rx_data))
+                three_day_data = list(filter(lambda x: x["rain_alert"] == 'b', rx_data))
+
+                days = []
+                cumulatives = []
+                thresholds = []
+                print("one_day_data", one_day_data)
+                print("three_day_data", three_day_data)
+                
+                if len(one_day_data) == 1:
+                    days += ["1-day"]
+                    for i in one_day_data:
+                        cumulatives.append(i['cumulative'])
+                        thresholds.append(i['threshold'])
+                    
+                            
+                if len(three_day_data) == 1:
+                    days += ["3-day"]
+                    for i in three_day_data:
+                        cumulatives.append(i['cumulative'])
+                        thresholds.append(i['threshold'])
+                    
+                day = ' and '.join(days)
+                cumulative = ' and '.join(cumulatives)
+                threshold = ' and '.join(thresholds)    
+                
+                rx_tech_info = "RAIN %s: %s cumulative rainfall " %(rain_gauge, day)
+                # rx_tech_info += "(%s mm) at 75% of threshold (%s mm)" %(cumulative, threshold)
+                rx_tech_info += f"({cumulative} mm) at 75% of threshold ({threshold} mm)"
+
+
+                print("rx_tech_info", rx_tech_info)
+                final_rx_data = rx_data[0]
+                final_rx_data["tech_info"] = rx_tech_info
+                final_rx_data["message"] = f"We are extending alert due to: {rx_tech_info}"
+
+            candidate["rx_data"] = final_rx_data
             candidate["extend_rain_x"] = True
             internal = internal_alert
             if 'x' in internal:
@@ -179,6 +228,7 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         # if is_end_of_validity and int(candidate["ts_since_last_ground_data"]) < 3 and candidate["has_no_ground_data"]:
         #     is_release_time = False
 
+        candidate["extend_ND"] = False
         if candidate["has_no_ground_data"] and candidate["public_alert_level"] > 0 and site_db_alert and is_end_of_validity:
             candidate["extend_ND"] = True
 
@@ -189,6 +239,7 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
             no_data_ext_hours = int(site_dv["no_data_hours_extension"])
             updated_validity = site_db_validity + timedelta(hours=no_data_ext_hours)
             candidate.update({"validity": h.dt_to_str(updated_validity)})
+
 
         # ADD MISSING DATA
         candidate.update({
