@@ -120,16 +120,6 @@ class AlertGeneration():
 
         return result
 
-    def get_rx_data(ts, site_id):
-        """
-        """
-        query = f"SELECT * FROM senslopedb.rainfall_alerts "
-        query += f"WHERE site_id = {site_id} AND ts = '{ts}'"
-
-        schema = "senslopedb"
-        result = DB.db_read(query, schema)
-        return result
-
     def fetch_recent_operational_trigger(self, site_id, trig_sym_id=None):
         """
         Returns most recent operational_trigger.

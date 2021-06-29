@@ -208,6 +208,15 @@ function AlertValidation() {
                             </View>
                         )
                     }
+                    {
+                        data[0]["extend_rain_x"] == true && (
+                            <View key={'rx_container'}>
+                                <Text key={'rx_value'} style={[LabelStyle.large_label, LabelStyle.brand, {textAlign: 'center', color: '#FF7B00'}]}>
+                                    { data[0]["rx_data"]["message"] }
+                                </Text>
+                            </View>
+                        )
+                    }
 
                 </View>
             )
