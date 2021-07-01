@@ -338,7 +338,8 @@ def tag_sites_for_lowering(merged_list, no_alerts):
             data_ts = site["data_ts"]
             internal_alert_level = site["internal_alert_level"]
 
-            if data_ts != x["ts"] and internal_alert_level not in ["A0", "ND"] and site["rainfall"] != "rx":
+
+            if data_ts != x["ts"] and internal_alert_level not in ["A0", "ND"] and x["rainfall"] != "rx":
                 # x.update({
                 #     "status": "lowering",
                 #     "latest_trigger_timestamp": None,
