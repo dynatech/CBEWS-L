@@ -122,6 +122,7 @@ def get_mar_alert_validation_data():
                     "public_alert_level": 0,
                     "status": "no_alert"
                 },
+                "message": "Latest validation data retrieved",
                 "status": True
             }
             
@@ -167,6 +168,7 @@ def get_umi_alert_validation_data():
                     "public_alert_level": 0,
                     "status": "no_alert"
                 },
+                "message": "Latest validation data retrieved",
                 "status": 200,
                 "ok": True
             }
@@ -317,7 +319,7 @@ def validate_trigger():
             "message": "Trigger successfully validated."
         }
     except Exception as err:
-        raise(err)
+        # raise(err)
         response = {
             "data": None,
             "status": False,
@@ -810,6 +812,7 @@ def insert_ewi(internal_ewi_data=None):
 
         return_data = {
             "status": True,
+            "message": "EWI Release successful",
             "data": event_id
         }
     except Exception as err:

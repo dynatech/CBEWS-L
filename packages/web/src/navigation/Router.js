@@ -13,6 +13,8 @@ import UmiDashboard from '../components/umingan/UminganDashboard';
 import SigninIloilo from '../components/iloilo_pdrrmo/authentication/Signin';
 import IloiloDashboard from '../components/iloilo_pdrrmo/IloIloDashboard';
 
+import AlertGenTestDataDashboard from "../components/test_components/AlertGenTestDataDashboard";
+
 import { useCookies } from "react-cookie";
 import {DashRedirectIfLoggedIn, PrivateRoute} from './RouteType';
 
@@ -50,6 +52,7 @@ function RouterApp() {
         {/* PDRRMO SECTION */}
         <Route exact path="/forgot-password" component={ForgotPassword} /> 
         <Route exact path="/signup" component={SignUp} />
+        <Route exact path="/gentest" component={AlertGenTestDataDashboard} />
         <DashRedirectIfLoggedIn exact path="/signin" component={Signin} />
         <DashRedirectIfLoggedIn exact path="/" component={DownloadPage} />
 

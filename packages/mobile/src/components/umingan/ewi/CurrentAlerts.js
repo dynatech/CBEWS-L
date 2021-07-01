@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ToastAndroid, Alert, Linking, Platform } from 'react-native';
 import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
 import { ButtonStyle } from '../../../styles/button_style';
@@ -7,6 +7,7 @@ import { AlertGeneration } from '@dynaslope/commons';
 import moment from 'moment';
 import MobileCaching from '../../../utils/MobileCaching';
 import NetworkUtils from '../../../utils/NetworkUtils';
+import Helpers from '../../utils/Helpers';
 
 function CurrentAlerts() {
 
@@ -14,6 +15,7 @@ function CurrentAlerts() {
     const [currentAlertData, setCurrentAlertData] = useState([]);
     const [ewiDate, setEwiDate] = useState(moment().format('MMMM Do YYYY, h:mm:ss a'));
     const [isDisabled, setDisabled] = useState(false);
+    const [ewiSMS, setEWISMS] = useState("");
 
     useEffect(()=> {
         setTimeout( async ()=> {
@@ -82,17 +84,30 @@ function CurrentAlerts() {
                 </Text>
             )
         }   
-    }
+    } 
 
     const init = async (data) => {
         console.log("CURRENT ALERT", data);
         let temp = [];
         const alert_style = [LabelStyle.large_label, LabelStyle.brand, {textAlign: 'center', fontWeight: 'bold'}];
 
-        if (data.length != 0) {
-            if (data[0].public_alert_level === 1) alert_style.push(LabelStyle.level_one);
-            else if (data[0].public_alert_level === 2) alert_style.push(LabelStyle.level_two);
-            else if (data[0].public_alert_level === 3) alert_style.push(LabelStyle.level_three);
+        if (data.length > 0 && data[0]) {
+            const alert_level = data[0].public_alert_level;
+            const ts_str = data[0].data_ts;
+            
+            let ewi_sms_str = `Magandang ${Helpers.getGreeting(moment())} po.\n\nAlert ${alert_level} ang alert level sa Brgy. Umingan, Alimodian, Iloilo ngayong ${ts_str}. Ang recommended response ay `;
+            let response = "";
+            if (alert_level === 1) {
+                alert_style.push(LabelStyle.level_one);
+                response = " MANATILI SA BAHAY AT MAGHANDA PARA SA SUSUNOD NA EWI."
+            } else if (alert_level === 2) {
+                alert_style.push(LabelStyle.level_two);
+                response = " MAGHANDANG LUMIKAS KUNG SAKALING TUMAAS PA ANG ALERT."
+            } else if (alert_level === 3) {
+                alert_style.push(LabelStyle.level_three);
+                response = " LUMIKAS MULA SA SITE."
+            }
+            setEWISMS(`${ewi_sms_str} ${response}`);
 
             temp.push(
                 <View key={'container'}>
@@ -163,8 +178,7 @@ function CurrentAlerts() {
     }
 
     const sendEWI = async () => {
-        // TODO: Connect to messaging APP?
-        console.log("EWI SEND CLICKED")
+        Linking.openURL(`sms:?addresses=null&body=${ewiSMS}`);
     }
 
     return(

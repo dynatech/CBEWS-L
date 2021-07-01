@@ -101,7 +101,7 @@ function AlertValidation() {
                             </View>
                             <View key="trigger_type">
                                 <Text style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left', fontWeight: 'bold'}]}>
-                                    Trigger Type"
+                                    Trigger Type
                                 </Text>
                                 <Text style={[LabelStyle.small_label, LabelStyle.brand, {textAlign: 'center'}]}>
                                     {row.trigger}
@@ -150,7 +150,8 @@ function AlertValidation() {
         let temp = [];
         const alert_style = [LabelStyle.large_label, LabelStyle.brand, {textAlign: 'center', fontWeight: 'bold'}];
 
-        if (data.length != 0) {
+        if (data.length > 0 && data[0]) {
+            console.log("data", data);
             if (data[0].public_alert_level === 1) alert_style.push(LabelStyle.level_one);
             else if (data[0].public_alert_level === 2) alert_style.push(LabelStyle.level_two);
             else if (data[0].public_alert_level === 3) alert_style.push(LabelStyle.level_three);
@@ -167,17 +168,17 @@ function AlertValidation() {
                     {
                         status !== "no_alert" && (
                             <Text key={'alert_level_value'} style={alert_style}>
-                                `Candidate Alert Level ${ data[0].public_alert_level }`
+                                Candidate Alert Level { data[0].public_alert_level }
                                 </Text>
                         )
                     }
-                    <View key={'site_status_container'} style={{flexDirection:'row'}, {flexWrap:'wrap'}}>
-                        <Text key="site_status_label" style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
+                    <View key={'site_status_container'}>
+                        <Text key="site_status_label" style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'center'}]}>
                             Site Status
                         </Text>
                         {
                             status === "extended" ? (
-                                <Text key="site_status_value" style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left', fontWeight: 'bold'}]}>
+                                <Text key="site_status_value" style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'center', fontWeight: 'bold'}]}>
                                     Day { data[0].day } of Extended Monitoring
                                 </Text>
                             ) : (
@@ -190,10 +191,10 @@ function AlertValidation() {
                     {
                         ![null, ''].includes(data[0].validity) && (
                             <View key={'validity_container'}>
-                                <Text key="validity_label" style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
+                                <Text key="validity_label" style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'center'}]}>
                                     Validity 
                                 </Text>
-                                <Text key={'validity_value'} style={[LabelStyle.large_label, LabelStyle.brand, {textAlign: 'left', fontWeight: 'bold'}]}>
+                                <Text key={'validity_value'} style={[LabelStyle.large_label, LabelStyle.brand, {textAlign: 'center', fontWeight: 'bold'}]}>
                                     { moment(data[0].validity).format("H:mm A, D MMMM YYYY, dddd") }
                                 </Text>
                             </View>
