@@ -43,6 +43,8 @@ function AlertValidation() {
     const [as_of_ts, setAsOfTs] = useState("");
     const [ewi_data, setEwiData] = useState({});
     const [is_release_time, setIsReleaseTime] = useState(false);
+    const [rx_data, setRxData] = useState(null);
+    
     const [rows, setRow] = useState([]);
     const [day, setDay] = useState(null);
     const [all_validated, setAllValidated] = useState(false);
@@ -127,7 +129,7 @@ function AlertValidation() {
                 let rel_trig = [];
                 setCandidateStatus(status);
                 if (["on-going", "new", "valid", "extended", "lowering"].includes(status)) {
-                    const { validity: val, data_ts: dts, is_release_time: irt, release_triggers, all_validated: a_v } = responseJson.data;
+                    const { validity: val, data_ts: dts, is_release_time: irt, release_triggers, all_validated: a_v, rx_data: rxdata, extend_rain_x: extend_rain_x } = responseJson.data;
                     const color_class = identifyAlertStyle(public_alert_level, classes);
                     setPublicAlert(
                         <Typography variant="h2" className={[classes.label_paddings, classes.alert_level, color_class]}>
@@ -139,6 +141,13 @@ function AlertValidation() {
                     setDataTs(moment(dts).format("MMMM D, YYYY h:mm A"));
                     setIsReleaseTime(irt);
                     setAllValidated(a_v);
+                    if(extend_rain_x){
+                        setRxData(
+                            <Typography variant="h6" display="block" style={{color:'#ff7b00'}}>{rxdata.message}</Typography>
+                        );
+                    }else{
+                        setRxData(null);
+                    }
                     rel_trig = release_triggers;
                     if ("day" in responseJson.data) setDay(responseJson.data.day)
 
@@ -148,7 +157,8 @@ function AlertValidation() {
                         <Typography variant="h2" color="#28a745" className={[classes.label_paddings, classes.alert_level]}>
                             No candidate alert
                         </Typography>
-                        )
+                        );
+                        setRxData(null);
                     setNotifText("No new candidate data.");
                 } else {
                     rel_trig = [];
@@ -328,8 +338,9 @@ function AlertValidation() {
                                 <Typography>Day {day}</Typography>
                             )
                         }
+                        {/* Insert rx_data.message for Rainfall Rx extension */}
+                        <Grid xs={6}>{rx_data}</Grid>
                     </Grid>
-
                     {
                         ["valid", "new", "on-going", "extended", "routine", "lowering"].includes(candidate_status) && (
                         // is_release_time && (
