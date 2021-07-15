@@ -453,3 +453,19 @@ class AlertGeneration():
             return_data = result[0][return_col]
 
         return return_data
+
+
+    def get_rx_data(ts, site_id):
+        """
+        """
+        query = "SELECT ra.*, rp.*, ra.id as ra_id "
+        query += "FROM rainfall_alerts AS ra "
+        query += "JOIN rain_props AS rp "
+        query += "ON ra.rain_id = rp.rain_id "
+        query += "AND ra.site_id = rp.site_id "
+        query += f"WHERE ra.site_id = {site_id} AND ra.ts = '{ts}'"
+
+        schema = "senslopedb"
+        result = DB.db_read(query, schema)
+
+        return result

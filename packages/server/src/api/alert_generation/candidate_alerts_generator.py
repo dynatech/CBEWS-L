@@ -24,6 +24,7 @@ def format_release_triggers(candidate, all_event_triggers):
         raw_triggers = candidate["triggers"]
         tech_info_dict = candidate["tech_info"]
         all_validated = True
+        print("raw_triggers", raw_triggers)
         for trigger in raw_triggers:
             ias_symbol = AG.get_internal_alert_symbol_row(trigger_symbol=trigger["alert"], return_col="ias.alert_symbol")
             saved_trigger = next(filter(lambda x: x["trigger_type"] == ias_symbol and x["timestamp"] == trigger["ts"], all_event_triggers), None)
@@ -158,6 +159,7 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         ################
         if candidate["rainfall"] == "rx" or 'x' in candidate["internal_alert"]:
             candidate["extend_rain_x"] = True
+            candidate["rx_data"] = AG.get_rx_data(ts=candidate_ts, site_id=site_id)
             internal = internal_alert
             if 'x' in internal:
                 if 'R' in internal:

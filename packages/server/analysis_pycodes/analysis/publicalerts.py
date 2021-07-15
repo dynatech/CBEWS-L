@@ -581,7 +581,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     # id and three-letter code per site
     site_code = site_props['site_code'].values[0]
     site_id = site_props['site_id'].values[0]
-    # LOUIE
+
     print(f"Site Code: {site_code.upper()}")
 
     # Creates a public_alerts table if it doesn't exist yet
@@ -612,7 +612,6 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     release_op_trig = op_trig[op_trig.ts_updated <= \
             # release_time(end)-timedelta(hours=4)]
             release_time(end)-timedelta(hours=rel_interval_hour)]
-
     release_op_trig = release_op_trig.drop_duplicates(['source_id', \
             'alert_level'])
     subsurface_id = internal_symbols[internal_symbols.trigger_source == \
@@ -629,7 +628,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     last_pos_trig = pos_trig.drop_duplicates(['source_id', \
             'alert_level'])
 
-    # public alert based on highest alert level in operational triggers
+    # Obtain public alert based on highest alert level in operational triggers
     public_alert = max(list(pos_trig['alert_level'].values) + [0])
     print('Public Alert: %s' %public_alert)   
     print()
@@ -649,9 +648,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     except:
         surficial = -1
 
-
-    # MOMS ALERT NOTE: Following code is redundant with above
-    # TODO: LOUIE 
+    # MOMS ALERT
     if public_alert > 0:
         moms_ts = release_time(end) - timedelta(hours=rel_interval_hour)
     else:
@@ -663,8 +660,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
     except:
         moms_alert = -1
 
-    # NOTE: LOUIE
-    # Get moms from database sorted by obs_ts and highest alert level
+    # Get MOMS from database sorted by obs_ts and highest alert level
     sorted_ma_df, moms_alert_level = get_site_moms_alerts(
                                         site_id=site_id,
                                         start=moms_ts,
@@ -766,7 +762,7 @@ def site_public_alert(site_props, end, public_symbols, internal_symbols,
         if validity > end + timedelta(hours=0.5):
             pass
         elif rain75_id in internal_df['trigger_sym_id'].values \
-                or is_within_alert_extension and has_no_ground_data \
+                or (is_within_alert_extension and has_no_ground_data) \
                     or is_not_yet_write_time:
                     # or is_not_yet_write_time \
                     #     or is_within_alert_extension and has_unresolved_moms:
@@ -895,7 +891,6 @@ def main(end=datetime.now()):
     """
     start_time = datetime.now()
     print("Running publicalerts.py @", start_time)
-    # LOUIE
     # qdb.print_out(start_time)
 
     end = round_data_ts(pd.to_datetime(end))
@@ -921,7 +916,6 @@ def main(end=datetime.now()):
     rain_map = trig_symbols[trig_symbols.trigger_source == 'rainfall']
     rain_map = alert_map(rain_map)
     
-    # LOUIE
     # site id and code
     query = "SELECT id as site_id, site_code FROM cbewsl_commons_db.sites WHERE active = 1"
     props = qdb.get_db_dataframe(query)

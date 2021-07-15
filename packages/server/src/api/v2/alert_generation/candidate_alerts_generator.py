@@ -1,7 +1,7 @@
 import sys, json, os, platform
 from flask import Blueprint, jsonify, request
 from connections import SOCKETIO
-from datetime import datetime as dt, timedelta
+from datetime import datetime as dt, timedelta, time
 from src.api.v2.alert_generation import public_alerts as PA 
 from config import APP_CONFIG
 from src.model.v2.alert_generation import AlertGeneration as AG
@@ -163,7 +163,55 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         ################
         # CHECK FOR RX #
         ################
+        candidate["extend_rain_x"] = False
         if candidate["rainfall"] == "rx" or 'x' in candidate["internal_alert"]:
+            rx_data = AG.get_rx_data(ts=candidate_ts, site_id=site_id)
+
+            final_rx_data = {}
+            
+            if rx_data:
+                rain_gauge = rx_data[0]['gauge_name']
+                if rx_data[0]['data_source'] == "noah":
+                    rain_gauge = "NOAH " + str(rain_gauge)
+                rain_gauge = rain_gauge.upper()
+                
+                one_day_data = list(filter(lambda x: x["rain_alert"] == 'a', rx_data))
+                three_day_data = list(filter(lambda x: x["rain_alert"] == 'b', rx_data))
+
+                days = []
+                cumulatives = []
+                thresholds = []
+                print("one_day_data", one_day_data)
+                print("three_day_data", three_day_data)
+                
+                if len(one_day_data) == 1:
+                    days += ["1-day"]
+                    for i in one_day_data:
+                        cumulatives.append(i['cumulative'])
+                        thresholds.append(i['threshold'])
+                    
+                            
+                if len(three_day_data) == 1:
+                    days += ["3-day"]
+                    for i in three_day_data:
+                        cumulatives.append(i['cumulative'])
+                        thresholds.append(i['threshold'])
+                    
+                day = ' and '.join(days)
+                cumulative = ' and '.join(cumulatives)
+                threshold = ' and '.join(thresholds)    
+                
+                rx_tech_info = "RAIN %s: %s cumulative rainfall " %(rain_gauge, day)
+                # rx_tech_info += "(%s mm) at 75% of threshold (%s mm)" %(cumulative, threshold)
+                rx_tech_info += f"({cumulative} mm) at 75% of threshold ({threshold} mm)"
+
+
+                print("rx_tech_info", rx_tech_info)
+                final_rx_data = rx_data[0]
+                final_rx_data["tech_info"] = rx_tech_info
+                final_rx_data["message"] = f"We are extending alert due to: {rx_tech_info}"
+
+            candidate["rx_data"] = final_rx_data
             candidate["extend_rain_x"] = True
             internal = internal_alert
             if 'x' in internal:
@@ -178,13 +226,22 @@ def finalize_candidates_before_release(candidate_alerts_list, latest_events, ove
         # If status is "lowering" and w/o Ground Data, extend validity to MAX: 72 hours before lowering:
         # if is_end_of_validity and int(candidate["ts_since_last_ground_data"]) < 3 and candidate["has_no_ground_data"]:
         #     is_release_time = False
-
-
+        candidate["extend_ND"] = False
         if candidate["has_no_ground_data"] and candidate["public_alert_level"] > 0 and site_db_alert and is_end_of_validity:
             candidate["extend_ND"] = True
 
-        # if candidate["status"] == "lowering":
-        #     is_release_time = True
+        # Check if status is 'lowering', and if after Rx/rx extension
+        # check if ts = end of validity. Allow release if 'True'
+        if candidate["status"] == "lowering" and candidate_ts >= target_data_ts:
+            is_release_time = True
+
+        # Extend validity by (4) hours if:
+        # 1. Rx/rx
+        # 2. ND / no ground data and is w/in (3) days ND extension
+        if candidate["extend_rain_x"] or candidate["extend_ND"]:
+            no_data_ext_hours = int(site_dv["no_data_hours_extension"])
+            updated_validity = site_db_validity + timedelta(hours=no_data_ext_hours)
+            candidate.update({"validity": h.dt_to_str(updated_validity)})
 
         # ADD MISSING DATA
         candidate.update({
@@ -276,14 +333,15 @@ def tag_sites_for_lowering(merged_list, no_alerts):
     for site in merged_list:
         
         index = next((index for (index, d) in enumerate(no_alerts) if d["site_code"] == site["site_code"]), -1)
-
+        print("INDEX: ", index)
         if index != -1:
             x = no_alerts[index]
             lowering_index.append(index)
             data_ts = site["data_ts"]
             internal_alert_level = site["internal_alert_level"]
 
-            if data_ts != x["ts"] and internal_alert_level not in ["A0", "ND"]:
+
+            if data_ts != x["ts"] and internal_alert_level not in ["A0", "ND"] and x["rainfall"] != "rx":
                 # x.update({
                 #     "status": "lowering",
                 #     "latest_trigger_timestamp": None,
@@ -298,6 +356,7 @@ def tag_sites_for_lowering(merged_list, no_alerts):
                 })
                 # x = prepare_candidate_for_release(x, merged_list)
                 return_arr.append(x)
+
     return [return_arr, lowering_index]
 
 
@@ -501,7 +560,7 @@ def fix_internal_alert_invalids(entry, invalid_triggers_list, merged_list):
     entry["triggers"] = tagged_triggers
     entry["invalid_list"] = invalid_list
 
-    # FINALIZE ALERT LEVEL 
+    # FINALIZE ALERT LEVEL
     if current_public_alert_level > candidate_alert_level:
         candidate_alert_level = current_public_alert_level
     
