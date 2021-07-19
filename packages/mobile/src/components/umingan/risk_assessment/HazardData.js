@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Modal, ScrollView, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
+import { View, Text, Modal, ScrollView, TouchableOpacity, ToastAndroid, Alert, RefreshControl, SafeAreaView } from 'react-native';
 import { DataTable } from 'react-native-paper';
 import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
@@ -15,6 +15,7 @@ function HazardData() {
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
     const [hazardDataContainer, setHazardDataContainer] = useState([]);
+    const [refreshing, setRefreshing] = React.useState(false);
     const [cmd, setCmd] = useState('add');
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Hazard': '',
@@ -24,6 +25,11 @@ function HazardData() {
     });
 
     let formData = useRef();
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        fetchLatestData().then(() => setRefreshing(false));
+    }, []);
 
     useEffect(() => {
         setTimeout( async ()=> {
@@ -238,7 +244,7 @@ function HazardData() {
                     })
                     if (response.status == true) {
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        init();
+                        fetchLatestData();
                         closeForm();
                     } else {
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
@@ -251,7 +257,14 @@ function HazardData() {
     }
 
     return (
-        <ScrollView>
+        <SafeAreaView>
+            <ScrollView refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                />
+                }
+            >
             <View style={ContainerStyle.content}>
                 <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Hazard Data</Text>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Hazard Reports / Logs</Text>
@@ -304,6 +317,7 @@ function HazardData() {
                     deleteForm={() => { deleteForm() }} />
             </Modal>
         </ScrollView>
+        </SafeAreaView>
     )
 }
 
