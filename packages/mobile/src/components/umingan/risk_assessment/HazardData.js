@@ -10,6 +10,23 @@ import MobileCaching from '../../../utils/MobileCaching';
 import NetworkUtils from '../../../utils/NetworkUtils';
 import { useIsFocused } from '@react-navigation/native';
 
+const numberOfItemsPerPageList = [2, 3, 4];
+
+const items = [
+  {
+    key: 1,
+    name: 'Page 1',
+  },
+  {
+    key: 2,
+    name: 'Page 2',
+  },
+  {
+    key: 3,
+    name: 'Page 3',
+  },
+];
+
 function HazardData() {
 
     const [openModal, setOpenModal] = useState(false);
@@ -19,6 +36,7 @@ function HazardData() {
     const [refreshing, setRefreshing] = React.useState(false);
     const [cmd, setCmd] = useState('add');
     const isFocused = useIsFocused();
+
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Hazard': '',
         'Speed of Onset': '',
@@ -26,7 +44,26 @@ function HazardData() {
         'Impact': ''
     });
 
+    // Datatable pagination
+    const [page, setPage] = React.useState(0);
+    const [numberOfItemsPerPage, onItemsPerPageChange] = React.useState(numberOfItemsPerPageList[0]);
+    const from = page * numberOfItemsPerPage;
+    const to = Math.min((page + 1) * numberOfItemsPerPage, items.length);
+    React.useEffect(() => {
+        setPage(0);
+     }, [numberOfItemsPerPage]);
+    
+
     let formData = useRef();
+    const resetForm = () => {
+        setDefaultStrValues({
+            'Hazard': '',
+            'Speed of Onset': '',
+            'Early Warning': '',
+            'Impact': ''
+        });
+        setSelectedData({});
+    }
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
@@ -138,15 +175,17 @@ function HazardData() {
                     } else {
                         data['user_id'] = credentials['user_id']
                         response = await UmiRiskManagement.InsertHazardData(data)
-                        fetchLatestData();
                     }
 
                     if (response.status == true) {
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        closeForm();
                     } else {
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                     }
+                    closeForm();
+                    resetForm();
+                    setCmd('add');
+                    fetchLatestData();
                 }, 300);
             });
         } else {
@@ -208,12 +247,15 @@ function HazardData() {
                         } else {
                             response = await UmiRiskManagement.UpdateHazardData(temp_array)
                             if (response.status == true) {
-                                fetchLatestData();
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            } else {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                             }
                         }
-                        setCmd('add');
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                         closeForm();
+                        resetForm();
+                        setCmd('add');
+                        fetchLatestData();
                     }, 300);
                 });
             }
@@ -248,11 +290,13 @@ function HazardData() {
                     })
                     if (response.status == true) {
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        fetchLatestData();
-                        closeForm();
                     } else {
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                     }
+                    closeForm();
+                    resetForm();
+                    setCmd('add');
+                    fetchLatestData();    
                 },300)
               }}
             ],
@@ -283,17 +327,22 @@ function HazardData() {
                         { dataTableContent }
                     </DataTable>
                     <DataTable.Pagination
-                        page={1}
-                        numberOfPages={3}
-                        onPageChange={(page) => { console.log(page); }}
-                        label="1-2 of 6"
+                        page={page}
+                        numberOfPages={Math.ceil(items.length / numberOfItemsPerPage)}
+                        onPageChange={page => setPage(page)}
+                        label={`${from + 1}-${to} of ${items.length}`}
+                        showFastPaginationControls
+                        numberOfItemsPerPageList={numberOfItemsPerPageList}
+                        numberOfItemsPerPage={numberOfItemsPerPage}
+                        onItemsPerPageChange={onItemsPerPageChange}
+                        selectPageDropdownLabel={'Rows per page'}
                     />
                 </View>
                 <View>
                     <Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click row to modify.</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: 'center', padding: 10 }}>
-                    <TouchableOpacity style={ButtonStyle.medium} onPress={() => { showForm() }}>
+                    <TouchableOpacity style={ButtonStyle.medium} onPress={() => { showForm(); setCmd('add'); }}>
                         <Text style={ButtonStyle.large_text}>Add +</Text>
                     </TouchableOpacity>
                 </View>
