@@ -5,6 +5,7 @@ import HazardData from '../../components/umingan/risk_assessment/HazardData';
 import ResourcesNCapacities from '../../components/umingan/risk_assessment/ResourcesNCapacities';
 import Maps from '../../components/umingan/risk_assessment/Maps';
 import FamilyRiskProfile from '../../components/umingan/risk_assessment/FamilyRiskProfile';
+import { BackHandler } from 'react-native';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -13,6 +14,7 @@ function RATabStack() {
         <Tab.Navigator
             lazyLoad={true}
             tabBarPosition='bottom'
+            backBehavior='initialRoute'
             tabBarOptions={{
                 inactiveTintColor: 'white',
                 activeTintColor: '#f5981c',
