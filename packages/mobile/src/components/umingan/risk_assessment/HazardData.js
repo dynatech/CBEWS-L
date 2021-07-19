@@ -10,7 +10,7 @@ import MobileCaching from '../../../utils/MobileCaching';
 import NetworkUtils from '../../../utils/NetworkUtils';
 import { useIsFocused } from '@react-navigation/native';
 
-function HazardData({ navigation }) {
+function HazardData() {
 
     const [openModal, setOpenModal] = useState(false);
     const [dataTableContent, setDataTableContent] = useState([]);
