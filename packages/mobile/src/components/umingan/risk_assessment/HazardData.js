@@ -8,8 +8,9 @@ import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
 import NetworkUtils from '../../../utils/NetworkUtils';
+import { useIsFocused } from '@react-navigation/native';
 
-function HazardData() {
+function HazardData({ navigation }) {
 
     const [openModal, setOpenModal] = useState(false);
     const [dataTableContent, setDataTableContent] = useState([]);
@@ -17,6 +18,7 @@ function HazardData() {
     const [hazardDataContainer, setHazardDataContainer] = useState([]);
     const [refreshing, setRefreshing] = React.useState(false);
     const [cmd, setCmd] = useState('add');
+    const isFocused = useIsFocused();
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Hazard': '',
         'Speed of Onset': '',
@@ -32,18 +34,20 @@ function HazardData() {
     }, []);
 
     useEffect(() => {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-                MobileCaching.getItem('UmiHazardData').then(response => {
-                    init(response);
-                    setHazardDataContainer(response);
-                });
-            } else {
-                fetchLatestData();
-            }
-        },100);
-    }, [])
+        if(isFocused){
+            setTimeout( async ()=> {
+                const isConnected = await NetworkUtils.isNetworkAvailable()
+                if (isConnected != true) {
+                    MobileCaching.getItem('UmiHazardData').then(response => {
+                        init(response);
+                        setHazardDataContainer(response);
+                    });
+                } else {
+                    fetchLatestData();
+                }
+            },100);
+        }
+    }, [isFocused])
 
     const init = async (data) => {
         let temp = [];
