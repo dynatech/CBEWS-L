@@ -12,7 +12,7 @@ function AlertValidation() {
 
     const [candidateComponent, setCandidateComponent] = useState([]);
     const [ewi_data, setEwiData] = useState([]);
-    const [ewiDate, setEwiDate] = useState(moment().format('MMMM Do YYYY, h:mm:ss a'));
+    const [ewiDate, setEwiDate] = useState(moment().format('MMMM Do YYYY, h:mm A'));
     const [isDisabled, setDisabled] = useState(false);
 
     useEffect(()=> {
@@ -212,7 +212,7 @@ function AlertValidation() {
 
                 </View>
             )
-            setEwiDate(moment(data[0].data_ts).format('MMMM Do YYYY, h:mm:ss a'));
+            setEwiDate(moment(data[0].data_ts).format('MMMM Do YYYY, h:mm A'));
         } else {
             temp.push(
                 <Text key={0} style={[LabelStyle.medium_label, LabelStyle.brand, {fontWeight: 'bold'}]}>
