@@ -75,10 +75,18 @@ function HazardData() {
             setTimeout( async ()=> {
                 const isConnected = await NetworkUtils.isNetworkAvailable()
                 if (isConnected != true) {
-                    MobileCaching.getItem('UmiHazardData').then(response => {
-                        init(response);
-                        setHazardDataContainer(response);
-                    });
+                    Alert.alert(
+                        'CBEWS-L is not connected to the internet',
+                        'CBEWS-L Local data will be used.',
+                        [
+                        { text: 'Ok', onPress: () => {
+                            MobileCaching.getItem('UmiHazardData').then(response => {
+                                init(response);
+                                setHazardDataContainer(response);
+                            });
+                        }, style: 'cancel' },
+                        ]
+                    )
                 } else {
                     fetchLatestData();
                 }
@@ -179,19 +187,22 @@ function HazardData() {
 
                     if (response.status == true) {
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        fetchLatestData();
                     } else {
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                     }
+
+                    ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                     closeForm();
                     resetForm();
                     setCmd('add');
-                    fetchLatestData();
                 }, 300);
             });
         } else {
             if (!Object.keys(selectedData).length) {
                 ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.LONG, ToastAndroid.CENTER)
                 closeForm();
+                resetForm();
             } else {
                 MobileCaching.getItem('user_credentials').then(credentials => {
                     setTimeout(async () => {
@@ -248,14 +259,15 @@ function HazardData() {
                             response = await UmiRiskManagement.UpdateHazardData(temp_array)
                             if (response.status == true) {
                                 ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                                fetchLatestData();
                             } else {
                                 ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                             }
                         }
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
                         closeForm();
                         resetForm();
                         setCmd('add');
-                        fetchLatestData();
                     }, 300);
                 });
             }
@@ -285,18 +297,23 @@ function HazardData() {
               },
               { text: "Confirm", onPress: () => {
                 setTimeout(async ()=> {
-                    let response = await UmiRiskManagement.DeleteHazardData({
-                        'id': selectedData['id']
-                    })
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                    const isConnected = await NetworkUtils.isNetworkAvailable();
+                    if (isConnected != true) {
+                        ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.LONG, ToastAndroid.CENTER)
                     } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        let response = await UmiRiskManagement.DeleteHazardData({
+                            'id': selectedData['id']
+                        })
+                        if (response.status == true) {
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            fetchLatestData();
+                        } else {
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        }
                     }
                     closeForm();
                     resetForm();
                     setCmd('add');
-                    fetchLatestData();    
                 },300)
               }}
             ],
