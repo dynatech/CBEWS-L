@@ -323,7 +323,7 @@ function RiskAssessmentSummary(props) {
                     <Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click row to modify.</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: 'center', padding: 10 }}>
-                    <TouchableOpacity style={ButtonStyle.medium} onPress={() => { showForm() }}>
+                    <TouchableOpacity style={ButtonStyle.medium} onPress={() => { showForm(); setCmd('add'); }}>
                         <Text style={ButtonStyle.large_text}>Add +</Text>
                     </TouchableOpacity>
                 </View>

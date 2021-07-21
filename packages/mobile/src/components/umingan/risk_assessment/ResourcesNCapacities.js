@@ -152,7 +152,7 @@ function ResourcesNCapacities(props) {
                                 MobileCaching.setItem("UmiResourceAndCapacities", cached_data);
                                 response = {
                                     "status": true,
-                                    "message": "Resource and capacity is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                    "message": "Resources and Capacities is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
                                 }
                             } catch (err) {
                                 response = {
@@ -169,14 +169,25 @@ function ResourcesNCapacities(props) {
                         response = await UmiRiskManagement.InsertResourceAndCapacities(data)
                         fetchLatestData()
                     }
+
+                    if (response.status == true) {
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+                        fetchLatestData();
+                    } else {
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+                    }
+
                     ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                     closeForm();
+                    resetForm();
+                    setCmd('add');
                 }, 300);
             });
         } else {
             if (!Object.keys(selectedData).length) {
                 ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.SHORT, ToastAndroid.CENTER)
                 closeForm();
+                resetForm();
             } else {
                 MobileCaching.getItem('user_credentials').then(credentials => {
                     setTimeout(async () => {
@@ -214,12 +225,12 @@ function ResourcesNCapacities(props) {
                                     MobileCaching.setItem("UmiResourceAndCapacities", cached_data);
                                     response = {
                                         "status": true,
-                                        "message": "Resource and capacity is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                        "message": "Resources and Capacities is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
                                     }
                                 } catch (err) {
                                     response = {
                                         "status": false,
-                                        "message": "Resource and capacity failed to save data to memory."
+                                        "message": "Resources and Capacities failed to save data to memory."
                                     }
                                 }
                                 init(cached_data);
@@ -228,11 +239,15 @@ function ResourcesNCapacities(props) {
                         } else {
                             response = await UmiRiskManagement.UpdateResourceAndCapacities(temp_array)
                             if (response.status == true) {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                                 fetchLatestData();
+                            } else {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                             }
                         }
                         ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                         closeForm();
+                        resetForm();
                         setCmd('add');
                     }, 300);
                 });
@@ -253,7 +268,7 @@ function ResourcesNCapacities(props) {
 
     const deleteForm = () => {
         Alert.alert(
-            "Risk Assessment Resource and Capacities",
+            "Risk Assessment Resources and Capacities",
             "Are you sure you want to delete this data?",
             [
               {
@@ -272,11 +287,13 @@ function ResourcesNCapacities(props) {
                         if (response.status == true) {
                             ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                             fetchLatestData();
-                            closeForm();
                         } else {
                             ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                         }
                     }
+                    closeForm();
+                    resetForm();
+                    setCmd('add');
                 },300)
               }}
             ],
@@ -316,7 +333,7 @@ function ResourcesNCapacities(props) {
                     <Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click row to modify.</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: 'center', padding: 10 }}>
-                    <TouchableOpacity style={ButtonStyle.medium} onPress={() => { showForm() }}>
+                    <TouchableOpacity style={ButtonStyle.medium} onPress={() => { showForm(); setCmd('add'); }}>
                         <Text style={ButtonStyle.large_text}>Add +</Text>
                     </TouchableOpacity>
                 </View>
