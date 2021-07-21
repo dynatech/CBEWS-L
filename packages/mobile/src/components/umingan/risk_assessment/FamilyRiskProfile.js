@@ -78,7 +78,7 @@ function FamilyRiskProfile() {
             setFamilyRiskProfile(response.data);
             MobileCaching.setItem('UmiFamilyRiskProfile', response.data);
         } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
         }
     }
 
@@ -132,17 +132,17 @@ function FamilyRiskProfile() {
                     }
                    
                     if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                         closeForm();
                         setCmd("add");
                     } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                     }
                 }, 300);
             });
         } else {
             if (!Object.keys(selectedData).length) {
-                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.LONG, ToastAndroid.CENTER)
+                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.SHORT, ToastAndroid.CENTER)
                 closeForm();
             } else {
                 MobileCaching.getItem('user_credentials').then(credentials => {
@@ -203,7 +203,7 @@ function FamilyRiskProfile() {
                                 fetchLatestData();
                             }
                         }
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                         closeForm();
                         setCmd('add');
                     }, 300);
@@ -238,11 +238,11 @@ function FamilyRiskProfile() {
                         'id': selectedData['id']
                     })
                     if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                         init();
                         closeForm();
                     } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                     }
                 },300)
               }}
