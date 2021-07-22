@@ -20,7 +20,6 @@ function RiskAssessmentSummary(props) {
     const [refreshing, setRefreshing] = React.useState(false);
     const [cmd, setCmd] = useState('add');
     const isFocused = useIsFocused();
-
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Location': '',
         'Impact': '',
@@ -29,6 +28,7 @@ function RiskAssessmentSummary(props) {
     });
 
     let formData = useRef();
+
     const resetForm = () => {
         setDefaultStrValues({
             'Location': '',
@@ -39,15 +39,17 @@ function RiskAssessmentSummary(props) {
         setSelectedData({});
     }
 
+    // Refresh summary on pull down
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
         fetchLatestData().then(() => setRefreshing(false));
     }, []);
 
+    // Fetch summary on succeeding tab loads
     useEffect(() => {
         if(isFocused){
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
+            setTimeout( async ()=> {
+                const isConnected = await NetworkUtils.isNetworkAvailable()
                 if (isConnected != true) {
                 Alert.alert(
                     'CBEWS-L is not connected to the internet',

@@ -33,10 +33,9 @@ function HazardData() {
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
     const [hazardDataContainer, setHazardDataContainer] = useState([]);
-    const [refreshing, setRefreshing] = React.useState(false);
+    const [refreshing, setRefreshing] = useState(false);
     const [cmd, setCmd] = useState('add');
     const isFocused = useIsFocused();
-
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Hazard': '',
         'Speed of Onset': '',
@@ -53,8 +52,8 @@ function HazardData() {
         setPage(0);
      }, [numberOfItemsPerPage]);
     
-
     let formData = useRef();
+    
     const resetForm = () => {
         setDefaultStrValues({
             'Hazard': '',
@@ -65,32 +64,43 @@ function HazardData() {
         setSelectedData({});
     }
 
+    // Refresh hazard data on pull down
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
         fetchLatestData().then(() => setRefreshing(false));
     }, []);
 
+    const initHazardsData = () => {
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+                Alert.alert(
+                    'CBEWS-L is not connected to the internet',
+                    'CBEWS-L Local data will be used.',
+                    [
+                    { text: 'Ok', onPress: () => {
+                        MobileCaching.getItem('UmiHazardData').then(response => {
+                            init(response);
+                            setHazardDataContainer(response);
+                        });
+                    }, style: 'cancel' },
+                    ]
+                )
+            } else {
+                fetchLatestData();
+            }
+        },100);
+    }
+
+    // Fetch hazard data on initial tab load
+    useEffect(() => {
+        initHazardsData();
+    }, []);
+
+    // Fetch hazard data on succeeding tab loads
     useEffect(() => {
         if(isFocused){
-            setTimeout( async ()=> {
-                const isConnected = await NetworkUtils.isNetworkAvailable()
-                if (isConnected != true) {
-                    Alert.alert(
-                        'CBEWS-L is not connected to the internet',
-                        'CBEWS-L Local data will be used.',
-                        [
-                        { text: 'Ok', onPress: () => {
-                            MobileCaching.getItem('UmiHazardData').then(response => {
-                                init(response);
-                                setHazardDataContainer(response);
-                            });
-                        }, style: 'cancel' },
-                        ]
-                    )
-                } else {
-                    fetchLatestData();
-                }
-            },100);
+            initHazardsData();
         }
     }, [isFocused])
 

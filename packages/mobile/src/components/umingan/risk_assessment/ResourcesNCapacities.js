@@ -29,6 +29,7 @@ function ResourcesNCapacities(props) {
     });
 
     let formData = useRef();
+
     const resetForm = () => {
         setDefaultStrValues({
             'Resource and Capacities': '',
@@ -56,27 +57,35 @@ function ResourcesNCapacities(props) {
         fetchLatestData().then(() => setRefreshing(false));
     }, []);
 
+    const initResNCapacities = () => {
+        setTimeout( async ()=> {
+            const isConnected = await NetworkUtils.isNetworkAvailable()
+            if (isConnected != true) {
+                Alert.alert(
+                    'CBEWS-L is not connected to the internet',
+                    'CBEWS-L Local data will be used.',
+                    [
+                    { text: 'Ok', onPress: () => {
+                        MobileCaching.getItem('UmiResourceAndCapacities').then(response => {
+                            init(response);
+                            setResourceAndCapacitiesContainer(response);
+                        });
+                    }, style: 'cancel' },
+                    ]
+                )
+            } else {
+                fetchLatestData();
+            }
+        },100);
+    }
+
+    useEffect(() => {
+        initResNCapacities();
+    }, [])
+
     useEffect(() => {
         if(isFocused){
-            setTimeout( async ()=> {
-                const isConnected = await NetworkUtils.isNetworkAvailable()
-                if (isConnected != true) {
-                    Alert.alert(
-                        'CBEWS-L is not connected to the internet',
-                        'CBEWS-L Local data will be used.',
-                        [
-                        { text: 'Ok', onPress: () => {
-                            MobileCaching.getItem('UmiResourceAndCapacities').then(response => {
-                                init(response);
-                                setResourceAndCapacitiesContainer(response);
-                            });
-                        }, style: 'cancel' },
-                        ]
-                    )
-                } else {
-                    fetchLatestData();
-                }
-            },100);
+            initResNCapacities();
         }
     }, [isFocused])
 
