@@ -18,7 +18,7 @@ function ResourcesNCapacities(props) {
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
     const [resourceAndCapacitiesContainer, setResourceAndCapacitiesContainer] = useState([]);
-    const [refreshing, setRefreshing] = React.useState(false);
+    const [refreshing, setRefreshing] = useState(false);
     const [cmd, setCmd] = useState('add');
     const isFocused = useIsFocused();
 
@@ -52,37 +52,31 @@ function ResourcesNCapacities(props) {
     //     }, [])
     // );
 
-    const onRefresh = React.useCallback(() => {
-        setRefreshing(true);
-        fetchLatestData().then(() => setRefreshing(false));
-    }, []);
-
-    const initResNCapacities = () => {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-                Alert.alert(
-                    'CBEWS-L is not connected to the internet',
-                    'CBEWS-L Local data will be used.',
-                    [
-                    { text: 'Ok', onPress: () => {
-                        MobileCaching.getItem('UmiResourceAndCapacities').then(response => {
-                            init(response);
-                            setResourceAndCapacitiesContainer(response);
-                        });
-                    }, style: 'cancel' },
-                    ]
-                )
-            } else {
-                fetchLatestData();
-            }
-        },100);
+    // Initialize Resources and Capacities data: Get from cache or fetch from server
+    const initResNCapacities = async () => {
+        const isConnected = await NetworkUtils.isNetworkAvailable()
+        if (isConnected != true) {
+            MobileCaching.getItem('UmiResourceAndCapacities').then(response => {
+                init(response);
+                setResourceAndCapacitiesContainer(response);
+            });
+        } else {
+            fetchLatestData();
+        }
     }
 
+    // Refresh Resources and Capacities on pull down
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        initResNCapacities().then(() => setRefreshing(false));
+    }, []);
+
+    // Fetch Resources and Capacities on initial tab load
     useEffect(() => {
         initResNCapacities();
     }, [])
 
+    // Fetch Resources and Capacities on next succeeding tab loads
     useEffect(() => {
         if(isFocused){
             initResNCapacities();
@@ -94,7 +88,7 @@ function ResourcesNCapacities(props) {
         if (data == undefined) {
             temp.push(
                 <View key={0}>
-                    <Text>No local data available.</Text>
+                    <Text style={{ textAlign: 'center' }}>No local data available.</Text>
                 </View>
             )
         } else {
@@ -112,7 +106,7 @@ function ResourcesNCapacities(props) {
             } else {
                 temp.push(
                     <View key={0}>
-                        <Text>No available data.</Text>
+                        <Text style={{ textAlign: 'center' }}>No available data.</Text>
                     </View>
                 )
             }

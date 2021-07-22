@@ -64,40 +64,31 @@ function HazardData() {
         setSelectedData({});
     }
 
+    // Initialize Hazards Data data: Get from cache or fetch from server
+    const initHazardsData = async () => {
+        const isConnected = await NetworkUtils.isNetworkAvailable()
+        if (isConnected != true) {
+            MobileCaching.getItem('UmiHazardData').then(response => {
+                init(response);
+                setHazardDataContainer(response);
+            });
+        } else {
+            fetchLatestData();
+        }
+    }
+
     // Refresh hazard data on pull down
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
-        fetchLatestData().then(() => setRefreshing(false));
+        initHazardsData().then(() => setRefreshing(false));
     }, []);
 
-    const initHazardsData = () => {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-                Alert.alert(
-                    'CBEWS-L is not connected to the internet',
-                    'CBEWS-L Local data will be used.',
-                    [
-                    { text: 'Ok', onPress: () => {
-                        MobileCaching.getItem('UmiHazardData').then(response => {
-                            init(response);
-                            setHazardDataContainer(response);
-                        });
-                    }, style: 'cancel' },
-                    ]
-                )
-            } else {
-                fetchLatestData();
-            }
-        },100);
-    }
-
-    // Fetch hazard data on initial tab load
+    // Fetch Hazards Data on initial tab load
     useEffect(() => {
         initHazardsData();
     }, []);
 
-    // Fetch hazard data on succeeding tab loads
+    // Fetch Hazards Data on next succeeding tab loads
     useEffect(() => {
         if(isFocused){
             initHazardsData();
@@ -109,7 +100,7 @@ function HazardData() {
         if (data == undefined) {
             temp.push(
                 <View key={0}>
-                    <Text>No local data available.</Text>
+                    <Text style={{ textAlign: 'center' }}>No local data available.</Text>
                 </View>
             )
         } else {
@@ -128,7 +119,7 @@ function HazardData() {
             } else {
                 temp.push(
                     <View key={0}>
-                        <Text>No available data.</Text>
+                        <Text style={{ textAlign: 'center' }}>No available data.</Text>
                     </View>
                 )
             }

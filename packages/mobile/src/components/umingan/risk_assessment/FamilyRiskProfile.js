@@ -36,12 +36,7 @@ function FamilyRiskProfile() {
         setSelectedData({});
     }
 
-    // Refresh hazard data on pull down
-    const onRefresh = React.useCallback(() => {
-        setRefreshing(true);
-        fetchLatestData().then(() => setRefreshing(false));
-    }, []);
-
+    // Initialize Family Risk Profile data: Get from cache or fetch from server
     const initFamilyRiskProfile = async () => {
         const isConnected = await NetworkUtils.isNetworkAvailable()
         if (isConnected != true) {
@@ -54,12 +49,18 @@ function FamilyRiskProfile() {
         }
     }
 
-    // Fetch family risk profile on initial tab load
+    // Refresh Family Risk Profile on pull down
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        initFamilyRiskProfile().then(() => setRefreshing(false));
+    }, []);
+
+    // Fetch Family Risk Profile on initial tab load
     useEffect(() => {
         initFamilyRiskProfile();
     }, [])
 
-    // Fetch family risk profile on next succeeding tab loads
+    // Fetch Family Risk Profile on next succeeding tab loads
     useEffect(() => {
         if(isFocused){
             initFamilyRiskProfile();
@@ -71,7 +72,7 @@ function FamilyRiskProfile() {
         if (data == undefined) {
             temp.push(
                 <View key={0}>
-                    <Text>No local data available.</Text>
+                    <Text style={{ textAlign: 'center' }}>No local data available.</Text>
                 </View>
             )
         } else {
@@ -89,7 +90,7 @@ function FamilyRiskProfile() {
             } else {
                 temp.push(
                     <View key={0}>
-                        <Text>No available data.</Text>
+                        <Text style={{ textAlign: 'center' }}>No available data.</Text>
                     </View>
                 )
             }

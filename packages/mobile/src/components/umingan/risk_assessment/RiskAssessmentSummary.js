@@ -17,7 +17,7 @@ function RiskAssessmentSummary(props) {
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
     const [riskAssessmentContainer, setRiskAssessmentContainer] = useState([]);
-    const [refreshing, setRefreshing] = React.useState(false);
+    const [refreshing, setRefreshing] = useState(false);
     const [cmd, setCmd] = useState('add');
     const isFocused = useIsFocused();
     const [defaultStrValues, setDefaultStrValues] = useState({
@@ -39,33 +39,36 @@ function RiskAssessmentSummary(props) {
         setSelectedData({});
     }
 
-    // Refresh summary on pull down
+    // Initialize Risk Assessment Summary data: Get from cache or fetch from server
+    const initRiskAssessmentSummary = async () => {
+        const isConnected = await NetworkUtils.isNetworkAvailable()
+        if (isConnected != true) {
+            MobileCaching.getItem('UmiRiskAssessmentSummary').then(response => {
+                init(response);
+                setRiskAssessmentContainer(response);
+            });
+        } else {
+            console.log(riskAssessmentContainer);
+            fetchLatestData();
+        }
+    }
+
+    // Upload cached data to server
+    const uploadCachedData = async () => {
+        
+    }
+
+    // Refresh Risk Assessment Summary on pull down
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
-        fetchLatestData().then(() => setRefreshing(false));
+        initRiskAssessmentSummary().then(() => setRefreshing(false));
     }, []);
 
-    // Fetch summary on succeeding tab loads
+    // Fetch Risk Assessment Summary on succeeding tab loads
     useEffect(() => {
         if(isFocused){
             setTimeout( async ()=> {
-                const isConnected = await NetworkUtils.isNetworkAvailable()
-                if (isConnected != true) {
-                Alert.alert(
-                    'CBEWS-L is not connected to the internet',
-                    'CBEWS-L Local data will be used.',
-                    [
-                    { text: 'Ok', onPress: () => {
-                        MobileCaching.getItem('UmiRiskAssessmentSummary').then(response => {
-                            init(response);
-                            setRiskAssessmentContainer(response);
-                        });
-                    }, style: 'cancel' },
-                    ]
-                )
-                } else {
-                    fetchLatestData();
-                }
+                initRiskAssessmentSummary();
             },100);
         }
     }, [isFocused])
@@ -75,7 +78,7 @@ function RiskAssessmentSummary(props) {
         if (data == undefined) {
             temp.push(
                 <View key={0}>
-                    <Text>No local data available.</Text>
+                    <Text style={{ textAlign: 'center' }}>No local data available.</Text>
                 </View>
             )
         } else {
@@ -94,7 +97,7 @@ function RiskAssessmentSummary(props) {
             } else {
                 temp.push(
                     <View key={0}>
-                        <Text>No available data.</Text>
+                        <Text style={{ textAlign: 'center' }}>No available data.</Text>
                     </View>
                 )
             }
