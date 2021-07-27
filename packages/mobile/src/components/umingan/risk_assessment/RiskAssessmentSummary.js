@@ -20,6 +20,7 @@ function RiskAssessmentSummary(props) {
     const [refreshing, setRefreshing] = useState(false);
     const [cmd, setCmd] = useState('add');
     const isFocused = useIsFocused();
+		const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Location': '',
         'Impact': '',
@@ -43,19 +44,30 @@ function RiskAssessmentSummary(props) {
     const initRiskAssessmentSummary = async () => {
         const isConnected = await NetworkUtils.isNetworkAvailable()
         if (isConnected != true) {
-            MobileCaching.getItem('UmiRiskAssessmentSummary').then(response => {
-                init(response);
-                setRiskAssessmentContainer(response);
-            });
+					if(isInitialLoad){
+						Alert.alert(
+							'CBEWS-L is not connected to the internet',
+							'CBEWS-L Local data will be used.',
+							[
+								{ text: 'Ok', onPress: () => {
+									MobileCaching.getItem('UmiRiskAssessmentSummary').then(response => {
+										init(response);
+										setRiskAssessmentContainer(response);
+										setIsInitialLoad(false);
+									});
+								}, style: 'cancel' },
+							]
+						)
+					} else {
+						MobileCaching.getItem('UmiRiskAssessmentSummary').then(response => {
+							init(response);
+							setRiskAssessmentContainer(response);
+							setIsInitialLoad(false);
+						});
+					}	
         } else {
-            console.log(riskAssessmentContainer);
             fetchLatestData();
         }
-    }
-
-    // Upload cached data to server
-    const uploadCachedData = async () => {
-        
     }
 
     // Refresh Risk Assessment Summary on pull down
@@ -67,9 +79,7 @@ function RiskAssessmentSummary(props) {
     // Fetch Risk Assessment Summary on succeeding tab loads
     useEffect(() => {
         if(isFocused){
-            setTimeout( async ()=> {
-                initRiskAssessmentSummary();
-            },100);
+          initRiskAssessmentSummary();   
         }
     }, [isFocused])
 
@@ -148,7 +158,7 @@ function RiskAssessmentSummary(props) {
                                 response = {
                                     "status": true,
                                     "message": "Risk assessment summary is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
-                                }
+                                }	
                             } catch (err) {
                                 response = {
                                     "status": false,
