@@ -2,6 +2,7 @@ import time
 import os
 import glob
 import ntpath
+from datetime import datetime
 from stat import S_ISREG, ST_CTIME, ST_MODE
 from pathlib import Path
 from flask import Blueprint, jsonify, request, redirect, url_for, send_from_directory, send_file
@@ -159,6 +160,9 @@ def fetch_hazard_map():
         entries = ((stat[ST_CTIME], path)
                    for stat, path in entries if S_ISREG(stat[ST_MODE]))
 
+        # file timestamp last modified
+        ts_last_modified = h.dt_to_str(datetime.fromtimestamp(os.stat(basepath).st_mtime))
+
         maps = []
         for map in map_list:
             path = Path(basepath)
@@ -169,7 +173,8 @@ def fetch_hazard_map():
                 maps.append({
                     "filename": filename,
                     "file_type": file_type,
-                    "file_path": basepath
+                    "file_path": basepath,
+                    "ts": ts_last_modified
                 })
 
         response = {"status": True, "data": maps,
@@ -198,6 +203,9 @@ def fetch_hazard_map_gallery_data():
         entries = ((stat[ST_CTIME], path)
                    for stat, path in entries if S_ISREG(stat[ST_MODE]))
 
+        # file timestamp last modified
+        ts_last_modified = h.dt_to_str(datetime.fromtimestamp(os.stat(basepath).st_mtime))
+
         maps = []
         for map in map_list:
             path = Path(basepath)
@@ -212,7 +220,8 @@ def fetch_hazard_map_gallery_data():
 
                 maps.append({
                     "original": http_path,
-                    "thumbnail": http_path
+                    "thumbnail": http_path,
+                    "ts": ts_last_modified
                 })
 
         response = {"status": True, "data": maps,
