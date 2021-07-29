@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Text, TouchableOpacity, Linking, View, Alert } from 'react-native';
+import { Image, Text, TouchableOpacity, Linking, View, Alert, RefreshControl, SafeAreaView } from 'react-native';
 import { ContainerStyle } from '../../styles/container_style';
 import { ImageStyle } from '../../styles/image_style';
 import { LabelStyle } from '../../styles/label_style';
@@ -8,44 +8,68 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import NetworkUtils from '../../utils/NetworkUtils';
 import DataSync from '../../utils/DataSync';
 import MobileCaching from '../../utils/MobileCaching';
+import { useIsFocused } from '@react-navigation/native';
 
 function UminganDashboard(props) {
     const navigator = props.navigation;
     const [isSyncing, setSyncing] = useState(false);
     const [syncMessage, setSyncMessage] = useState("Syncing data to Umingan server...");
+		const [refreshing, setRefreshing] = useState(false);
+    const isFocused = useIsFocused();
+		const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+		// Refresh UminganDashboard on pull down
+    const onRefresh = React.useCallback(() => {
+			setRefreshing(true);
+			initUminganDashboard().then(() => setRefreshing(false));
+		}, []);
+
+		const initUminganDashboard = async () => {
+			const isConnected = await NetworkUtils.isNetworkAvailable()
+			if (isConnected != true) {
+				if (isInitialLoad) {
+					Alert.alert(
+						'CBEWS-L is not connected to the internet',
+						'CBEWS-L Local data will be used.',
+						[
+							{ text: 'Ok', onPress: () => {
+								setSyncing(true);
+								setSyncMessage("Collecting local data...")
+								setTimeout(async()=> {
+										setSyncing(false);
+								}, 1000);
+								setIsInitialLoad(false);
+							}, style: 'cancel' },
+						]
+					)
+				}
+			} else {
+				MobileCaching.getItem('user_credentials').then((credentials)=> {
+					setSyncing(true);
+					setTimeout(async()=> {
+						let cache_keys = await DataSync.getCachedData(credentials.site_id)
+						let _Alterations = await DataSync.compileUnsyncData(cache_keys, "Umingan");
+						setSyncing(false);
+					}, 1000);
+				});
+			}
+		}
 
     useEffect(()=> {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-              Alert.alert(
-                'CBEWS-L is not connected to the internet',
-                'CBEWS-L Local data will be used.',
-                [
-                  { text: 'Ok', onPress: () => {
-                    setSyncing(true);
-                    setSyncMessage("Collecting local data...")
-                    setTimeout(async()=> {
-                        setSyncing(false);
-                    }, 1000);
-                  }, style: 'cancel' },
-                ]
-              )
-            } else {
-              MobileCaching.getItem('user_credentials').then((credentials)=> {
-                setSyncing(true);
-                setTimeout(async()=> {
-                  let cache_keys = await DataSync.getCachedData(credentials.site_id)
-                  let _Alterations = await DataSync.compileUnsyncData(cache_keys, "Umingan");
-                  setSyncing(false);
-                }, 1000);
-              });
-            }
-          },100);
-    },[])
+			if(isFocused){
+				initUminganDashboard();
+			}
+    },[isFocused])
 
     return (
-        <ScrollView>
+			<SafeAreaView>
+        <ScrollView refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                />
+                }
+            >
             <Spinner
                 visible={isSyncing}
                 textContent={syncMessage}
@@ -127,7 +151,8 @@ function UminganDashboard(props) {
                 </View>
             </View>
         </ScrollView>
-    );
+			</SafeAreaView>
+		);
 }
 
 export default UminganDashboard;

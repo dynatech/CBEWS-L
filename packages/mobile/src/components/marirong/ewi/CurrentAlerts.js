@@ -14,7 +14,7 @@ function CurrentAlerts() {
 
     const [currentAlert, setCurrentAlert] = useState([]);
     const [currentAlertData, setCurrentAlertData] = useState([]);
-    const [ewiDate, setEwiDate] = useState(moment().format('MMMM Do YYYY, h:mm:ss a'));
+    const [ewiDate, setEwiDate] = useState(moment().format('MMMM Do YYYY, h:mm A'));
     const [isDisabled, setDisabled] = useState(false);
     const [ewiSMS, setEWISMS] = useState("");
 
@@ -122,7 +122,7 @@ function CurrentAlerts() {
                             Event Started 
                         </Text>
                         <Text key={'feature_value'}style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
-                            { moment(data[0].event_start).format('MMMM Do YYYY, h:mm:ss a') }
+                            { moment(data[0].event_start).format('MMMM D, YYYY h:mm A') }
                         </Text>
                         {/* <Text key={'materials_characterization_value'}style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
                             { data[0].materials_characterization }
@@ -143,7 +143,7 @@ function CurrentAlerts() {
                                     Alert Validity
                                 </Text>
                                 <Text key={'mechanism_value'}style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
-                                    { data[0].validity }
+                                    { moment(data[0].validity).format('MMMM D, YYYY h:mm A') }
                                 </Text>
                             </View>
                         )
@@ -164,7 +164,7 @@ function CurrentAlerts() {
                     </View>
                 </View>
             )
-            setEwiDate(moment(data[0].data_ts).format('MMMM Do YYYY, h:mm:ss a'));
+            setEwiDate(moment(data[0].data_ts).format('MMMM Do YYYY, h:mm A'));
         } else {
             temp.push(
                 <Text key={0} style={[LabelStyle.medium_label, LabelStyle.brand, {fontWeight: 'bold'}]}>

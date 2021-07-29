@@ -62,7 +62,7 @@ export default function HazardMaps() {
         const response = await MarCommunityRiskAssessment.GetHazardMaps();
         if (response.status) {
             if (response.data.length > 0) {
-                setMapPreview(`${AppConfig.HOST_DIR}:5001/MARIRONG/MAPS/${response.data[0].filename}`);
+                setMapPreview(`${AppConfig.HOST_DIR}:5001/src/client-cbewsl/MARIRONG/MAPS/${response.data[0].filename}`);
 
                 const response2 = await MarCommunityRiskAssessment.GetHazardMapsGallery();
                 if (response2.status) setMapList(response2.data);

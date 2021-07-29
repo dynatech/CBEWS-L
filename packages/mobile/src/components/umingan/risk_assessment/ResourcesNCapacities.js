@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Text, Modal, ScrollView, TouchableOpacity, ToastAndroid, Alert, BackHandler } from 'react-native';
+import { View, Text, Modal, ScrollView, TouchableOpacity, ToastAndroid, Alert, BackHandler, RefreshControl, SafeAreaView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { DataTable } from 'react-native-paper';
 import { ContainerStyle } from '../../../styles/container_style';
@@ -9,6 +9,7 @@ import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
 import NetworkUtils from '../../../utils/NetworkUtils';
+import { useIsFocused } from '@react-navigation/native';
 
 function ResourcesNCapacities(props) {
     const navigator = props.navigation;
@@ -17,7 +18,10 @@ function ResourcesNCapacities(props) {
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
     const [resourceAndCapacitiesContainer, setResourceAndCapacitiesContainer] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
     const [cmd, setCmd] = useState('add');
+    const isFocused = useIsFocused();
+
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Resource and Capacities': '',
         'Status': '',
@@ -25,6 +29,15 @@ function ResourcesNCapacities(props) {
     });
 
     let formData = useRef();
+
+    const resetForm = () => {
+        setDefaultStrValues({
+            'Resource and Capacities': '',
+            'Status': '',
+            'Owner': ''
+        });
+        setSelectedData({});
+    }
 
     // useFocusEffect(
     //     useCallback(() => {
@@ -39,26 +52,43 @@ function ResourcesNCapacities(props) {
     //     }, [])
     // );
 
+    // Initialize Resources and Capacities data: Get from cache or fetch from server
+    const initResNCapacities = async () => {
+        const isConnected = await NetworkUtils.isNetworkAvailable()
+        if (isConnected != true) {
+            MobileCaching.getItem('UmiResourceAndCapacities').then(response => {
+                init(response);
+                setResourceAndCapacitiesContainer(response);
+            });
+        } else {
+            fetchLatestData();
+        }
+    }
+
+    // Refresh Resources and Capacities on pull down
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        initResNCapacities().then(() => setRefreshing(false));
+    }, []);
+
+    // Fetch Resources and Capacities on initial tab load
     useEffect(() => {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-                MobileCaching.getItem('UmiResourceAndCapacities').then(response => {
-                    init(response);
-                    setResourceAndCapacitiesContainer(response);
-                });
-            } else {
-                fetchLatestData();
-            }
-        },100);
+        initResNCapacities();
     }, [])
+
+    // Fetch Resources and Capacities on next succeeding tab loads
+    useEffect(() => {
+        if(isFocused){
+            initResNCapacities();
+        }
+    }, [isFocused])
 
     const init = async (data) => {
         let temp = [];
         if (data == undefined) {
             temp.push(
                 <View key={0}>
-                    <Text>No local data available.</Text>
+                    <Text style={{ textAlign: 'center' }}>No local data available.</Text>
                 </View>
             )
         } else {
@@ -76,7 +106,7 @@ function ResourcesNCapacities(props) {
             } else {
                 temp.push(
                     <View key={0}>
-                        <Text>No available data.</Text>
+                        <Text style={{ textAlign: 'center' }}>No available data.</Text>
                     </View>
                 )
             }
@@ -91,7 +121,7 @@ function ResourcesNCapacities(props) {
             setResourceAndCapacitiesContainer(response.data);
             MobileCaching.setItem('UmiResourceAndCapacities', response.data);
         } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
         }
     }
 
@@ -125,7 +155,7 @@ function ResourcesNCapacities(props) {
                                 MobileCaching.setItem("UmiResourceAndCapacities", cached_data);
                                 response = {
                                     "status": true,
-                                    "message": "Resource and capacity is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                    "message": "Resources and Capacities is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
                                 }
                             } catch (err) {
                                 response = {
@@ -142,14 +172,25 @@ function ResourcesNCapacities(props) {
                         response = await UmiRiskManagement.InsertResourceAndCapacities(data)
                         fetchLatestData()
                     }
-                    ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+
+                    if (response.status == true) {
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+                        fetchLatestData();
+                    } else {
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+                    }
+
+                    ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                     closeForm();
+                    resetForm();
+                    setCmd('add');
                 }, 300);
             });
         } else {
             if (!Object.keys(selectedData).length) {
-                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.LONG, ToastAndroid.CENTER)
+                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.SHORT, ToastAndroid.CENTER)
                 closeForm();
+                resetForm();
             } else {
                 MobileCaching.getItem('user_credentials').then(credentials => {
                     setTimeout(async () => {
@@ -187,12 +228,12 @@ function ResourcesNCapacities(props) {
                                     MobileCaching.setItem("UmiResourceAndCapacities", cached_data);
                                     response = {
                                         "status": true,
-                                        "message": "Resource and capacity is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
+                                        "message": "Resources and Capacities is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
                                     }
                                 } catch (err) {
                                     response = {
                                         "status": false,
-                                        "message": "Resource and capacity failed to save data to memory."
+                                        "message": "Resources and Capacities failed to save data to memory."
                                     }
                                 }
                                 init(cached_data);
@@ -201,11 +242,15 @@ function ResourcesNCapacities(props) {
                         } else {
                             response = await UmiRiskManagement.UpdateResourceAndCapacities(temp_array)
                             if (response.status == true) {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                                 fetchLatestData();
+                            } else {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                             }
                         }
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                         closeForm();
+                        resetForm();
                         setCmd('add');
                     }, 300);
                 });
@@ -226,7 +271,7 @@ function ResourcesNCapacities(props) {
 
     const deleteForm = () => {
         Alert.alert(
-            "Risk Assessment Resource and Capacities",
+            "Risk Assessment Resources and Capacities",
             "Are you sure you want to delete this data?",
             [
               {
@@ -237,19 +282,21 @@ function ResourcesNCapacities(props) {
                 setTimeout(async ()=> {
                     const isConnected = await NetworkUtils.isNetworkAvailable();
                     if (isConnected != true) {
-                        ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.LONG, ToastAndroid.CENTER)
+                        ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.SHORT, ToastAndroid.CENTER)
                     } else {
                         let response = await UmiRiskManagement.DeleteResourceAndCapacities({
                             'id': selectedData['id']
                         })
                         if (response.status == true) {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                             fetchLatestData();
-                            closeForm();
                         } else {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                         }
                     }
+                    closeForm();
+                    resetForm();
+                    setCmd('add');
                 },300)
               }}
             ],
@@ -258,9 +305,16 @@ function ResourcesNCapacities(props) {
     }
 
     return (
-        <ScrollView>
+        <SafeAreaView>
+            <ScrollView refreshControl={
+            <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+            />
+            }
+        >
             <View style={ContainerStyle.content}>
-                <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Resource and Capacities</Text>
+                <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Resources and Capacities</Text>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Resources Logs / Inventory</Text>
                 <View style={ContainerStyle.datatable_content}>
                     <DataTable style={{ flex: 1, padding: 10, textAlign: 'center' }}>
@@ -282,7 +336,7 @@ function ResourcesNCapacities(props) {
                     <Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click row to modify.</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: 'center', padding: 10 }}>
-                    <TouchableOpacity style={ButtonStyle.medium} onPress={() => { showForm() }}>
+                    <TouchableOpacity style={ButtonStyle.medium} onPress={() => { showForm(); setCmd('add'); }}>
                         <Text style={ButtonStyle.large_text}>Add +</Text>
                     </TouchableOpacity>
                 </View>
@@ -309,6 +363,7 @@ function ResourcesNCapacities(props) {
                     deleteForm={() => { deleteForm() }} />
             </Modal>
         </ScrollView>
+        </SafeAreaView>
     )
 }
 

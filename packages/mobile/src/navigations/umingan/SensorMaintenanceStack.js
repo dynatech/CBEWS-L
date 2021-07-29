@@ -13,6 +13,7 @@ function SensorMaintenanceStack() {
         <Tab.Navigator
             lazyLoad={true}
             tabBarPosition='bottom'
+            backBehavior='initialRoute'
             tabBarOptions={{
                 inactiveTintColor: 'white',
                 activeTintColor: '#f5981c',

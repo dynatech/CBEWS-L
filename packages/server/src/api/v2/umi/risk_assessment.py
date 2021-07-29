@@ -3,6 +3,7 @@ import time
 import os
 import glob
 import ntpath
+from datetime import datetime
 from pathlib import Path
 from flask import Blueprint, jsonify, request
 from src.model.v2.umi.risk_assessment import RiskAssessmentModel
@@ -25,7 +26,7 @@ def get_all_summary():
     except Exception as err:
         ret_val = {
             'status': False,
-            'message': "Failed to get risk assessment summary."
+            'message': "Failed to get Risk Assessment Summary: {err}"
         }
     return jsonify(ret_val)
 
@@ -48,13 +49,13 @@ def add_summary():
         summary_id = RiskAssessmentModel.create_summary(request_data)
         ret_val = {
             'status': True,
-            'message': "Successfully created new summary",
+            'message': "Successfully created new Risk Assessment Summary",
             'summary_id': summary_id
         }
     except Exception as e:
         ret_val = {
             'status': False,
-            'message': f"Failed to insert summary: {e}"
+            'message': f"Failed to insert Risk Assessment Summary: {e}"
         }
     return jsonify(ret_val)
 
@@ -66,17 +67,17 @@ def update_summary():
         if summary_status == '0':
             ret_val = {
                 'status': True,
-                'message': "Successfully updated summary",
+                'message': "Successfully updated Risk Assessment Summary",
             }
         else:
             ret_val = {
                 'status': False,
-                'message': "Failed to update summary. Check your network connection",
+                'message': "Failed to update Risk Assessment Summary. Check your network connection",
             }
     except Exception as e:
         ret_val = {
             'status': False,
-            'message': f"Failed to insert summary: {e}"
+            'message': f"Failed to insert Risk Assessment Summary: {e}"
         }
     return jsonify(ret_val)
 
@@ -89,17 +90,17 @@ def delete_summary():
         if summary_status == '0':
             ret_val = {
                 'status': True,
-                'message': "Successfully deleted summary",
+                'message': "Successfully deleted Risk Assessment Summary",
             }
         else:
             ret_val = {
                 'status': False,
-                'message': "Failed to delete summary. Check your network connection",
+                'message': "Failed to delete Risk Assessment Summary. Check your network connection",
             }
     except Exception as e:
         ret_val = {
             'status': False,
-            'message': f"Failed to insert summary: {e}"
+            'message': f"Failed to insert Risk Assessment Summary: {e}"
         }
     return jsonify(ret_val)
 
@@ -109,13 +110,13 @@ def get_all_hazard_data():
         hazard_data = RiskAssessmentModel.fetch_all_hazard_data()
         ret_val = {
             'status': True,
-            'message': "Successfully loaded risk assessment hazard data",
+            'message': "Successfully loaded Hazard Data",
             'data': hazard_data
         }
     except Exception as err:
         ret_val = {
             'status': False,
-            'message': f"Failed to get risk assessment hazard data. Error: {err}"
+            'message': f"Failed to get Hazard Data: {err}"
         }
     return jsonify(ret_val)
 
@@ -133,13 +134,13 @@ def add_hazard_data():
         hazard_id = RiskAssessmentModel.create_hazard_data(request_data)
         ret_val = {
             'status': True,
-            'message': "Successfully created new hazard data",
+            'message': "Successfully created new Hazard Data",
             'hazard_id': hazard_id
         }
     except Exception as e:
         ret_val = {
             'status': False,
-            'message': f"Failed to add hazard data: {e}"
+            'message': f"Failed to add Hazard Data: {e}"
         }
     return jsonify(ret_val)
 
@@ -151,17 +152,17 @@ def update_hazard_data():
         if hazard_status == '0':
             ret_val = {
                 'status': True,
-                'message': "Successfully updated hazard data",
+                'message': "Successfully updated Hazard Data",
             }
         else:
             ret_val = {
                 'status': False,
-                'message': "Failed to update hazard data. Check your network connection",
+                'message': "Failed to update Hazard Data. Check your network connection",
             }
     except Exception as e:
         ret_val = {
             'status': False,
-            'message': f"Failed to update hazard_Data: {e}"
+            'message': f"Failed to update Hazard Data: {e}"
         }
     return jsonify(ret_val)
 
@@ -174,17 +175,17 @@ def delete_hazard_data():
         if hazard_status == '0':
             ret_val = {
                 'status': True,
-                'message': "Successfully deleted hazard data",
+                'message': "Successfully deleted Hazard Data",
             }
         else:
             ret_val = {
                 'status': False,
-                'message': "Failed to delete hazard data. Check your network connection",
+                'message': "Failed to delete Hazard Data. Check your network connection",
             }
     except Exception as e:
         ret_val = {
             'status': False,
-            'message': f"Failed to delete hazard data: {e}"
+            'message': f"Failed to delete Hazard Data: {e}"
         }
     return jsonify(ret_val)
 
@@ -194,13 +195,13 @@ def get_all_resource_and_capacities():
         resource_and_capacities = RiskAssessmentModel.fetch_all_resource_and_capacities()
         ret_val = {
             'status': True,
-            'message': "Successfully loaded risk assessment hazard data",
+            'message': "Successfully loaded Resources and Capacities",
             'data': resource_and_capacities
         }
     except Exception as err:
         ret_val = {
             'status': False,
-            'message': f"Failed to get risk assessment hazard data. Error: {err}"
+            'message': f"Failed to get Resources and Capacities: {err}"
         }
     return jsonify(ret_val)
 
@@ -217,13 +218,13 @@ def add_resource_and_capacities():
         hazard_id = RiskAssessmentModel.create_resource_and_capacities(request_data)
         ret_val = {
             'status': True,
-            'message': "Successfully created new hazard data",
+            'message': "Successfully created new Resource and Capacity",
             'hazard_id': hazard_id
         }
     except Exception as e:
         ret_val = {
             'status': False,
-            'message': f"Failed to add hazard data: {e}"
+            'message': f"Failed to add Resource and Capacity: {e}"
         }
     return jsonify(ret_val)
 
@@ -235,17 +236,17 @@ def update_resource_and_capacities():
         if hazard_status == '0':
             ret_val = {
                 'status': True,
-                'message': "Successfully updated hazard data",
+                'message': "Successfully updated Resources and Capacities",
             }
         else:
             ret_val = {
                 'status': False,
-                'message': "Failed to update hazard data. Check your network connection",
+                'message': "Failed to update Resources and Capacities. Check your network connection",
             }
     except Exception as e:
         ret_val = {
             'status': False,
-            'message': f"Failed to update resource and capacities: {e}"
+            'message': f"Failed to update Resources and Capacities: {e}"
         }
     return jsonify(ret_val)
 
@@ -258,17 +259,17 @@ def delete_resource_and_capacities():
         if hazard_status == '0':
             ret_val = {
                 'status': True,
-                'message': "Successfully deleted hazard data",
+                'message': "Successfully deleted Resource and Capacity",
             }
         else:
             ret_val = {
                 'status': False,
-                'message': "Failed to delete hazard data. Check your network connection",
+                'message': "Failed to delete Resource and Capacity. Check your network connection",
             }
     except Exception as e:
         ret_val = {
             'status': False,
-            'message': f"Failed to delete hazard data: {e}"
+            'message': f"Failed to delete Resource and Capacity: {e}"
         }
     return jsonify(ret_val)
 
@@ -278,13 +279,13 @@ def get_all_family_risk_profile():
         family_risk_profile = RiskAssessmentModel.fetch_all_family_risk_profile()
         ret_val = {
             'status': True,
-            'message': "Successfully loaded risk assessment family risk profile",
+            'message': "Successfully loaded Family Risk Profile",
             'data': family_risk_profile
         }
     except Exception as err:
         ret_val = {
             'status': False,
-            'message': f"Failed to get risk assessment family risk profile. Error: {err}"
+            'message': f"Failed to get Family Risk Profile: {err}"
         }
     return jsonify(ret_val)
 
@@ -307,7 +308,7 @@ def add_family_risk_profile():
     except Exception as e:
         ret_val = {
             'status': False,
-            'message': f"Failed to add family risk profile: {e}"
+            'message': f"Failed to add Family Risk Profile: {e}"
         }
     return jsonify(ret_val)
 
@@ -319,17 +320,17 @@ def update_family_risk_profile():
         if family_risk_status == '0':
             ret_val = {
                 'status': True,
-                'message': "Successfully updated family risk profile",
+                'message': "Successfully updated Family Risk Profile",
             }
         else:
             ret_val = {
                 'status': False,
-                'message': "Failed to update family risk profile. Check your network connection",
+                'message': "Failed to update Family Risk Profile. Check your network connection",
             }
     except Exception as e:
         ret_val = {
             'status': False,
-            'message': f"Failed to update resource and capacities: {e}"
+            'message': f"Failed to update Family Risk Profile: {e}"
         }
     return jsonify(ret_val)
 
@@ -342,17 +343,17 @@ def delete_family_risk_profile():
         if family_risk_status == '0':
             ret_val = {
                 'status': True,
-                'message': "Successfully deleted family risk profile",
+                'message': "Successfully deleted Family Risk Profile",
             }
         else:
             ret_val = {
                 'status': False,
-                'message': "Failed to delete family risk profile. Check your network connection",
+                'message': "Failed to delete Family Risk Profile. Check your network connection",
             }
     except Exception as e:
         ret_val = {
             'status': False,
-            'message': f"Failed to delete family risk profile: {e}"
+            'message': f"Failed to delete Family Risk Profile: {e}"
         }
     return jsonify(ret_val)
 
@@ -374,6 +375,9 @@ def fetch_hazard_map():
         entries = ((stat[ST_CTIME], path)
         for stat, path in entries if S_ISREG(stat[ST_MODE]))
 
+        # file timestamp last modified
+        ts_last_modified = h.dt_to_str(datetime.fromtimestamp(os.stat(basepath).st_mtime))
+
         maps = []
         for map in map_list:
             path = Path(basepath)
@@ -384,7 +388,8 @@ def fetch_hazard_map():
                 maps.append({
                     "filename": filename,
                     "file_type": file_type,
-                    "file_path": basepath
+                    "file_path": basepath,
+                    "ts": ts_last_modified
                 })
 
         response = {"status": True, "data": maps, "message": "Success loading map"}

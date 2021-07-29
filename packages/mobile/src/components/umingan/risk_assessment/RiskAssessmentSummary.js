@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Modal, ScrollView, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
+import { View, Text, Modal, ScrollView, TouchableOpacity, ToastAndroid, Alert, RefreshControl, SafeAreaView } from 'react-native';
 import { DataTable } from 'react-native-paper';
 import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
@@ -8,6 +8,7 @@ import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
 import NetworkUtils from '../../../utils/NetworkUtils';
+import { useIsFocused } from '@react-navigation/native';
 
 function RiskAssessmentSummary(props) {
     const navigator = props.navigation;
@@ -16,8 +17,10 @@ function RiskAssessmentSummary(props) {
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
     const [riskAssessmentContainer, setRiskAssessmentContainer] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
     const [cmd, setCmd] = useState('add');
-
+    const isFocused = useIsFocused();
+		const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Location': '',
         'Impact': '',
@@ -27,34 +30,65 @@ function RiskAssessmentSummary(props) {
 
     let formData = useRef();
 
+    const resetForm = () => {
+        setDefaultStrValues({
+            'Location': '',
+            'Impact': '',
+            'Adaptive Capacity': '',
+            'Vulnerability': ''
+        });
+        setSelectedData({});
+    }
+
+    // Initialize Risk Assessment Summary data: Get from cache or fetch from server
+    const initRiskAssessmentSummary = async () => {
+        const isConnected = await NetworkUtils.isNetworkAvailable()
+        if (isConnected != true) {
+					if(isInitialLoad){
+						Alert.alert(
+							'CBEWS-L is not connected to the internet',
+							'CBEWS-L Local data will be used.',
+							[
+								{ text: 'Ok', onPress: () => {
+									MobileCaching.getItem('UmiRiskAssessmentSummary').then(response => {
+										init(response);
+										setRiskAssessmentContainer(response);
+										setIsInitialLoad(false);
+									});
+								}, style: 'cancel' },
+							]
+						)
+					} else {
+						MobileCaching.getItem('UmiRiskAssessmentSummary').then(response => {
+							init(response);
+							setRiskAssessmentContainer(response);
+							setIsInitialLoad(false);
+						});
+					}	
+        } else {
+            fetchLatestData();
+        }
+    }
+
+    // Refresh Risk Assessment Summary on pull down
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        initRiskAssessmentSummary().then(() => setRefreshing(false));
+    }, []);
+
+    // Fetch Risk Assessment Summary on succeeding tab loads
     useEffect(() => {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-              Alert.alert(
-                'CBEWS-L is not connected to the internet',
-                'CBEWS-L Local data will be used.',
-                [
-                  { text: 'Ok', onPress: () => {
-                    MobileCaching.getItem('UmiRiskAssessmentSummary').then(response => {
-                        init(response);
-                        setRiskAssessmentContainer(response);
-                    });
-                  }, style: 'cancel' },
-                ]
-              )
-            } else {
-                fetchLatestData();
-            }
-          },100);
-    }, [])
+        if(isFocused){
+          initRiskAssessmentSummary();   
+        }
+    }, [isFocused])
 
     const init = async (data) => {
         let temp = [];
         if (data == undefined) {
             temp.push(
                 <View key={0}>
-                    <Text>No local data available.</Text>
+                    <Text style={{ textAlign: 'center' }}>No local data available.</Text>
                 </View>
             )
         } else {
@@ -73,7 +107,7 @@ function RiskAssessmentSummary(props) {
             } else {
                 temp.push(
                     <View key={0}>
-                        <Text>No available data.</Text>
+                        <Text style={{ textAlign: 'center' }}>No available data.</Text>
                     </View>
                 )
             }
@@ -88,7 +122,7 @@ function RiskAssessmentSummary(props) {
             setRiskAssessmentContainer(response.data);
             MobileCaching.setItem('UmiRiskAssessmentSummary', response.data);
         } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
         }
     }
 
@@ -124,7 +158,7 @@ function RiskAssessmentSummary(props) {
                                 response = {
                                     "status": true,
                                     "message": "Risk assessment summary is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
-                                }
+                                }	
                             } catch (err) {
                                 response = {
                                     "status": false,
@@ -138,21 +172,26 @@ function RiskAssessmentSummary(props) {
                     } else {
                         data['user_id'] = credentials['user_id']
                         response = await UmiRiskManagement.InsertSummary(data)
-                        fetchLatestData();
                     }
 
                     if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        closeForm();
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+                        fetchLatestData();
                     } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                     }
+
+                    ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+                    closeForm();
+                    resetForm();
+                    setCmd('add');
                 }, 100)
             });
         } else {
             if (!Object.keys(selectedData).length) {
-                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.LONG, ToastAndroid.CENTER)
+                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.SHORT, ToastAndroid.CENTER)
                 closeForm();
+                resetForm();
             } else {
                 MobileCaching.getItem('user_credentials').then(credentials => {
                     setTimeout(async () => {
@@ -202,11 +241,16 @@ function RiskAssessmentSummary(props) {
                         } else {
                             response = await UmiRiskManagement.UpdateSummary(temp_array)
                             if (response.status == true) {
-                                fetchLatestData()
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+                                fetchLatestData();
+                            } else {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                             }
                         }
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                         closeForm();
+                        resetForm();
                         setCmd('add');
                     }, 300);
                 });
@@ -239,19 +283,21 @@ function RiskAssessmentSummary(props) {
                 setTimeout(async ()=> {
                     const isConnected = await NetworkUtils.isNetworkAvailable();
                     if (isConnected != true) {
-                        ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.LONG, ToastAndroid.CENTER)
+                        ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.SHORT, ToastAndroid.CENTER)
                     } else {
                         let response = await UmiRiskManagement.DeleteSummary({
                             'id': selectedData['id']
                         })
                         if (response.status == true) {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                            init();
-                            closeForm();
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+                            fetchLatestData();               
                         } else {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                         }
                     }
+                    closeForm();
+                    resetForm();
+                    setCmd('add');
                 },300)
               }}
             ],
@@ -260,7 +306,14 @@ function RiskAssessmentSummary(props) {
     }
 
     return (
-        <ScrollView>
+        <SafeAreaView>
+            <ScrollView refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                />
+                }
+            >
             <View style={ContainerStyle.content}>
                 <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Risk Assessment Summary</Text>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Summary of Reports / Logs</Text>
@@ -285,7 +338,7 @@ function RiskAssessmentSummary(props) {
                     <Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click row to modify.</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: 'center', padding: 10 }}>
-                    <TouchableOpacity style={ButtonStyle.medium} onPress={() => { showForm() }}>
+                    <TouchableOpacity style={ButtonStyle.medium} onPress={() => { showForm(); setCmd('add'); }}>
                         <Text style={ButtonStyle.large_text}>Add +</Text>
                     </TouchableOpacity>
                 </View>
@@ -313,6 +366,7 @@ function RiskAssessmentSummary(props) {
                     deleteForm={() => { deleteForm() }} />
             </Modal>
         </ScrollView>
+        </SafeAreaView>
     )
 }
 

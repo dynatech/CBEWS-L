@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Modal, ScrollView, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
+import { View, Text, Modal, ScrollView, TouchableOpacity, ToastAndroid, Alert, RefreshControl, SafeAreaView } from 'react-native';
 import { DataTable } from 'react-native-paper';
 import { ContainerStyle } from '../../../styles/container_style';
 import { LabelStyle } from '../../../styles/label_style';
@@ -8,6 +8,7 @@ import { UmiRiskManagement } from '@dynaslope/commons';
 import Forms from '../../utils/Forms';
 import MobileCaching from '../../../utils/MobileCaching';
 import NetworkUtils from '../../../utils/NetworkUtils';
+import { useIsFocused } from '@react-navigation/native';
 
 function FamilyRiskProfile() {
 
@@ -15,7 +16,9 @@ function FamilyRiskProfile() {
     const [dataTableContent, setDataTableContent] = useState([]);
     const [selectedData, setSelectedData] = useState({});
     const [familyRiskProfile, setFamilyRiskProfile] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
     const [cmd, setCmd] = useState('add');
+    const isFocused = useIsFocused();
     const [defaultStrValues, setDefaultStrValues] = useState({
         'Number of Members': '',
         'Vulnerable Groups': '',
@@ -24,27 +27,52 @@ function FamilyRiskProfile() {
 
     let formData = useRef();
 
-    useEffect(() => {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-                MobileCaching.getItem('UmiFamilyRiskProfile').then(response => {
-                    init(response);
-                    setFamilyRiskProfile(response);
-                });
-            } else {
-                fetchLatestData();
-            }
-        },100);
+    const resetForm = () => {
+        setDefaultStrValues({
+            'Number of Members': '',
+            'Vulnerable Groups': '',
+            'Nature of Vulnerability': ''
+        });
+        setSelectedData({});
+    }
 
+    // Initialize Family Risk Profile data: Get from cache or fetch from server
+    const initFamilyRiskProfile = async () => {
+        const isConnected = await NetworkUtils.isNetworkAvailable()
+        if (isConnected != true) {
+            MobileCaching.getItem('UmiFamilyRiskProfile').then(response => {
+                init(response);
+                setFamilyRiskProfile(response);
+            });
+        } else {
+            fetchLatestData();
+        }
+    }
+
+    // Refresh Family Risk Profile on pull down
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        initFamilyRiskProfile().then(() => setRefreshing(false));
+    }, []);
+
+    // Fetch Family Risk Profile on initial tab load
+    useEffect(() => {
+        initFamilyRiskProfile();
     }, [])
+
+    // Fetch Family Risk Profile on next succeeding tab loads
+    useEffect(() => {
+        if(isFocused){
+            initFamilyRiskProfile();
+        }
+    }, [isFocused])
 
     const init = async (data) => {
         let temp = [];
         if (data == undefined) {
             temp.push(
                 <View key={0}>
-                    <Text>No local data available.</Text>
+                    <Text style={{ textAlign: 'center' }}>No local data available.</Text>
                 </View>
             )
         } else {
@@ -62,7 +90,7 @@ function FamilyRiskProfile() {
             } else {
                 temp.push(
                     <View key={0}>
-                        <Text>No available data.</Text>
+                        <Text style={{ textAlign: 'center' }}>No available data.</Text>
                     </View>
                 )
             }
@@ -78,7 +106,7 @@ function FamilyRiskProfile() {
             setFamilyRiskProfile(response.data);
             MobileCaching.setItem('UmiFamilyRiskProfile', response.data);
         } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
         }
     }
 
@@ -95,10 +123,8 @@ function FamilyRiskProfile() {
         if (!Object.keys(selectedData).length) {
             MobileCaching.getItem('user_credentials').then(credentials => {
                 setTimeout(async () => {
-
                     const isConnected = await NetworkUtils.isNetworkAvailable();
                     let response = null;
-                    
                     if (isConnected != true) {
                         response = await MobileCaching.getItem("UmiFamilyRiskProfile").then(cached_data => {
                             cached_data.push({
@@ -122,28 +148,33 @@ function FamilyRiskProfile() {
                                     "message": "Capacity and Vulnerability failed to save data to memory."
                                 }
                             }
+                            setFamilyRiskProfile(cached_data);
                             init(cached_data);
                             return response;
                         });
                     } else {
                         data['user_id'] = credentials['user_id']
                         response = await UmiRiskManagement.InsertFamilyRiskProfile(data)
-                        fetchLatestData();
                     }
                    
                     if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        closeForm();
-                        setCmd("add");
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+                        fetchLatestData();
                     } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                     }
+
+                    ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+                    closeForm();
+                    resetForm();
+                    setCmd('add');
                 }, 300);
             });
         } else {
             if (!Object.keys(selectedData).length) {
-                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.LONG, ToastAndroid.CENTER)
+                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.SHORT, ToastAndroid.CENTER)
                 closeForm();
+                resetForm();
             } else {
                 MobileCaching.getItem('user_credentials').then(credentials => {
                     setTimeout(async () => {
@@ -196,15 +227,20 @@ function FamilyRiskProfile() {
                                     }
                                 }
                                 init(cached_data);
+                                return response;
                             });
                         } else {
                             response = await UmiRiskManagement.UpdateFamilyRiskProfile(temp_array)
                             if (response.status == true) {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                                 fetchLatestData();
+                            } else {
+                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                             }
                         }
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
                         closeForm();
+                        resetForm();
                         setCmd('add');
                     }, 300);
                 });
@@ -234,16 +270,23 @@ function FamilyRiskProfile() {
               },
               { text: "Confirm", onPress: () => {
                 setTimeout(async ()=> {
-                    let response = await UmiRiskManagement.DeleteFamilyRiskProfile({
-                        'id': selectedData['id']
-                    })
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        init();
-                        closeForm();
+                    const isConnected = await NetworkUtils.isNetworkAvailable();
+                    if (isConnected != true) {
+                        ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.SHORT, ToastAndroid.CENTER)
                     } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                        let response = await UmiRiskManagement.DeleteFamilyRiskProfile({
+                            'id': selectedData['id']
+                        })
+                        if (response.status == true) {
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+                            fetchLatestData();
+                        } else {
+                            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+                        }
                     }
+                    closeForm();
+                    resetForm();
+                    setCmd('add');
                 },300)
               }}
             ],
@@ -252,7 +295,14 @@ function FamilyRiskProfile() {
     }
 
     return (
-        <ScrollView>
+        <SafeAreaView>
+            <ScrollView refreshControl={
+            <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+            />
+            }
+        >
             <View style={ContainerStyle.content}>
                 <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Family Risk Profile</Text>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Household affected areas logs</Text>
@@ -276,7 +326,7 @@ function FamilyRiskProfile() {
                     <Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click row to modify.</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: 'center', padding: 10 }}>
-                    <TouchableOpacity style={ButtonStyle.medium} onPress={() => { showForm() }}>
+                    <TouchableOpacity style={ButtonStyle.medium} onPress={() => { showForm(); setCmd('add'); }}>
                         <Text style={ButtonStyle.large_text}>Add +</Text>
                     </TouchableOpacity>
                 </View>
@@ -303,6 +353,7 @@ function FamilyRiskProfile() {
                     deleteForm={() => { deleteForm() }} />
             </Modal>
         </ScrollView>
+        </SafeAreaView>
     )
 }
 
