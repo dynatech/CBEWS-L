@@ -6,7 +6,6 @@ import { ColPos, Displacement } from '../../utils/SubsurfaceGraph';
 import NetworkUtils from '../../../utils/NetworkUtils';
 
 function SubsurfacePlot() {
-    const temp = require('../../../assets/blcsb.json');
     const [subsurfaceData, setSubsurfaceData] = useState([]);
     const [latestSubTs, setLatestSubTs] = useState(null);
 
@@ -32,8 +31,6 @@ function SubsurfacePlot() {
         console.log("response", response)
         if (response.status == true) {
             let subsurface_data = response.data[0];
-            console.log("temp subs", temp);
-            console.log("subsurface_data", subsurface_data)
             setLatestSubTs(null);
             setSubsurfaceData(response.data);
             MobileCaching.setItem('MarDataAnalyisSubsurfaceData', response.data);

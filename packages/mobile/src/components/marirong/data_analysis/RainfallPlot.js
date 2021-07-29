@@ -7,12 +7,10 @@ import { MarDataAnalysis } from '@dynaslope/commons';
 import NetworkUtils from '../../../utils/NetworkUtils';
 
 function RainfallPlot() {
-    const temp_rain = require('../../../assets/rain_data_mar.json');
     const [rainfallData, setRainfallData] = useState([]);
     const [latestRainTs, setLatestRainTs] = useState(null);
 
     useEffect(()=> {
-        // console.log("temp_rain", temp_rain);
         setTimeout( async () => {
             const isConnected = await NetworkUtils.isNetworkAvailable()
             if (isConnected != true) {
@@ -22,16 +20,14 @@ function RainfallPlot() {
                 });
             } else {
                 initRainfall();
-                initSubsurface();
             }
         }, 100);
     }, []);
 
     const initRainfall = async () => {
         const response = await MarDataAnalysis.GetRainfallPlotData();
-        console.log("response", response)
         if (response.status == true) {
-            setLatestRainTs(rainfallData.ts_end);
+            setLatestRainTs(response.data[0].ts_end);
             setRainfallData(response.data);
             MobileCaching.setItem('MarSensorGraphsRainfallData', response.data);
         } else {
@@ -52,9 +48,9 @@ function RainfallPlot() {
                 {
                     rainfallData.map((element)=> {
                         let ret_val = [];
-                        element.plot.forEach(row => {
+                        element.plot.forEach((row, index) => {
                             ret_val.push(
-                                <View style={{alignItems: "center"}}>
+                                <View style={{alignItems: "center"}} key={index}>
                                     <RainfallGraph props={row} />
                                 </View>
                             );

@@ -7,34 +7,38 @@ USER_MANAGEMENT_BLUEPRINT = Blueprint("user_management_blueprint", __name__)
 
 @USER_MANAGEMENT_BLUEPRINT.route("/auth/signin", methods=["POST"])
 def signin():
-    print("Signing in...")
-    credentials = request.get_json()
-    username, password = credentials.values()
-    account_details = Users.fetch_account(username)
-    if len(account_details) != 0:
-        acc_details = account_details[0]
-        v_password = acc_details["password"]
-        salt = acc_details["salt"]
+    try:
+        credentials = request.get_json()
+        username, password = credentials.values()
+        account_details = Users.fetch_account(username)
+        if len(account_details) != 0:
+            acc_details = account_details[0]
+            v_password = acc_details["password"]
+            salt = acc_details["salt"]
 
-        password_hashed = str(hashlib.sha512(str(password+salt).encode("utf-8")).hexdigest())
+            password_hashed = str(hashlib.sha512(str(password+salt).encode("utf-8")).hexdigest())
 
-        if v_password == password_hashed:
-            status = {
-                "status": True,
-                "message": "Login Successfull!",
-                "user_data": acc_details
-            }
+            if v_password == password_hashed:
+                status = {
+                    "status": True,
+                    "message": "Login Successfull!",
+                    "user_data": acc_details
+                }
+            else:
+                status = {
+                    "status": False,
+                    "message": "Invalid password, please try again."
+                }
         else:
             status = {
                 "status": False,
-                "message": "Invalid password, please try again."
+                "message": "Username / Password does not match any records."
             }
-    else:
-        status = {
-            "status": False,
-            "message": "Username / Password does not match any records."
-        }
-    return jsonify(status)
+        return jsonify(status)
+    except:
+        print("Oops!", sys.exc_info()[0], "occurred.")
+        return jsonify({'status': 202})
+
 
 @USER_MANAGEMENT_BLUEPRINT.route("/auth/signout", methods=["GET"])
 def signout():

@@ -27,10 +27,10 @@ function DataAnalysisStack() {
                 component={RainfallPlot} options={{
                     'tabBarLabel': 'Rainfall Plot Summary'
                 }} />
-            <Tab.Screen name="SubsurfacePlot"
+            {/* <Tab.Screen name="SubsurfacePlot"
                 component={SubsurfacePlot} options={{
                     'tabBarLabel': 'Subsurface Plot Summary'
-                }} />
+                }} /> */}
             <Tab.Screen name="SurficialPlot"
                 component={SurficialPlot} options={{
                     'tabBarLabel': 'Surficial Plot Summary'

@@ -12,14 +12,12 @@ import { UmiDataAnalysis } from "@dynaslope/commons";
 
 
 function SensorGraphs() {
-    const temp = require('../../../assets/blcsb.json');
     const [rainfallData, setRainfallData] = useState([]);
     const [latestRainTs, setLatestRainTs] = useState(null);
     const [subsurfaceData, setSubsurfaceData] = useState([]);
     const [latestSubTs, setLatestSubTs] = useState(null);
 
     useEffect(()=> {
-        // console.log("temp_rain", temp_rain);
         setTimeout( async () => {
             const isConnected = await NetworkUtils.isNetworkAvailable()
             if (isConnected != true) {
@@ -55,8 +53,6 @@ function SensorGraphs() {
         console.log("response", response)
         if (response.status == true) {
             let subsurface_data = response.data[0];
-            console.log("temp subs", temp);
-            console.log("subsurface_data", subsurface_data)
             setLatestSubTs(null);
             setSubsurfaceData(response.data);
             MobileCaching.setItem('UmiSensorGraphsSubsurfaceData', response.data);

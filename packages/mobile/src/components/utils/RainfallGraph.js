@@ -18,12 +18,10 @@ const RainfallGraph = (props) => {
 
     useEffect(()=> {
         let temp = constructDataSet(data)
-        // Add costum legend
-        if (temp.length !=0 ) {
-            setDisplay([
-                <Fragment>
-                    <Text style={[LabelStyle.medium_label, LabelStyle.brand]}>{`${gauge_name.toUpperCase()} (${distance}km away)`}</Text>
-                        <LineChart style={{height: 250, width: '100%'}}
+        setDisplay([
+            <Fragment key={gauge_name}>
+                <Text style={[LabelStyle.medium_label, LabelStyle.brand]}>{`${gauge_name.toUpperCase()} (${distance}km away)`}</Text>
+                    <LineChart style={{height: 250, width: '100%'}}
                         data={{
                             dataSets: temp
                         }}
@@ -32,11 +30,13 @@ const RainfallGraph = (props) => {
                             valueFormatterPattern: 'HH:mm',
                             position: 'BOTTOM',
                         }}
-                        legend={{wordWrapEnabled: true}}
-                    />
-                </Fragment>
-            ])
-        }
+                    legend={{wordWrapEnabled: true}}
+                />
+                {
+                    temp.length == 0 && <Text style={[LabelStyle.medium_label, LabelStyle.brand]}>{`No data available for ${gauge_name.toUpperCase()}`}</Text>
+                }
+            </Fragment>
+        ]);
     },[]);
 
     const constructDataSet = (data) => {
@@ -127,10 +127,8 @@ const RainfallGraph = (props) => {
                 values: threshold_3_day  
             })
         }
-
         return ret;
     }
-
     return display
 }
 
