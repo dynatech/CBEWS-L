@@ -30,7 +30,7 @@ APP_DIR = "/home/dynaslope"
 APP_CONFIG = {
     "development": DevelopmentConfig,
     "production": ProductionConfig,
-    "url": "http://localhost:3000",
+    "url": "https://dynaslope.phivolcs.dost.gov.ph",
     "WEB_ASSETS_DIR": f"{APP_DIR}/CBEWS-L/packages/web/src/assets",
     "MARIRONG_DIR": f"{APP_DIR}/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG",
     "CRA_PATH": f"{APP_DIR}/CBEWS-L/packages/commons/src/client-cbewsl/MARIRONG/DOCUMENTS/",

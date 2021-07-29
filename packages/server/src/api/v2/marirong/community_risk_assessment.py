@@ -214,8 +214,8 @@ def fetch_hazard_map_gallery_data():
                 file_type = map.split(".")[1]
                 head, filename = ntpath.split(map)
 
-                web_host_ip = "https://dynaslope.phivolcs.dost.gov.ph"
-                path = f"MARIRONG/MAPS"
+                web_host_ip = APP_CONFIG['url']
+                path = f"src/client-cbewsl/MARIRONG/MAPS"
                 http_path = f"{web_host_ip}:5001/{path}/{filename}"
 
                 maps.append({
