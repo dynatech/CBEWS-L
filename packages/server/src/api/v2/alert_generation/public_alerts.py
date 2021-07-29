@@ -66,7 +66,7 @@ def prepare_triggers(row):
             info = row["info"]["l3"]
         except KeyError:
             info = row["info"]["l2"]
-        data_source = "dummy"
+        data_source = "Local"
     elif trigger_source == "on demand":
         info = row["info"]
         data_source = "Requested by authorities"

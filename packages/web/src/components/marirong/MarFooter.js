@@ -11,7 +11,7 @@ export default function MarFooter () {
     console.log("This is the footer");
 
     return (
-        <BottomNavigation className={classes.footer}>
+        <BottomNavigation className={classes.footer} style={{backgroundColor: '#18516c'}}>
             <Grid container spacing={1}>
                 <Grid item xs={12}>
                     <Typography variant="h6" align="center">Email: pdrrmo@gmail.com</Typography>
