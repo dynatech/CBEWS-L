@@ -64,7 +64,6 @@ function MarirongDashboard(props) {
   }
 
   const initLocation = async () => {
-
     const isConnected = await NetworkUtils.isNetworkAvailable()
     if (isConnected != true) {
       setWeather({
@@ -92,7 +91,7 @@ function MarirongDashboard(props) {
     .then(response => response.json())
     .then(data => {
       data.current.feelslike = `${data.current.feelslike} °`
-        setWeather(data.current)
+      setWeather(data.current)
     })
   }
 

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
 
-import { ScrollView, Text, TouchableOpacity, View, processColor } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View, processColor, Dimensions  } from 'react-native';
 import { Input } from 'react-native-elements';
 import { ButtonStyle } from '../../styles/button_style';
 import { ContainerStyle } from '../../styles/container_style';
@@ -22,6 +22,9 @@ const SurficialMarkerGraph = (props) => {
         ts_end,
         ts_start
     } = props.props;
+
+    const [flagEmpty, setFlag] = useState(true);
+    const [dataset, setDataset] = useState([]);
 
     const constructDataSet = (surficial_plot) => {
         let temp = [];
@@ -45,25 +48,50 @@ const SurficialMarkerGraph = (props) => {
                 values: temp_values
             })
         });
-        console.log(temp);
-        return temp
+        setDataset(temp);
     }
     
-    const constructConfig = () => {
-
+    const checkIfNoData = (data) => {
+        let temp = true;
+        data.forEach(element => {
+            if (element.values.length != 0) {
+                temp = false;
+            }
+        });
+        setFlag(temp);
     }
 
+    useEffect(() => {
+        if (surficial_plot) {
+            constructDataSet(surficial_plot);
+        }
+    }, [surficial_plot]);
+
+    useEffect(() => {
+        if (dataset.length != 0) {
+            checkIfNoData(dataset);
+        }
+    }, [dataset]);
+
     return(
-        <LineChart style={{height: 250, width: 750}}
-            data={{
-                dataSets: constructDataSet(surficial_plot)
-            }}
-            xAxis={{
-                valueFormatter: 'date',
-                valueFormatterPattern: 'yyyy/MM/dd HH:mm',
-                position: 'BOTTOM',
-            }}
-        />
+        <Fragment>
+            {
+                dataset.length != 0 &&
+                    <LineChart style={{height: 250, width: Dimensions.get('window').width - 20}}
+                        data={{
+                            dataSets: dataset
+                        }}
+                        xAxis={{
+                            valueFormatter: 'date',
+                            valueFormatterPattern: 'yyyy/MM/dd HH:mm',
+                            position: 'BOTTOM',
+                        }}
+                    />
+            }
+            {
+                flagEmpty && <Text style={[LabelStyle.medium_label, LabelStyle.brand]}>No available ground data</Text>
+            }
+        </Fragment>
     )
 }
 

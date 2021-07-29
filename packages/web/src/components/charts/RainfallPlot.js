@@ -8,7 +8,6 @@ import {
     TableBody, TableCell, TableHead,
     TableRow, Typography
 } from "@material-ui/core";
-// import { sample_rain_data } from "./sample_rain_data._not_final";
 import { useCookies } from 'react-cookie';
 import { MarDataAnalysis } from "@dynaslope/commons";
 import { UmiDataAnalysis } from "@dynaslope/commons";
