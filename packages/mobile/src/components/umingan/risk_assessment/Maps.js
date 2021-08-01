@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Modal, ScrollView, TouchableOpacity, TouchableHighlight, ToastAndroid, Image, RefreshControl, SafeAreaView, StyleSheet } from 'react-native';
+import { View, Text, Modal, ScrollView, TouchableOpacity, TouchableHighlight, ToastAndroid, Image, RefreshControl, SafeAreaView } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { ContainerStyle } from '../../../styles/container_style';
 import { ImageStyle } from '../../../styles/image_style';
@@ -13,15 +13,12 @@ import { Fragment } from 'react';
 
 function Maps() {
 	const [mapView, setMapView] = useState(false);
-	const [viewMapUpload, setViewMapUpload] = useState(false);
 	const [isDisabled, setIsDisabled] = useState(false);
 	const [mapList, setMapList] = useState([]);
 	const [mapTS, setMapTS] = useState(null);
 	const [singleFile, setSingleFile] = useState(null);
 	const [refreshing, setRefreshing] = useState(false);
 	const isFocused = useIsFocused();
-
-	let formData = useRef();
 
 	useEffect(() => {
 			if(isFocused){
