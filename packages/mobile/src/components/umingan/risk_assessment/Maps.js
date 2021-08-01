@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import { View, Text, Modal, ScrollView, TouchableOpacity, TouchableHighlight, ToastAndroid, Image, RefreshControl, SafeAreaView } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { ContainerStyle } from '../../../styles/container_style';
@@ -9,7 +9,6 @@ import { UmiRiskManagement, AppConfig } from '@dynaslope/commons';
 import { useIsFocused } from '@react-navigation/native';
 import DocumentPicker from 'react-native-document-picker';
 import moment from 'moment';
-import { Fragment } from 'react';
 
 function Maps() {
 	const [mapView, setMapView] = useState(false);
@@ -102,24 +101,23 @@ function Maps() {
 				}
 			>
 				<View style={ContainerStyle.content}>
-						<Text style={[LabelStyle.large_label, LabelStyle.brand]}>Latest Hazard Map for Umingan, Alimodian, Iloilo as of {moment(mapTS).format("MMMM D, YYYY h:mm A")}</Text>
-						{mapList.length == 0 ?
-								<Text style={[LabelStyle.large_label, LabelStyle.brand]} > No Hazard map available.</Text>
-								:
-								<TouchableHighlight onPress={() => showMaps()}>
-									<Image
-										style={ImageStyle.hazard_maps}
-										source={mapList}
-										resizeMode="center" />
-								</TouchableHighlight>
-						}
-						<Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click image to enlarge.</Text>
-						<Modal visible={mapView}
-							transparent={true}>
-							<ImageViewer imageUrls={[{url:mapList.uri}]} enableSwipeDown={true} onSwipeDown={() => { hideMaps() }} />
-						</Modal>
-						<View style={{ paddingTop: '10%', alignItems: 'center' }}>
-						</View>
+					<Text style={[LabelStyle.large_label, LabelStyle.brand]}>Latest Hazard Map for Umingan, Alimodian, Iloilo as of {moment(mapTS).format("MMMM D, YYYY h:mm A")}</Text>
+					{mapList.length == 0 ?
+						<Text style={[LabelStyle.large_label, LabelStyle.brand]} > No Hazard map available.</Text>
+						:
+						<TouchableHighlight onPress={showMaps}>
+							<Image
+							style={ImageStyle.hazard_maps}
+							source={mapList}
+							resizeMode="center"
+							/>
+						</TouchableHighlight>
+					}
+					<Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click image to enlarge.</Text>
+					<Modal visible={mapView}
+						transparent={true}>
+						<ImageViewer imageUrls={[{url:mapList.uri}]} enableSwipeDown={true} onSwipeDown={() => { hideMaps() }} />
+					</Modal>
 				</View>
 				<View style={{ flex: 1, alignItems: 'center', padding: 10 }}>
 					{/* Show Map+ when singleFile is empty, else show Upload */}
