@@ -81,9 +81,9 @@ function FamilyRiskProfile() {
                 row.forEach(element => {
                     temp.push(
                         <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
-                            <DataTable.Cell>{element.number_of_members}</DataTable.Cell>
-                            <DataTable.Cell>{element.vulnerable_groups}</DataTable.Cell>
-                            <DataTable.Cell>{element.nature_of_vulnerability}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 150}}>{element.number_of_members}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 150}}>{element.vulnerable_groups}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 150}}>{element.nature_of_vulnerability}</DataTable.Cell>
                         </DataTable.Row>
                     )
                 });
@@ -307,14 +307,16 @@ function FamilyRiskProfile() {
                 <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Family Risk Profile</Text>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Household affected areas logs</Text>
                 <View style={ContainerStyle.datatable_content}>
-                    <DataTable style={{ flex: 1, padding: 10, textAlign: 'center' }}>
-                        <DataTable.Header>
-                            <DataTable.Title>Number of Members</DataTable.Title>
-                            <DataTable.Title>Vulnerable Groups</DataTable.Title>
-                            <DataTable.Title>Nature of Vulnerability</DataTable.Title>
-                        </DataTable.Header>
-                        { dataTableContent }
-                    </DataTable>
+                    <ScrollView horizontal={true}>
+                        <DataTable style={{ flex: 1, padding: 10, textAlign: 'center' }}>
+                            <DataTable.Header>
+                                <DataTable.Title style={{width: 150}}>Number of Members</DataTable.Title>
+                                <DataTable.Title style={{width: 150}}>Vulnerable Groups</DataTable.Title>
+                                <DataTable.Title style={{width: 150}}>Nature of Vulnerability</DataTable.Title>
+                            </DataTable.Header>
+                            { dataTableContent }
+                        </DataTable>
+                    </ScrollView>
                     <DataTable.Pagination
                         page={1}
                         numberOfPages={3}
