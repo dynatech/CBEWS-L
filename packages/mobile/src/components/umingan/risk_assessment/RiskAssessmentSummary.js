@@ -97,10 +97,10 @@ function RiskAssessmentSummary(props) {
                 row.forEach(element => {
                     temp.push(
                         <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
-                            <DataTable.Cell>{element.location}</DataTable.Cell>
-                            <DataTable.Cell>{element.impact}</DataTable.Cell>
-                            <DataTable.Cell>{element.adaptive_capacity}</DataTable.Cell>
-                            <DataTable.Cell>{element.vulnerability}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 100}}>{element.location}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 100}}>{element.impact}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 120}}>{element.adaptive_capacity}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 120}}>{element.vulnerability}</DataTable.Cell>
                         </DataTable.Row>
                     )
                 });
@@ -318,15 +318,17 @@ function RiskAssessmentSummary(props) {
                 <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Risk Assessment Summary</Text>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Summary of Reports / Logs</Text>
                 <View style={ContainerStyle.datatable_content}>
+									<ScrollView horizontal={true}>
                     <DataTable style={{ flex: 1, padding: 10, textAlign: 'center' }}>
-                        <DataTable.Header>
-                            <DataTable.Title>Location</DataTable.Title>
-                            <DataTable.Title>Impact</DataTable.Title>
-                            <DataTable.Title>Adaptive Capacity</DataTable.Title>
-                            <DataTable.Title>Vulnerability</DataTable.Title>
-                        </DataTable.Header>
-                        {dataTableContent}
+											<DataTable.Header>
+												<DataTable.Title style={{width: 100}}>Location</DataTable.Title>
+												<DataTable.Title style={{width: 100}}>Impact</DataTable.Title>
+												<DataTable.Title style={{width: 120}}>Adaptive Capacity</DataTable.Title>
+												<DataTable.Title style={{width: 120}}>Vulnerability</DataTable.Title>
+											</DataTable.Header>
+											{dataTableContent}
                     </DataTable>
+									</ScrollView>
                     <DataTable.Pagination
                         page={1}
                         numberOfPages={3}
