@@ -315,19 +315,27 @@ function FieldSurveyLogs () {
                 temp.push(
                     <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
                         <DataTable.Cell>{moment(element.report_date).format('YYYY-MM-DD HH:mm:ss')}</DataTable.Cell>
-                        <DataTable.Cell>{element.feature}</DataTable.Cell>
                         <DataTable.Cell>{element.reporter}</DataTable.Cell>
+                        <DataTable.Cell>{element.report_narrative}</DataTable.Cell>
+                        <DataTable.Cell>{element.feature}</DataTable.Cell>
+                        <DataTable.Cell>{element.exposure}</DataTable.Cell>
+                        <DataTable.Cell>{element.mechanism}</DataTable.Cell>
+                        <DataTable.Cell>{element.materials_characterization}</DataTable.Cell>
                     </DataTable.Row>
                 )
             });
             setDataContainer(
                     <View style={[ContainerStyle.datatable_content, {paddingTop: 20}]}>
                         <ScrollView horizontal={true}>
-                            <DataTable style={{ width: 500, padding: 10 }}>
+                            <DataTable style={{ width: 1200, padding: 10 }}>
                                 <DataTable.Header>
                                     <DataTable.Title>Report Date</DataTable.Title>
-                                    <DataTable.Title>Feature</DataTable.Title>
                                     <DataTable.Title>Reporter</DataTable.Title>
+                                    <DataTable.Title>Report Narrative</DataTable.Title>
+                                    <DataTable.Title>Feature</DataTable.Title>
+                                    <DataTable.Title>Exposure</DataTable.Title>
+                                    <DataTable.Title>Mechanism</DataTable.Title>
+                                    <DataTable.Title>Materials Characterization</DataTable.Title>
                                 </DataTable.Header>
                                 { temp }
                             </DataTable>
