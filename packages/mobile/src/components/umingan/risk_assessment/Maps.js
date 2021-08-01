@@ -1,23 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, ScrollView, TouchableOpacity, TouchableHighlight, Image, RefreshControl, SafeAreaView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, Modal, ScrollView, TouchableOpacity, TouchableHighlight, ToastAndroid, Image, RefreshControl, SafeAreaView, StyleSheet } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { ContainerStyle } from '../../../styles/container_style';
 import { ImageStyle } from '../../../styles/image_style';
 import { LabelStyle } from '../../../styles/label_style';
 import { ButtonStyle } from '../../../styles/button_style';
-import { InputStyle } from '../../../styles/input_style';
 import { UmiRiskManagement, AppConfig } from '@dynaslope/commons';
-import MobileCaching from '../../../utils/MobileCaching';
-import NetworkUtils from '../../../utils/NetworkUtils';
 import { useIsFocused } from '@react-navigation/native';
+import DocumentPicker from 'react-native-document-picker';
 import moment from 'moment';
+import { Fragment } from 'react';
 
 function Maps() {
 	const [mapView, setMapView] = useState(false);
+	const [viewMapUpload, setViewMapUpload] = useState(false);
+	const [isDisabled, setIsDisabled] = useState(false);
 	const [mapList, setMapList] = useState([]);
 	const [mapTS, setMapTS] = useState(null);
+	const [singleFile, setSingleFile] = useState(null);
 	const [refreshing, setRefreshing] = useState(false);
 	const isFocused = useIsFocused();
+
+	let formData = useRef();
 
 	useEffect(() => {
 			if(isFocused){
@@ -44,17 +48,59 @@ function Maps() {
 	const showMaps = () => {
 		setMapView(true);
 	}
-
 	const hideMaps = () => {
 		setMapView(false);
 	}
-    
+	const disableUploadButton = () => {
+		setIsDisabled(true);
+	}
+	const enableUploadButton = () => {
+		setIsDisabled(false);
+	}
+
+	const handleUpload = async () => {
+		disableUploadButton();
+		const fileToUpload = singleFile;
+		const data = new FormData();
+		data.append('file', fileToUpload);
+		const response = await UmiRiskManagement.UploadHazardMaps(data);
+		if (response.status === true) {
+			ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+		} else {
+			ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
+		}
+		setSingleFile(null);
+		initMaps();
+		enableUploadButton();
+	}
+
+	const selectFile = async () => {
+    try {
+      const res = await DocumentPicker.pick({
+        // Provide which type of file you want user to pick
+        type: [DocumentPicker.types.images],
+      });
+      setSingleFile(res);
+    } catch (err) {
+      setSingleFile(null);
+      // Handling any exception (If any)
+      if (DocumentPicker.isCancel(err)) {
+        // If user canceled the document selection
+        setSingleFile(null);
+      } else {
+        // For Unknown Error
+        alert('Unknown Error: ' + JSON.stringify(err));
+        throw err;
+      }
+    }
+  };
+
 	return (
 		<SafeAreaView>
 			<ScrollView refreshControl={
 				<RefreshControl
-						refreshing={refreshing}
-						onRefresh={onRefresh}
+					refreshing={refreshing}
+					onRefresh={onRefresh}
 				/>
 				}
 			>
@@ -64,11 +110,10 @@ function Maps() {
 								<Text style={[LabelStyle.large_label, LabelStyle.brand]} > No Hazard map available.</Text>
 								:
 								<TouchableHighlight onPress={() => showMaps()}>
-										<Image
-												style={ImageStyle.hazard_maps}
-												source={mapList}
-												// source={{uri:'http://192.168.0.150:5001/src/client-cbewsl/UMINGAN/MAPS/hazard_map_01.jpg'}}
-												resizeMode="center" />
+									<Image
+										style={ImageStyle.hazard_maps}
+										source={mapList}
+										resizeMode="center" />
 								</TouchableHighlight>
 						}
 						<Text style={[LabelStyle.small_label, LabelStyle.brand]}>* Click image to enlarge.</Text>
@@ -80,11 +125,23 @@ function Maps() {
 						</View>
 				</View>
 				<View style={{ flex: 1, alignItems: 'center', padding: 10 }}>
-					<TouchableOpacity style={ButtonStyle.medium} onPress={() => { initMaps() }}>
-						<Text style={ButtonStyle.large_text}>Map +</Text>
-					</TouchableOpacity>
-			</View>
-
+					{/* Show Map+ when singleFile is empty, else show Upload */}
+					{singleFile == null ? (
+						<TouchableOpacity style={ButtonStyle.medium} onPress={selectFile}>
+							<Text style={ButtonStyle.large_text}>Map +</Text>
+						</TouchableOpacity>
+					):(
+						<Fragment>
+							<Text>
+								File Name: {singleFile.name ? singleFile.name : ''}
+								{'\n'}
+							</Text>
+							<TouchableOpacity style={ButtonStyle.medium} onPress={handleUpload} disabled={isDisabled}>
+								<Text style={ButtonStyle.large_text}>Upload Map</Text>
+							</TouchableOpacity>
+						</Fragment>
+					)}
+				</View>
 			</ScrollView>
 		</SafeAreaView>
 	)
