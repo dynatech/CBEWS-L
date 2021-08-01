@@ -109,10 +109,10 @@ function HazardData() {
                 row.forEach(element => {
                     temp.push(
                         <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
-                            <DataTable.Cell>{element.hazard}</DataTable.Cell>
-                            <DataTable.Cell>{element.speed_of_onset}</DataTable.Cell>
-                            <DataTable.Cell>{element.early_warning}</DataTable.Cell>
-                            <DataTable.Cell>{element.impact}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 120}}>{element.hazard}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 120}}>{element.speed_of_onset}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 120}}>{element.early_warning}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 120}}>{element.impact}</DataTable.Cell>
                         </DataTable.Row>
                     )
                 });
@@ -335,15 +335,17 @@ function HazardData() {
                 <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Hazard Data</Text>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Hazard Reports / Logs</Text>
                 <View style={ContainerStyle.datatable_content}>
+									<ScrollView horizontal={true}>
                     <DataTable style={{ flex: 1, padding: 10, textAlign: 'center' }}>
-                        <DataTable.Header>
-                            <DataTable.Title>Hazard</DataTable.Title>
-                            <DataTable.Title>Speed of Onset</DataTable.Title>
-                            <DataTable.Title>Early Warning</DataTable.Title>
-                            <DataTable.Title>Impact</DataTable.Title>
-                        </DataTable.Header>
-                        { dataTableContent }
+											<DataTable.Header>
+												<DataTable.Title style={{width: 120}}>Hazard</DataTable.Title>
+												<DataTable.Title style={{width: 120}}>Speed of Onset</DataTable.Title>
+												<DataTable.Title style={{width: 120}}>Early Warning</DataTable.Title>
+												<DataTable.Title style={{width: 120}}>Impact</DataTable.Title>
+											</DataTable.Header>
+											{ dataTableContent }
                     </DataTable>
+									</ScrollView>
                     <DataTable.Pagination
                         page={page}
                         numberOfPages={Math.ceil(items.length / numberOfItemsPerPage)}
