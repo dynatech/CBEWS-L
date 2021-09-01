@@ -15,37 +15,7 @@ function ReportSummary() {
     const [fieldSurveyReportDate, setFieldSurveyReportDate] = useState(moment().format('MMMM Do YYYY, h:mm:ss a'));
     const [isDisabled, setDisabled] = useState(false);
 
-    useEffect(()=> {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-              Alert.alert(
-                'CBEWS-L is not connected to the internet',
-                'CBEWS-L Local data will be used.',
-                [
-                  { text: 'Ok', onPress: () => {
-                    MobileCaching.getItem('UmiFieldSurveySummary').then(response => {
-                        init(response);
-                        setFieldSurvey(response);
-                    });
-                  }, style: 'cancel' },
-                ]
-              )
-            } else {
-                fetchLatestData();
-            }
-          },100);
-    }, []);
-
     const fetchLatestData = async () => {
-        let response = await UmiFieldSurvey.GetLatestReportSummary();
-        if (response.status == true) {
-            init(response.data);
-            setFieldSurvey(response.data);
-            MobileCaching.setItem('UmiFieldSurveySummary', response.data);
-        } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-        }
     }
 
     const init = async (data) => {
@@ -108,12 +78,10 @@ function ReportSummary() {
     }
 
     const download = async () => {
-        let download_response = UmiFieldSurvey.DownloadLatestReportSummary(fieldSurvey);
         // TODO: Dev this function when the Web functionality is available
     }
 
     const email = async () => {
-        let email_response = UmiFieldSurvey.EmailLatestReportSummary(fieldSurvey);
         // TODO: Dev this function when the Web functionality is available
     }
 

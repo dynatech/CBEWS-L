@@ -17,48 +17,10 @@ function SensorGraphs() {
     const [subsurfaceData, setSubsurfaceData] = useState([]);
     const [latestSubTs, setLatestSubTs] = useState(null);
 
-    useEffect(()=> {
-        setTimeout( async () => {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-                MobileCaching.getItem('UmiSensorGraphsRainfallData').then(response => {
-                    console.log("Getting data from UmiSensorGraphsRainfallData cache")
-                    setRainfallData(response);
-                });
-                MobileCaching.getItem('UmiSensorGraphsSubsurfaceData').then(response => {
-                    console.log("Getting data from UmiSensorGraphsSubsurfaceData cache")
-                    init(response);
-                    setSubsurfaceData(response);
-                });
-            } else {
-                initRainfall();
-                initSubsurface();
-            }
-        }, 100);
-    }, []);
-
     const initRainfall = async () => {
-        const response = await UmiDataAnalysis.GetRainfallPlotData();
-        if (response.status == true) {
-            setLatestRainTs(rainfallData.ts_end);
-            setRainfallData(response.data);
-            MobileCaching.setItem('UmiSensorGraphsRainfallData', response.data);
-        } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-        }
     };
 
     const initSubsurface = async () => {
-        const response = await UmiDataAnalysis.GetSubsurfacePlotData();
-        console.log("response", response)
-        if (response.status == true) {
-            let subsurface_data = response.data[0];
-            setLatestSubTs(null);
-            setSubsurfaceData(response.data);
-            MobileCaching.setItem('UmiSensorGraphsSubsurfaceData', response.data);
-        } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-        }
     };
 
     return(

@@ -19,26 +19,12 @@ function Maps() {
 	const [refreshing, setRefreshing] = useState(false);
 	const isFocused = useIsFocused();
 
-	useEffect(() => {
-			if(isFocused){
-				initMaps();
-			}
-	}, [isFocused])
-
+	
 	const initMaps = async () => {
-		const response = await UmiRiskManagement.GetHazardMaps();
-		if (response.status) {
-			if (response.data.length > 0) {
-				setMapList({uri: `${AppConfig.HOST_DIR}:5001/src/client-cbewsl/UMINGAN/MAPS/${response.data[0].filename}`});
-				setMapTS(response.data[0].ts);
-			}
-		}
 	};
 
 	// Refresh Maps on pull down
 	const onRefresh = React.useCallback(() => {
-		setRefreshing(true);
-		initMaps().then(() => setRefreshing(false));
 	}, []);
 
 	const showMaps = () => {

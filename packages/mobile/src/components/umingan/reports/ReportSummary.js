@@ -63,38 +63,7 @@ function ReportSummary(props) {
     };
 
     const createPDF = async(item) => {
-
-        // HOLD FOR NOW. FETCH HTML from front end
-        let html_string = "";
-        html_string = ""
-        let options = {
-          html:
-            '<h1 style="text-align: center;"><strong>Hello Guys</strong></h1><p style="text-align: center;">Here is an example of pdf Print in React Native</p><p style="text-align: center;"><strong>Team About React</strong></p>',
-          fileName: 'test',
-          directory: 'docs',
-        };
-        let file = await RNHTMLtoPDF.convert(options);
-        return file.filePath;
     }
-
-    useEffect(()=> {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-              Alert.alert(
-                'CBEWS-L is not connected to the internet',
-                'CBEWS-L Local data will be used.',
-                [
-                  { text: 'Ok', onPress: () => {
-                    askPermission();
-                  }, style: 'cancel' },
-                ]
-              )
-            } else {
-                fetchLatestData();
-            }
-          },100);
-    },[]);
 
     const showDatePicker = (entity, selectedDate) => {
         setDatePicker(
@@ -114,35 +83,9 @@ function ReportSummary(props) {
     }
 
     const download = async (item) => {
-        const isConnected = await NetworkUtils.isNetworkAvailable()
-        if (isConnected != true) {
-          Alert.alert(
-            'CBEWS-L is not connected to the internet',
-            'Cannot perform download due to internet / lan connection.',
-            [
-              { text: 'Ok', onPress: () => {}, style: 'cancel' },
-            ]
-          )
-        } else {
-            let path = await createPDF(item);
-            FileViewer.open(path)
-            .then(() => {
-                // success
-            })
-            .catch(error => {
-                // error
-            });
-        }
     }
 
     const generateReport = async () => {
-        if (moment(startDate) <= moment(endDate)) {
-            let report_list = await UmiReports.GetReportsByRange(startDate, endDate);
-            setItemList(report_list);
-            setListDisplay(true);
-        } else {
-            Alert.alert("Invalid date range. Please select a valid date range.")
-        }
     }
 
     return (

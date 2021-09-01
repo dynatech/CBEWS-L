@@ -42,46 +42,11 @@ function RiskAssessmentSummary(props) {
 
     // Initialize Risk Assessment Summary data: Get from cache or fetch from server
     const initRiskAssessmentSummary = async () => {
-        const isConnected = await NetworkUtils.isNetworkAvailable()
-        if (isConnected != true) {
-					if(isInitialLoad){
-						Alert.alert(
-							'CBEWS-L is not connected to the internet',
-							'CBEWS-L Local data will be used.',
-							[
-								{ text: 'Ok', onPress: () => {
-									MobileCaching.getItem('UmiRiskAssessmentSummary').then(response => {
-										init(response);
-										setRiskAssessmentContainer(response);
-										setIsInitialLoad(false);
-									});
-								}, style: 'cancel' },
-							]
-						)
-					} else {
-						MobileCaching.getItem('UmiRiskAssessmentSummary').then(response => {
-							init(response);
-							setRiskAssessmentContainer(response);
-							setIsInitialLoad(false);
-						});
-					}	
-        } else {
-            fetchLatestData();
-        }
     }
 
     // Refresh Risk Assessment Summary on pull down
     const onRefresh = React.useCallback(() => {
-        setRefreshing(true);
-        initRiskAssessmentSummary().then(() => setRefreshing(false));
     }, []);
-
-    // Fetch Risk Assessment Summary on succeeding tab loads
-    useEffect(() => {
-        if(isFocused){
-          initRiskAssessmentSummary();   
-        }
-    }, [isFocused])
 
     const init = async (data) => {
         let temp = [];
@@ -116,14 +81,6 @@ function RiskAssessmentSummary(props) {
     }
 
     const fetchLatestData = async () => {
-        let response = await UmiRiskManagement.GetAllSummary()
-        if (response.status == true) {
-            init(response.data);
-            setRiskAssessmentContainer(response.data);
-            MobileCaching.setItem('UmiRiskAssessmentSummary', response.data);
-        } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-        }
     }
 
     const showForm = () => {
@@ -135,174 +92,12 @@ function RiskAssessmentSummary(props) {
     }
 
     const submitForm = () => {
-        let data = formData.current;
-        if (!Object.keys(selectedData).length) {
-            MobileCaching.getItem('user_credentials').then(credentials => {
-                setTimeout(async()=> {
-                    const isConnected = await NetworkUtils.isNetworkAvailable();
-                    let response = null;
-                    if (isConnected != true) {
-                        let temp = await MobileCaching.getItem("UmiRiskAssessmentSummary").then(cached_data => {
-                            cached_data.push({
-                                'adaptive_capacity': data['AdaptiveCapacity'],
-                                'id': 0,
-                                'impact': data['Impact'],
-                                'last_ts': null,
-                                'location': data['Location'],
-                                'user_id': credentials['user_id'],
-                                'vulnerability': data['Vulnerability'],
-                                'alterations': 'add'
-                            });
-                            try {
-                                MobileCaching.setItem("UmiRiskAssessmentSummary", cached_data);
-                                response = {
-                                    "status": true,
-                                    "message": "Risk assessment summary is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
-                                }	
-                            } catch (err) {
-                                response = {
-                                    "status": false,
-                                    "message": "Risk assessment summary failed to save data to memory."
-                                }
-                            }
-                            setRiskAssessmentContainer(cached_data);
-                            init(cached_data);
-                            return response;
-                        });
-                    } else {
-                        data['user_id'] = credentials['user_id']
-                        response = await UmiRiskManagement.InsertSummary(data)
-                    }
-
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                        fetchLatestData();
-                    } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                    }
-
-                    ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                    closeForm();
-                    resetForm();
-                    setCmd('add');
-                }, 100)
-            });
-        } else {
-            if (!Object.keys(selectedData).length) {
-                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.SHORT, ToastAndroid.CENTER)
-                closeForm();
-                resetForm();
-            } else {
-                MobileCaching.getItem('user_credentials').then(credentials => {
-                    setTimeout(async () => {
-                        const isConnected = await NetworkUtils.isNetworkAvailable();
-                        let response = null;
-                        let temp_array = []
-                        Object.keys(data).forEach(key => {
-                            let temp = {};
-                            if (key == "AdaptiveCapacity") {
-                                temp["adaptive_capacity"] = data[key]
-                            } else {
-                                temp[key.replace(" ","_").toLocaleLowerCase()] = data[key]
-                            }
-
-                            if (key != 'attachment') {
-                                temp_array.push(temp);
-                            }
-                        });
-                        temp_array.push({'user_id': credentials['user_id']})
-                        temp_array.push({'id': selectedData['id']})
-                        
-                        if (isConnected != true) {
-                            let temp = await MobileCaching.getItem("UmiRiskAssessmentSummary").then(cached_data => {
-                                let state_contaner = selectedData;
-                                temp_array.forEach(element => {
-                                    let key = Object.keys(element)[0];
-                                    state_contaner[key] = element[key];
-                                });
-                                state_contaner['alterations'] = "update";
-                                let index = cached_data.findIndex(x => x.id == selectedData['id']);
-                                cached_data[index] = state_contaner;
-                                try {
-                                    MobileCaching.setItem("UmiRiskAssessmentSummary", cached_data);
-                                    response = {
-                                        "status": true,
-                                        "message": "Risk assessment summary is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
-                                    }
-                                } catch (err) {
-                                    response = {
-                                        "status": false,
-                                        "message": "Risk assessment summary failed to save data to memory."
-                                    }
-                                }
-                                init(cached_data);
-                                return response;
-                            });
-                        } else {
-                            response = await UmiRiskManagement.UpdateSummary(temp_array)
-                            if (response.status == true) {
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                                fetchLatestData();
-                            } else {
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                            }
-                        }
-
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                        closeForm();
-                        resetForm();
-                        setCmd('add');
-                    }, 300);
-                });
-            }
-        }
     }
 
     const modifySummary = (data) => {
-        setSelectedData(data)
-        setDefaultStrValues({
-            'Location': data['location'],
-            'Impact': data['impact'],
-            'Adaptive Capacity': data['adaptive_capacity'],
-            'Vulnerability': data['vulnerability']
-        })
-        setCmd('update')
-        showForm();
     }
 
     const deleteForm = () => {
-        Alert.alert(
-            "Risk Assessment Summary",
-            "Are you sure you want to delete this data?",
-            [
-              {
-                text: "Cancel",
-                style: "cancel"
-              },
-              { text: "Confirm", onPress: () => {
-                setTimeout(async ()=> {
-                    const isConnected = await NetworkUtils.isNetworkAvailable();
-                    if (isConnected != true) {
-                        ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.SHORT, ToastAndroid.CENTER)
-                    } else {
-                        let response = await UmiRiskManagement.DeleteSummary({
-                            'id': selectedData['id']
-                        })
-                        if (response.status == true) {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                            fetchLatestData();               
-                        } else {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                        }
-                    }
-                    closeForm();
-                    resetForm();
-                    setCmd('add');
-                },300)
-              }}
-            ],
-            { cancelable: false }
-        );
     }
 
     return (

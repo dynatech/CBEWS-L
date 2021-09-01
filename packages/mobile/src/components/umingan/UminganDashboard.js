@@ -20,47 +20,11 @@ function UminganDashboard(props) {
 
 		// Refresh UminganDashboard on pull down
     const onRefresh = React.useCallback(() => {
-			setRefreshing(true);
-			initUminganDashboard().then(() => setRefreshing(false));
 		}, []);
 
 		const initUminganDashboard = async () => {
-			const isConnected = await NetworkUtils.isNetworkAvailable()
-			if (isConnected != true) {
-				if (isInitialLoad) {
-					Alert.alert(
-						'CBEWS-L is not connected to the internet',
-						'CBEWS-L Local data will be used.',
-						[
-							{ text: 'Ok', onPress: () => {
-								setSyncing(true);
-								setSyncMessage("Collecting local data...")
-								setTimeout(async()=> {
-										setSyncing(false);
-								}, 1000);
-								setIsInitialLoad(false);
-							}, style: 'cancel' },
-						]
-					)
-				}
-			} else {
-				MobileCaching.getItem('user_credentials').then((credentials)=> {
-					setSyncing(true);
-					setTimeout(async()=> {
-						let cache_keys = await DataSync.getCachedData(credentials.site_id)
-						let _Alterations = await DataSync.compileUnsyncData(cache_keys, "Umingan");
-						setSyncing(false);
-					}, 1000);
-				});
-			}
 		}
-
-    useEffect(()=> {
-			if(isFocused){
-				initUminganDashboard();
-			}
-    },[isFocused])
-
+        
     return (
 			<SafeAreaView>
         <ScrollView refreshControl={

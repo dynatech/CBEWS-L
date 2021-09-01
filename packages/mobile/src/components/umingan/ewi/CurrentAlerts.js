@@ -17,73 +17,10 @@ function CurrentAlerts() {
     const [isDisabled, setDisabled] = useState(false);
     const [ewiSMS, setEWISMS] = useState("");
 
-    useEffect(()=> {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-              Alert.alert(
-                'CBEWS-L is not connected to the internet',
-                'CBEWS-L Local data will be used.',
-                [
-                  { text: 'Ok', onPress: () => {
-                    MobileCaching.getItem('UmiCurrentAlert').then(response => {
-                        init(response);
-                        setCurrentAlertData(response);
-                    });
-                  }, style: 'cancel' },
-                ]
-              )
-            } else {
-                fetchLatestData();
-            }
-          },100);
-    }, []);
-
     const fetchLatestData = async () => {
-        let { status, data } = await AlertGeneration.UmiGetOngoingAndExtendedMonitoring();
-        console.log("response data", data);
-        if (status) {
-            let key = "";
-            if (data.latest.length > 0) key = "latest";
-            else if (data.overdue.length > 0) key = "overdue";
-            else if (data.extended.length > 0) key = "extended";
-            else if ("routine_list" in data.routine) key = "routine";
-
-            if (key in data) {
-                const site_data = data[key].find(site_data => site_data.site_id === 50);
-                console.log("cachiiing");
-                init([site_data]);
-                setCurrentAlertData([site_data]);
-                MobileCaching.setItem('UmiCurrentAlert', [site_data]);
-                ToastAndroid.showWithGravity("Successfully retrieved current event", ToastAndroid.LONG, ToastAndroid.CENTER)
-            } else {
-                init([]);
-                setCurrentAlertData([]);
-                MobileCaching.setItem('UmiCurrentAlert', []);
-                ToastAndroid.showWithGravity("No current event", ToastAndroid.LONG, ToastAndroid.CENTER)
-            }
-        } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-        }
     }
 
-    const PrepareTriggers = (triggers) => {
-        if (triggers.length > 0) {
-            return triggers.map(trigger => {
-                const { trigger_type, timestamp, info, trigger_source } = trigger;
-                return (
-                    <Text key={`${trigger_type}-${timestamp}`} style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left', color: 'red'}]} >
-                        {`${moment(timestamp).format("MMMM D, YYYY h:mm A")} | ${trigger_source.toUpperCase()} (${trigger_type}): ${info}`}
-                    </Text>
-                );
-            });
-        } else {
-            return (
-                <Text style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left', color: 'red'}]} >
-                    No retriggers
-                </Text>
-            )
-        }   
+    const PrepareTriggers = (triggers) => {   
     } 
 
     const init = async (data) => {

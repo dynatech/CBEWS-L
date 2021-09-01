@@ -82,36 +82,7 @@ function SensorSummary() {
     }
 
     const fetchLatestData = async () => {
-        let response = await UmiSensorMaintenance.GetSensorMaintenanceLogs();
-        if (response.status == true) {
-            init(response.data);
-            MobileCaching.setItem('UmiSensorMaintenanceLogs', response.data);
-        } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-        }
     };
-
-    useEffect(()=> {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-              Alert.alert(
-                'CBEWS-L is not connected to the internet',
-                'CBEWS-L Local data will be used.',
-                [
-                  { text: 'Ok', onPress: () => {
-                    MobileCaching.getItem('UmiSensorMaintenanceLogs').then(response => {
-                        init(response);
-                        setSensorMaintenanceLogs(response);
-                    });
-                  }, style: 'cancel' },
-                ]
-              )
-            } else {
-                fetchLatestData();
-            }
-          },100);
-    }, []);
 
     return(
         <ScrollView>
