@@ -31,20 +31,21 @@ function SensorMaintenanceLogs() {
         'Rain Gauge Status': ''
     }
 
+    const listTable = [{
+        'id': 0,
+        'timestamp': moment().add(-1,'days').format('lll'),
+        'working_nodes': '14',
+        'anomalous_nodes': '1',
+        'rain_gauge_status': 'still working',
+        'remarks': 'test',
+        'report_date': moment()
+    }];
+
+
     let formData = useRef();
     
     useEffect(()=> {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-                MobileCaching.getItem('UmiSensorMaintenanceLogs').then(response => {
-                    init(response);
-                    setSensorMaintenanceLogs(response);
-                });
-            } else {
-                fetchLatestData();
-            }
-          },100);
+        fetchLatestData();
     },[]);
 
     const init = async (data) => {
@@ -61,14 +62,7 @@ function SensorMaintenanceLogs() {
     };
 
     const fetchLatestData = async () => {
-        let response = await UmiSensorMaintenance.GetSensorMaintenanceLogs();
-        if (response.status == true) {
-            init(response.data);
-            // setDataTableContent([]);
-            MobileCaching.setItem('UmiSensorMaintenanceLogs', response.data);
-        } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-        }
+        init(listTable);
     };
 
     const constructDtBody = (data, dt_row) => {
@@ -115,191 +109,9 @@ function SensorMaintenanceLogs() {
     }
 
     const submitForm = async () => {
-        let data = formData.current;
-        if (!Object.keys(selectedData).length) {
-            MobileCaching.getItem('user_credentials').then(credentials => {
-                setTimeout(async () => {
-                    const isConnected = await NetworkUtils.isNetworkAvailable();
-                    let response = null;
-
-                    if (isConnected != true) {
-                        let cached = await MobileCaching.getItem("UmiSurficialData").then(cached_data => {
-                            let surficial_obj = {};
-
-                            surficial_obj[temp['ts']] = {
-                                ...temp['marker_value'],
-                                'observer': temp['observer'],
-                                'weather': temp['weather'],
-                                'ts': temp['ts'],
-                                'alterations': 'add'
-                            }
-
-                            cached_data.push(surficial_obj);
-
-                            try {
-                                MobileCaching.setItem("MarSurficialData", cached_data);
-                                // OPEN MESSAGING APP TO SEND MANUALLY
-                                response = {
-                                    "status": true,
-                                    "message": "Surficial Data is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
-                                }
-                            } catch (err) {
-                                response = {
-                                    "status": false,
-                                    "message": "Surficial Data failed to save data to memory."
-                                }
-                            }
-                            MobileCaching.getItem('MarSurficialDataMarkers').then(markers => {
-                                init(cached_data, markers);
-                            });
-                            return response;
-                        });
-                    } else {
-                        response = await UmiSensorMaintenance.InsertSensorMaintenanceLogs({
-                            timestamp: data['Timestamp'],
-                            remarks: data['Remarks'],
-                            working_nodes: data['WorkingNodes'],
-                            anomalous_nodes: data['AnomalousNodes'],
-                            rain_gauge_status: data['RainGaugeStatus']
-                        });
-                        fetchLatestData();
-                    }
-
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        closeForm();
-                    } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                    }
-                }, 300);
-            });
-        } else {
-            if (!Object.keys(selectedData).length) {
-                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.LONG, ToastAndroid.CENTER)
-                closeForm();
-            } else {
-                MobileCaching.getItem('user_credentials').then(credentials => {
-                    setTimeout(async () => {
-                        const isConnected = await NetworkUtils.isNetworkAvailable();
-                        let response = {};
-                        let obj_temp = {...selectedData};
-                        Object.keys(data).forEach(key => {
-                            switch(key) {
-                                case 'Remarks':
-                                    obj_temp = {
-                                        ...obj_temp,
-                                        remarks: data['Remarks']
-                                    }
-                                    break;
-                                case 'Timestamp':
-                                    obj_temp = {
-                                        ...obj_temp,
-                                        timestamp: data['Timestamp']
-                                    }
-                                    break;
-                                case 'WorkingNodes':
-                                    obj_temp = {
-                                        ...obj_temp,
-                                        working_nodes: data['WorkingNodes']
-                                    }
-                                    break;
-                                case 'RainGaugeStatus':
-                                    obj_temp = {
-                                        ...obj_temp,
-                                        rain_gauge_status: data['RainGaugeStatus']
-                                    }
-                                    break;
-                                case 'AnomalousNodes':
-                                    obj_temp = {
-                                        ...obj_temp,
-                                        anomalous_nodes: data['AnomalousNodes']
-                                    }
-                                    break;
-                                case 'attachment':
-                                    console.log('Attachment not availble for ground data');
-                                    break;
-                                default:
-                                    console.log("All set")
-                                    break;
-                            }
-                        });
-
-                        if (isConnected != true) {
-                            let temp_data = await MobileCaching.getItem("UmiSensorMaintenanceLogs").then(cached_data => {
-                                let temp_proc = {}
-
-                                let index = cached_data.findIndex(x=> x[obj_temp['id']].id == obj_temp['id']);
-                                temp_proc[obj_temp['id']] = obj_temp;
-                                cached_data[index] = temp_proc
-
-                                try {
-                                    MobileCaching.setItem("UmiSensorMaintenanceLogs", cached_data);
-                                    response = {
-                                        "status": true,
-                                        "message": "Sensor Maintenance Logs is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
-                                    }
-                                } catch (err) {
-                                    response = {
-                                        "status": false,
-                                        "message": "Sensor Maintenance Logs failed to save data to memory."
-                                    }
-                                }
-                                MobileCaching.getItem('UmiSurficialDataMarkers').then(markers => {
-                                    init(cached_data, markers);
-                                });
-                                return response
-                            });
-                        } else {
-                            response = await UmiSensorMaintenance.UpdateSensorMaintenanceLogs(obj_temp);
-                            if (response.status == true) {
-                                fetchLatestData();
-                            }
-                        }
-
-                        closeForm();
-                        setCmd('add');
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                    }, 300);
-                });
-            }
-        }
     }
 
     const deleteForm = () => {
-        Alert.alert(
-            "Sensor Maintenance Logs",
-            "Are you sure you want to delete this data?",
-            [
-              {
-                text: "Cancel",
-                style: "cancel"
-              },
-              { text: "Confirm", onPress: () => {
-                setTimeout(async ()=> {
-                    const isConnected = await NetworkUtils.isNetworkAvailable();
-                    if (isConnected != true) {
-                        ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.LONG, ToastAndroid.CENTER)
-                    } else {
-                        // let response = await UmiGroundData.DeleteSurficialMarkersData({
-                        //     "observer": selectedData['observer'],
-                        //     "site_id": "50",
-                        //     "ts": selectedData['ts'],
-                        //     "weather": selectedData['weather']
-                        //  })
-
-                        // if (response.status == true) {
-                        //     ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        //     fetchLatestData();
-                        //     closeForm();
-                        // } else {
-                        //     ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                        // }
-                    }
-                },300)
-              }}
-            ],
-            { cancelable: false }
-        );
     }
 
     return(

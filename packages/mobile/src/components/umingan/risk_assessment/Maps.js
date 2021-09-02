@@ -20,19 +20,12 @@ function Maps() {
 	const isFocused = useIsFocused();
 
 	useEffect(() => {
-			if(isFocused){
-				initMaps();
-			}
+		if(isFocused){
+			initMaps();
+		}
 	}, [isFocused])
 
 	const initMaps = async () => {
-		const response = await UmiRiskManagement.GetHazardMaps();
-		if (response.status) {
-			if (response.data.length > 0) {
-				setMapList({uri: `${AppConfig.HOST_DIR}:5001/src/client-cbewsl/UMINGAN/MAPS/${response.data[0].filename}`});
-				setMapTS(response.data[0].ts);
-			}
-		}
 	};
 
 	// Refresh Maps on pull down
@@ -84,7 +77,6 @@ function Maps() {
 						<Text style={ButtonStyle.large_text}>Map +</Text>
 					</TouchableOpacity>
 			</View>
-
 			</ScrollView>
 		</SafeAreaView>
 	)

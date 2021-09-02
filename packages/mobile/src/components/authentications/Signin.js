@@ -49,13 +49,10 @@ function Signin(props) {
                         initialValues={{username: '', password: ''}}
                         onSubmit={values => {
                             setTimeout(async () => {
-                                let response = await UserManagement.UserAuthentication(values);
-                                if (response.status == true) {
-                                    ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-                                    MobileCaching.setItem('user_credentials', response.user_data);
-                                    navigator.navigate(site_navigator[response.user_data.site_id]);
-                                } else {
-                                    ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+                                if(values.username === 'umi' && values.password === 'umi'){
+                                    navigator.navigate(site_navigator['50']);
+                                }else {
+                                    navigator.navigate(site_navigator['29']);
                                 }
                             })
                         }}

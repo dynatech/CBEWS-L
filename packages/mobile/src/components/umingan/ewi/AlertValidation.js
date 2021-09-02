@@ -15,38 +15,32 @@ function AlertValidation() {
     const [ewiDate, setEwiDate] = useState(moment().format('MMMM Do YYYY, h:mm:ss a'));
     const [isDisabled, setDisabled] = useState(false);
 
-    useEffect(()=> {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-              Alert.alert(
-                'CBEWS-L is not connected to the internet',
-                'CBEWS-L Local data will be used.',
-                [
-                  { text: 'Ok', onPress: () => {
-                    MobileCaching.getItem('UmiCandidateAlert').then(response => {
-                        init(response);
-                        setEwiData(response);
-                    });
-                  }, style: 'cancel' },
-                ]
-              )
-            } else {
-                fetchLatestData();
-            }
-          },100);
+    const dummmyData = {
+        "data": {
+          "as_of_ts": "2021-09-02 16:00:00", 
+          "public_alert_level": 0, 
+          "status": "no_alert"
+        }, 
+        "message": "Latest validation data retrieved", 
+        "ok": true, 
+        "status": 200
+    }
+      
+
+    useEffect(()=> {     
+        fetchLatestData();    
     }, []);
 
     const fetchLatestData = async () => {
-        let temp = await AlertGeneration.GetUmiAlertValidationData();
+        let temp = dummmyData;
         const { status, data, message } = temp;
         if (status) {
             init([data]);
             setEwiData([data]);
             MobileCaching.setItem('UmiCandidateAlert', [data]);
-            ToastAndroid.showWithGravity(message, ToastAndroid.LONG, ToastAndroid.CENTER)
+            ToastAndroid.showWithGravity(message, ToastAndroid.SHORT, ToastAndroid.CENTER)
         } else {
-            ToastAndroid.showWithGravity(message, ToastAndroid.LONG, ToastAndroid.CENTER)
+            ToastAndroid.showWithGravity(message, ToastAndroid.SHORT, ToastAndroid.CENTER)
         }
     }
 
@@ -72,10 +66,10 @@ function AlertValidation() {
 
         const response = await AlertGeneration.ValidateTrigger(payload);
         if (status) {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
             fetchLatestData();
         } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
         };
     }
     
@@ -237,7 +231,7 @@ function AlertValidation() {
         if (response.status) {
             fetchLatestData();
         } else console.error("Problem in releasing ewi: ", response.message);
-        ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
+        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
     }
 
     const getButton = (data) => {

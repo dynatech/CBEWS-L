@@ -18,64 +18,57 @@ function CurrentSituationReport() {
     const [situationReportDate, setSituationReportDate] = useState(moment().format('MMMM Do YYYY, h:mm:ss a'));
     const [isDisabled, setDisabled] = useState(false);
 
+    const listTable = [{
+        'id': 0,
+        'attachment_path': 'N/A',
+        'report_summary': 'Summary',
+        'report_ts': moment()
+    }];
 
-    useEffect(() => {
-        MobileCaching.getItem('UmiSituationReport').then(response => {
-            let temp = [];
-            if (response.length != 0) {
-                temp.push(
-                    <View key={'container'}>
-                        <View key={'feature_container'}>
-                            <Text key={'situation_report_summary'} style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left', fontWeight: 'bold'}]}>
-                                Situation Report Summary
-                            </Text>
-                            <Text key={'feature_value'}style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
-                                { response[0].report_summary }
-                            </Text>
-                        </View>
-                        <View key={'attachments'}>
-                            <Text key={'materials_characterization'} style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left', fontWeight: 'bold'}]}>
-                                Attachments
-                            </Text>
-                            <Text key={'materials_characterization_value'}style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
-                                { response[0].attachment_path }
-                            </Text>
-                        </View>
+    useEffect(()=> {  
+        fetchLatestData(); 
+    }, []);
+
+    const fetchLatestData = async () => {
+        init(listTable);
+    }
+
+    const init = async (data) => {
+        let temp = [];
+        if (data.length != 0) {
+            temp.push(
+                <View key={'container'}>
+                    <View key={'feature_container'}>
+                        <Text key={'situation_report_summary'} style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left', fontWeight: 'bold'}]}>
+                            Situation Report Summary
+                        </Text>
+                        <Text key={'feature_value'}style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
+                            { data[0].report_summary }
+                        </Text>
                     </View>
-                )
-                setSituationReportDate(moment(response[0].report_ts).format('MMMM Do YYYY, h:mm:ss a'));
-            } else {
-                temp.push(
-                    <Text key={0} style={[LabelStyle.medium_label, LabelStyle.brand, {fontWeight: 'bold'}]}>
-                        No field situation report available.
-                    </Text>
-                )
-                setDisabled(true);
-            }
-            setSituationReport(response);
-            setSituationReportContainer(temp)
-        });
-    }, [])
-
-
-    const init = (data) => {
-
+                    <View key={'attachments'}>
+                        <Text key={'materials_characterization'} style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left', fontWeight: 'bold'}]}>
+                            Attachments
+                        </Text>
+                        <Text key={'materials_characterization_value'}style={[LabelStyle.medium_label, LabelStyle.brand, {textAlign: 'left'}]}>
+                            { data[0].attachment_path }
+                        </Text>
+                    </View>
+                </View>
+            )
+            setSituationReportDate(moment(data[0].report_ts).format('MMMM Do YYYY, h:mm:ss a'));
+        }
+        setSituationReportContainer(temp);
     }
 
     const download = async () => {
-        let download_response = UmiSituationReport.DownloadSituationReport(situationReport);
-        // TODO: Dev this function when the Web functionality is available
+
     }
 
     const email = async () => {
-        let email_response = UmiSituationReport.EmailSituationReport(situationReport);
-        // TODO: Dev this function when the Web functionality is available
+
     }
-
-    useEffect(()=> {
-        init();
-    }, []);
-
+    
     return(
         <ScrollView>
             <View style={ContainerStyle.content}>

@@ -64,17 +64,18 @@ function HazardData() {
         setSelectedData({});
     }
 
+    const listTable = [{
+        'id': 0,
+        'early_warning': 'PAGASA',
+        'hazard': 'Tropical Cyclone',
+        'impact': 'Few Days',
+        'last_ts': null,
+        'speed_of_onset': 'Slow',
+    }];
+
     // Initialize Hazards Data data: Get from cache or fetch from server
     const initHazardsData = async () => {
-        const isConnected = await NetworkUtils.isNetworkAvailable()
-        if (isConnected != true) {
-            MobileCaching.getItem('UmiHazardData').then(response => {
-                init(response);
-                setHazardDataContainer(response);
-            });
-        } else {
-            fetchLatestData();
-        }
+        fetchLatestData();
     }
 
     // Refresh hazard data on pull down
@@ -128,14 +129,7 @@ function HazardData() {
     }
 
     const fetchLatestData = async () => {
-        let response = await UmiRiskManagement.GetAllHazardData()
-        if (response.status == true) {
-            init(response.data);
-            setHazardDataContainer(response.data);
-            MobileCaching.setItem('UmiHazardData', response.data);
-        } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-        }
+        init(listTable);   
     }
 
     const showForm = () => {
@@ -147,132 +141,6 @@ function HazardData() {
     }
 
     const submitForm = () => {
-        let data = formData.current;
-        if (!Object.keys(selectedData).length) {
-            MobileCaching.getItem('user_credentials').then(credentials => {
-                setTimeout(async () => {
-                    const isConnected = await NetworkUtils.isNetworkAvailable();
-                    let response = null;
-                    if (isConnected != true) {
-                        let temp = await MobileCaching.getItem("UmiHazardData").then(cached_data => {
-                            cached_data.push({
-                                'early_warning': data[''],
-                                'hazard': data[''],
-                                'id': 0,
-                                'impact': data[''],
-                                'last_ts': null,
-                                'speed_of_onset': data[''],
-                                'user_id': credentials['user_id'],
-                                'alterations': 'add'
-                            });
-                            try {
-                                MobileCaching.setItem("UmiHazardData", cached_data);
-                                response = {
-                                    "status": true,
-                                    "message": "Hazard Data is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
-                                }
-                            } catch (err) {
-                                response = {
-                                    "status": false,
-                                    "message": "Hazard Data failed to save data to memory."
-                                }
-                            }
-                            setHazardDataContainer(cached_data);
-                            init(cached_data);
-                            return response;
-                        });
-                    } else {
-                        data['user_id'] = credentials['user_id']
-                        response = await UmiRiskManagement.InsertHazardData(data)
-                    }
-
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                        fetchLatestData();
-                    } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                    }
-
-                    ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                    closeForm();
-                    resetForm();
-                    setCmd('add');
-                }, 300);
-            });
-        } else {
-            if (!Object.keys(selectedData).length) {
-                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.SHORT, ToastAndroid.CENTER)
-                closeForm();
-                resetForm();
-            } else {
-                MobileCaching.getItem('user_credentials').then(credentials => {
-                    setTimeout(async () => {
-                        let temp_array = []
-                        Object.keys(data).forEach(key => {
-                            let temp = {};
-                            switch(key) {
-                                case 'SpeedofOnset':
-                                    temp["speed_of_onset"] = data[key]
-                                    break;
-                                case 'EarlyWarning':
-                                    temp["early_warning"] = data[key]
-                                    break;
-                                default:
-                                    temp[key.replace(" ","_").toLocaleLowerCase()] = data[key]
-                                    break;
-                            }
-
-                            if (key != 'attachment') {
-                                temp_array.push(temp);
-                            }
-                        });
-                        temp_array.push({'user_id': credentials['user_id']})
-                        temp_array.push({'id': selectedData['id']})
-
-                        const isConnected = await NetworkUtils.isNetworkAvailable();
-                        let response = null;
-                        if (isConnected != true) {
-                            let temp = await MobileCaching.getItem("UmiHazardData").then(cached_data => {
-                                let state_contaner = selectedData;
-                                temp_array.forEach(element => {
-                                    let key = Object.keys(element)[0];
-                                    state_contaner[key] = element[key];
-                                });
-                                state_contaner['alterations'] = "update";
-                                let index = cached_data.findIndex(x => x.id == selectedData['id']);
-                                cached_data[index] = state_contaner;
-                                try {
-                                    MobileCaching.setItem("UmiHazardData", cached_data);
-                                    response = {
-                                        "status": true,
-                                        "message": "Hazard data is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
-                                    }
-                                } catch (err) {
-                                    response = {
-                                        "status": false,
-                                        "message": "Hazard data failed to save data to memory."
-                                    }
-                                }
-                                init(cached_data);
-                                return response;
-                            });
-                        } else {
-                            response = await UmiRiskManagement.UpdateHazardData(temp_array)
-                            if (response.status == true) {
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                                fetchLatestData();
-                            } else {
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                            }
-                        }
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                        closeForm();
-                        resetForm();
-                        setCmd('add');
-                    }, 300);
-                });
-            }
-        }
     }
 
     const modifySummary = (data) => {
@@ -288,38 +156,6 @@ function HazardData() {
     }
 
     const deleteForm = () => {
-        Alert.alert(
-            "Risk Assessment Hazard Data",
-            "Are you sure you want to delete this data?",
-            [
-              {
-                text: "Cancel",
-                style: "cancel"
-              },
-              { text: "Confirm", onPress: () => {
-                setTimeout(async ()=> {
-                    const isConnected = await NetworkUtils.isNetworkAvailable();
-                    if (isConnected != true) {
-                        ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.SHORT, ToastAndroid.CENTER)
-                    } else {
-                        let response = await UmiRiskManagement.DeleteHazardData({
-                            'id': selectedData['id']
-                        })
-                        if (response.status == true) {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                            fetchLatestData();
-                        } else {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                        }
-                    }
-                    closeForm();
-                    resetForm();
-                    setCmd('add');
-                },300)
-              }}
-            ],
-            { cancelable: false }
-        );
     }
 
     return (

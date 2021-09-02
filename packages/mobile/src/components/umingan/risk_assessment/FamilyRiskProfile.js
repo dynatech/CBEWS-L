@@ -36,17 +36,17 @@ function FamilyRiskProfile() {
         setSelectedData({});
     }
 
+    const listTable = [{
+        'id': 0,
+        'nature_of_vulnerability': 'Elderly',
+        'number_of_members': '3',
+        'vulnerable_groups': '5',
+    }];
+
     // Initialize Family Risk Profile data: Get from cache or fetch from server
     const initFamilyRiskProfile = async () => {
-        const isConnected = await NetworkUtils.isNetworkAvailable()
-        if (isConnected != true) {
-            MobileCaching.getItem('UmiFamilyRiskProfile').then(response => {
-                init(response);
-                setFamilyRiskProfile(response);
-            });
-        } else {
-            fetchLatestData();
-        }
+        fetchLatestData();
+
     }
 
     // Refresh Family Risk Profile on pull down
@@ -100,14 +100,7 @@ function FamilyRiskProfile() {
     }
 
     const fetchLatestData = async () => {
-        let response = await UmiRiskManagement.GetAllFamilyRiskProfile()
-        if (response.status == true) {
-            init(response.data);
-            setFamilyRiskProfile(response.data);
-            MobileCaching.setItem('UmiFamilyRiskProfile', response.data);
-        } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-        }
+        init(listTable);
     }
 
     const showForm = () => {
@@ -119,133 +112,6 @@ function FamilyRiskProfile() {
     }
 
     const submitForm = () => {
-        let data = formData.current;
-        if (!Object.keys(selectedData).length) {
-            MobileCaching.getItem('user_credentials').then(credentials => {
-                setTimeout(async () => {
-                    const isConnected = await NetworkUtils.isNetworkAvailable();
-                    let response = null;
-                    if (isConnected != true) {
-                        response = await MobileCaching.getItem("UmiFamilyRiskProfile").then(cached_data => {
-                            cached_data.push({
-                                'id': 0,
-                                'last_ts': null,
-                                'nature_of_vulnerability': data['NatureofVulnerability'],
-                                'number_of_members': data['NumberofMembers'],
-                                'user_id': credentials['user_id'],
-                                'vulnerable_groups': data['VulnerableGroups'],
-                                'alterations': 'add'
-                            });
-                            try {
-                                MobileCaching.setItem("UmiFamilyRiskProfile", cached_data);
-                                response = {
-                                    "status": true,
-                                    "message": "Capacity and Vulnerability is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
-                                }
-                            } catch (err) {
-                                response = {
-                                    "status": false,
-                                    "message": "Capacity and Vulnerability failed to save data to memory."
-                                }
-                            }
-                            setFamilyRiskProfile(cached_data);
-                            init(cached_data);
-                            return response;
-                        });
-                    } else {
-                        data['user_id'] = credentials['user_id']
-                        response = await UmiRiskManagement.InsertFamilyRiskProfile(data)
-                    }
-                   
-                    if (response.status == true) {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                        fetchLatestData();
-                    } else {
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                    }
-
-                    ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                    closeForm();
-                    resetForm();
-                    setCmd('add');
-                }, 300);
-            });
-        } else {
-            if (!Object.keys(selectedData).length) {
-                ToastAndroid.showWithGravity('No changes has been made.', ToastAndroid.SHORT, ToastAndroid.CENTER)
-                closeForm();
-                resetForm();
-            } else {
-                MobileCaching.getItem('user_credentials').then(credentials => {
-                    setTimeout(async () => {
-                        const isConnected = await NetworkUtils.isNetworkAvailable();
-                        let response = null;
-                        let temp_array = []
-                        Object.keys(data).forEach(key => {
-                            let temp = {};
-                            switch(key) {
-                                case 'NumberofMembers':
-                                    temp["number_of_members"] = data[key]
-                                    break;
-                                case 'VulnerableGroups':
-                                    temp["vulnerable_groups"] = data[key]
-                                    break;
-                                case 'NatureofVulnerability':
-                                    temp["nature_of_vulnerability"] = data[key]
-                                    break;
-                                default:
-                                    temp[key.replace(" ","_").toLocaleLowerCase()] = data[key]
-                                    break;
-                            }
-                            if (key != 'attachment') {
-                                temp_array.push(temp);
-                            }
-                        });
-                        temp_array.push({'user_id': credentials['user_id']})
-                        temp_array.push({'id': selectedData['id']})
-
-                        if (isConnected != true) {
-                            let temp = await MobileCaching.getItem("UmiFamilyRiskProfile").then(cached_data => {
-                                let state_contaner = selectedData;
-                                temp_array.forEach(element => {
-                                    let key = Object.keys(element)[0];
-                                    state_contaner[key] = element[key];
-                                });
-                                state_contaner['alterations'] = "update";
-                                let index = cached_data.findIndex(x => x.id == selectedData['id']);
-                                cached_data[index] = state_contaner;
-                                try {
-                                    MobileCaching.setItem("UmiFamilyRiskProfile", cached_data);
-                                    response = {
-                                        "status": true,
-                                        "message": "Family Risk Profile is temporarily saved in the memory.\nPlease connect to the internet and sync your data."
-                                    }
-                                } catch (err) {
-                                    response = {
-                                        "status": false,
-                                        "message": "Family Risk Profile failed to save data to memory."
-                                    }
-                                }
-                                init(cached_data);
-                                return response;
-                            });
-                        } else {
-                            response = await UmiRiskManagement.UpdateFamilyRiskProfile(temp_array)
-                            if (response.status == true) {
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                                fetchLatestData();
-                            } else {
-                                ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                            }
-                        }
-                        ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                        closeForm();
-                        resetForm();
-                        setCmd('add');
-                    }, 300);
-                });
-            }
-        }
     }
 
     const modifySummary = (data) => {
@@ -260,38 +126,6 @@ function FamilyRiskProfile() {
     }
 
     const deleteForm = () => {
-        Alert.alert(
-            "Risk Assessment Family Risk Profile",
-            "Are you sure you want to delete this data?",
-            [
-              {
-                text: "Cancel",
-                style: "cancel"
-              },
-              { text: "Confirm", onPress: () => {
-                setTimeout(async ()=> {
-                    const isConnected = await NetworkUtils.isNetworkAvailable();
-                    if (isConnected != true) {
-                        ToastAndroid.showWithGravity("Cannot delete data when offline.\nPlease connect to internet or CBEWS-L Network to proceed.", ToastAndroid.SHORT, ToastAndroid.CENTER)
-                    } else {
-                        let response = await UmiRiskManagement.DeleteFamilyRiskProfile({
-                            'id': selectedData['id']
-                        })
-                        if (response.status == true) {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                            fetchLatestData();
-                        } else {
-                            ToastAndroid.showWithGravity(response.message, ToastAndroid.SHORT, ToastAndroid.CENTER)
-                        }
-                    }
-                    closeForm();
-                    resetForm();
-                    setCmd('add');
-                },300)
-              }}
-            ],
-            { cancelable: false }
-        );
     }
 
     return (

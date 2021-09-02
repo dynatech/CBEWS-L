@@ -14,12 +14,20 @@ function SensorSummary() {
     const [latestTs, setTs] = useState(moment().format('MMMM Do YYYY, h:mm:ss a'))
     const [summary, setSummary] = useState(null); 
 
-    const download = () => {
+    const listTable = [{
+        'id': 0,
+        'timestamp': moment().add(-1,'days').format('MMMM Do YYYY, h:mm:ss a'),
+        'working_nodes': '14',
+        'anomalous_nodes': '1',
+        'rain_gauge_status': 'still working',
+        'remarks': 'test',
+        'report_date': moment()
+    }];
 
+    const download = () => {
     }
 
     const email = () => {
-
     }
 
     const init = async (data) => {
@@ -82,35 +90,11 @@ function SensorSummary() {
     }
 
     const fetchLatestData = async () => {
-        let response = await UmiSensorMaintenance.GetSensorMaintenanceLogs();
-        if (response.status == true) {
-            init(response.data);
-            MobileCaching.setItem('UmiSensorMaintenanceLogs', response.data);
-        } else {
-            ToastAndroid.showWithGravity(response.message, ToastAndroid.LONG, ToastAndroid.CENTER)
-        }
+        init(listTable);
     };
 
     useEffect(()=> {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-              Alert.alert(
-                'CBEWS-L is not connected to the internet',
-                'CBEWS-L Local data will be used.',
-                [
-                  { text: 'Ok', onPress: () => {
-                    MobileCaching.getItem('UmiSensorMaintenanceLogs').then(response => {
-                        init(response);
-                        setSensorMaintenanceLogs(response);
-                    });
-                  }, style: 'cancel' },
-                ]
-              )
-            } else {
-                fetchLatestData();
-            }
-          },100);
+        fetchLatestData();
     }, []);
 
     return(

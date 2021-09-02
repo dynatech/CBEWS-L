@@ -18,30 +18,22 @@ function CurrentAlerts() {
     const [ewiSMS, setEWISMS] = useState("");
 
     useEffect(()=> {
-        setTimeout( async ()=> {
-            const isConnected = await NetworkUtils.isNetworkAvailable()
-            if (isConnected != true) {
-              Alert.alert(
-                'CBEWS-L is not connected to the internet',
-                'CBEWS-L Local data will be used.',
-                [
-                  { text: 'Ok', onPress: () => {
-                    MobileCaching.getItem('UmiCurrentAlert').then(response => {
-                        init(response);
-                        setCurrentAlertData(response);
-                    });
-                  }, style: 'cancel' },
-                ]
-              )
-            } else {
-                fetchLatestData();
-            }
-          },100);
+        fetchLatestData();
     }, []);
 
+    const dummyData = {
+        "data": {
+          "extended": [], 
+          "latest": [], 
+          "overdue": [], 
+          "routine": {}
+        }, 
+        "message": "Success", 
+        "status": true
+      }
+
     const fetchLatestData = async () => {
-        let { status, data } = await AlertGeneration.UmiGetOngoingAndExtendedMonitoring();
-        console.log("response data", data);
+        let { status, data } = dummyData;
         if (status) {
             let key = "";
             if (data.latest.length > 0) key = "latest";
