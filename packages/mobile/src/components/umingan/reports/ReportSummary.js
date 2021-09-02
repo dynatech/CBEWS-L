@@ -42,6 +42,9 @@ function ReportSummary(props) {
         'report_date': 'YYYY-MM-DD'
     }];
 
+    const fetchLatestData = async () => {  
+    }
+
     const askPermission = async () => {
         try {
             const granted = await PermissionsAndroid.request(
