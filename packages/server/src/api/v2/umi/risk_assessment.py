@@ -422,9 +422,9 @@ def upload_hazard_map():
 
         file.save(os.path.join(Path(directory), temp))
 
-        return_data = { "status": True }
+        return_data = {"status": True, "message": "Successfully uploaded map"}
     except Exception as err:
         # raise err
-        return_data = { "status": False }
+        return_data = { "status": False, "message": "Failed to upload map" }
 
     return jsonify(return_data)

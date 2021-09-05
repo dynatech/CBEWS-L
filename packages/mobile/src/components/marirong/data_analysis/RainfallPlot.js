@@ -4,6 +4,7 @@ import { LabelStyle } from '../../../styles/label_style';
 import { ContainerStyle } from '../../../styles/container_style';
 import { RainfallGraph } from '../../utils/RainfallGraph';
 import { MarDataAnalysis } from '@dynaslope/commons';
+import MobileCaching from '../../../utils/MobileCaching';
 import NetworkUtils from '../../../utils/NetworkUtils';
 
 function RainfallPlot() {

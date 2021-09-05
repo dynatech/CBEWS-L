@@ -97,8 +97,8 @@ function ResourcesNCapacities(props) {
                 row.forEach(element => {
                     temp.push(
                         <DataTable.Row key={element.id} onPress={() => { modifySummary(element) }}>
-                            <DataTable.Cell>{element.resource_and_capacities}</DataTable.Cell>
-                            <DataTable.Cell>{element.status}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 150}}>{element.resource_and_capacities}</DataTable.Cell>
+                            <DataTable.Cell style={{width: 150}}>{element.status}</DataTable.Cell>
                             <DataTable.Cell>{element.owner}</DataTable.Cell>
                         </DataTable.Row>
                     )
@@ -317,14 +317,16 @@ function ResourcesNCapacities(props) {
                 <Text style={[LabelStyle.large_label, LabelStyle.brand]}>Resources and Capacities</Text>
                 <Text style={[LabelStyle.small_label, LabelStyle.brand]}>Resources Logs / Inventory</Text>
                 <View style={ContainerStyle.datatable_content}>
-                    <DataTable style={{ flex: 1, padding: 10, textAlign: 'center' }}>
-                        <DataTable.Header>
-                            <DataTable.Title>Resource / Capacity</DataTable.Title>
-                            <DataTable.Title>Status</DataTable.Title>
-                            <DataTable.Title>Owner</DataTable.Title>
-                        </DataTable.Header>
-                        { dataTableContent }
-                    </DataTable>
+                    <ScrollView horizontal={true}>
+                        <DataTable style={{ flex: 1, padding: 10, textAlign: 'center' }}>
+                            <DataTable.Header>
+                                <DataTable.Title style={{width: 150}}>Resource / Capacity</DataTable.Title>
+                                <DataTable.Title style={{width: 150}}>Status</DataTable.Title>
+                                <DataTable.Title>Owner</DataTable.Title>
+                            </DataTable.Header>
+                            { dataTableContent }
+                        </DataTable>
+                    </ScrollView>
                     <DataTable.Pagination
                         page={1}
                         numberOfPages={3}
