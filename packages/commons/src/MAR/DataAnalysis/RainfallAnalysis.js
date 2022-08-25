@@ -49,9 +49,8 @@ const GetRainfallAnalysis = () => {
     // .catch((error) => {
     //     console.error("Error on fetching rainfall analysis. Err: ", error);
     // });
-    let rainfall = require('../../../../web/public/dummy_data/rainfall.json');
-    console.log(rainfall);
-    return rainfall;
-}
-
+    return (
+        require('/home/pul/Desktop/CBEWS-L/packages/commons/src/MAR/DataAnalysis/rainfall.json')
+    );
+};
 export { GetRainfallPlotData, GetRainfallAnalysis, GetRainfallPlotDataWithDays }
