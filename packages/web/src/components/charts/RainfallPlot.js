@@ -312,7 +312,7 @@ export default function RainfallPlot(props) {
         if (cookies.credentials.site_code === "mar") {
             func = MarDataAnalysis
         }
-        const response = await MarDataAnalysis.GetRainfallPlotData();
+        const response = MarDataAnalysis.GetRainfallPlotData();
         if (response.status === true) {
             let rainfall_data = response.data[0];
             setRainfallData(rainfall_data);
