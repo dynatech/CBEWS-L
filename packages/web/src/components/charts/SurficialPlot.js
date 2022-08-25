@@ -134,7 +134,7 @@ export default function SurficialPlot(props) {
     }, [])
 
     const initSurficial = async () => {
-        const response = await MarDataAnalysis.GetSurficialPlotData();
+        const response = MarDataAnalysis.GetSurficialPlotData();
         if (response.status === true) {
             let { site_code, ts_start, ts_end } = response;
             let timestamps = { start: ts_start, end: ts_end };
