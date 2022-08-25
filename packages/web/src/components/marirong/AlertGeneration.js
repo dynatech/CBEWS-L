@@ -6,7 +6,7 @@ import { useStyles } from '../../styles/general_styles';
 export default function AlertGeneration () {
 
     // const [feature, setFeature] = useState(<LatestCurrentAlert />);
-    const [feature, setFeature] = useState(<LatestCurrentAlert />);
+    const [feature, setFeature] = useState();
     const [av, avActive] = useState("");
     const [lca, lcaActive] = useState("primary");
 
@@ -16,17 +16,17 @@ export default function AlertGeneration () {
             case "latest_current_alert":
                 lcaActive("primary");
                 avActive("");
-                return_feat = <LatestCurrentAlert />
+                // return_feat = <LatestCurrentAlert />
                 break;
             case "alert_validation":
                 lcaActive("");
                 avActive("primary");
-                return_feat = <AlertValidation />
+                // return_feat = <AlertValidation />
                 break;
             default:
                 lcaActive("primary")
                 avActive("");
-                return_feat = <LatestCurrentAlert />
+                // return_feat = <LatestCurrentAlert />
                 break;
         }
         setFeature(return_feat)
@@ -44,7 +44,9 @@ export default function AlertGeneration () {
                                     color={lca}
                                     aria-label="add"
                                     className={classes.menu}
-                                    onClick={() => { handleFeatureNav("latest_current_alert") }}>
+                                    onClick={() => { 
+                                        handleFeatureNav("latest_current_alert") 
+                                    }}>
                                     Latest Current Alert
                                 </Fab>
                             </Grid>
@@ -54,7 +56,9 @@ export default function AlertGeneration () {
                                     color={av}
                                     aria-label="add"
                                     className={classes.menu}
-                                    onClick={() => { handleFeatureNav("alert_validation") }}>
+                                    onClick={() => { 
+                                        handleFeatureNav("alert_validation") 
+                                    }}>
                                     Alert Validation
                                 </Fab>
                             </Grid>

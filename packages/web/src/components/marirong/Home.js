@@ -9,15 +9,17 @@ function LatestRainfall () {
     const [data, setData] = React.useState("loading");
     
     React.useEffect(() => {
+        console.log("dd");
         init();
     }, []);
 
     const init = async () => {
-        const response = await MarDataAnalysis.GetRainfallAnalysis();
-        if (response.status === true) {
-            console.log("success");
-            setData(response.data);
-        }
+        const response = MarDataAnalysis.GetRainfallAnalysis();
+        console.log(response);
+        // if (response.status === true) {
+        //     console.log("success");
+        //     setData(response.data);
+        // }
     }
     
     if (data === "loading"){
@@ -51,18 +53,19 @@ function LatestGroundMeas () {
     const [data, setData] = React.useState("loading");
     
     React.useEffect(() => {
+        console.log('ss');
         init();
     }, []);
 
     const init = async () => {
-        const response = await MarDataAnalysis.GetSurficialPlotAnalysis();
+        const response = MarDataAnalysis.GetSurficialPlotAnalysis();
         console.log("response", response);
-        if (response.status === true) {
-            console.log(response.message);
-            setData(response.data);
-        } else {
-            console.error(response.message);
-        }
+        // if (response.status === true) {
+        //     console.log(response.message);
+        //     setData(response.data);
+        // } else {
+        //     console.error(response.message);
+        // }
     }
 
     if (data === "loading"){
