@@ -8,6 +8,7 @@ function LatestRainfall() {
     const [data, setData] = React.useState("loading");
 
     React.useEffect(() => {
+        console.log("dd");
         init();
     }, []);
 
@@ -75,12 +76,12 @@ function LatestGroundMeas() {
     const [data, setData] = React.useState("loading");
 
     React.useEffect(() => {
+        console.log('ss');
         init();
     }, []);
 
     const init = async () => {
         const response = MarDataAnalysis.GetSurficialPlotAnalysis();
-        // console.log("response", response);
         // if (response.status === true) {
         //     console.log(response.message);
         //     setData(response.data);

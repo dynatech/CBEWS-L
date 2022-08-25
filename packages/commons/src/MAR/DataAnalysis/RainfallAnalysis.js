@@ -52,7 +52,5 @@ const GetRainfallAnalysis = () => {
     return (
         require('/home/pul/Desktop/CBEWS-L/packages/commons/src/MAR/DataAnalysis/rainfall.json')
     );
-    
 };
-
 export { GetRainfallPlotData, GetRainfallAnalysis, GetRainfallPlotDataWithDays }

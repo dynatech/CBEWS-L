@@ -3,10 +3,10 @@ import { Box, Grid, Typography, Fab } from '@material-ui/core';
 import phone_download from "../../assets/phone_download.png";
 import phiv_dyna from "../../assets/phiv_dyna.png";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
+import {createTheme} from '@material-ui/core/styles';
 import {ThemeProvider}  from "@material-ui/core/styles";
 
-const theme = createMuiTheme();
+const theme = createTheme();
 
 theme.typography.h3 = {
     fontSize: '2.3rem',
