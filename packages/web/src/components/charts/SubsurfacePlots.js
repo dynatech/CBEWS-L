@@ -368,7 +368,7 @@ export default function SubsurfaceColumnPositionPlot(props) {
     },[])
     
     const initSubsurface = async () => {
-        const response = await MarDataAnalysis.GetSubsurfacePlotData();
+        const response = MarDataAnalysis.GetSubsurfacePlotData();
         // hotfix
         if (response !== undefined) {
             if (response.status) {

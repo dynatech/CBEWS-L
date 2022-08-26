@@ -48,7 +48,7 @@ export default function EarthquakeData() {
     }, []);
 
     const initEarthquakeData = async () => {
-        const response = await MarSensorData.GetEarthquakeData();
+        const response = MarSensorData.GetEarthquakeData();
         console.log("response", response);
         if (response.status === true) {
             setRows(response.data);
