@@ -248,8 +248,9 @@ class AlertGeneration():
         schema = "senslopedb"
         result = DB.db_read(query, schema)
 
-        if not complete:
-            result = [result[0]]
+        print(result)
+        # if not complete:
+        #     result = [result[0]]
     
         return result
 

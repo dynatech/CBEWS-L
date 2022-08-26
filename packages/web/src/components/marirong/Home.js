@@ -234,7 +234,7 @@ export default function Home() {
                     <Typography variant="h6" align="center">
                         Latest Manifestations of Movement data
                     </Typography>
-                    {/* <LatestMoms /> */}
+                    <LatestMoms />
                 </Paper>
             </Grid>
         </Grid>
