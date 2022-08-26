@@ -89,7 +89,7 @@ function LatestGroundMeas() {
         //     console.error(response.message);
         // }
         // setData(response.data);
-        console.log(response);
+        // setData(response);
     };
 
     if (data === "loading") {
@@ -238,7 +238,7 @@ export default function Home() {
                     <Typography variant="h6" align="center">
                         Latest Manifestations of Movement data
                     </Typography>
-                    {/* <LatestMoms /> */}
+                    <LatestMoms />
                 </Paper>
             </Grid>
         </Grid>

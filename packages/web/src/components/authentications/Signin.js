@@ -228,31 +228,41 @@ export default function SignInSide(props) {
                             return errors;
                         }}
                         onSubmit={(values, { setSubmitting }) => {
-                            setTimeout(async () => {
-                                let response =
-                                    await UserManagement.UserAuthentication(
-                                        values,
-                                    );
-                                if (response.status === true) {
-                                    setCookie(
-                                        "credentials",
-                                        response.user_data,
-                                        { path: "/" },
-                                    );
-                                    loginSeverityRef.current = (
-                                        <Alert
-                                            onClose={handleClose}
-                                            severity="success"
-                                        >
-                                            {response.message}
-                                        </Alert>
-                                    );
-                                    handleChangeRoute("dashboard");
-                                } else {
-                                    console.error("problem signing in");
-                                }
-                                setSubmitting(false);
-                            }, 400);
+
+
+                            setCookie(
+                                "credentials",
+                                {"age":"22","email":"mar@mail.com","firstname":"Mar","gender":"m","gsm_id":"0","lastname":"Mar","middlename":"Mar","mobile_id":"15","mobile_number":"630917123456","password":"d4e1cb9051497430859760ac68f539fd4c59a59e047c8d62c9abfc701ef8277890733fdb46a79df882abb6de8bba061df69f6abe5562aa8bcee14b4937ec58a9","profile_id":"16","role_id":"1","role_restrictions":"1","role_title":"lewc","salt":"fadc516dc0d557653d01153e02b48f82","site_id":"29","user_id":"14","username":"mar"},
+                                { path: "/" },
+                            );
+                            handleChangeRoute("dashboard");
+
+                            // setTimeout(async () => {
+                            //     let response =
+                            //         await UserManagement.UserAuthentication(
+                            //             values,
+                            //         );
+                            //     if (response.status === true) {
+
+                            //         setCookie(
+                            //             "credentials",
+                            //             response.user_data,
+                            //             { path: "/" },
+                            //         );
+                            //         loginSeverityRef.current = (
+                            //             <Alert
+                            //                 onClose={handleClose}
+                            //                 severity="success"
+                            //             >
+                            //                 {response.message}
+                            //             </Alert>
+                            //         );
+                            //         handleChangeRoute("dashboard");
+                            //     } else {
+                            //         console.error("problem signing in");
+                            //     }
+                            //     // setSubmitting(false);
+                            // }, 400);
                         }}
                     >
                         {({

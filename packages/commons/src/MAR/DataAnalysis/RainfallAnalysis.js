@@ -50,7 +50,7 @@ const GetRainfallAnalysis = () => {
     //     console.error("Error on fetching rainfall analysis. Err: ", error);
     // });
     return (
-        require('/home/pul/Desktop/CBEWS-L/packages/commons/src/MAR/DataAnalysis/rainfall.json')
+        require('./rainfall.json')
     );
 };
 export { GetRainfallPlotData, GetRainfallAnalysis, GetRainfallPlotDataWithDays }

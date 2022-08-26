@@ -1,18 +1,19 @@
 import AppConfig from '../../utils/AppConfig';
 
 const GetHazardMaps = () => {
-    return fetch(`${AppConfig.HOSTNAME}/v2/get/community_risk_assessment/mar/hazard_map`, {
-        method: "GET",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-        },
-    })
-    .then((response) => response.json())
-    .then((responseJson) => {
-        return responseJson;
-    })
-    .catch((error) => console.error("Problem in commons GetHazMap", error));
+    // return fetch(`${AppConfig.HOSTNAME}/v2/get/community_risk_assessment/mar/hazard_map`, {
+    //     method: "GET",
+    //     headers: {
+    //         Accept: "application/json",
+    //         "Content-Type": "application/json",
+    //     },
+    // })
+    // .then((response) => response.json())
+    // .then((responseJson) => {
+    //     return responseJson;
+    // })
+    // .catch((error) => console.error("Problem in commons GetHazMap", error));
+    return require('./hazard_maps.json');
 };
 
 const GetHazardMapsGallery = () => {
@@ -28,6 +29,7 @@ const GetHazardMapsGallery = () => {
         return responseJson;
     })
     .catch((error) => console.error("Problem in commons GetHazMap", error));
+    // return require('./gallery.json');
 };
 
 const UploadHazardMaps = (data) => {

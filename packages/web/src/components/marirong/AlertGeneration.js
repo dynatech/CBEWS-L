@@ -16,17 +16,17 @@ export default function AlertGeneration () {
             case "latest_current_alert":
                 lcaActive("primary");
                 avActive("");
-                // return_feat = <LatestCurrentAlert />
+                return_feat = <LatestCurrentAlert />
                 break;
             case "alert_validation":
                 lcaActive("");
                 avActive("primary");
-                // return_feat = <AlertValidation />
+                return_feat = <AlertValidation />
                 break;
             default:
                 lcaActive("primary")
                 avActive("");
-                // return_feat = <LatestCurrentAlert />
+                return_feat = <LatestCurrentAlert />
                 break;
         }
         setFeature(return_feat)
