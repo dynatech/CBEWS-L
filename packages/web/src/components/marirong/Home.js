@@ -51,18 +51,20 @@ function LatestRainfall() {
                         {moment(data.data_ts).format("LLL")}
                     </span>
                 </Typography>
-                <Typography
-                    variant="h6"
-                    color="primary"
-                >{`1-day cumulative rainfall: ${data["1D cml"]} (${data["1_day_percent"]}% of threshold)`}</Typography>
-                <Typography
-                    variant="h6"
-                    color="secondary"
-                >{`3-day cumulative rainfall: ${data["3D cml"]} (${
-                    Math.round(
-                        (parseInt(data["3D cml"]) + Number.EPSILON) * 100,
-                    ) / 100
-                }% of threshold)`}</Typography>
+                <Typography variant="h6" color="primary">
+                    {`1-day cumulative rainfall: ${
+                        data["1D cml"]
+                    } mm (${Math.round(
+                        (data["1D cml"] / data["half of 2yr max"]) * 100,
+                    )}% of threshold)`}
+                </Typography>
+                <Typography variant="h6" color="primary">
+                    {`3-day cumulative rainfall: ${
+                        data["3D cml"]
+                    } mm (${Math.round(
+                        (data["3D cml"] / data["2yr max"]) * 100,
+                    )}% of threshold)`}
+                </Typography>
                 <Typography variant="body1">
                     DATA ANALYSIS:{"\n"}
                     {data["DataSource"]}
@@ -73,10 +75,10 @@ function LatestRainfall() {
 }
 
 function LatestGroundMeas() {
-    const [data, setData] = React.useState("loading");
+    const [data, setData] = React.useState("No data available");
 
     React.useEffect(() => {
-        console.log('ss');
+        console.log("ss");
         init();
     }, []);
 
@@ -89,35 +91,29 @@ function LatestGroundMeas() {
         //     console.error(response.message);
         // }
         // setData(response.data);
-        // setData(response);
     };
 
-    if (data === "loading") {
-        return (
-            <Grid item xs={12} align="center">
-                <Typography variant="h5" align="center" color="primary">
-                    Loading...
-                </Typography>
-            </Grid>
-        );
-    } else if (data.analysis === "No data available") {
-        return (
-            <Grid item xs={12} align="center">
-                <Typography variant="h5" align="center" color="secondary">
-                    No data available
-                </Typography>
-            </Grid>
-        );
-    } else {
-        return (
-            <Grid item align="center">
-                <Typography variant="body1">{data.surficial_plot}</Typography>
-                <br />
-                <br />
-                <Typography variant="body1">{data.analysis}</Typography>
-            </Grid>
-        );
-    }
+    return data === "loading" ? (
+        <Grid item xs={12} align="center">
+            <Typography variant="h5" align="center" color="primary">
+                Loading...
+            </Typography>
+        </Grid>
+    ) : data === "No data available" ? (
+        <Grid item xs={12} align="center">
+            <Typography variant="h5" align="center" color="secondary">
+                No data available
+            </Typography>
+        </Grid>
+    ) : (
+        <Grid item align="center">
+            {console.log("data.surficial_plot:", data.surficial_plot)}
+            <Typography variant="body1">{data.surficial_plot}</Typography>
+            <br />
+            <br />
+            <Typography variant="body1">{data.analysis}</Typography>
+        </Grid>
+    );
 }
 
 function LatestMoms() {

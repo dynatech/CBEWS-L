@@ -36,6 +36,7 @@ const GetSurficialPlotAnalysis = () => {
     // });
 
     let surficial = require('../../../../web/public/dummy_data/surficial.json');
+    console.log(surficial)
     return surficial;
 };
 
