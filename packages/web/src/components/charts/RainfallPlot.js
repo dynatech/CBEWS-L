@@ -40,14 +40,18 @@ const tableStyle = makeStyles(theme => ({
     },
 }));
 
-function prepareRainfallData(set) {
+function prepareRainfallData(raw) {
+    let set = {...raw}
     const series_data = [];
     const max_rval_data = [];
     const hr_24 = [];
     const hr_72 = [];
     const rain = [];
     const max_72h = 0;
+    // console.log(set);
 
+    // let dataKeys = Object.keys(set.data);
+    // console.log(dataKeys);
     set.data.forEach((hr24) => {
         hr_24.push([moment(hr24.ts).unix(), hr24['24hr cumulative rainfall']])
     })
@@ -305,6 +309,7 @@ export default function RainfallPlot(props) {
 
     useEffect(() => {
         initRainfall(cookies.credentials.site_code)
+        console.log("fs")
     }, [])
 
     const initRainfall = async () => {
@@ -312,11 +317,15 @@ export default function RainfallPlot(props) {
         if (cookies.credentials.site_code === "mar") {
             func = MarDataAnalysis
         }
+        
         const response = MarDataAnalysis.GetRainfallPlotData();
+        // console.log(response);
         if (response.status === true) {
+            
             let rainfall_data = response.data[0];
             setRainfallData(rainfall_data);
             prepRainPlot(rainfall_data.plot, rainfall_data.ts_start, rainfall_data.ts_end);
+            
         } else {
             console.error(response.message);
         }
@@ -329,6 +338,7 @@ export default function RainfallPlot(props) {
         });
         setOptions(renderGraph(processed_data, ts_start, ts_end))
         setLoadGraph(true);
+      
     }
 
     const renderGraph = (processed_data, start, end) => {

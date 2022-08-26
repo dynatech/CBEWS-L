@@ -15,7 +15,7 @@ const GetSurficialPlotData = () => {
     // .catch((error) => {
     //     console.error("Error on fetching all surficial markers data. Err: ", error);
     // });
-    let surficial = require('../../../../web/public/dummy_data/surficial.json');
+    let surficial = require('../DataAnalysis/surficial.json');
     return surficial;
 };
 
@@ -35,7 +35,7 @@ const GetSurficialPlotAnalysis = () => {
     //     console.error("Error on fetching surficial analysis. Err: ", error);
     // });
 
-    let surficial = require('../../../../web/public/dummy_data/surficial.json');
+    let surficial = require('../DataAnalysis/surficial.json');
     return surficial;
 };
 
