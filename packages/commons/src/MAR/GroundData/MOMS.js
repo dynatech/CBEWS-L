@@ -37,20 +37,21 @@ const UpdateMOMSData = (data) => {
 };
 
 const GetMOMSData = () => {
-  return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/mar/moms`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => response.json())
-    .then((responseJson) => {
-      return responseJson;
-    })
-    .catch((error) => {
-      console.error("Error on fetching all moms data. Err: ", error);
-    });
+  // return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/mar/moms`, {
+  //   method: "GET",
+  //   headers: {
+  //     Accept: "application/json",
+  //     "Content-Type": "application/json",
+  //   },
+  // })
+  //   .then((response) => response.json())
+  //   .then((responseJson) => {
+  //     return responseJson;
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error on fetching all moms data. Err: ", error);
+  //   });
+  return require('./moms.json')
 };
 
 const DeleteMOMSData = (data) => {
@@ -91,20 +92,21 @@ const InsertMomsFeatureType = (data) => {
 
 const FetchMoMSFeatures = () => {
   // return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types/${site_id}`, {
-  return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => response.json())
-    .then((responseJson) => {
-      return responseJson;
-    })
-    .catch((error) => {
-      console.error("Error on fetching all moms feature types. Err: ", error);
-    });
+  // return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/feature/types`, {
+  //   method: "GET",
+  //   headers: {
+  //     Accept: "application/json",
+  //     "Content-Type": "application/json",
+  //   },
+  // })
+  //   .then((response) => response.json())
+  //   .then((responseJson) => {
+  //     return responseJson;
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error on fetching all moms feature types. Err: ", error);
+  //   });
+  return require('./moms_types.json')
 }
 
 const FetchOneMoMSFeatures = (feature_type, site_id) => {
@@ -197,20 +199,21 @@ const GetMomsInstancesPerType = (feature_id, site_id) => {
 };
 
 const GetMomsInstancesPerSite = (site_id) => {
-  return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/instance/${site_id}`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => response.json())
-    .then((responseJson) => {
-      return responseJson;
-    })
-    .catch((error) => {
-      console.error("Error on fetching all moms features. Err: ", error);
-    });
+  // return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/moms/instance/${site_id}`, {
+  //   method: "GET",
+  //   headers: {
+  //     Accept: "application/json",
+  //     "Content-Type": "application/json",
+  //   },
+  // })
+  //   .then((response) => response.json())
+  //   .then((responseJson) => {
+  //     return responseJson;
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error on fetching all moms features. Err: ", error);
+  //   });
+  return require('./moms_instances.json')
 };
 
 const UpdateMomsInstance = (data) => {
