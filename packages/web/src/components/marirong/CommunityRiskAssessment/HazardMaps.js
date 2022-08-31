@@ -70,6 +70,15 @@ export default function HazardMaps() {
                 console.error(response.message);
             }
         }
+        // let gallery_raw = require('@dynaslope/commons/src/MAR/CommunityRiskAssessment/gallery.json')
+        // let map_raw = require('@dynaslope/commons/src/MAR/CommunityRiskAssessment/hazard_maps.json')
+        // setMapList([
+        //     require('../../../assets/hazard_map_01.jpg')
+        // ])
+        // setMapPreview(map_raw.data[0].filename)
+        // // console.log(require('@dynaslope/commons/src/MAR/CommunityRiskAssessment/gallery.json'))
+        // // setMapPreview(require('@dynaslope/commons/src/MAR/CommunityRiskAssessment/hazard_maps.json'))
+        // console.log(require('@dynaslope/commons/src/MAR/CommunityRiskAssessment/hazard_maps.json'))
     };
 
     const handleFileSelection = (event) => {

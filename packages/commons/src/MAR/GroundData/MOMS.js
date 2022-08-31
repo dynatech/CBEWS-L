@@ -37,20 +37,22 @@ const UpdateMOMSData = (data) => {
 };
 
 const GetMOMSData = () => {
-  return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/mar/moms`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => response.json())
-    .then((responseJson) => {
-      return responseJson;
-    })
-    .catch((error) => {
-      console.error("Error on fetching all moms data. Err: ", error);
-    });
+  // return fetch(`${AppConfig.HOSTNAME}/v2/get/ground_data/mar/moms`, {
+  //   method: "GET",
+  //   headers: {
+  //     Accept: "application/json",
+  //     "Content-Type": "application/json",
+  //   },
+  // })
+  //   .then((response) => response.json())
+  //   .then((responseJson) => {
+  //     return responseJson;
+  //   })
+  //   .catch((error) => {
+  //     console.error("Error on fetching all moms data. Err: ", error);
+  //   });
+
+  return require('../../dummy_data/get_moms_data.json')
 };
 
 const DeleteMOMSData = (data) => {

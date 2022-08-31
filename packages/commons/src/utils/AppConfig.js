@@ -3,7 +3,7 @@
 // const AppDir = "/home/pulidongz/Projects/CBEWS-L"
 
  const web_ip = "https://dynaslope.phivolcs.dost.gov.ph"
-// const web_ip = "http://192.168.0.172"
+// const web_ip = "http://localhost"
 
 const AppConfig = {
     HOSTNAME: `${web_ip}:5000`,
