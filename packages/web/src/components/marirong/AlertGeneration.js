@@ -1,12 +1,12 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
 import { Container, Grid, Fab } from '@material-ui/core';
 import { AlertValidation, LatestCurrentAlert } from './AlertGenerationFeature';
 import { useStyles } from '../../styles/general_styles';
 
 export default function AlertGeneration () {
 
-    // const [feature, setFeature] = useState(<LatestCurrentAlert />);
-    const [feature, setFeature] = useState();
+    const [feature, setFeature] = useState(<LatestCurrentAlert />);
+    // const [feature, setFeature] = useState();
     const [av, avActive] = useState("");
     const [lca, lcaActive] = useState("primary");
 

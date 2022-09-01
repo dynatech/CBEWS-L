@@ -63,7 +63,7 @@ function AlertValidation() {
 
     useEffect(() => {
         // GET CANDIDATE TRIGGER
-        updateAlertGen();
+        // updateAlertGen();
     }, []);
 
     function handleFeatureNav(feature) {
@@ -246,8 +246,6 @@ function AlertValidation() {
                 setRow(release_triggers);
             })
             .catch((error) => {
-                console.log(error);
-
                 setOpenNotif(true);
                 setNotifText("Problem in updating candidate data.");
                 setNotifStatus("error");
@@ -436,9 +434,10 @@ function AlertValidation() {
                             variant="h5"
                             className={[classes.label_paddings]}
                         >
-                            As of {as_of_ts}
+                            {/* As of {as_of_ts} */}
+                            As of September 3, 2022 14:00:00
                         </Typography>
-                        {public_alert}
+                        {/* {public_alert} */}
                         <Typography
                             variant="h5"
                             className={[classes.label_paddings]}
@@ -520,8 +519,6 @@ function AlertValidation() {
 function CurrentAlertArea(props) {
     const { leo, classes, actions } = props;
     const { sendEmail, download, print } = actions;
-
-    console.log(JSON.stringify(leo));
     const prepareTriggers = (triggers) => {
         if (triggers.length > 0) {
             return triggers.map((trigger) => {
@@ -544,15 +541,17 @@ function CurrentAlertArea(props) {
         }
     };
 
+    // if (leo === null) {
+    //     return (
+    //         <Grid item xs={12} align="center">
+    //             <Typography variant="h4" align="center">
+    //                 Loading...
+    //             </Typography>
+    //         </Grid>
+    //     );
+    // } else 
+    // if (leo === "no_alert") {
     if (leo === null) {
-        return (
-            <Grid item xs={12} align="center">
-                <Typography variant="h4" align="center">
-                    Loading...
-                </Typography>
-            </Grid>
-        );
-    } else if (leo === "no_alert") {
         return (
             <Grid item xs={12} align="center">
                 <Typography variant="h2" align="center">
@@ -739,14 +738,12 @@ function LatestCurrentAlert() {
     const [notifText, setNotifText] = useState("");
     const [notifStatus, setNotifStatus] = useState("success");
 
-    // useEffect(() => {
-    //     initLatestCurrentAlert();
-    // }, []);
+    useEffect(() => {
+        // initLatestCurrentAlert();
+    }, []);
 
     const initLatestCurrentAlert = async () => {
-        const response =
-            await AlertGeneration.MarGetOngoingAndExtendedMonitoring();
-        console.log("response", response);
+        const response = await AlertGeneration.MarGetOngoingAndExtendedMonitoring();
         const { data, status } = response;
         if (status) {
             const temp = [...data.latest, ...data.overdue, ...data.extended];
